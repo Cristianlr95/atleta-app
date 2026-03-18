@@ -1,0 +1,7 @@
+<div class="venue-map" *ngIf="resolvedCoordinates; else noMap">
+  <div #mapContainer class="venue-map__container" role="application" aria-label="Mapa de cancha seleccionada"></div>
+</div>
+
+<ng-template #noMap>
+  <p class="venue-map__fallback">La cancha no tiene coordenadas disponibles.</p>
+</ng-template>

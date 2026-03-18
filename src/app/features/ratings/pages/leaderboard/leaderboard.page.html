@@ -1,0 +1,84 @@
+<ion-content class="leaderboard-bg">
+  <div class="leaderboard-container">
+    <app-metallic-card title="Ranking competitivo" [titleIconAsset]="titleIconAsset">
+      <app-metallic-form-section
+        title="Ranking"
+        [titleIconAsset]="overallSectionIconAsset"
+        description="Compara el rendimiento global y el de tu equipo.">
+
+        <div class="leaderboard-scope" role="tablist" aria-label="Alcance del ranking">
+          <button
+            type="button"
+            class="leaderboard-scope__item"
+            [class.leaderboard-scope__item--active]="selectedScope === 'PLATFORM'"
+            (click)="onScopeChange('PLATFORM')">
+            Plataforma
+          </button>
+          <button
+            type="button"
+            class="leaderboard-scope__item"
+            [class.leaderboard-scope__item--active]="selectedScope === 'TEAM'"
+            (click)="onScopeChange('TEAM')">
+            Mi equipo
+          </button>
+        </div>
+
+        <div class="leaderboard-mode" *ngIf="selectedScope === 'PLATFORM'" role="tablist" aria-label="Modo de ranking plataforma">
+          <button
+            type="button"
+            class="leaderboard-mode__item"
+            [class.leaderboard-mode__item--active]="selectedMode === 'OVERALL'"
+            (click)="onModeChange('OVERALL')">
+            OVR global
+          </button>
+          <button
+            type="button"
+            class="leaderboard-mode__item"
+            [class.leaderboard-mode__item--active]="selectedMode === 'ROLE'"
+            (click)="onModeChange('ROLE')">
+            Por posicion
+          </button>
+        </div>
+
+        <div class="leaderboard-roles" *ngIf="selectedScope === 'PLATFORM' && selectedMode === 'ROLE'" role="tablist" aria-label="Filtro de posiciones">
+          <button
+            *ngFor="let option of roleOptions"
+            type="button"
+            class="leaderboard-roles__item"
+            [class.leaderboard-roles__item--active]="selectedRole === option.role"
+            (click)="onSelectRole(option.role)">
+            <ion-icon [src]="option.iconAsset" aria-hidden="true"></ion-icon>
+            <span>{{ option.label }}</span>
+          </button>
+        </div>
+
+        <div class="leaderboard-team-select" *ngIf="selectedScope === 'TEAM'">
+          <app-metallic-select
+            label="Equipo"
+            [options]="teamOptions"
+            [ngModel]="selectedTeamValue"
+            (ngModelChange)="onTeamChange($event)">
+          </app-metallic-select>
+        </div>
+
+        <p class="leaderboard-current" *ngIf="currentUserPositionText">{{ currentUserPositionText }}</p>
+
+        <p *ngIf="modeLoading" class="leaderboard-message">Actualizando ranking...</p>
+        <p *ngIf="modeError" class="leaderboard-message leaderboard-message--error">{{ modeError }}</p>
+        <button *ngIf="modeError" type="button" class="leaderboard-retry" (click)="onRetryActive()">Reintentar</button>
+
+        <app-metallic-leaderboard
+          [title]="modeTitle"
+          [rows]="modeRows"
+          [currentPlayerId]="currentUserId">
+        </app-metallic-leaderboard>
+      </app-metallic-form-section>
+    </app-metallic-card>
+  </div>
+</ion-content>
+
+<ion-footer class="leaderboard-footer" translucent>
+  <ion-toolbar>
+    <app-metallic-bottom-nav [items]="bottomNavItems" (itemSelected)="onNavItemSelected($event)"></app-metallic-bottom-nav>
+  </ion-toolbar>
+</ion-footer>

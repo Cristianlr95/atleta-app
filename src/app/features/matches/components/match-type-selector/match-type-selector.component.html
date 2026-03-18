@@ -1,0 +1,12 @@
+﻿<div class="type-grid">
+  <button
+    type="button"
+    *ngFor="let option of options"
+    class="type-card"
+    [class.type-card--selected]="selectedType === option.type"
+    (click)="onSelect(option.type)">
+    <p class="type-card__title">{{ option.title }}</p>
+    <p class="type-card__description">{{ option.description }}</p>
+  </button>
+</div>
+

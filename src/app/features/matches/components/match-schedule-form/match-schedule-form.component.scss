@@ -1,0 +1,29 @@
+﻿.schedule-form {
+  display: grid;
+  gap: 10px;
+}
+
+.schedule-form__datetime {
+  --background: rgba(14, 22, 36, 0.78);
+  --color: #eaf2ff;
+  border: 1px solid rgba(130, 155, 189, 0.32);
+  border-radius: 10px;
+}
+
+.schedule-form__grid {
+  display: grid;
+  gap: 8px;
+  grid-template-columns: 1fr 1fr;
+}
+
+.schedule-form__meta {
+  margin: 0;
+  color: #9dc0f8;
+  font-size: 12px;
+}
+
+.schedule-form__error {
+  margin: 0;
+  color: #ffb5b5;
+  font-size: 12px;
+}

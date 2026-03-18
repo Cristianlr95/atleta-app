@@ -1,0 +1,41 @@
+.venue-create-bg {
+  --background: none;
+  background:
+    linear-gradient(rgba(10, 12, 20, 0.78), rgba(10, 12, 20, 0.9)),
+    url('/assets/backgrounds/stadium.png');
+  background-size: cover;
+  background-position: center;
+}
+
+.venue-create-container {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px 14px 90px;
+}
+
+.venue-create__header {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.venue-create__header p {
+  margin: 0;
+  color: #d7e6ff;
+  font-size: 13px;
+}
+
+.venue-create__coords {
+  margin: 8px 0 0;
+  color: #b8c9e3;
+  font-size: 12px;
+}
+
+.venue-create__error {
+  margin: 8px 0 0;
+  color: #ffb6b6;
+  font-size: 12px;
+}

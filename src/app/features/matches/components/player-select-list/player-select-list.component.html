@@ -1,0 +1,46 @@
+<div class="player-toolbar">
+  <p class="player-toolbar__meta">Invitados: {{ selectedIds.length }}</p>
+  <div class="player-toolbar__actions">
+    <button type="button" (click)="onSelectAll()">Seleccionar todos</button>
+    <button type="button" (click)="onClear()">Limpiar</button>
+  </div>
+</div>
+
+<p class="player-state" *ngIf="loading">Cargando jugadores del equipo...</p>
+
+<div class="player-list" *ngIf="!loading">
+  <label class="player-row" *ngFor="let player of players">
+    <div class="player-row__avatar">{{ player.name.slice(0, 1).toUpperCase() }}</div>
+    <div class="player-row__info">
+      <p>{{ player.name }}</p>
+      <span>OVR {{ player.ovr ?? 65 }} | {{ player.position }}</span>
+    </div>
+    <ion-checkbox [checked]="isSelected(player.uuid)" (ionChange)="onToggle(player.uuid, !!$event.detail.checked)"></ion-checkbox>
+  </label>
+</div>
+
+<div class="team-preview" *ngIf="!loading && selectedIds.length > 1">
+  <div class="team-preview__head">
+    <p>Equipos sugeridos (equitativo)</p>
+    <span>{{ balanceLabel }}</span>
+  </div>
+  <div class="team-preview__actions">
+    <button type="button" (click)="equilibrarPartido()">Equilibrar partido</button>
+  </div>
+
+  <div class="team-preview__grid">
+    <section class="team-preview__column">
+      <h4>Local</h4>
+      <p class="team-preview__level">Nivel estimado: {{ homeAverageOvr }}</p>
+      <p class="team-preview__stars">{{ homeStars }}</p>
+      <p *ngFor="let player of balancedHome">OVR {{ player.ovr ?? 65 }} | {{ player.name }}</p>
+    </section>
+
+    <section class="team-preview__column">
+      <h4>Rival</h4>
+      <p class="team-preview__level">Nivel estimado rival: {{ awayAverageOvr }}</p>
+      <p class="team-preview__stars">{{ awayStars }}</p>
+      <p *ngFor="let player of balancedAway">OVR {{ player.ovr ?? 65 }} | {{ player.name }}</p>
+    </section>
+  </div>
+</div>

@@ -1,0 +1,68 @@
+﻿.metallic-select-wrapper {
+  width: 100%;
+}
+
+.metallic-select__label {
+  display: block;
+  color: #c0c8d8;
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-family: 'Orbitron', sans-serif;
+  font-weight: 600;
+  font-size: 12px;
+}
+
+.metallic-select {
+  position: relative;
+}
+
+.metallic-select__field {
+  width: 100%;
+  padding: 14px;
+  background: #1a1d2e;
+  border: 2px solid #3a3f54;
+  border-radius: 12px;
+  color: #e8e8f0;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 14px;
+  transition: all 0.2s ease;
+  outline: none;
+  appearance: none;
+  cursor: pointer;
+
+  &:hover:not(:disabled) {
+    border-color: #7a8aa0;
+  }
+
+  &:focus {
+    border-color: #c0c8d8;
+    box-shadow: 0 0 20px rgba(192, 200, 216, 0.3);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.metallic-select::after {
+  content: '';
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  width: 8px;
+  height: 8px;
+  border-right: 2px solid #c0c8d8;
+  border-bottom: 2px solid #c0c8d8;
+  transform: translateY(-70%) rotate(45deg);
+  pointer-events: none;
+}
+
+.metallic-select__shine {
+  position: absolute;
+  inset: 0;
+  border-radius: 12px;
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.05), transparent);
+  pointer-events: none;
+}

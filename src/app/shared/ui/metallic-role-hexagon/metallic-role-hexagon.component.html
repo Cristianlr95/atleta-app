@@ -1,0 +1,60 @@
+﻿<div class="metallic-role-hexagon" [class.metallic-role-hexagon--compact]="compact">
+  <div class="metallic-role-hexagon__header">
+    <h3 class="metallic-role-hexagon__title">{{ title }}</h3>
+    <p class="metallic-role-hexagon__subtitle">{{ subtitle }}</p>
+  </div>
+
+  <div class="metallic-role-hexagon__chart-wrap">
+    <svg
+      class="metallic-role-hexagon__chart"
+      [attr.viewBox]="'0 0 ' + size + ' ' + size"
+      role="img"
+      [attr.aria-label]="title">
+      <g class="metallic-role-hexagon__grid">
+        <polygon
+          *ngFor="let level of gridLevels"
+          [attr.points]="levelPolygonPoints(level)">
+        </polygon>
+
+        <line
+          *ngFor="let axis of axisPoints"
+          [attr.x1]="center"
+          [attr.y1]="center"
+          [attr.x2]="axis.x"
+          [attr.y2]="axis.y">
+        </line>
+      </g>
+
+      <polygon class="metallic-role-hexagon__shape" [attr.points]="shapePoints"></polygon>
+
+      <g *ngFor="let point of points" class="metallic-role-hexagon__point-group">
+        <circle class="metallic-role-hexagon__point" [attr.cx]="point.x" [attr.cy]="point.y" r="4"></circle>
+        <text class="metallic-role-hexagon__label" [attr.x]="point.labelX" [attr.y]="point.labelY">
+          {{ roleLabel(point.role) }}
+        </text>
+        <text class="metallic-role-hexagon__value" [attr.x]="point.labelX" [attr.y]="point.labelY + 12">
+          {{ point.rating }}
+        </text>
+      </g>
+    </svg>
+  </div>
+
+  <div class="metallic-role-hexagon__summary">
+    <button type="button" class="metallic-role-hexagon__chip" (click)="showSummaryInfo('overall')">
+      <ion-icon [src]="starIconAsset"></ion-icon>
+      <span>Nivel General: {{ displayOverall }}</span>
+    </button>
+    <button type="button" class="metallic-role-hexagon__chip" (click)="showSummaryInfo('bestRole')">
+      <ion-icon [src]="medalIconAsset"></ion-icon>
+      <span>Rol Destacado: {{ roleLabel(displayBestRole.role) }} ({{ displayBestRole.rating }})</span>
+    </button>
+    <button type="button" class="metallic-role-hexagon__chip" (click)="showSummaryInfo('versatility')">
+      <ion-icon [src]="trophyIconAsset"></ion-icon>
+      <span>Indice de Versatilidad: {{ displayVersatility }}%</span>
+    </button>
+  </div>
+
+  <p class="metallic-role-hexagon__classification" [ngClass]="classificationClassName">
+    Nivel competitivo: {{ overallClassification }}
+  </p>
+</div>

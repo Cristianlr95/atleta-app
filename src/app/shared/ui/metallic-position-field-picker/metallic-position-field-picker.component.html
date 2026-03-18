@@ -1,0 +1,47 @@
+﻿<div class="field-picker" [class.field-picker--disabled]="disabled">
+  <div
+    class="field-picker__pitch"
+    [attr.role]="isMultiSelectMode ? 'group' : 'radiogroup'"
+    [attr.aria-label]="
+      isMultiSelectMode
+        ? 'Selecciona tus posiciones por orden de prioridad'
+        : 'Selecciona tu posicion principal'
+    ">
+    <div class="field-picker__line field-picker__line--mid"></div>
+    <div class="field-picker__circle"></div>
+    <div class="field-picker__box field-picker__box--top"></div>
+    <div class="field-picker__box field-picker__box--bottom"></div>
+    <div class="field-picker__goal field-picker__goal--top"></div>
+    <div class="field-picker__goal field-picker__goal--bottom"></div>
+
+    <button
+      *ngFor="let node of nodes"
+      type="button"
+      class="field-picker__position"
+      [class.field-picker__position--active]="isSelected(node.value)"
+      [style.left.%]="node.x"
+      [style.top.%]="node.y"
+      [attr.aria-pressed]="isSelected(node.value)"
+      [attr.aria-label]="node.label"
+      [disabled]="disabled"
+      (click)="onSelect(node.value)">
+      <span class="field-picker__order" *ngIf="selectedOrder(node.value) as order">{{ order }}</span>
+      <ion-icon [src]="isSelected(node.value) ? selectedIconAsset : defaultIconAsset" aria-hidden="true"></ion-icon>
+      <span>{{ shortLabel(node.label) }}</span>
+    </button>
+  </div>
+
+  <p class="field-picker__selected" *ngIf="!isMultiSelectMode && selectedValue">
+    Posicion seleccionada:
+    <strong>{{ selectedLabel }}</strong>
+  </p>
+
+  <p class="field-picker__selected" *ngIf="isMultiSelectMode && selectedLabels.length > 0">
+    Posiciones elegidas:
+    <strong>{{ selectedLabels.join(' / ') }}</strong>
+  </p>
+
+  <p class="field-picker__hint" *ngIf="isMultiSelectMode">
+    Elige hasta {{ maxSelections }} y se guardan por orden (1, 2, 3).
+  </p>
+</div>

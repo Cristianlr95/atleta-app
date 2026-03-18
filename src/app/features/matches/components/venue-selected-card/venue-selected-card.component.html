@@ -1,0 +1,12 @@
+<div class="venue-selected" *ngIf="venue; else emptyState">
+  <p class="venue-selected__title">{{ venue.name }}</p>
+  <p class="venue-selected__meta"><strong>Direccion:</strong> {{ venue.address || 'Sin direccion' }}</p>
+  <p class="venue-selected__meta"><strong>Ciudad:</strong> {{ venue.city || 'Sin ciudad' }}</p>
+  <div class="venue-selected__actions">
+    <app-metallic-button type="button" variant="secondary" (click)="onOpenMaps()">Abrir en Maps</app-metallic-button>
+  </div>
+</div>
+
+<ng-template #emptyState>
+  <p class="venue-selected__empty">Busca una cancha para abrir ubicacion.</p>
+</ng-template>

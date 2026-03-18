@@ -1,0 +1,95 @@
+.match-detail-bg {
+  --background: none;
+  --atleta-icon-color: #ebf6ff;
+  --atleta-icon-glow-main: rgba(136, 216, 255, 0.72);
+  --atleta-icon-glow-deep: rgba(36, 104, 146, 0.56);
+  --atleta-icon-nav-main: rgba(145, 221, 255, 0.8);
+  --atleta-icon-nav-deep: rgba(30, 88, 128, 0.62);
+  background:
+    linear-gradient(rgba(10, 12, 20, 0.8), rgba(10, 12, 20, 0.92)),
+    url('/assets/backgrounds/stadium.png');
+  background-size: cover;
+}
+
+.match-detail-container {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px 14px 90px;
+}
+
+.match-detail-feedback {
+  margin: 0 0 8px;
+  border: 1px solid rgba(99, 198, 255, 0.45);
+  border-radius: 10px;
+  background: rgba(11, 24, 36, 0.78);
+  color: #c6e7ff;
+  font-size: 12px;
+  padding: 8px 10px;
+}
+
+.match-detail-feedback--success {
+  border-color: rgba(124, 233, 168, 0.45);
+  background: rgba(12, 38, 27, 0.75);
+  color: #b9f2cc;
+}
+
+.match-detail-feedback--error {
+  border-color: rgba(255, 130, 130, 0.5);
+  background: rgba(48, 14, 18, 0.78);
+  color: #ffd0d0;
+}
+
+.match-detail-live {
+  margin: 8px 0 0;
+  color: #a2c4e6;
+  font-size: 11px;
+}
+
+.match-detail-retry {
+  margin: 0 0 10px;
+  display: flex;
+  justify-content: center;
+}
+
+.match-detail-impact {
+  border: 1px solid rgba(127, 154, 186, 0.35);
+  border-radius: 10px;
+  background: rgba(12, 19, 31, 0.7);
+  padding: 10px;
+}
+
+.match-detail-impact p {
+  margin: 0;
+  color: #c7dcf3;
+  font-size: 12px;
+}
+
+.match-detail-impact p + p {
+  margin-top: 6px;
+}
+
+.match-detail-actions {
+  display: grid;
+  gap: 8px;
+}
+
+.match-detail-events-form {
+  display: grid;
+  gap: 10px;
+}
+
+.match-detail-footer ion-toolbar {
+  --background: rgba(6, 10, 20, 0.92);
+  --border-color: transparent;
+  padding: 6px 8px calc(env(safe-area-inset-bottom) + 8px);
+}
+
+@media (min-width: 720px) {
+  .match-detail-actions {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+

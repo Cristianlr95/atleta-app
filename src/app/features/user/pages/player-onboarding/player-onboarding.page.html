@@ -1,0 +1,85 @@
+﻿<ion-content class="onboarding-bg">
+  <div class="onboarding-container">
+    <app-metallic-card title="Configura tu jugador" [titleIconAsset]="titleIconAsset">
+      <form class="onboarding-form" [formGroup]="onboardingForm" (ngSubmit)="onFinishSetup()">
+        <app-metallic-form-section
+          title="Perfil"
+          [titleIconAsset]="profileSectionIconAsset"
+          description="Define tu alias visible para la comunidad.">
+          <app-metallic-input
+            formControlName="alias"
+            label="Alias"
+            type="text"
+            placeholder="Ej: El10">
+          </app-metallic-input>
+          <app-metallic-select
+            formControlName="genero"
+            label="Genero"
+            placeholder="Selecciona genero"
+            [options]="genderOptions">
+          </app-metallic-select>
+          <p *ngIf="onboardingForm.controls.genero.touched && onboardingForm.controls.genero.invalid" class="onboarding-error">
+            Debes seleccionar genero.
+          </p>
+        </app-metallic-form-section>
+
+        <app-metallic-form-section
+          class="onboarding-position-section"
+          title="Posiciones por prioridad"
+          [titleIconAsset]="positionSectionIconAsset"
+          description="Selecciona 3 posiciones distintas en el mismo mapa. El orden define prioridad 1, 2 y 3.">
+          <app-metallic-position-field-picker
+            [options]="positionOptions"
+            [selectedValues]="selectedPositionIds"
+            [maxSelections]="3"
+            [disabled]="isLoadingPositions || isSubmitting"
+            (selectedValuesChange)="onPositionsSelected($event)">
+          </app-metallic-position-field-picker>
+
+          <p *ngIf="isLoadingPositions" class="onboarding-info">Cargando posiciones...</p>
+
+          <p
+            *ngIf="onboardingForm.controls.primaryPositionId.touched && onboardingForm.controls.primaryPositionId.invalid"
+            class="onboarding-error">
+            Debes seleccionar la posicion principal.
+          </p>
+
+          <p
+            *ngIf="onboardingForm.controls.secondaryPositionId.touched && onboardingForm.controls.secondaryPositionId.invalid"
+            class="onboarding-error">
+            Debes seleccionar la posicion secundaria.
+          </p>
+
+          <p
+            *ngIf="onboardingForm.controls.tertiaryPositionId.touched && onboardingForm.controls.tertiaryPositionId.invalid"
+            class="onboarding-error">
+            Debes seleccionar la posicion terciaria.
+          </p>
+
+          <p
+            *ngIf="onboardingForm.hasError('duplicatePositions') && onboardingForm.touched"
+            class="onboarding-error">
+            Debes elegir tres posiciones distintas.
+          </p>
+        </app-metallic-form-section>
+
+        <p *ngIf="submitError" class="onboarding-error">{{ submitError }}</p>
+        <app-metallic-button
+          *ngIf="submitError && !isSubmitting"
+          type="button"
+          variant="secondary"
+          (click)="onRetryLoadPositions()">
+          Reintentar carga
+        </app-metallic-button>
+
+        <app-metallic-button
+          class="onboarding-submit"
+          type="submit"
+          variant="primary"
+          [disabled]="onboardingForm.invalid || isSubmitting || isLoadingPositions">
+          {{ isSubmitting ? 'Guardando...' : 'Finalizar configuracion' }}
+        </app-metallic-button>
+      </form>
+    </app-metallic-card>
+  </div>
+</ion-content>

@@ -1,0 +1,80 @@
+<ion-content class="matches-create-bg">
+  <div class="matches-create-container">
+    <app-page-nav></app-page-nav>
+    <app-metallic-card title="Crear Partido" [titleIconAsset]="titleIconAsset">
+      <p class="wizard-head">Paso {{ step() }}/{{ totalSteps }}</p>
+      <app-metallic-progress [value]="step()" [max]="totalSteps" label="Progreso" [showValue]="true"></app-metallic-progress>
+
+      <div class="wizard-actions">
+        <app-metallic-button type="button" variant="secondary" [disabled]="step() === 1" (click)="onPrevious()">Anterior</app-metallic-button>
+        <app-metallic-button type="button" variant="secondary" [disabled]="!canContinue() || step() === totalSteps" (click)="onContinue()">Continuar</app-metallic-button>
+      </div>
+
+      <app-metallic-form-section *ngIf="step() === 1" title="Tipo de partido" [titleIconAsset]="typeIconAsset" description="Selecciona una modalidad.">
+        <app-match-type-selector [selectedType]="selectedMatchType()" (selectedTypeChange)="selectedMatchType.set($event)"></app-match-type-selector>
+      </app-metallic-form-section>
+
+      <app-metallic-form-section *ngIf="step() === 2" title="Fecha, hora y lugar" [titleIconAsset]="scheduleIconAsset" description="Programa el partido.">
+        <p *ngIf="loadTeamsError()" class="kit-help">{{ loadTeamsError() }}</p>
+        <app-metallic-button *ngIf="loadTeamsError()" type="button" variant="secondary" (click)="onRetryLoadTeams()">
+          Reintentar equipos
+        </app-metallic-button>
+        <app-match-schedule-form
+          [teams]="teamOptions()"
+          [loadingTeams]="loadingTeams()"
+          [selectedTeamId]="schedule().teamId"
+          (scheduleChange)="onScheduleChange($event)">
+        </app-match-schedule-form>
+      </app-metallic-form-section>
+
+      <app-metallic-form-section *ngIf="step() === 3" title="Invitar jugadores" [titleIconAsset]="playersIconAsset" description="Define invitados del equipo.">
+        <div class="kit-grid">
+          <app-metallic-select
+            label="Vestimenta local"
+            [options]="kitColorOptions"
+            [ngModel]="kitColors().home"
+            (ngModelChange)="onKitColorChange('home', $event)">
+          </app-metallic-select>
+          <app-metallic-select
+            label="Vestimenta visitante"
+            [options]="kitColorOptions"
+            [ngModel]="kitColors().away"
+            (ngModelChange)="onKitColorChange('away', $event)">
+          </app-metallic-select>
+        </div>
+        <p class="kit-help">Sugerencia: usa colores distintos para evitar confusiones en cancha.</p>
+
+        <app-player-select-list
+          [players]="teamPlayers()"
+          [selectedIds]="selectedPlayerIds()"
+          [loading]="loadingPlayers()"
+          (selectionChange)="onSelectionChange($event)">
+        </app-player-select-list>
+        <p *ngIf="loadPlayersError()" class="kit-help">{{ loadPlayersError() }}</p>
+        <app-metallic-button *ngIf="loadPlayersError()" type="button" variant="secondary" (click)="onRetryLoadPlayers()">
+          Reintentar jugadores
+        </app-metallic-button>
+      </app-metallic-form-section>
+
+      <app-metallic-form-section *ngIf="step() === 4" title="Confirmar y enviar" [titleIconAsset]="confirmIconAsset" description="Revisa y envía invitaciones.">
+        <div class="summary">
+          <p><strong>Tipo:</strong> {{ matchTypeLabel }}</p>
+          <p><strong>Modalidad:</strong> {{ modalityLabel }}</p>
+          <p><strong>Convocatoria:</strong> {{ genderCategoryLabel }}</p>
+          <p><strong>Fecha:</strong> {{ schedule().scheduledAt | date:'short' }}</p>
+          <p><strong>Cancha:</strong> {{ schedule().venue?.name ?? schedule().location }}</p>
+          <p><strong>Dirección:</strong> {{ schedule().venue?.address ?? schedule().location }}</p>
+          <p><strong>Vestimenta:</strong> Local {{ kitColors().home }} | Visitante {{ kitColors().away }}</p>
+          <p><strong>Invitados:</strong> {{ selectedPlayerIds().length }}</p>
+        </div>
+
+        <app-metallic-button type="button" variant="primary" [disabled]="isSending()" (click)="onSendInvitations()">
+          {{ isSending() ? 'Enviando...' : 'Enviar invitaciones' }}
+        </app-metallic-button>
+        <app-metallic-button *ngIf="isSending()" type="button" variant="secondary" (click)="onCancelSending()">
+          Cancelar y volver
+        </app-metallic-button>
+      </app-metallic-form-section>
+    </app-metallic-card>
+  </div>
+</ion-content>

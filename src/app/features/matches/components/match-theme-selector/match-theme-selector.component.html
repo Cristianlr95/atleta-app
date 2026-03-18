@@ -1,0 +1,11 @@
+<div class="theme-selector">
+  <button
+    type="button"
+    *ngFor="let theme of themes"
+    class="theme-option"
+    [class.theme-option--active]="theme.id === selectedThemeId"
+    (click)="selectTheme.emit(theme.id)">
+    <span class="theme-dot" [style.background]="theme.localAccent"></span>
+    <span class="theme-dot" [style.background]="theme.awayAccent"></span>
+  </button>
+</div>

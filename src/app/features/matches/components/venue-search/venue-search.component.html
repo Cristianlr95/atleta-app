@@ -1,0 +1,42 @@
+<div class="venue-search">
+  <ng-container *ngIf="showSelector; else selectedState">
+    <div class="venue-search__header">
+      <form [formGroup]="queryForm" class="venue-search__form" (click)="onOpenList()">
+        <app-metallic-input formControlName="query" label="Buscar cancha" type="text" placeholder="Nombre o direccion"></app-metallic-input>
+      </form>
+
+      <button type="button" class="venue-search__add-button" (click)="onGoToCreateVenue()" aria-label="Agregar nueva cancha">
+        +
+      </button>
+    </div>
+
+    <div class="venue-search__loading" *ngIf="isListOpen && isLoading" aria-label="Cargando canchas">
+      <ion-skeleton-text animated></ion-skeleton-text>
+      <ion-skeleton-text animated></ion-skeleton-text>
+    </div>
+    <p class="venue-search__state venue-search__state--error" *ngIf="isListOpen && errorMessage">{{ errorMessage }}</p>
+    <app-metallic-button type="button" variant="secondary" *ngIf="isListOpen && errorMessage" (click)="onRetry()">Reintentar</app-metallic-button>
+
+    <div class="venue-search__results" *ngIf="isListOpen && !isLoading && venues.length > 0">
+      <button type="button" class="venue-result" *ngFor="let venue of venues" (click)="onSelectVenue(venue)">
+        <strong>{{ venue.name }}</strong>
+        <span>{{ venue.address }}</span>
+        <small *ngIf="venue.city">{{ venue.city }}</small>
+      </button>
+    </div>
+
+    <p class="venue-search__state" *ngIf="isListOpen && !isLoading && !errorMessage && venues.length === 0">
+      No hay canchas guardadas para mostrar.
+    </p>
+  </ng-container>
+
+  <ng-template #selectedState>
+    <div class="venue-search__selected">
+      <div>
+        <strong>{{ selectedVenue?.name }}</strong>
+        <p>{{ selectedVenue?.address }}</p>
+      </div>
+      <app-metallic-button type="button" variant="secondary" (click)="onChangeSelection()">Cambiar cancha</app-metallic-button>
+    </div>
+  </ng-template>
+</div>

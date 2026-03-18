@@ -1,0 +1,68 @@
+﻿<ion-content class="home-bg">
+  <div class="home-container">
+    <app-metallic-card title="Inicio competitivo" [titleIconAsset]="titleIconAsset">
+      <app-metallic-form-section title="Identidad" [titleIconAsset]="identityIconAsset" description="Tu progreso competitivo en tiempo real.">
+        <div class="home-identity">
+          <div class="home-avatar">{{ playerName.charAt(0) }}</div>
+          <div class="home-identity__meta">
+            <p class="home-name">{{ playerName }}</p>
+            <p class="home-subtitle">Nivel {{ playerLevel }} · {{ divisionLabel }}</p>
+            <p class="home-streak">Racha de participación: {{ streakValue }}</p>
+          </div>
+        </div>
+
+        <div class="home-xp">
+          <div class="home-xp__labels">
+            <span>XP total: {{ totalXp }}</span>
+            <span>{{ xpProgressPercent }}%</span>
+          </div>
+          <div class="home-xp__track">
+            <div class="home-xp__fill" [style.width.%]="xpProgressPercent"></div>
+          </div>
+          <p class="home-hint">{{ xpHint }}</p>
+        </div>
+      </app-metallic-form-section>
+
+      <app-metallic-form-section title="Estado actual" [titleIconAsset]="statusIconAsset" description="Urgencia y próximos objetivos.">
+        <div class="home-status-card">
+          <p class="home-status-card__title">{{ nextMatchLabel }}</p>
+          <p class="home-status-card__detail">{{ nextMatchDetail }}</p>
+          <span
+            class="home-next-status"
+            [ngClass]="getHomeStatusClass()"
+            *ngIf="nextMatchStatus !== 'NONE'">
+            <span class="home-next-status__icon-wrap">
+              <ion-icon class="home-next-status__icon" [src]="getHomeStatusIconAsset()" aria-hidden="true"></ion-icon>
+            </span>
+            {{ getHomeStatusLabel() }}
+          </span>
+        </div>
+        <div class="home-status-grid">
+          <article class="home-status-pill">
+            <span class="home-status-pill__label">Partidos por responder</span>
+            <strong>{{ pendingInvitations() }}</strong>
+          </article>
+          <article class="home-status-pill">
+            <span class="home-status-pill__label">Objetivo inmediato</span>
+            <strong>Subir de nivel</strong>
+          </article>
+        </div>
+      </app-metallic-form-section>
+
+      <app-metallic-form-section title="Actividad reciente" [titleIconAsset]="activityIconAsset" description="Feed corto estilo social competitivo.">
+        <p *ngIf="isLoading" class="home-loading">Actualizando actividad...</p>
+        <div class="home-feed">
+          <article class="home-feed__item" *ngFor="let item of activities" [attr.data-variant]="item.variant">
+            {{ item.text }}
+          </article>
+        </div>
+      </app-metallic-form-section>
+    </app-metallic-card>
+  </div>
+</ion-content>
+
+<ion-footer class="home-footer" translucent>
+  <ion-toolbar>
+    <app-metallic-bottom-nav [items]="bottomNavItems" (itemSelected)="onNavItemSelected($event)"></app-metallic-bottom-nav>
+  </ion-toolbar>
+</ion-footer>

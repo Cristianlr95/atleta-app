@@ -1,0 +1,56 @@
+.match-panel {
+  display: grid;
+  gap: 10px;
+}
+
+.match-panel h4 {
+  margin: 0;
+  color: #eaf2ff;
+  font-size: 14px;
+}
+
+.match-panel__state {
+  margin: 0;
+  color: #9cb7da;
+  font-size: 12px;
+}
+
+.match-panel__list {
+  display: grid;
+  gap: 8px;
+}
+
+.match-item {
+  border: 1px solid rgba(126, 144, 168, 0.35);
+  border-radius: 10px;
+  background: rgba(10, 15, 25, 0.62);
+  padding: 8px;
+  display: grid;
+  gap: 6px;
+}
+
+.match-item p {
+  margin: 0;
+  color: #dce8fa;
+  font-size: 12px;
+}
+
+.match-item small {
+  color: #8fb0da;
+  font-size: 11px;
+}
+
+.match-item button {
+  justify-self: start;
+  border: 1px solid rgba(126, 144, 168, 0.45);
+  border-radius: 8px;
+  background: rgba(12, 19, 31, 0.72);
+  color: #edf4ff;
+  font-size: 11px;
+  padding: 4px 8px;
+}
+
+.match-item__actions {
+  display: flex;
+  gap: 6px;
+}

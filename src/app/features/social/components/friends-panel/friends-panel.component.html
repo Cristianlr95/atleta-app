@@ -1,0 +1,37 @@
+<section class="friends-panel">
+  <h4>Solicitudes pendientes</h4>
+  <p class="friends-panel__state" *ngIf="pendingRequests.length === 0">No tienes solicitudes pendientes.</p>
+  <div class="friends-panel__list" *ngIf="pendingRequests.length > 0">
+    <article class="friends-item" *ngFor="let item of pendingRequests">
+      <p>{{ item.requesterAlias }} te envio una solicitud</p>
+      <div class="friends-item__actions">
+        <button type="button" (click)="respondRequest.emit({ requestId: item.id, accept: true })">Aceptar</button>
+        <button type="button" (click)="respondRequest.emit({ requestId: item.id, accept: false })">Rechazar</button>
+      </div>
+    </article>
+  </div>
+
+  <h4>Buscar jugador</h4>
+  <app-metallic-input [ngModel]="query" (ngModelChange)="onSearchQueryChange($event)" label="Alias, nombre o email" type="text"></app-metallic-input>
+  <p class="friends-panel__state" *ngIf="loadingSearch">Buscando jugadores...</p>
+  <div class="friends-panel__list" *ngIf="candidates.length > 0">
+    <article class="friends-item" *ngFor="let candidate of candidates">
+      <p>{{ formatCandidate(candidate) }}</p>
+      <div class="friends-item__actions">
+        <button type="button" (click)="sendRequest.emit(candidate.atletaUuid)">Enviar solicitud</button>
+        <button type="button" (click)="openProfile.emit(candidate.atletaUuid)">Ver perfil</button>
+      </div>
+    </article>
+  </div>
+
+  <h4>Tus amigos</h4>
+  <p class="friends-panel__state" *ngIf="acceptedFriendships.length === 0">Aun no tienes amistades aceptadas.</p>
+  <div class="friends-panel__list" *ngIf="acceptedFriendships.length > 0">
+    <article class="friends-item" *ngFor="let item of acceptedFriendships">
+      <p>{{ item.requesterAlias }} y {{ item.targetAlias }}</p>
+      <div class="friends-item__actions">
+        <button type="button" (click)="openProfile.emit(item.requesterUuid)">Ver perfil</button>
+      </div>
+    </article>
+  </div>
+</section>

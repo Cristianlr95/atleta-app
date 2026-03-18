@@ -1,0 +1,14 @@
+﻿.countdown {
+  display: inline-flex;
+  padding: 8px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(143, 180, 233, 0.45);
+  color: #d9e8ff;
+  font-weight: 700;
+  background: rgba(12, 18, 34, 0.92);
+}
+
+.countdown--closed {
+  border-color: rgba(177, 125, 125, 0.45);
+  color: #ffcccc;
+}

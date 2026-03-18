@@ -1,0 +1,52 @@
+﻿.matches-create-bg {
+  --background: none;
+  background:
+    linear-gradient(rgba(10, 12, 20, 0.78), rgba(10, 12, 20, 0.9)),
+    url('/assets/backgrounds/stadium.png');
+  background-size: cover;
+  background-position: center;
+}
+
+.matches-create-container {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px 14px 90px;
+}
+
+.wizard-head {
+  margin: 0 0 8px;
+  text-align: center;
+  color: #eaf2ff;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.wizard-actions {
+  margin: 10px 0;
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.summary p {
+  margin: 0 0 6px;
+  color: #d7e6ff;
+}
+
+.kit-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.kit-help {
+  margin: 0 0 10px;
+  color: #9ec0f6;
+  font-size: 12px;
+}
+

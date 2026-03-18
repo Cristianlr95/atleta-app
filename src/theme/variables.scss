@@ -1,0 +1,155 @@
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Rajdhani:wght@300;400;500;600;700&display=swap');
+
+// Variables CSS personalizadas
+:root {
+  // Fuentes
+  --font-family-display: 'Orbitron', sans-serif;
+  --font-family-body: 'Rajdhani', sans-serif;
+  
+  // Colores principales - Estilo Winning Eleven 10
+  --background: #1a1d2e;
+  --foreground: #e8e8f0;
+  --card: #252938;
+  --card-foreground: #e8e8f0;
+  --popover: #2a2e42;
+  --popover-foreground: #e8e8f0;
+  
+  // Colores plateados metálicos
+  --primary: #c0c8d8;
+  --primary-foreground: #1a1d2e;
+  --secondary: #7a8aa0;
+  --secondary-foreground: #ffffff;
+  --muted: #3a3f54;
+  --muted-foreground: #9aa5b8;
+  --accent: #8895ab;
+  --accent-foreground: #ffffff;
+  
+  // Otros
+  --destructive: #d4183d;
+  --destructive-foreground: #ffffff;
+  --border: rgba(192, 200, 216, 0.2);
+  --input-background: #2a2e42;
+  --radius: 0.5rem;
+  
+  // Gradientes metálicos
+  --metallic-gradient: linear-gradient(135deg, #a8b4c4 0%, #d4dce8 25%, #e8eef5 50%, #d4dce8 75%, #a8b4c4 100%);
+  --metallic-dark: linear-gradient(135deg, #5a6578 0%, #7a8aa0 25%, #9aa5b8 50%, #7a8aa0 75%, #5a6578 100%);
+  --metallic-shine: linear-gradient(180deg, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0) 50%, rgba(0,0,0,0.1) 100%);
+}
+
+// Reset y estilos base
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: var(--font-family-body);
+  background: linear-gradient(to bottom right, #0f1219, #1a1d2e, #252938);
+  color: var(--foreground);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-family-display);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+// Animaciones
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    opacity: 0.5;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.05);
+  }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes icon-premium-pulse {
+  0%, 100% {
+    filter: drop-shadow(0 0 4px rgba(192, 200, 216, 0.35));
+    transform: translateY(0);
+  }
+  50% {
+    filter: drop-shadow(0 0 8px rgba(168, 196, 255, 0.6));
+    transform: translateY(-1px);
+  }
+}
+
+// Iconografia "game premium" reutilizable
+.atleta-game-icon {
+  --icon-bg-a: rgba(90, 101, 120, 0.42);
+  --icon-bg-b: rgba(20, 28, 42, 0.55);
+  --icon-border: rgba(192, 200, 216, 0.4);
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 4px;
+  border-radius: 8px;
+  border: 1px solid var(--icon-border);
+  background: linear-gradient(165deg, var(--icon-bg-a), var(--icon-bg-b));
+  color: #dce6f7;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.15),
+    0 0 0 1px rgba(8, 12, 20, 0.25),
+    0 6px 14px rgba(7, 10, 17, 0.35);
+  animation: icon-premium-pulse 2.2s ease-in-out infinite;
+}
+
+.atleta-game-icon--sm {
+  width: 24px;
+  height: 24px;
+  padding: 3px;
+  border-radius: 7px;
+}
+
+.atleta-game-icon--md {
+  width: 30px;
+  height: 30px;
+}
+
+.atleta-game-icon--nav {
+  width: 30px;
+  height: 30px;
+  border-radius: 9px;
+}
+
+// Scrollbar personalizado
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--background);
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #7a8aa0 0%, #5a6578 100%);
+  border-radius: 5px;
+  border: 2px solid var(--background);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #8a9ab0 0%, #6a7588 100%);
+}

@@ -1,0 +1,20 @@
+<section class="activity-feed">
+  <div class="activity-feed__head">
+    <p class="activity-feed__title">Actividad reciente</p>
+    <app-metallic-button type="button" variant="secondary" [disabled]="unreadCount === 0" (click)="markAllRead.emit()">
+      Marcar todo como leido
+    </app-metallic-button>
+  </div>
+
+  <p class="activity-feed__state" *ngIf="loading">Cargando actividad...</p>
+  <p class="activity-feed__state" *ngIf="!loading && items.length === 0">No hay actividad por ahora.</p>
+
+  <div class="activity-feed__list" *ngIf="!loading && items.length > 0">
+    <app-activity-card
+      *ngFor="let item of items"
+      [item]="item"
+      (actionSelected)="actionSelected.emit($event)"
+      (openContext)="openContext.emit($event)">
+    </app-activity-card>
+  </div>
+</section>

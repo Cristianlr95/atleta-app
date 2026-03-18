@@ -1,0 +1,101 @@
+.mvp-vote-bg {
+  --background: none;
+  --atleta-icon-color: #fff1cc;
+  --atleta-icon-glow-main: rgba(255, 217, 122, 0.78);
+  --atleta-icon-glow-deep: rgba(142, 95, 23, 0.56);
+  --atleta-icon-nav-main: rgba(255, 229, 152, 0.84);
+  --atleta-icon-nav-deep: rgba(126, 85, 21, 0.62);
+  background:
+    linear-gradient(rgba(10, 12, 20, 0.82), rgba(10, 12, 20, 0.94)),
+    url('/assets/backgrounds/stadium.png');
+  background-size: cover;
+}
+
+.mvp-vote-container {
+  min-height: 100%;
+  width: min(980px, 100%);
+  margin: 0 auto;
+  padding: 20px 14px 90px;
+}
+
+.mvp-vote-message {
+  margin: 0;
+  color: #c6e7ff;
+  font-size: 13px;
+}
+
+.mvp-vote-message--error {
+  color: #ffb4c2;
+}
+
+.mvp-vote-message--accent {
+  color: #ffe3a8;
+}
+
+.mvp-vote-actions {
+  margin-top: 10px;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.mvp-header {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.vote-grid,
+.mvp-tally-list {
+  display: grid;
+  gap: 10px;
+}
+
+.mvp-progress-chip {
+  display: inline-flex;
+  align-items: center;
+  margin-bottom: 10px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 215, 122, 0.45);
+  background: rgba(54, 35, 8, 0.55);
+  color: #ffe7b5;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.mvp-tally-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border: 1px solid rgba(127, 154, 186, 0.35);
+  border-radius: 10px;
+  background: rgba(12, 19, 31, 0.7);
+  padding: 10px;
+  color: #d6ebff;
+  font-size: 13px;
+}
+
+.winner-banner {
+  margin-top: 12px;
+  border-radius: 12px;
+  padding: 12px;
+  border: 1px solid rgba(145, 205, 130, 0.5);
+  background: rgba(24, 58, 34, 0.75);
+  color: #d7ffd7;
+  font-weight: 700;
+}
+
+.mvp-vote-footer ion-toolbar {
+  --background: rgba(6, 10, 20, 0.92);
+  --border-color: transparent;
+  padding: 6px 8px calc(env(safe-area-inset-bottom) + 8px);
+}
+
+@media (min-width: 780px) {
+  .vote-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+

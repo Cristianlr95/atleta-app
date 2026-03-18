@@ -1,0 +1,24 @@
+.activity-feed__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.activity-feed__title {
+  margin: 0;
+  color: #eaf2ff;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.activity-feed__state {
+  margin: 0;
+  color: #a4bedf;
+  font-size: 12px;
+}
+
+.activity-feed__list {
+  display: grid;
+  gap: 8px;
+}

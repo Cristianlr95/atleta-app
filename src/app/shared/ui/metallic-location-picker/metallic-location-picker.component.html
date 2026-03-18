@@ -1,0 +1,66 @@
+<div class="location-picker">
+  <div class="location-picker__controls">
+    <select class="location-picker__search" [value]="selectedFieldId" (change)="onSelectSavedField($event)">
+      <option value="">Canchas guardadas</option>
+      <option *ngFor="let field of savedFields" [value]="field.id">{{ field.nombre }} - {{ field.ciudad }}</option>
+    </select>
+  </div>
+
+  <div class="location-picker__controls">
+    <input
+      class="location-picker__search"
+      type="text"
+      [value]="searchQuery"
+      placeholder="Buscar direccion o lugar"
+      (input)="searchQuery = $any($event.target).value"
+      (keydown.enter)="onSearchLocation()"
+    />
+    <button type="button" class="location-picker__button" [disabled]="isSearching" (click)="onSearchLocation()">
+      Buscar
+    </button>
+    <button
+      type="button"
+      class="location-picker__button location-picker__button--secondary"
+      [disabled]="isSearching"
+      (click)="useCurrentLocation()">
+      Mi ubicacion
+    </button>
+  </div>
+
+  <div #mapContainer class="location-picker__map" role="application" aria-label="Mapa para seleccionar ubicacion"></div>
+
+  <p class="location-picker__hint">Toca el mapa para seleccionar un punto o elige una cancha guardada.</p>
+  <p *ngIf="helperMessage" class="location-picker__hint">{{ helperMessage }}</p>
+  <p *ngIf="selectedLat !== null && selectedLng !== null" class="location-picker__selected">Punto seleccionado en el mapa.</p>
+
+  <div class="location-picker__save">
+    <input
+      class="location-picker__search"
+      type="text"
+      [value]="fieldName"
+      placeholder="Nombre de la cancha"
+      (input)="fieldName = $any($event.target).value"
+    />
+    <input
+      class="location-picker__search"
+      type="text"
+      [value]="fieldAddress"
+      placeholder="Direccion"
+      (input)="fieldAddress = $any($event.target).value"
+    />
+    <input
+      class="location-picker__search"
+      type="text"
+      [value]="fieldCity"
+      placeholder="Ciudad"
+      (input)="fieldCity = $any($event.target).value"
+    />
+    <button
+      type="button"
+      class="location-picker__button"
+      [disabled]="isSavingField || selectedLat === null || selectedLng === null"
+      (click)="onSaveField()">
+      {{ isSavingField ? 'Guardando...' : 'Guardar nueva cancha' }}
+    </button>
+  </div>
+</div>

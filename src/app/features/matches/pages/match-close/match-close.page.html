@@ -1,0 +1,130 @@
+﻿<ion-content class="match-close-bg">
+  <div class="match-close-container">
+    <app-metallic-card title="Cierre del Partido" [titleIconAsset]="titleIconAsset">
+      <div class="steps" *ngIf="!closedSuccess()">
+        <button type="button" [class.active]="step() === 1">1. Ajustes</button>
+        <button type="button" [class.active]="step() === 2">2. Resumen</button>
+        <button type="button" [class.active]="step() === 3">3. Recompensas</button>
+      </div>
+
+      <p *ngIf="loading()" class="feedback">Cargando resumen del partido...</p>
+      <p *ngIf="error()" class="feedback feedback--error">{{ error() }}</p>
+      <div class="retry" *ngIf="error()">
+        <app-metallic-button variant="secondary" (click)="onRetry()">Reintentar</app-metallic-button>
+      </div>
+
+      <ng-container *ngIf="!loading() && !error() && !closedSuccess()">
+        <section *ngIf="step() === 1" class="panel">
+          <h3>Ajustes rapidos</h3>
+          <p class="helper-copy">Ajusta marcador global y distribuye goles en la lista completa de jugadores.</p>
+
+          <app-score-editor
+            [homeLabel]="homeName()"
+            [awayLabel]="awayName()"
+            [homeScore]="homeScore()"
+            [awayScore]="awayScore()"
+            (homeScoreChange)="onHomeScoreChange($event)"
+            (awayScoreChange)="onAwayScoreChange($event)">
+          </app-score-editor>
+
+          <div class="team-goal-balance">
+            <span>Local asignados: {{ assignedHomeGoals() }} / {{ homeScore() }}</span>
+            <span>Visita asignados: {{ assignedAwayGoals() }} / {{ awayScore() }}</span>
+          </div>
+
+          <div #playersTableWrap class="players-table-wrap players-table-scroll" *ngIf="players().length > 0; else noPlayersState">
+            <section class="team-section">
+              <h4 class="team-title">{{ homeName() }}</h4>
+              <div class="players-table">
+                <div class="table-head">
+                  <span>Jugador</span>
+                  <span>- Gol</span>
+                  <span>+ Gol</span>
+                  <span>Goles</span>
+                </div>
+                <div class="table-row" *ngFor="let player of localPlayers(); trackBy: trackByPlayerId">
+                  <span class="player-cell">{{ player.name }}</span>
+                  <button class="mini-btn" type="button" [disabled]="!isCreator() || (goalCounts()[player.userId] || 0) <= 0" (click)="decrementGoal(player.userId)">-</button>
+                  <button class="mini-btn" type="button" [disabled]="!isCreator()" (click)="incrementGoal(player.userId)">+</button>
+                  <strong>{{ goalCounts()[player.userId] || 0 }}</strong>
+                </div>
+                <div class="table-empty" *ngIf="localPlayers().length === 0">Sin jugadores en Local.</div>
+              </div>
+            </section>
+
+            <section class="team-section">
+              <h4 class="team-title">{{ awayName() }}</h4>
+              <div class="players-table">
+                <div class="table-head">
+                  <span>Jugador</span>
+                  <span>- Gol</span>
+                  <span>+ Gol</span>
+                  <span>Goles</span>
+                </div>
+                <div class="table-row" *ngFor="let player of awayPlayers(); trackBy: trackByPlayerId">
+                  <span class="player-cell">{{ player.name }}</span>
+                  <button class="mini-btn" type="button" [disabled]="!isCreator() || (goalCounts()[player.userId] || 0) <= 0" (click)="decrementGoal(player.userId)">-</button>
+                  <button class="mini-btn" type="button" [disabled]="!isCreator()" (click)="incrementGoal(player.userId)">+</button>
+                  <strong>{{ goalCounts()[player.userId] || 0 }}</strong>
+                </div>
+                <div class="table-empty" *ngIf="awayPlayers().length === 0">Sin jugadores en Visita.</div>
+              </div>
+            </section>
+          </div>
+          <ng-template #noPlayersState>
+            <p class="helper-copy">No hay jugadores disponibles para asignar goles en este partido.</p>
+          </ng-template>
+
+          <p class="helper-copy" *ngIf="!isCreator()">Solo el creador del partido puede editar goles.</p>
+
+          <div class="footer-actions">
+            <app-metallic-button variant="accent" [disabled]="!canContinue()" (click)="onNextStep()">Ir al resumen</app-metallic-button>
+          </div>
+        </section>
+
+        <section *ngIf="step() === 2" class="panel">
+          <h3>Resumen del partido</h3>
+          <app-match-summary-card
+            [homeName]="homeName()"
+            [awayName]="awayName()"
+            [homeColor]="homeColor()"
+            [awayColor]="awayColor()"
+            [homeScore]="homeScore()"
+            [awayScore]="awayScore()"
+            [homeEvents]="homeEvents()"
+            [awayEvents]="awayEvents()">
+          </app-match-summary-card>
+
+          <div class="footer-actions">
+            <app-metallic-button variant="secondary" (click)="onBackStep()">Atras</app-metallic-button>
+            <app-metallic-button variant="accent" (click)="onNextStep()">Ver recompensas</app-metallic-button>
+          </div>
+        </section>
+
+        <section *ngIf="step() === 3" class="panel">
+          <h3>XP Ganada</h3>
+          <app-xp-reward-card [rewards]="xpRewards()"></app-xp-reward-card>
+
+          <div class="footer-actions">
+            <app-metallic-button variant="secondary" (click)="onBackStep()">Atras</app-metallic-button>
+            <app-metallic-button variant="accent" [disabled]="saving() || !isCreator()" (click)="onConfirmClose()">
+              {{ saving() ? 'Confirmando...' : 'Confirmar cierre del partido' }}
+            </app-metallic-button>
+          </div>
+          <p class="helper-copy" *ngIf="!isCreator()">Solo el creador puede confirmar el cierre.</p>
+        </section>
+      </ng-container>
+
+      <section *ngIf="closedSuccess()" class="success">
+        <h3>Partido Finalizado</h3>
+        <p>Experiencia aplicada correctamente.</p>
+        <app-metallic-button variant="accent" (click)="onOpenMvp()">Ir a Votacion MVP</app-metallic-button>
+      </section>
+    </app-metallic-card>
+  </div>
+</ion-content>
+<ion-footer class="match-close-footer" translucent>
+  <ion-toolbar>
+    <app-metallic-bottom-nav [items]="bottomNavItems" (itemSelected)="onNavItemSelected($event)"></app-metallic-bottom-nav>
+  </ion-toolbar>
+</ion-footer>

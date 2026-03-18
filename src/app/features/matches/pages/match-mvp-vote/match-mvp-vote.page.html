@@ -1,0 +1,63 @@
+﻿<ion-content class="mvp-vote-bg">
+  <div class="mvp-vote-container">
+    <app-metallic-card title="Jugador del Partido">
+      <p *ngIf="loading()" class="mvp-vote-message">Cargando votacion MVP...</p>
+      <p *ngIf="loadError()" class="mvp-vote-message mvp-vote-message--error">{{ loadError() }}</p>
+      <div class="mvp-vote-actions" *ngIf="loadError()">
+        <app-metallic-button type="button" variant="secondary" (click)="onRetry()">Reintentar</app-metallic-button>
+      </div>
+
+      <ng-container *ngIf="!loading() && !loadError() && state()">
+        <div class="mvp-header">
+          <app-mvp-countdown [isOpen]="isOpen()" [remainingLabel]="remainingLabel()"></app-mvp-countdown>
+          <p class="mvp-vote-message">{{ voteHint() }}</p>
+          <p class="mvp-vote-message mvp-vote-message--accent" *ngIf="voteProgressHint()">
+            {{ voteProgressHint() }}
+          </p>
+        </div>
+
+        <app-metallic-form-section title="Candidatos" description="Toca un jugador para votar.">
+          <div class="vote-grid" *ngIf="voteCards().length > 0; else noCandidates">
+            <app-player-vote-card
+              *ngFor="let card of voteCards()"
+              [userId]="card.userId"
+              [name]="card.name"
+              [teamLabel]="card.teamLabel"
+              [accent]="card.accent"
+              [selected]="myVote() === card.userId"
+              [disabled]="!isOpen() || votingProcessing() === card.userId"
+              (vote)="onVote($event)">
+            </app-player-vote-card>
+          </div>
+          <ng-template #noCandidates>
+            <p class="mvp-vote-message">No hay candidatos disponibles.</p>
+          </ng-template>
+        </app-metallic-form-section>
+
+        <app-metallic-form-section title="Tendencia de votos" description="Ranking actual de votacion.">
+          <div class="mvp-progress-chip" *ngIf="totalEligibleVotes() > 0">{{ votesProgressLabel() }}</div>
+          <div class="mvp-tally-list" *ngIf="tally().length > 0; else noTally">
+            <div class="mvp-tally-item" *ngFor="let item of tally(); let idx = index">
+              <span>#{{ idx + 1 }} {{ item.alias || item.userId }}</span>
+              <strong>{{ item.votes }}</strong>
+            </div>
+          </div>
+          <ng-template #noTally>
+            <p class="mvp-vote-message">Aun no hay votos registrados.</p>
+          </ng-template>
+        </app-metallic-form-section>
+
+        <div class="winner-banner" *ngIf="winnerAlias()">MVP del partido: {{ winnerAlias() }}</div>
+      </ng-container>
+
+      <div class="mvp-vote-actions">
+        <app-metallic-button type="button" variant="secondary" (click)="onBackToMatch()">Volver al partido</app-metallic-button>
+      </div>
+    </app-metallic-card>
+  </div>
+</ion-content>
+<ion-footer class="mvp-vote-footer" translucent>
+  <ion-toolbar>
+    <app-metallic-bottom-nav [items]="bottomNavItems" (itemSelected)="onNavItemSelected($event)"></app-metallic-bottom-nav>
+  </ion-toolbar>
+</ion-footer>

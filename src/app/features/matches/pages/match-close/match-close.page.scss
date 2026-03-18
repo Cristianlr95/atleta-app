@@ -1,0 +1,236 @@
+.match-close-bg {
+  --background: radial-gradient(circle at top, rgba(24, 36, 62, 0.45), rgba(8, 12, 24, 0.97));
+  --atleta-icon-color: #f6f3ff;
+  --atleta-icon-glow-main: rgba(199, 170, 255, 0.7);
+  --atleta-icon-glow-deep: rgba(94, 61, 160, 0.56);
+  --atleta-icon-nav-main: rgba(210, 185, 255, 0.78);
+  --atleta-icon-nav-deep: rgba(82, 54, 145, 0.62);
+}
+
+.match-close-container {
+  width: min(960px, 100%);
+  margin: 0 auto;
+  padding: 16px 12px 28px;
+}
+
+.steps {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.steps button {
+  border: 1px solid rgba(125, 157, 212, 0.3);
+  border-radius: 999px;
+  background: rgba(10, 16, 30, 0.8);
+  color: #95a9cd;
+  padding: 7px;
+  font-weight: 700;
+  font-size: 0.88rem;
+}
+
+.steps button.active {
+  color: #eff6ff;
+  border-color: rgba(125, 194, 255, 0.55);
+  box-shadow: 0 0 12px rgba(125, 194, 255, 0.2);
+}
+
+.feedback {
+  margin: 0;
+  color: #a8bddf;
+}
+
+.feedback--error {
+  color: #ffc2c2;
+}
+
+.retry {
+  margin-top: 10px;
+}
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.panel h3 {
+  margin: 0;
+  color: #edf3ff;
+  font-size: 1.02rem;
+}
+
+.helper-copy {
+  margin: 0;
+  color: #a8bddf;
+  font-size: 0.8rem;
+}
+
+.players-table-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  border: 1px solid rgba(125, 157, 212, 0.25);
+  border-radius: 12px;
+  padding: 8px;
+  max-height: 46vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+}
+
+.players-table-scroll {
+  max-height: 46vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.team-section {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.players-table-wrap::-webkit-scrollbar {
+  width: 6px;
+}
+
+.players-table-wrap::-webkit-scrollbar-thumb {
+  background: rgba(142, 170, 214, 0.55);
+  border-radius: 999px;
+}
+
+.team-title {
+  margin: 2px 0;
+  color: #cfe1ff;
+  font-size: 0.82rem;
+}
+
+.players-table {
+  border: 1px solid rgba(125, 157, 212, 0.2);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.table-head,
+.table-row {
+  display: grid;
+  grid-template-columns: minmax(120px, 1fr) 38px 38px 42px;
+  align-items: center;
+  gap: 4px;
+  padding: 7px 6px;
+}
+
+.table-head {
+  background: rgba(12, 19, 33, 0.92);
+  color: #9fb4d7;
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.table-row {
+  background: rgba(9, 14, 26, 0.72);
+  border-top: 1px solid rgba(125, 157, 212, 0.18);
+}
+
+.table-empty {
+  padding: 8px 6px;
+  color: #9fb4d7;
+  font-size: 0.76rem;
+}
+
+.player-cell {
+  color: #e8f2ff;
+  font-size: 0.78rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.team-goal-balance {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  color: #c8daf7;
+  font-size: 0.78rem;
+}
+
+.table-row strong {
+  color: #eef5ff;
+  text-align: center;
+  font-size: 0.76rem;
+}
+
+.mini-btn {
+  height: 20px;
+  min-width: 20px;
+  padding: 0;
+  border: 1px solid rgba(153, 183, 227, 0.45);
+  border-radius: 6px;
+  background: linear-gradient(180deg, rgba(162, 181, 211, 0.26), rgba(90, 112, 146, 0.2));
+  color: #eff5ff;
+  font-weight: 700;
+  font-size: 0.66rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.mini-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.cta-row,
+.footer-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.cta-row app-metallic-button,
+.footer-actions app-metallic-button {
+  flex: 1;
+}
+
+.success {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px;
+  border: 1px solid rgba(101, 180, 131, 0.35);
+  border-radius: 12px;
+  background: rgba(10, 27, 21, 0.72);
+}
+
+.success h3,
+.success p {
+  margin: 0;
+  color: #d4ffe2;
+  font-size: 0.9rem;
+}
+
+.match-close-footer ion-toolbar {
+  --background: rgba(6, 10, 20, 0.92);
+  --border-color: transparent;
+  padding: 6px 8px calc(env(safe-area-inset-bottom) + 8px);
+}
+
+@media (max-width: 720px) {
+  .steps {
+    grid-template-columns: 1fr;
+  }
+
+  .table-head,
+  .table-row {
+    grid-template-columns: minmax(90px, 1fr) 32px 32px 36px;
+    font-size: 0.68rem;
+  }
+  
+  .players-table-wrap {
+    max-height: 52vh;
+  }
+}
+

@@ -1,0 +1,37 @@
+<form class="team-creator" [formGroup]="createTeamForm" (ngSubmit)="onCreateTeam()">
+  <div class="team-creator__grid">
+    <app-metallic-input
+      formControlName="nombre"
+      label="Nombre del equipo"
+      placeholder="Ej: Atleta FC">
+    </app-metallic-input>
+
+    <app-metallic-input
+      formControlName="anioFundacion"
+      label="Ano fundacion (opcional)"
+      type="number"
+      placeholder="2026">
+    </app-metallic-input>
+  </div>
+
+  <label class="team-creator__file-label" for="teamLogoInput">Logo del equipo (opcional)</label>
+  <input
+    id="teamLogoInput"
+    class="team-creator__file-input"
+    type="file"
+    accept="image/png,image/jpeg,image/webp"
+    (change)="onLogoSelected($event)"
+  />
+  <p *ngIf="selectedLogoName" class="team-creator__file-name">{{ selectedLogoName }}</p>
+
+  <app-metallic-button
+    class="team-creator__submit"
+    type="submit"
+    variant="primary"
+    [disabled]="createTeamForm.invalid || isSubmitting">
+    {{ isSubmitting ? 'Creando...' : 'Crear equipo' }}
+  </app-metallic-button>
+
+  <p *ngIf="submitError" class="team-creator__message team-creator__message--error">{{ submitError }}</p>
+  <p *ngIf="submitSuccess" class="team-creator__message team-creator__message--success">{{ submitSuccess }}</p>
+</form>

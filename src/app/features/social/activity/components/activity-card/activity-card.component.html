@@ -1,0 +1,24 @@
+<article class="activity-card" [class.activity-card--unread]="!item.isRead" (click)="onOpen()">
+  <div class="activity-card__icon">
+    <ion-icon [src]="iconAsset"></ion-icon>
+  </div>
+  <div class="activity-card__content">
+    <p class="activity-card__title">
+      {{ item.title }}
+      <span *ngIf="item.groupCount && item.groupCount > 1">({{ item.groupCount }})</span>
+    </p>
+    <app-match-status-badge *ngIf="matchStatus" [status]="matchStatus"></app-match-status-badge>
+    <p class="activity-card__subtitle">{{ item.subtitle }}</p>
+    <p class="activity-card__time">{{ relativeTime }}</p>
+    <div class="activity-card__actions" (click)="$event.stopPropagation()">
+      <button
+        type="button"
+        *ngFor="let action of item.actions"
+        [class.activity-card__action--primary]="action.variant === 'primary'"
+        [class.activity-card__action--danger]="action.variant === 'danger'"
+        (click)="onAction(action.type)">
+        {{ action.label }}
+      </button>
+    </div>
+  </div>
+</article>

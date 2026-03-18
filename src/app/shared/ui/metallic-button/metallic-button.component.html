@@ -1,0 +1,10 @@
+<button
+  [attr.type]="type"
+  [disabled]="disabled"
+  [class]="'metallic-btn metallic-btn--' + variant"
+>
+  <span class="metallic-btn__content">
+    <ng-content></ng-content>
+  </span>
+  <div class="metallic-btn__shine"></div>
+</button>

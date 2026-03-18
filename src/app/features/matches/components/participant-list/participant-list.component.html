@@ -1,0 +1,23 @@
+<div class="participant-list" *ngIf="participants.length; else emptyState">
+  <article class="participant-list__item" *ngFor="let participant of participants; trackBy: trackByUserId">
+    <div class="participant-list__avatar" [class.participant-list__avatar--with-image]="participant.avatarUrl">
+      <img *ngIf="participant.avatarUrl" [src]="participant.avatarUrl" [alt]="participant.name" />
+      <span *ngIf="!participant.avatarUrl">{{ participant.name.charAt(0) }}</span>
+    </div>
+
+    <div class="participant-list__info">
+      <p class="participant-list__name">
+        {{ participant.name }}
+        <span *ngIf="participant.isCurrentUser">(Tu)</span>
+      </p>
+      <p class="participant-list__meta">{{ participant.position || 'Sin posicion definida' }}</p>
+      <p class="participant-list__kit" *ngIf="participant.kitColor">
+        {{ participant.teamSide === 'HOME' ? 'Local' : 'Visita' }} · {{ participant.kitColor }}
+      </p>
+    </div>
+  </article>
+</div>
+
+<ng-template #emptyState>
+  <p class="participant-list__empty">{{ emptyMessage }}</p>
+</ng-template>

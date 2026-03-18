@@ -1,0 +1,23 @@
+﻿<div class="team-builder" [class.team-builder--disabled]="!enabled">
+  <div class="team-builder__modes">
+    <button type="button" [class.active]="mode === 'AUTO'" (click)="setMode('AUTO')" [disabled]="!enabled">Generar equipos automaticamente</button>
+    <button type="button" [class.active]="mode === 'MANUAL'" (click)="setMode('MANUAL')" [disabled]="!enabled">Armar manualmente</button>
+  </div>
+
+  <div class="team-builder__grid">
+    <section class="team-builder__column" (dragover)="onDragOver($event)" (drop)="onDrop('HOME', $event)">
+      <h4>Local</h4>
+      <p *ngFor="let player of homePlayers" [attr.draggable]="mode === 'MANUAL' && enabled" (dragstart)="onDragStart(player.uuid, $event)">
+        {{ player.name }} · {{ player.position }}
+      </p>
+    </section>
+
+    <section class="team-builder__column" (dragover)="onDragOver($event)" (drop)="onDrop('AWAY', $event)">
+      <h4>Visita</h4>
+      <p *ngFor="let player of awayPlayers" [attr.draggable]="mode === 'MANUAL' && enabled" (dragstart)="onDragStart(player.uuid, $event)">
+        {{ player.name }} · {{ player.position }}
+      </p>
+    </section>
+  </div>
+</div>
+

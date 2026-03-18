@@ -1,0 +1,10 @@
+﻿<div class="vote-card" [class.vote-card--selected]="selected" [style.--accent]="accent">
+  <div class="vote-avatar">{{ name.charAt(0) }}</div>
+  <div class="vote-copy">
+    <strong>{{ name }}</strong>
+    <small>{{ teamLabel }}</small>
+  </div>
+  <app-metallic-button variant="accent" [disabled]="disabled" (click)="onVote()">
+    {{ selected ? 'Votado ✓' : 'Votar' }}
+  </app-metallic-button>
+</div>

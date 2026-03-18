@@ -1,0 +1,16 @@
+﻿<div class="metallic-select-wrapper">
+  <label *ngIf="label" class="metallic-select__label">{{ label }}</label>
+
+  <div class="metallic-select">
+    <select
+      class="metallic-select__field"
+      [disabled]="disabled"
+      [value]="value"
+      (change)="onValueChange($event)"
+      (blur)="onTouched()">
+      <option value="" disabled>{{ placeholder }}</option>
+      <option *ngFor="let option of options" [value]="option.value">{{ option.label }}</option>
+    </select>
+    <div class="metallic-select__shine"></div>
+  </div>
+</div>

@@ -1,0 +1,174 @@
+﻿.metallic-role-hexagon {
+  position: relative;
+  border: 1px solid rgba(122, 138, 160, 0.45);
+  border-radius: 16px;
+  background: linear-gradient(165deg, rgba(29, 33, 47, 0.9), rgba(20, 24, 36, 0.95));
+  padding: 16px;
+  box-shadow:
+    inset 0 1px 1px rgba(255, 255, 255, 0.06),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.45),
+    0 8px 28px rgba(0, 0, 0, 0.55);
+}
+
+.metallic-role-hexagon__header {
+  margin-bottom: 12px;
+}
+
+.metallic-role-hexagon__title {
+  margin: 0;
+  color: #e8eef5;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 14px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.metallic-role-hexagon__subtitle {
+  margin: 4px 0 0;
+  color: #aeb8cb;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 13px;
+}
+
+.metallic-role-hexagon__chart-wrap {
+  display: flex;
+  justify-content: center;
+}
+
+.metallic-role-hexagon__chart {
+  width: 100%;
+  max-width: 320px;
+}
+
+.metallic-role-hexagon__grid polygon,
+.metallic-role-hexagon__grid line {
+  fill: none;
+  stroke: rgba(122, 138, 160, 0.35);
+  stroke-width: 1;
+}
+
+.metallic-role-hexagon__shape {
+  fill: rgba(192, 200, 216, 0.2);
+  stroke: #c0c8d8;
+  stroke-width: 2;
+  filter: drop-shadow(0 0 8px rgba(192, 200, 216, 0.25));
+}
+
+.metallic-role-hexagon__point {
+  fill: #e8eef5;
+  stroke: #7a8aa0;
+  stroke-width: 1.5;
+}
+
+.metallic-role-hexagon__label,
+.metallic-role-hexagon__value {
+  text-anchor: middle;
+  dominant-baseline: middle;
+}
+
+.metallic-role-hexagon__label {
+  fill: #d9e1ef;
+  font-size: 9px;
+  font-family: 'Orbitron', sans-serif;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.metallic-role-hexagon__value {
+  fill: #9fb0ca;
+  font-size: 9px;
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 700;
+}
+
+.metallic-role-hexagon__summary {
+  display: grid;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.metallic-role-hexagon__chip {
+  border: 1px solid rgba(122, 138, 160, 0.3);
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #c0c8d8;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 13px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: linear-gradient(to right, rgba(42, 46, 66, 0.7), rgba(26, 29, 46, 0.7));
+  text-align: left;
+  cursor: pointer;
+
+  ion-icon {
+    font-size: 16px;
+    color: #d4dce8;
+  }
+
+  &:active {
+    border-color: rgba(192, 200, 216, 0.55);
+  }
+}
+
+.metallic-role-hexagon__classification {
+  margin: 10px 0 0;
+  text-align: center;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.metallic-role-hexagon--compact {
+  padding: 10px;
+
+  .metallic-role-hexagon__header {
+    margin-bottom: 8px;
+  }
+
+  .metallic-role-hexagon__title {
+    font-size: 12px;
+  }
+
+  .metallic-role-hexagon__subtitle {
+    font-size: 11px;
+  }
+
+  .metallic-role-hexagon__chart {
+    max-width: 220px;
+  }
+
+  .metallic-role-hexagon__label,
+  .metallic-role-hexagon__value {
+    font-size: 8px;
+  }
+
+  .metallic-role-hexagon__summary {
+    gap: 6px;
+    margin-top: 8px;
+  }
+
+  .metallic-role-hexagon__chip {
+    padding: 6px 8px;
+    font-size: 11px;
+
+    ion-icon {
+      font-size: 14px;
+    }
+  }
+
+  .metallic-role-hexagon__classification {
+    margin-top: 8px;
+    font-size: 10px;
+  }
+}
+
+.metallic-role-hexagon__classification--leyenda { color: #ffd700; }
+.metallic-role-hexagon__classification--elite { color: #ff8a8a; }
+.metallic-role-hexagon__classification--experto { color: #7cd9d1; }
+.metallic-role-hexagon__classification--avanzado { color: #95e1d3; }
+.metallic-role-hexagon__classification--intermedio { color: #a8e6cf; }
+.metallic-role-hexagon__classification--principiante { color: #dcedc1; }
+.metallic-role-hexagon__classification--novato { color: #c7ceea; }

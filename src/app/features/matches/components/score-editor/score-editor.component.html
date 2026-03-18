@@ -1,0 +1,21 @@
+﻿<div class="score-editor">
+  <div class="team-score">
+    <span>{{ homeLabel }}</span>
+    <div class="controls">
+      <button type="button" class="score-btn" (click)="decrementHome()">-</button>
+      <strong>{{ homeScore }}</strong>
+      <button type="button" class="score-btn" (click)="incrementHome()">+</button>
+    </div>
+  </div>
+
+  <span class="separator">:</span>
+
+  <div class="team-score">
+    <span>{{ awayLabel }}</span>
+    <div class="controls">
+      <button type="button" class="score-btn" (click)="decrementAway()">-</button>
+      <strong>{{ awayScore }}</strong>
+      <button type="button" class="score-btn" (click)="incrementAway()">+</button>
+    </div>
+  </div>
+</div>

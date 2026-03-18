@@ -1,0 +1,52 @@
+﻿.score-editor {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 8px;
+  align-items: center;
+  border: 1px solid rgba(126, 157, 210, 0.35);
+  border-radius: 14px;
+  padding: 10px;
+}
+
+.team-score {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: center;
+  color: #dce8ff;
+}
+
+.team-score > span {
+  font-size: 0.82rem;
+}
+
+.controls {
+  display: grid;
+  grid-template-columns: 34px 30px 34px;
+  gap: 4px;
+  align-items: center;
+}
+
+.score-btn {
+  height: 28px;
+  min-width: 28px;
+  border: 1px solid rgba(153, 183, 227, 0.45);
+  border-radius: 8px;
+  background: linear-gradient(180deg, rgba(162, 181, 211, 0.26), rgba(90, 112, 146, 0.2));
+  color: #eff5ff;
+  font-weight: 700;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+.controls strong {
+  text-align: center;
+  font-size: 1.35rem;
+  color: #f6f9ff;
+}
+
+.separator {
+  font-size: 1.5rem;
+  color: #8ea8d1;
+  font-weight: 700;
+}

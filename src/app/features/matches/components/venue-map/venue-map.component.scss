@@ -1,0 +1,18 @@
+﻿.venue-map__container {
+  width: 100%;
+  min-height: 210px;
+  border-radius: 12px;
+  border: 1px solid rgba(122, 138, 160, 0.45);
+  overflow: hidden;
+  box-shadow: 0 12px 20px rgba(6, 10, 16, 0.3);
+}
+
+.venue-map__fallback {
+  margin: 0;
+  color: #b8c9e3;
+  font-size: 12px;
+  border: 1px dashed rgba(130, 155, 189, 0.35);
+  border-radius: 10px;
+  padding: 10px;
+  text-align: center;
+}

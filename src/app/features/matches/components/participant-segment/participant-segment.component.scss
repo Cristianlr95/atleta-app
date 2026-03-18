@@ -1,0 +1,25 @@
+.participant-segment {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.participant-segment__item {
+  border: 1px solid rgba(127, 154, 186, 0.36);
+  border-radius: 10px;
+  background: rgba(11, 18, 29, 0.68);
+  color: #d8e8ff;
+  font-size: 12px;
+  padding: 8px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.participant-segment__item strong {
+  color: #ebf4ff;
+}
+
+.participant-segment__item--active {
+  border-color: rgba(83, 181, 255, 0.7);
+  box-shadow: 0 0 0 1px rgba(83, 181, 255, 0.3) inset;
+}

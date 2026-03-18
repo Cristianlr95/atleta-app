@@ -1,0 +1,11 @@
+.page-nav {
+  width: min(100%, 920px);
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.page-nav app-metallic-button {
+  flex: 1;
+}

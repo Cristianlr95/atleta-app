@@ -1,0 +1,36 @@
+﻿<div class="metallic-input-wrapper">
+
+  <label *ngIf="label" class="metallic-input__label">
+    {{ label }}
+  </label>
+
+  <div class="metallic-input">
+
+    <input
+      class="metallic-input__field"
+      [class.metallic-input__field--with-toggle]="allowPasswordToggle && type === 'password'"
+      [type]="resolvedType"
+      [placeholder]="placeholder"
+      [disabled]="disabled"
+      [value]="value"
+      (input)="onInput($event)"
+      (change)="onInput($event)"
+      (blur)="onTouched()"
+    />
+
+    <button
+      *ngIf="allowPasswordToggle && type === 'password'"
+      type="button"
+      class="metallic-input__toggle"
+      [disabled]="disabled"
+      (click)="togglePasswordVisibility()"
+      [attr.aria-label]="isPasswordVisible ? 'Ocultar contrasena' : 'Mostrar contrasena'"
+    >
+      <ion-icon [src]="passwordToggleIconAsset"></ion-icon>
+    </button>
+
+    <div class="metallic-input__shine"></div>
+
+  </div>
+
+</div>

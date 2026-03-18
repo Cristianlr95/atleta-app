@@ -1,0 +1,34 @@
+<ion-content class="session-bg">
+  <div class="session-container">
+    <app-page-nav></app-page-nav>
+
+    <app-metallic-card title="Jugar" [titleIconAsset]="sessionTitleIconAsset">
+      <div class="session-start" *ngIf="playMode === 'none'">
+        <p class="session-start__title">Elige que quieres crear</p>
+        <p class="session-start__subtitle">Puedes iniciar un partido o crear un nuevo equipo.</p>
+        <app-associated-team-roster></app-associated-team-roster>
+        <div class="session-play-action">
+          <app-metallic-button type="button" variant="primary" (click)="onStartCreateMatchFlow()">
+            Crear partido
+          </app-metallic-button>
+          <app-metallic-button type="button" variant="secondary" (click)="onStartCreateTeamFlow()">
+            Crear equipo
+          </app-metallic-button>
+        </div>
+      </div>
+
+      <div *ngIf="playMode === 'team'" class="session-start">
+        <p class="session-start__title">Crear equipo</p>
+        <p class="session-start__subtitle">Ingresa nombre y logo para registrar tu equipo.</p>
+        <app-team-creator (teamCreated)="onTeamCreated()"></app-team-creator>
+      </div>
+    </app-metallic-card>
+  </div>
+</ion-content>
+
+<ion-footer class="session-footer" translucent>
+  <ion-toolbar>
+    <app-metallic-bottom-nav [items]="bottomNavItems" (itemSelected)="onNavItemSelected($event)">
+    </app-metallic-bottom-nav>
+  </ion-toolbar>
+</ion-footer>

@@ -1,0 +1,2 @@
+﻿safeCalls=48
+directCallsOutsideNavigationService=0

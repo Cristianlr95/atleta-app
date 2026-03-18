@@ -1,0 +1,19 @@
+<div class="metallic-card">
+  <div class="metallic-card__shine-top"></div>
+  <div class="metallic-card__glow"></div>
+
+  <div class="metallic-card__content">
+    <div *ngIf="title" class="metallic-card__header">
+      <div class="metallic-card__title-row">
+        <ion-icon *ngIf="titleIconAsset" [src]="titleIconAsset" class="metallic-card__title-icon atleta-game-icon atleta-game-icon--md"></ion-icon>
+        <h3 class="metallic-card__title">{{ title }}</h3>
+      </div>
+    </div>
+
+    <div class="metallic-card__body metallic-card__body--spaced">
+      <ng-content></ng-content>
+    </div>
+  </div>
+
+  <div class="metallic-card__shine-bottom"></div>
+</div>

@@ -1,0 +1,104 @@
+﻿<ion-content class="register-bg">
+  <div class="register-container">
+    <app-metallic-card title="Crear cuenta" [titleIconAsset]="registerTitleIconAsset">
+      <form class="register-form" [formGroup]="registerForm" (ngSubmit)="onRegister()">
+        <app-metallic-form-section
+          title="Datos de la cuenta"
+          [titleIconAsset]="accountSectionIconAsset"
+          description="Completa los campos para registrarte en Atleta.">
+          <app-metallic-input
+            formControlName="nombre"
+            label="Nombre completo"
+            type="text"
+            placeholder="Juan Perez">
+          </app-metallic-input>
+          <p *ngIf="hasControlError('nombre', 'required')" class="register-message register-message--error">
+            El nombre es obligatorio.
+          </p>
+          <p *ngIf="hasControlError('nombre', 'maxlength')" class="register-message register-message--error">
+            El nombre no puede superar 100 caracteres.
+          </p>
+
+          <app-metallic-input
+            formControlName="email"
+            label="Email"
+            type="email"
+            placeholder="tu@email.com">
+          </app-metallic-input>
+          <p *ngIf="hasControlError('email', 'required')" class="register-message register-message--error">
+            El email es obligatorio.
+          </p>
+          <p *ngIf="hasControlError('email', 'email')" class="register-message register-message--error">
+            Ingresa un email válido.
+          </p>
+
+          <app-metallic-select
+            formControlName="genero"
+            label="Genero"
+            placeholder="Selecciona genero"
+            [options]="genderOptions">
+          </app-metallic-select>
+          <p *ngIf="hasControlError('genero', 'required')" class="register-message register-message--error">
+            Debes seleccionar genero.
+          </p>
+        </app-metallic-form-section>
+
+        <app-metallic-form-section
+          title="Seguridad"
+          [titleIconAsset]="securitySectionIconAsset"
+          description="Tu contraseña debe tener entre 8 y 100 caracteres.">
+          <app-metallic-input
+            formControlName="password"
+            label="Contraseña"
+            type="password"
+            placeholder="••••••••"
+            allowPasswordToggle>
+          </app-metallic-input>
+          <p *ngIf="hasControlError('password', 'required')" class="register-message register-message--error">
+            La contraseña es obligatoria.
+          </p>
+          <p *ngIf="hasControlError('password', 'minlength')" class="register-message register-message--error">
+            La contraseña debe tener al menos 8 caracteres.
+          </p>
+          <p *ngIf="hasControlError('password', 'maxlength')" class="register-message register-message--error">
+            La contraseña no puede superar 100 caracteres.
+          </p>
+
+          <app-metallic-input
+            formControlName="confirmPassword"
+            label="Confirmar contraseña"
+            type="password"
+            placeholder="••••••••"
+            allowPasswordToggle>
+          </app-metallic-input>
+          <p *ngIf="hasControlError('confirmPassword', 'required')" class="register-message register-message--error">
+            Debes confirmar la contraseña.
+          </p>
+        </app-metallic-form-section>
+
+        <p *ngIf="hasPasswordMismatch" class="register-message register-message--error">
+          Las contraseñas no coinciden.
+        </p>
+
+        <p *ngIf="registerError" class="register-message register-message--error">{{ registerError }}</p>
+        <p *ngIf="registerSuccess" class="register-message register-message--success">{{ registerSuccess }}</p>
+
+        <app-metallic-button
+          class="register-submit"
+          type="submit"
+          variant="primary"
+          [disabled]="isSubmitting">
+          {{ isSubmitting ? 'Creando cuenta...' : 'Crear cuenta' }}
+        </app-metallic-button>
+
+        <button
+          type="button"
+          class="register-link"
+          [disabled]="isSubmitting"
+          (click)="onGoToLogin()">
+          Volver a iniciar sesión
+        </button>
+      </form>
+    </app-metallic-card>
+  </div>
+</ion-content>

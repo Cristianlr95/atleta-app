@@ -1,0 +1,11 @@
+<div class="participant-segment" role="tablist" aria-label="Segmento de participantes">
+  <button
+    *ngFor="let option of options"
+    type="button"
+    class="participant-segment__item"
+    [class.participant-segment__item--active]="selected === option.id"
+    (click)="selectedChange.emit(option.id)">
+    <span>{{ option.label }}</span>
+    <strong>{{ option.count() }}</strong>
+  </button>
+</div>

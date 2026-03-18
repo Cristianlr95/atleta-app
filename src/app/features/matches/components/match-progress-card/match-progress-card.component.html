@@ -1,0 +1,13 @@
+<div class="progress-head">
+  <app-match-status-badge [status]="match.status"></app-match-status-badge>
+  <p class="progress-head__meta">{{ progress.confirmed }} / {{ progress.minRequired }} confirmados</p>
+</div>
+
+<app-metallic-progress [value]="progress.confirmed" [max]="progress.minRequired" label="Confirmacion" [showValue]="true"></app-metallic-progress>
+
+<p class="progress-message">{{ progress.statusMessage }}</p>
+
+<div class="confirmed-list" *ngIf="confirmedPlayers.length > 0">
+  <p class="confirmed-list__title">Confirmados</p>
+  <p class="confirmed-list__item" *ngFor="let player of confirmedPlayers">{{ player.name }} · {{ player.position }}</p>
+</div>

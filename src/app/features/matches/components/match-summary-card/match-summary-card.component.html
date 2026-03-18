@@ -1,0 +1,31 @@
+﻿<div class="summary-card">
+  <div class="summary-header">
+    <div class="team team--home">
+      <span class="team-color" [style.background]="homeColor.toLowerCase()"></span>
+      <strong>{{ homeName }}</strong>
+    </div>
+    <div class="score">{{ homeScore }} : {{ awayScore }}</div>
+    <div class="team team--away">
+      <strong>{{ awayName }}</strong>
+      <span class="team-color" [style.background]="awayColor.toLowerCase()"></span>
+    </div>
+  </div>
+
+  <div class="summary-meta">
+    <span class="result-badge" [ngClass]="resultBadge.css">{{ resultBadge.icon }} {{ resultBadge.label }}</span>
+    <span class="winner-label">{{ winnerLabel }}</span>
+  </div>
+
+  <div class="summary-events">
+    <section>
+      <h4>{{ homeName }}</h4>
+      <p *ngFor="let event of homeEvents">{{ event.icon }} {{ event.text }}</p>
+      <p *ngIf="homeEvents.length === 0" class="empty">Sin eventos cargados</p>
+    </section>
+    <section>
+      <h4>{{ awayName }}</h4>
+      <p *ngFor="let event of awayEvents">{{ event.icon }} {{ event.text }}</p>
+      <p *ngIf="awayEvents.length === 0" class="empty">Sin eventos cargados</p>
+    </section>
+  </div>
+</div>

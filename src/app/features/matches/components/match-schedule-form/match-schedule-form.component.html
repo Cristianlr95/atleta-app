@@ -1,0 +1,26 @@
+<form [formGroup]="scheduleForm" class="schedule-form">
+  <app-metallic-select label="Equipo" formControlName="teamId" [options]="teams"></app-metallic-select>
+  <p class="schedule-form__meta" *ngIf="loadingTeams">Cargando equipos...</p>
+
+  <app-metallic-select label="Modalidad" formControlName="modality" [options]="modalityOptions"></app-metallic-select>
+  <app-metallic-select
+    label="Convocatoria"
+    formControlName="genderCategory"
+    [options]="genderCategoryOptions">
+  </app-metallic-select>
+
+  <ion-item lines="none" class="schedule-form__datetime">
+    <ion-label position="stacked">Fecha y hora</ion-label>
+    <ion-datetime presentation="date-time" formControlName="scheduledAt"></ion-datetime>
+  </ion-item>
+
+  <app-venue-search [selectedVenue]="selectedVenue" (venueSelected)="onVenueSelected($event)"></app-venue-search>
+  <app-venue-selected-card [venue]="selectedVenue"></app-venue-selected-card>
+
+  <p class="schedule-form__meta">Minimo requerido: {{ scheduleForm.controls.minRequired.value }}</p>
+  <p class="schedule-form__meta">Cupo maximo: {{ scheduleForm.controls.maxPlayers.value }}</p>
+
+  <p class="schedule-form__error" *ngIf="scheduleForm.controls.scheduledAt.value && !isValid">
+    Debes elegir una fecha futura y seleccionar una cancha.
+  </p>
+</form>

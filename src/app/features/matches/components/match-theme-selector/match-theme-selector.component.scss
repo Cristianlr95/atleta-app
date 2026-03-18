@@ -1,0 +1,23 @@
+.theme-selector {
+  display: flex;
+  gap: 6px;
+}
+
+.theme-option {
+  border: 1px solid rgba(126, 146, 178, 0.45);
+  border-radius: 10px;
+  background: rgba(13, 21, 34, 0.72);
+  padding: 6px;
+  display: flex;
+  gap: 4px;
+}
+
+.theme-option--active {
+  border-color: rgba(149, 228, 183, 0.72);
+}
+
+.theme-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}

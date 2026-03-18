@@ -1,0 +1,17 @@
+﻿<div class="xp-list" *ngIf="rewards.length > 0; else emptyRewards">
+  <article class="xp-item" *ngFor="let reward of rewards; trackBy: trackByRewardId">
+    <header>
+      <strong>{{ reward.playerName }}</strong>
+      <span>+{{ reward.xp }} XP {{ reward.position }}</span>
+    </header>
+    <p *ngIf="reward.currentOvr !== undefined && reward.currentOvr !== null">OVR actual: {{ reward.currentOvr | number: '1.0-2' }}</p>
+    <p *ngIf="reward.toLevel > reward.fromLevel">⬆ Nivel {{ reward.fromLevel }} → Nivel {{ reward.toLevel }}</p>
+    <div class="xp-bar">
+      <div class="xp-fill" [style.width.%]="reward.progressPercent"></div>
+    </div>
+  </article>
+</div>
+
+<ng-template #emptyRewards>
+  <p class="xp-empty">Sin recompensas para mostrar.</p>
+</ng-template>

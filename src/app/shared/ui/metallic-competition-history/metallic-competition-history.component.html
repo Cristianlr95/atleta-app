@@ -1,0 +1,63 @@
+﻿<div class="match-history" *ngIf="items.length > 0; else emptyState">
+  <table class="match-history__table" aria-label="Historial de competicion por jugador">
+    <thead>
+      <tr>
+        <th>Fecha</th>
+        <th>Mod.</th>
+        <th>Equipo</th>
+        <th>Posicion</th>
+        <th>Min</th>
+        <th>G</th>
+        <th>A</th>
+        <th>Calif.</th>
+        <th>MVP</th>
+        <th>Marcador</th>
+        <th>Estado</th>
+        <th>Resultado</th>
+        <th>Accion</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let item of items">
+        <td class="match-history__date">{{ item.dateLabel }}</td>
+        <td>{{ item.modalityLabel }}</td>
+        <td>{{ item.teamLabel }}</td>
+        <td>{{ item.positionLabel }}</td>
+        <td>{{ item.minutesPlayedLabel }}</td>
+        <td>{{ item.goals }}</td>
+        <td>{{ item.assists }}</td>
+        <td>{{ item.matchRatingLabel }}</td>
+        <td>{{ item.mvpLabel }}</td>
+        <td>{{ item.scoreLabel }}</td>
+        <td>
+          <span class="match-history__status" [ngClass]="getStatusClass(item.statusKey)">
+            <span class="match-history__status-icon-wrap">
+              <ion-icon class="match-history__status-icon" [src]="getStatusIconAsset(item.statusKey)" aria-hidden="true"></ion-icon>
+            </span>
+            {{ item.statusLabel }}
+          </span>
+        </td>
+        <td>
+          <span
+            class="match-history__outcome"
+            [class.match-history__outcome--win]="item.outcomeVariant === 'win'"
+            [class.match-history__outcome--draw]="item.outcomeVariant === 'draw'"
+            [class.match-history__outcome--loss]="item.outcomeVariant === 'loss'"
+          >
+            {{ item.outcomeLabel }}
+          </span>
+        </td>
+        <td>
+          <button type="button" class="match-history__action" (click)="onViewMatch(item)">
+            Ver estado
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+<p *ngIf="items.length > 4" class="match-history__hint">Desliza horizontal y vertical para ver todo</p>
+
+<ng-template #emptyState>
+  <p class="match-history__empty">Aun no tienes registros de competicion.</p>
+</ng-template>

@@ -1,0 +1,41 @@
+:host {
+  --social-ink: #e6eefb;
+}
+
+.social-bg {
+  --background: linear-gradient(180deg, #0c1626 0%, #060b14 55%, #04070f 100%);
+}
+
+.social-container {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 14px 80px;
+}
+
+.social-message {
+  margin: 0 0 10px;
+  text-align: center;
+  font-size: 13px;
+}
+
+.social-message--error {
+  color: #ff9eae;
+}
+
+.social-message--success {
+  color: #8ee0b0;
+}
+
+.social-retry {
+  border: 1px solid rgba(180, 205, 255, 0.45);
+  border-radius: 999px;
+  background: rgba(14, 22, 40, 0.8);
+  color: #d5e6ff;
+  font-size: 12px;
+  padding: 6px 14px;
+  margin: 0 auto 10px;
+  display: block;
+}

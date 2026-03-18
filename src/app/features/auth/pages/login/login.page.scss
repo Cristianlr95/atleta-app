@@ -1,0 +1,116 @@
+.login-bg {
+  --background: none;
+
+  background: 
+    linear-gradient(
+      rgba(10, 12, 20, 0.75),
+      rgba(10, 12, 20, 0.85)
+    ),
+    url("/assets/backgrounds/stadium.png");
+
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+.login-container {
+  min-height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 16px;
+}
+
+.login-form {
+  width: min(100%, 420px);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.login-submit {
+  align-self: center;
+}
+
+.login-link {
+  align-self: center;
+  border: 0;
+  background: transparent;
+  color: #c0c8d8;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: color 0.2s ease;
+
+  &:hover {
+    color: #e8eef5;
+  }
+
+  &:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+  }
+}
+
+.login-divider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  color: #9aa5b8;
+  text-transform: lowercase;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 12px;
+  letter-spacing: 0.08em;
+
+  &::before,
+  &::after {
+    content: '';
+    flex: 1;
+    max-width: 110px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, #5a6578, transparent);
+  }
+}
+
+.login-signup {
+  margin: 0;
+  text-align: center;
+  color: #b7c1d3;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.login-signup__action {
+  border: 0;
+  background: transparent;
+  color: #e8eef5;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-left: 6px;
+  cursor: pointer;
+  transition: color 0.2s ease;
+
+  &:hover {
+    color: #c0c8d8;
+  }
+
+  &:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+  }
+}
+
+.login-error {
+  margin: 0;
+  text-align: center;
+  color: #ff8f9f;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+}
+

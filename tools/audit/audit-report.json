@@ -1,0 +1,239 @@
+{
+  "generatedAt": "2026-02-25T14:24:28.785Z",
+  "routes": [
+    "login",
+    "register",
+    "player/profile",
+    "player/onboarding",
+    "demo/position-picker",
+    "sessions/create",
+    "matches/history",
+    "matches/create",
+    "matches/venues/new",
+    "matches/:id",
+    "invitations",
+    "leaderboard",
+    "ranking",
+    "stats",
+    "social"
+  ],
+  "totals": {
+    "pages": 14,
+    "pagesWithNgOnInit": 2,
+    "pagesWithIonViewWillEnter": 9,
+    "filesWithSubscribe": 11,
+    "filesWithSubscribeWithoutTeardown": 6,
+    "navigationSafeCalls": 48,
+    "directRouterNavigateOutsideNavigationService": 0,
+    "liveFilesWithPollingHints": 1
+  },
+  "lifecycleRows": [
+    {
+      "file": "src/app/features/auth/pages/login/login.page.ts",
+      "hasNgOnInit": false,
+      "hasIonViewWillEnter": false
+    },
+    {
+      "file": "src/app/features/auth/pages/register/register.page.ts",
+      "hasNgOnInit": false,
+      "hasIonViewWillEnter": false
+    },
+    {
+      "file": "src/app/features/matches/pages/invitations/invitations.page.ts",
+      "hasNgOnInit": false,
+      "hasIonViewWillEnter": true
+    },
+    {
+      "file": "src/app/features/matches/pages/match-detail/match-detail.page.ts",
+      "hasNgOnInit": true,
+      "hasIonViewWillEnter": true
+    },
+    {
+      "file": "src/app/features/matches/pages/matches-create/matches-create.page.ts",
+      "hasNgOnInit": false,
+      "hasIonViewWillEnter": true
+    },
+    {
+      "file": "src/app/features/matches/pages/matches-history/matches-history.page.ts",
+      "hasNgOnInit": false,
+      "hasIonViewWillEnter": true
+    },
+    {
+      "file": "src/app/features/matches/pages/venue-create/venue-create.page.ts",
+      "hasNgOnInit": true,
+      "hasIonViewWillEnter": false
+    },
+    {
+      "file": "src/app/features/ratings/pages/leaderboard/leaderboard.page.ts",
+      "hasNgOnInit": false,
+      "hasIonViewWillEnter": true
+    },
+    {
+      "file": "src/app/features/sessions/pages/create-session/create-session.page.ts",
+      "hasNgOnInit": false,
+      "hasIonViewWillEnter": true
+    },
+    {
+      "file": "src/app/features/social/pages/social.page.ts",
+      "hasNgOnInit": false,
+      "hasIonViewWillEnter": true
+    },
+    {
+      "file": "src/app/features/social/pages/stats/stats.page.ts",
+      "hasNgOnInit": false,
+      "hasIonViewWillEnter": false
+    },
+    {
+      "file": "src/app/features/user/pages/player-onboarding/player-onboarding.page.ts",
+      "hasNgOnInit": false,
+      "hasIonViewWillEnter": true
+    },
+    {
+      "file": "src/app/features/user/pages/player-profile/player-profile.page.ts",
+      "hasNgOnInit": false,
+      "hasIonViewWillEnter": true
+    },
+    {
+      "file": "src/app/features/user/pages/position-picker-demo/position-picker-demo.page.ts",
+      "hasNgOnInit": false,
+      "hasIonViewWillEnter": false
+    }
+  ],
+  "subscribeRows": [
+    {
+      "file": "src/app/features/auth/pages/login/login.page.ts",
+      "subscribeCount": 1,
+      "hasTeardownHints": false
+    },
+    {
+      "file": "src/app/features/auth/pages/register/register.page.ts",
+      "subscribeCount": 1,
+      "hasTeardownHints": false
+    },
+    {
+      "file": "src/app/features/matches/components/match-schedule-form/match-schedule-form.component.ts",
+      "subscribeCount": 2,
+      "hasTeardownHints": false
+    },
+    {
+      "file": "src/app/features/matches/components/venue-search/venue-search.component.ts",
+      "subscribeCount": 3,
+      "hasTeardownHints": false
+    },
+    {
+      "file": "src/app/features/matches/pages/matches-history/matches-history.page.ts",
+      "subscribeCount": 1,
+      "hasTeardownHints": true
+    },
+    {
+      "file": "src/app/features/ratings/pages/leaderboard/leaderboard.page.ts",
+      "subscribeCount": 2,
+      "hasTeardownHints": true
+    },
+    {
+      "file": "src/app/features/sessions/components/associated-team-roster/associated-team-roster.component.ts",
+      "subscribeCount": 1,
+      "hasTeardownHints": true
+    },
+    {
+      "file": "src/app/features/sessions/services/create-match-wizard-state.service.ts",
+      "subscribeCount": 2,
+      "hasTeardownHints": false
+    },
+    {
+      "file": "src/app/features/teams/components/team-creator/team-creator.component.ts",
+      "subscribeCount": 1,
+      "hasTeardownHints": false
+    },
+    {
+      "file": "src/app/features/user/pages/player-onboarding/player-onboarding.page.ts",
+      "subscribeCount": 2,
+      "hasTeardownHints": true
+    },
+    {
+      "file": "src/app/features/user/pages/player-profile/player-profile.page.ts",
+      "subscribeCount": 2,
+      "hasTeardownHints": true
+    }
+  ],
+  "liveServiceRows": [
+    {
+      "file": "src/app/features/matches/services/match-live.service.ts",
+      "timers": 2,
+      "pollingMentions": 33
+    }
+  ],
+  "navigationRows": [
+    {
+      "file": "src/app/core/services/navigation.service.ts",
+      "routerNavigateCount": 2,
+      "safeNavigateCount": 3
+    },
+    {
+      "file": "src/app/features/auth/pages/login/login.page.ts",
+      "routerNavigateCount": 0,
+      "safeNavigateCount": 2
+    },
+    {
+      "file": "src/app/features/auth/pages/register/register.page.ts",
+      "routerNavigateCount": 0,
+      "safeNavigateCount": 2
+    },
+    {
+      "file": "src/app/features/matches/components/venue-search/venue-search.component.ts",
+      "routerNavigateCount": 0,
+      "safeNavigateCount": 2
+    },
+    {
+      "file": "src/app/features/matches/pages/invitations/invitations.page.ts",
+      "routerNavigateCount": 0,
+      "safeNavigateCount": 1
+    },
+    {
+      "file": "src/app/features/matches/pages/match-detail/match-detail.page.ts",
+      "routerNavigateCount": 0,
+      "safeNavigateCount": 1
+    },
+    {
+      "file": "src/app/features/matches/pages/matches-create/matches-create.page.ts",
+      "routerNavigateCount": 0,
+      "safeNavigateCount": 1
+    },
+    {
+      "file": "src/app/features/matches/pages/matches-history/matches-history.page.ts",
+      "routerNavigateCount": 0,
+      "safeNavigateCount": 5
+    },
+    {
+      "file": "src/app/features/matches/pages/venue-create/venue-create.page.ts",
+      "routerNavigateCount": 0,
+      "safeNavigateCount": 1
+    },
+    {
+      "file": "src/app/features/ratings/pages/leaderboard/leaderboard.page.ts",
+      "routerNavigateCount": 0,
+      "safeNavigateCount": 5
+    },
+    {
+      "file": "src/app/features/sessions/pages/create-session/create-session.page.ts",
+      "routerNavigateCount": 0,
+      "safeNavigateCount": 6
+    },
+    {
+      "file": "src/app/features/social/pages/social.page.ts",
+      "routerNavigateCount": 0,
+      "safeNavigateCount": 11
+    },
+    {
+      "file": "src/app/features/user/pages/player-onboarding/player-onboarding.page.ts",
+      "routerNavigateCount": 0,
+      "safeNavigateCount": 3
+    },
+    {
+      "file": "src/app/features/user/pages/player-profile/player-profile.page.ts",
+      "routerNavigateCount": 0,
+      "safeNavigateCount": 5
+    }
+  ],
+  "directNavigateOutsideService": []
+}

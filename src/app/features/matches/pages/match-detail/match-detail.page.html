@@ -1,0 +1,146 @@
+﻿<ion-content class="match-detail-bg">
+  <div class="match-detail-container">
+    <app-metallic-card title="Estado del partido" [titleIconAsset]="titleIconAsset">
+      <p *ngIf="loadingMatch()" class="match-detail-live">Cargando informacion del partido...</p>
+      <p *ngIf="loadError()" class="match-detail-feedback">{{ loadError() }}</p>
+      <div class="match-detail-retry" *ngIf="loadError()">
+        <app-metallic-button type="button" variant="secondary" (click)="onRetry()">
+          Reintentar
+        </app-metallic-button>
+      </div>
+      <p *ngIf="!loadingMatch() && !loadError() && !match()" class="match-detail-feedback">
+        No se encontro informacion para este partido.
+      </p>
+
+      <app-metallic-form-section title="Header partido" [titleIconAsset]="titleIconAsset" description="Estado, cuenta regresiva y cancha.">
+        <app-match-header-card
+          *ngIf="match()"
+          [match]="match()!"
+          [theme]="selectedTheme()">
+        </app-match-header-card>
+      </app-metallic-form-section>
+
+      <app-metallic-form-section
+        *ngIf="canRespondInvitationInMatch()"
+        title="Tu invitacion"
+        [titleIconAsset]="actionsIconAsset"
+        description="Responde tu asistencia directamente desde este estado.">
+        <div class="match-detail-actions">
+          <app-metallic-button
+            type="button"
+            variant="accent"
+            [disabled]="inviteActionLoading()"
+            (click)="onAcceptFromMatchState()">
+            Aceptar
+          </app-metallic-button>
+          <app-metallic-button
+            type="button"
+            variant="secondary"
+            [disabled]="inviteActionLoading()"
+            (click)="onDeclineFromMatchState()">
+            No puedo
+          </app-metallic-button>
+        </div>
+      </app-metallic-form-section>
+
+      <app-metallic-form-section
+        title="Confirmaciones y participantes"
+        [titleIconAsset]="progressIconAsset"
+        description="Aqui ves progreso y estado de cada jugador en un solo lugar.">
+        <app-match-confirmation-progress
+          *ngIf="match() && progress()"
+          [match]="match()!"
+          [progress]="progress()!"
+          [isCreator]="isCreator()"
+          (remindPending)="onRemindPending()"
+          (inviteMore)="onInviteMore()">
+        </app-match-confirmation-progress>
+
+        <app-participant-segment
+          [selected]="selectedParticipantSegment()"
+          [confirmedCount]="confirmedParticipants().length"
+          [pendingCount]="pendingParticipants().length"
+          [declinedCount]="declinedParticipants().length"
+          (selectedChange)="onSegmentChange($event)">
+        </app-participant-segment>
+
+        <app-participant-list
+          [participants]="visibleParticipants()"
+          [emptyMessage]="'No hay jugadores en este estado por ahora.'">
+        </app-participant-list>
+      </app-metallic-form-section>
+
+      <app-metallic-form-section
+        *ngIf="canShowTeams()"
+        title="Equipos"
+        [titleIconAsset]="participantsIconAsset"
+        description="Equipos habilitados desde partido confirmado.">
+        <p *ngIf="teamAssignmentError()" class="match-detail-feedback match-detail-feedback--error">
+          {{ teamAssignmentError() }}
+        </p>
+        <app-teams-board
+          [players]="confirmedPlayers()"
+          [initialHomePlayers]="assignedHomePlayers()"
+          [initialAwayPlayers]="assignedAwayPlayers()"
+          [homeColor]="match()?.homeKitColor || 'Azul'"
+          [awayColor]="match()?.awayKitColor || 'Rojo'"
+          [enabled]="canEditTeams()"
+          [readOnlyMessage]="teamsReadOnlyMessage()"
+          (teamsChange)="onTeamsChange($event)">
+        </app-teams-board>
+      </app-metallic-form-section>
+
+      <app-metallic-form-section title="Ubicacion" [titleIconAsset]="progressIconAsset" description="Cancha seleccionada para el partido.">
+        <app-venue-selected-card [venue]="selectedVenue()"></app-venue-selected-card>
+      </app-metallic-form-section>
+
+      <app-metallic-form-section title="Impacto competitivo" [titleIconAsset]="rankingIconAsset" description="Preparado para ranking y estadisticas.">
+        <div class="match-detail-impact">
+          <p>Este partido afectara el ranking.</p>
+          <p>Proximamente: MVP, estadisticas y puntos competitivos.</p>
+        </div>
+      </app-metallic-form-section>
+
+      <app-metallic-form-section
+        *ngIf="isFinalized()"
+        title="Partido finalizado"
+        [titleIconAsset]="rankingIconAsset"
+        description="El partido ya fue cerrado y el resultado quedo consolidado.">
+        <div class="match-detail-impact">
+          <p *ngIf="finalizedScoreLabel()">Marcador final: {{ finalizedScoreLabel() }}</p>
+          <p *ngIf="finalizedResolutionLabel()">{{ finalizedResolutionLabel() }}</p>
+          <p *ngIf="mvpVotesProgressLabel()">{{ mvpVotesProgressLabel() }}</p>
+          <p *ngIf="mvpProgressHint()">{{ mvpProgressHint() }}</p>
+          <p *ngIf="canOpenMvpVote()">La votacion MVP esta disponible por 3 horas tras el cierre.</p>
+          <p *ngIf="!canOpenMvpVote()">La ventana de votacion MVP ya cerro.</p>
+        </div>
+        <div class="match-detail-actions" *ngIf="canOpenMvpVote()">
+          <app-metallic-button type="button" variant="accent" (click)="onOpenMvpVote()">
+            Ir a Votacion MVP
+          </app-metallic-button>
+        </div>
+      </app-metallic-form-section>
+
+      <app-metallic-form-section
+        *ngIf="isCreator()"
+        title="Acciones"
+        [titleIconAsset]="actionsIconAsset"
+        description="Acciones segun tu contexto en este partido.">
+        <p class="match-detail-feedback" *ngIf="closeMatchMessage()">
+          {{ closeMatchMessage() }}
+        </p>
+        <div class="match-detail-actions">
+          <app-metallic-button type="button" variant="accent" [disabled]="!canCloseMatch()" (click)="onFinishMatch()">
+            Cierre del Partido
+          </app-metallic-button>
+        </div>
+      </app-metallic-form-section>
+    </app-metallic-card>
+  </div>
+</ion-content>
+
+<ion-footer class="match-detail-footer" translucent>
+  <ion-toolbar>
+    <app-metallic-bottom-nav [items]="bottomNavItems" (itemSelected)="onNavItemSelected($event)"></app-metallic-bottom-nav>
+  </ion-toolbar>
+</ion-footer>

@@ -1,0 +1,124 @@
+/*
+ * App Global CSS
+ * ----------------------------------------------------------------------------
+ * Put style rules here that you want to apply globally. These styles are for
+ * the entire app and not just one component. Additionally, this file can be
+ * used as an entry point to import other CSS/Sass files to be included in the
+ * output CSS.
+ * For more information on global stylesheets, visit the documentation:
+ * https://ionicframework.com/docs/layout/global-stylesheets
+ */
+
+/* Core CSS required for Ionic components to work properly */
+@import "@ionic/angular/css/core.css";
+
+/* Basic CSS for apps built with Ionic */
+@import "@ionic/angular/css/normalize.css";
+@import "@ionic/angular/css/structure.css";
+@import "@ionic/angular/css/typography.css";
+@import "@ionic/angular/css/display.css";
+
+/* Optional CSS utils that can be commented out */
+@import "@ionic/angular/css/padding.css";
+@import "@ionic/angular/css/float-elements.css";
+@import "@ionic/angular/css/text-alignment.css";
+@import "@ionic/angular/css/text-transformation.css";
+@import "@ionic/angular/css/flex-utils.css";
+@import "leaflet/dist/leaflet.css";
+
+/**
+ * Ionic Dark Mode
+ * -----------------------------------------------------
+ * For more info, please see:
+ * https://ionicframework.com/docs/theming/dark-mode
+ */
+
+/* @import "@ionic/angular/css/palettes/dark.always.css"; */
+/* @import "@ionic/angular/css/palettes/dark.class.css"; */
+@import '@ionic/angular/css/palettes/dark.system.css';
+
+:root {
+  --atleta-icon-color: #dfe9f9;
+  --atleta-icon-glow-soft: rgba(255, 255, 255, 0.55);
+  --atleta-icon-glow-main: rgba(194, 226, 255, 0.58);
+  --atleta-icon-glow-deep: rgba(56, 90, 140, 0.48);
+  --atleta-icon-nav-main: rgba(173, 216, 255, 0.72);
+  --atleta-icon-nav-deep: rgba(50, 79, 122, 0.55);
+}
+
+ion-toast.toast-success::part(container) {
+  border: 1px solid rgba(74, 222, 128, 0.5);
+  background: rgba(11, 36, 24, 0.94);
+  color: #d1fae5;
+}
+
+ion-toast.toast-error::part(container) {
+  border: 1px solid rgba(248, 113, 113, 0.55);
+  background: rgba(42, 12, 12, 0.95);
+  color: #fecaca;
+}
+
+ion-toast.toast-info::part(container) {
+  border: 1px solid rgba(96, 165, 250, 0.45);
+  background: rgba(9, 20, 43, 0.95);
+  color: #bfdbfe;
+}
+
+/* Icon system: stronger, game-like definition across the app */
+ion-icon {
+  --ionicon-stroke-width: 42px;
+  color: var(--atleta-icon-color);
+  transition: transform 180ms ease, filter 180ms ease, opacity 180ms ease;
+  filter:
+    drop-shadow(0 0 1px var(--atleta-icon-glow-soft))
+    drop-shadow(0 1px 3px rgba(56, 78, 120, 0.45));
+}
+
+.atleta-game-icon {
+  color: var(--atleta-icon-color);
+  opacity: 0.95;
+  transform: translateZ(0);
+  filter:
+    drop-shadow(0 0 2px var(--atleta-icon-glow-main))
+    drop-shadow(0 2px 6px var(--atleta-icon-glow-deep));
+}
+
+.atleta-game-icon--nav {
+  color: var(--atleta-icon-color);
+  filter:
+    drop-shadow(0 0 3px var(--atleta-icon-nav-main))
+    drop-shadow(0 2px 8px var(--atleta-icon-nav-deep));
+}
+
+.atleta-game-icon:hover {
+  transform: translateY(-1px) scale(1.04);
+  filter:
+    drop-shadow(0 0 3px rgba(202, 233, 255, 0.7))
+    drop-shadow(0 3px 10px rgba(50, 86, 132, 0.55));
+}
+
+.atleta-icon-chip {
+  width: 30px;
+  height: 30px;
+  border-radius: 9px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(143, 171, 211, 0.45);
+  background: linear-gradient(155deg, rgba(27, 36, 58, 0.95), rgba(13, 20, 36, 0.95));
+  box-shadow:
+    inset 0 1px 0 rgba(240, 246, 255, 0.14),
+    0 0 0 1px rgba(91, 122, 166, 0.16),
+    0 7px 14px rgba(0, 0, 0, 0.36);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ion-icon,
+  .atleta-game-icon {
+    transition: none;
+  }
+
+  .atleta-game-icon:hover {
+    transform: none;
+  }
+}

@@ -1,0 +1,11 @@
+<div class="social-tabs">
+  <button
+    type="button"
+    *ngFor="let tab of tabs"
+    class="social-tabs__item"
+    [class.social-tabs__item--active]="tab.id === activeTab"
+    (click)="onSelect(tab.id)">
+    <span>{{ tab.label }}</span>
+    <small *ngIf="tab.badge && tab.badge > 0">{{ tab.badge }}</small>
+  </button>
+</div>

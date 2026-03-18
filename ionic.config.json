@@ -1,0 +1,7 @@
+{
+  "name": "atleta-app",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular-standalone"
+}

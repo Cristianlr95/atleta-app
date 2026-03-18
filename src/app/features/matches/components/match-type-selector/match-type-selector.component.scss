@@ -1,0 +1,32 @@
+﻿.type-grid {
+  display: grid;
+  gap: 10px;
+}
+
+.type-card {
+  border: 1px solid rgba(130, 155, 189, 0.35);
+  border-radius: 12px;
+  padding: 12px;
+  text-align: left;
+  background: rgba(13, 20, 33, 0.68);
+  color: #ecf3ff;
+}
+
+.type-card--selected {
+  border-color: rgba(85, 208, 172, 0.72);
+  box-shadow: 0 0 0 1px rgba(85, 208, 172, 0.3) inset;
+}
+
+.type-card__title {
+  margin: 0;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.type-card__description {
+  margin: 4px 0 0;
+  color: #b5c7e3;
+  font-size: 13px;
+}
+

@@ -1,0 +1,45 @@
+﻿.progress-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 8px;
+}
+
+.progress-head__title {
+  margin: 0;
+  color: #ecf3ff;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.progress-head__meta {
+  margin: 0;
+  color: #aac0de;
+  font-size: 12px;
+}
+
+.progress-message {
+  margin: 8px 0 0;
+  color: #dce8ff;
+  font-size: 13px;
+}
+
+.confirmed-list {
+  margin-top: 10px;
+  border-top: 1px solid rgba(120, 139, 162, 0.3);
+  padding-top: 8px;
+}
+
+.confirmed-list__title {
+  margin: 0 0 4px;
+  color: #edf3ff;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.confirmed-list__item {
+  margin: 0;
+  color: #b6c7e2;
+  font-size: 12px;
+}
+

@@ -1,0 +1,60 @@
+﻿<ion-content class="login-bg">
+  <div class="login-container">
+    <app-metallic-card title="Iniciar sesión" [titleIconAsset]="loginTitleIconAsset">
+      <form class="login-form" [formGroup]="loginForm" (ngSubmit)="onLogin()">
+        <app-metallic-input
+          formControlName="email"
+          label="Email"
+          type="email"
+          placeholder="tu@email.com">
+        </app-metallic-input>
+
+        <app-metallic-input
+          formControlName="password"
+          label="Contraseña"
+          type="password"
+          placeholder="••••••••"
+          allowPasswordToggle>
+        </app-metallic-input>
+
+        <app-metallic-button
+          class="login-submit"
+          type="submit"
+          variant="primary"
+          [disabled]="loginForm.invalid || isSubmitting">
+          {{ isSubmitting ? 'Ingresando...' : 'Iniciar sesión' }}
+        </app-metallic-button>
+
+        <p *ngIf="authError" class="login-error">{{ authError }}</p>
+
+        <button type="button" class="login-link" [disabled]="isSubmitting" (click)="onForgotPassword()">
+          ¿Olvidaste tu contraseña?
+        </button>
+
+        <div class="login-divider" aria-hidden="true">
+          <span>o</span>
+        </div>
+
+        <app-metallic-button
+          type="button"
+          variant="secondary"
+          [disabled]="isSubmitting"
+          (click)="onContinueWithGoogle()">
+          <ion-icon [src]="googleIconAsset" aria-hidden="true"></ion-icon>
+          Continuar con Google
+        </app-metallic-button>
+
+        <p class="login-signup">
+          ¿No tienes cuenta?
+          <button
+            type="button"
+            class="login-signup__action"
+            [disabled]="isSubmitting"
+            (click)="onCreateAccount()">
+            Crear cuenta
+          </button>
+        </p>
+      </form>
+    </app-metallic-card>
+  </div>
+</ion-content>

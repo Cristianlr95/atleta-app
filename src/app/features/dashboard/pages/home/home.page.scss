@@ -1,0 +1,212 @@
+.home-bg {
+  --background: radial-gradient(circle at top, #1e2b4f 0%, #0b1225 55%, #050913 100%);
+  --atleta-icon-color: #e8f7ff;
+  --atleta-icon-glow-main: rgba(126, 232, 255, 0.7);
+  --atleta-icon-glow-deep: rgba(44, 112, 144, 0.55);
+  --atleta-icon-nav-main: rgba(130, 227, 255, 0.78);
+  --atleta-icon-nav-deep: rgba(33, 90, 122, 0.6);
+}
+
+.home-container {
+  max-width: 880px;
+  margin: 0 auto;
+  padding: 16px 14px 96px;
+}
+
+.home-identity {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.home-avatar {
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #d6ecff;
+  border: 1px solid rgba(133, 174, 233, 0.55);
+  background: radial-gradient(circle at 35% 35%, rgba(135, 206, 255, 0.34), rgba(17, 33, 71, 0.95));
+}
+
+.home-name {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #eaf5ff;
+}
+
+.home-subtitle,
+.home-streak {
+  margin: 2px 0 0;
+  color: #b4c6e8;
+}
+
+.home-xp {
+  margin-top: 14px;
+}
+
+.home-xp__labels {
+  display: flex;
+  justify-content: space-between;
+  color: #d7e8ff;
+  font-size: 0.85rem;
+  margin-bottom: 8px;
+}
+
+.home-xp__track {
+  height: 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(147, 181, 229, 0.45);
+  background: rgba(19, 31, 61, 0.85);
+  overflow: hidden;
+}
+
+.home-xp__fill {
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #53d2ff 0%, #7ce9a8 100%);
+  box-shadow: 0 0 14px rgba(83, 210, 255, 0.48);
+  transition: width 300ms ease;
+}
+
+.home-hint {
+  margin: 8px 0 0;
+  color: #9cd9ff;
+  font-weight: 600;
+}
+
+.home-status-card {
+  border: 1px solid rgba(102, 171, 236, 0.5);
+  border-radius: 12px;
+  padding: 12px;
+  background: linear-gradient(145deg, rgba(8, 24, 54, 0.92), rgba(9, 18, 38, 0.95));
+}
+
+.home-status-card__title {
+  margin: 0;
+  color: #e6f4ff;
+  font-size: 1.02rem;
+  font-weight: 700;
+}
+
+.home-status-card__detail {
+  margin: 6px 0 0;
+  color: #b7d1ef;
+}
+
+.home-next-status {
+  margin-top: 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border-radius: 999px;
+  border: 1px solid rgba(141, 178, 226, 0.55);
+  padding: 3px 9px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.home-next-status__icon-wrap {
+  width: 18px;
+  height: 18px;
+  border-radius: 6px;
+  border: 1px solid rgba(132, 157, 190, 0.4);
+  background: linear-gradient(to bottom right, rgba(23, 34, 55, 0.92), rgba(10, 16, 30, 0.96));
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.home-next-status__icon {
+  font-size: 12px;
+}
+
+.home-next-status--neutral {
+  color: #d4e8ff;
+  border-color: rgba(141, 178, 226, 0.55);
+}
+
+.home-next-status--warning {
+  color: #ffe0ae;
+  border-color: rgba(255, 198, 110, 0.58);
+}
+
+.home-next-status--success {
+  color: #c8f5df;
+  border-color: rgba(124, 233, 168, 0.6);
+}
+
+.home-next-status--danger {
+  color: #ffd1d1;
+  border-color: rgba(255, 133, 133, 0.58);
+}
+
+.home-status-grid {
+  margin-top: 10px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.home-status-pill {
+  border-radius: 10px;
+  padding: 10px;
+  border: 1px solid rgba(119, 155, 207, 0.35);
+  background: rgba(11, 21, 44, 0.88);
+  color: #e5f2ff;
+  display: grid;
+  gap: 4px;
+}
+
+.home-status-pill__label {
+  color: #a7bddf;
+  font-size: 0.8rem;
+}
+
+.home-loading {
+  margin: 0 0 8px;
+  color: #9bc8f0;
+}
+
+.home-feed {
+  display: grid;
+  gap: 8px;
+}
+
+.home-feed__item {
+  border-radius: 10px;
+  padding: 10px 12px;
+  border: 1px solid rgba(113, 151, 204, 0.4);
+  background: rgba(8, 18, 38, 0.84);
+  color: #d6e9ff;
+}
+
+.home-feed__item[data-variant='xp'] {
+  border-color: rgba(80, 208, 255, 0.58);
+}
+
+.home-feed__item[data-variant='mvp'] {
+  border-color: rgba(124, 233, 168, 0.58);
+}
+
+.home-feed__item[data-variant='rank'] {
+  border-color: rgba(255, 215, 120, 0.58);
+}
+
+.home-footer ion-toolbar {
+  --background: rgba(6, 10, 20, 0.92);
+  --border-color: transparent;
+  padding: 6px 8px calc(env(safe-area-inset-bottom) + 8px);
+}
+
+@media (max-width: 640px) {
+  .home-status-grid {
+    grid-template-columns: 1fr;
+  }
+}

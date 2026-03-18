@@ -1,0 +1,36 @@
+﻿.invitation-card {
+  border: 1px solid rgba(130, 155, 189, 0.35);
+  border-radius: 12px;
+  background: rgba(12, 18, 30, 0.72);
+  padding: 12px;
+}
+
+.invitation-card__title {
+  margin: 0;
+  color: #ecf3ff;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.invitation-card__meta {
+  margin: 4px 0 0;
+  color: #b3c6e2;
+  font-size: 12px;
+}
+
+.invitation-card__actions {
+  margin-top: 10px;
+  display: flex;
+  gap: 8px;
+}
+
+.invitation-card__actions button {
+  border: 1px solid rgba(128, 151, 179, 0.4);
+  background: rgba(16, 27, 43, 0.76);
+  color: #dce8ff;
+  border-radius: 8px;
+  padding: 8px 10px;
+  font-size: 12px;
+}
+

@@ -1,0 +1,146 @@
+﻿<ion-content class="profile-bg">
+  <div class="profile-container">
+    <app-metallic-card title="Perfil del jugador" [titleIconAsset]="profileTitleIconAsset">
+      <div class="profile-header">
+        <div class="profile-identity">
+          <p class="profile-name">{{ displayName }}</p>
+          <p class="profile-alias">Alias: {{ displayAlias }}</p>
+          <p class="profile-email">{{ displayEmail }}</p>
+        </div>
+      </div>
+
+      <p *ngIf="isLoading" class="profile-message profile-message--info">Actualizando estadísticas...</p>
+      <p *ngIf="errorMessage" class="profile-message profile-message--warning">{{ errorMessage }}</p>
+
+      <app-metallic-form-section
+        title="Mis equipos"
+        [titleIconAsset]="teamsSectionIconAsset"
+        description="Equipos donde participas actualmente.">
+        <div *ngIf="memberTeams.length > 0; else noTeams" class="profile-teams">
+          <div class="profile-team" *ngFor="let team of memberTeams">
+            <div class="profile-team__head">
+              <img
+                *ngIf="team.logoUrl"
+                class="profile-team__logo"
+                [src]="team.logoUrl"
+                [alt]="'Logo ' + team.nombre"
+              />
+              <div class="profile-team__meta">
+                <p class="profile-team__name">{{ team.nombre }}</p>
+                <p class="profile-team__detail" *ngIf="team.anioFundacion">Fundado: {{ team.anioFundacion }}</p>
+              </div>
+              <div class="profile-team__actions">
+                <button
+                  type="button"
+                  class="profile-team__btn profile-team__btn--icon"
+                  (click)="toggleTeamAccordion(team.id)">
+                  {{ isTeamExpanded(team.id) ? 'Ocultar' : 'Ver' }}
+                </button>
+                <button type="button" class="profile-team__btn" *ngIf="isTeamCreator(team)" (click)="toggleTeamAccordion(team.id)">
+                  + Gestionar
+                </button>
+                <button type="button" class="profile-team__btn profile-team__btn--danger" *ngIf="isTeamCreator(team)" (click)="onDeleteTeam(team)">
+                  Eliminar
+                </button>
+              </div>
+            </div>
+
+            <div class="profile-team-invite" *ngIf="isTeamExpanded(team.id)">
+              <p class="profile-team-invite__title">Participantes y nivel del equipo</p>
+              <p class="profile-message profile-message--info" *ngIf="teamMembersLoading">Cargando miembros...</p>
+              <p class="profile-message profile-message--warning" *ngIf="teamMembersError">{{ teamMembersError }}</p>
+              <div class="profile-team-members" *ngIf="!teamMembersLoading && teamMembers.length > 0">
+                <div class="profile-team-members__item" *ngFor="let member of teamMembers">
+                  <div>
+                    <p>{{ member.alias }}</p>
+                    <small *ngIf="member.primaryPositionName">{{ member.primaryPositionName }}</small>
+                  </div>
+                  <div class="profile-team-members__right">
+                    <span>{{ memberRoleLabel(member.rol) }}</span>
+                    <span>{{ memberOvrLabel(member.ovr) }}</span>
+                  </div>
+                </div>
+              </div>
+
+              <ng-container *ngIf="isTeamCreator(team)">
+                <p class="profile-team-invite__subtitle">Invitar jugador</p>
+                <input
+                  type="text"
+                  class="profile-team-invite__input"
+                  [ngModel]="inviteQuery"
+                  (ngModelChange)="onInviteQueryChange($event)"
+                  placeholder="Buscar por alias, nombre o email" />
+                <p class="profile-message profile-message--info" *ngIf="inviteLoading">Buscando jugadores...</p>
+                <div class="profile-team-invite__list" *ngIf="inviteCandidates.length > 0">
+                  <div class="profile-team-invite__item" *ngFor="let player of inviteCandidates">
+                    <div class="profile-team-invite__meta">
+                      <p>{{ player.alias || player.athleteName || player.atletaUuid }}</p>
+                      <small *ngIf="player.athleteEmail">{{ player.athleteEmail }}</small>
+                    </div>
+                    <button
+                      type="button"
+                      class="profile-team__btn"
+                      [disabled]="inviteSendingUuid === player.atletaUuid"
+                      (click)="onSendTeamInvite(player.atletaUuid)">
+                      {{ inviteSendingUuid === player.atletaUuid ? 'Enviando...' : 'Invitar' }}
+                    </button>
+                  </div>
+                </div>
+              </ng-container>
+            </div>
+          </div>
+        </div>
+        <ng-template #noTeams>
+          <p class="profile-message profile-message--info">Aun no perteneces a ningun equipo.</p>
+        </ng-template>
+      </app-metallic-form-section>
+
+      <app-metallic-form-section
+        title="Hexágono de estadísticas"
+        [titleIconAsset]="hexagonSectionIconAsset"
+        description="Tu rendimiento por rol basado en el sistema de Atleta.">
+        <app-metallic-role-hexagon
+          [stats]="roleStats"
+          [compact]="true"
+          [overallValue]="overallHybridOvr"
+          [overallClassificationLabel]="overallText"
+          [versatilityValue]="overallVersatilityPercent"
+          [bestRoleOverride]="overallBestRole"
+          [bestRoleRatingOverride]="overallBestRoleRating"
+          [subtitle]="'Clasificación general: ' + overallText">
+        </app-metallic-role-hexagon>
+      </app-metallic-form-section>
+
+      <app-metallic-form-section
+        title="Resumen competitivo"
+        [titleIconAsset]="overviewSectionIconAsset"
+        descriptionSize="small"
+        description="Métricas rápidas para evaluar tu evolución.">
+        <app-metallic-stats [stats]="summaryStats" [compact]="true"></app-metallic-stats>
+      </app-metallic-form-section>
+
+      <app-metallic-form-section
+        title="Victorias / Empates / Derrotas"
+        [titleIconAsset]="outcomesSectionIconAsset"
+        description="Resumen rápido de resultados en partidos.">
+        <app-metallic-stats [stats]="outcomeStats" [compact]="true"></app-metallic-stats>
+      </app-metallic-form-section>
+
+      <app-metallic-form-section
+        title="Posiciones seleccionadas"
+        [titleIconAsset]="positionsSectionIconAsset"
+        description="Roles elegidos para tu perfil en Atleta.">
+        <app-metallic-player-positions [positions]="playerPositions"></app-metallic-player-positions>
+      </app-metallic-form-section>
+    </app-metallic-card>
+  </div>
+</ion-content>
+
+<ion-footer class="profile-footer" translucent>
+  <ion-toolbar>
+    <app-metallic-bottom-nav
+      [items]="bottomNavItems"
+      (itemSelected)="onNavItemSelected($event)">
+    </app-metallic-bottom-nav>
+  </ion-toolbar>
+</ion-footer>

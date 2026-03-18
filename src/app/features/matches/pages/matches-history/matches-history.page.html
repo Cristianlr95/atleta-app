@@ -1,0 +1,78 @@
+﻿<ion-content class="matches-bg">
+  <div class="matches-container">
+    <div class="matches-shell">
+      <app-page-nav></app-page-nav>
+
+      <app-metallic-card title="Partidos" [titleIconAsset]="titleIconAsset">
+        <p *ngIf="isLoading" class="matches-message matches-message--info">Cargando partidos...</p>
+        <p *ngIf="errorMessage" class="matches-message matches-message--warning">{{ errorMessage }}</p>
+        <div *ngIf="errorMessage" class="matches-message">
+          <button type="button" class="matches-retry" (click)="onRetryLoad()">Reintentar</button>
+        </div>
+
+        <div class="matches-panel matches-panel--outcomes">
+          <app-metallic-form-section
+            title="Resultados"
+            [titleIconAsset]="outcomesSectionIconAsset"
+            description="Resumen de victorias, empates y derrotas.">
+            <app-metallic-stats [stats]="outcomeStats"></app-metallic-stats>
+          </app-metallic-form-section>
+        </div>
+
+        <div class="matches-panel matches-panel--history">
+          <app-metallic-form-section
+            title="Historial de competicion"
+            [titleIconAsset]="historySectionIconAsset"
+            description="Listado completo de partidos registrados.">
+            <div class="matches-filters">
+              <label class="matches-filters__field">
+                <span>Resultado</span>
+                <select [(ngModel)]="selectedOutcomeFilter" (ngModelChange)="onHistoryFilterChange()">
+                  <option value="ALL">Todos</option>
+                  <option value="GANADO">Victoria</option>
+                  <option value="EMPATADO">Empate</option>
+                  <option value="PERDIDO">Derrota</option>
+                </select>
+              </label>
+
+              <label class="matches-filters__field">
+                <span>Modalidad</span>
+                <select [(ngModel)]="selectedModalityFilter" (ngModelChange)="onHistoryFilterChange()">
+                  <option value="ALL">Todas</option>
+                  <option value="CINCO_VS_CINCO">5 vs 5</option>
+                  <option value="SEIS_VS_SEIS">6 vs 6</option>
+                  <option value="SIETE_VS_SIETE">7 vs 7</option>
+                </select>
+              </label>
+
+              <label class="matches-filters__field">
+                <span>Estado</span>
+                <select [(ngModel)]="selectedStatusFilter" (ngModelChange)="onHistoryFilterChange()">
+                  <option value="ALL">Todos</option>
+                  <option value="FINALIZADO">Finalizado</option>
+                  <option value="INICIADO">En juego</option>
+                  <option value="CREADO">Creado</option>
+                  <option value="INVALIDO">Cancelado</option>
+                </select>
+              </label>
+
+              <button type="button" class="matches-filters__clear" (click)="resetHistoryFilters()">
+                Limpiar
+              </button>
+            </div>
+            <app-metallic-competition-history [items]="matchHistoryItems"></app-metallic-competition-history>
+          </app-metallic-form-section>
+        </div>
+      </app-metallic-card>
+    </div>
+  </div>
+</ion-content>
+
+<ion-footer class="matches-footer" translucent>
+  <ion-toolbar>
+    <app-metallic-bottom-nav
+      [items]="bottomNavItems"
+      (itemSelected)="onNavItemSelected($event)">
+    </app-metallic-bottom-nav>
+  </ion-toolbar>
+</ion-footer>

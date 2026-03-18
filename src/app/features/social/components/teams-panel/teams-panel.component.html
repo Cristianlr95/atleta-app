@@ -1,0 +1,46 @@
+<section class="teams-panel">
+  <h4>Mi equipo principal</h4>
+  <article class="teams-item" *ngIf="principalTeam; else noTeam">
+    <p>{{ principalTeam.nombre }}</p>
+    <button type="button" (click)="openTeam.emit(principalTeam.id)">Abrir equipo</button>
+  </article>
+  <ng-template #noTeam>
+    <p class="teams-panel__state">No tienes equipo principal definido.</p>
+  </ng-template>
+
+  <h4>Equipos creados</h4>
+  <p class="teams-panel__state" *ngIf="createdTeams.length === 0">Aun no tienes equipos creados.</p>
+  <div class="teams-panel__list" *ngIf="createdTeams.length > 0">
+    <article class="teams-item" *ngFor="let team of createdTeams">
+      <p>{{ team.nombre }}</p>
+      <div class="teams-item__actions">
+        <button type="button" (click)="openTeam.emit(team.id)">Administrar</button>
+        <button type="button" (click)="onPickTeamForInvite(team)">Invitar jugador</button>
+        <button type="button" (click)="onDeleteTeam(team)">Eliminar</button>
+      </div>
+    </article>
+  </div>
+
+  <h4>Invitaciones a equipos</h4>
+  <p class="teams-panel__state" *ngIf="pendingInvites.length === 0">Sin invitaciones pendientes.</p>
+  <div class="teams-panel__list" *ngIf="pendingInvites.length > 0">
+    <article class="teams-item" *ngFor="let invite of pendingInvites">
+      <p>{{ invite.requesterAlias }} te invito a {{ invite.teamName || ('Equipo ' + invite.teamId) }}</p>
+      <div class="teams-item__actions">
+        <button type="button" (click)="respondInvite.emit({ inviteId: invite.id, accept: true })">Aceptar</button>
+        <button type="button" (click)="respondInvite.emit({ inviteId: invite.id, accept: false })">Rechazar</button>
+      </div>
+    </article>
+  </div>
+
+  <h4>Invitar jugador a equipo</h4>
+  <p class="teams-panel__state">Flujo: Social > Equipos > elige equipo > invita por alias/nombre.</p>
+  <app-metallic-select label="Equipo" [options]="teamOptions" [(ngModel)]="inviteTeamId"></app-metallic-select>
+  <app-metallic-input label="Buscar jugador" type="text" [(ngModel)]="inviteQuery" (ngModelChange)="searchInviteCandidate.emit($event)"></app-metallic-input>
+  <div class="teams-panel__list" *ngIf="inviteCandidates.length > 0">
+    <article class="teams-item" *ngFor="let player of inviteCandidates">
+      <p>{{ player.alias || player.athleteName || player.atletaUuid }}</p>
+      <button type="button" (click)="onSendInvite(player.atletaUuid)">Invitar</button>
+    </article>
+  </div>
+</section>

@@ -1,0 +1,61 @@
+<section class="teams-board" [class.teams-board--disabled]="!enabled">
+  <div class="teams-board__actions" *ngIf="enabled">
+    <app-metallic-button type="button" variant="accent" [disabled]="!enabled" (click)="balanceTeams()">
+      Equilibrar equipos
+    </app-metallic-button>
+    <app-metallic-button type="button" variant="secondary" [disabled]="!enabled" (click)="setMode('MANUAL')">
+      Editar manual
+    </app-metallic-button>
+    <app-metallic-button type="button" variant="accent" [disabled]="!hasUnsavedChanges" (click)="saveTeams()">
+      Guardar cambios
+    </app-metallic-button>
+    <app-metallic-button type="button" variant="secondary" [disabled]="!hasUnsavedChanges" (click)="discardChanges()">
+      Descartar
+    </app-metallic-button>
+  </div>
+
+  <p class="teams-board__hint" *ngIf="enabled && hasUnsavedChanges">
+    Tienes cambios sin guardar. Solo se comparten cuando guardas.
+  </p>
+
+  <p class="teams-board__read-only" *ngIf="!enabled">{{ readOnlyMessage }}</p>
+
+  <div class="teams-board__grid">
+    <section class="teams-board__column" (dragover)="onDragOver($event)" (drop)="onDrop('HOME', $event)">
+      <header class="teams-board__column-head">
+        <h4>Local</h4>
+        <span>{{ homePlayers.length }} jugadores</span>
+      </header>
+      <p class="teams-board__color">Color: {{ homeColor }}</p>
+      <p class="teams-board__ovr">Nivel estimado: {{ homeAverage }}</p>
+
+      <article
+        class="teams-board__player"
+        *ngFor="let player of homePlayers; trackBy: trackByPlayer"
+        [attr.draggable]="enabled && mode === 'MANUAL'"
+        (dragstart)="onDragStart(player.uuid, $event)">
+        <span>{{ player.name }}</span>
+        <small>OVR {{ player.ovr || 65 }} | {{ player.position || 'Sin posicion' }}</small>
+      </article>
+    </section>
+
+    <section class="teams-board__column" (dragover)="onDragOver($event)" (drop)="onDrop('AWAY', $event)">
+      <header class="teams-board__column-head">
+        <h4>Visita</h4>
+        <span>{{ awayPlayers.length }} jugadores</span>
+      </header>
+      <p class="teams-board__color">Color: {{ awayColor }}</p>
+      <p class="teams-board__ovr">Nivel estimado: {{ awayAverage }}</p>
+
+      <article
+        class="teams-board__player"
+        *ngFor="let player of awayPlayers; trackBy: trackByPlayer"
+        [attr.draggable]="enabled && mode === 'MANUAL'"
+        (dragstart)="onDragStart(player.uuid, $event)">
+        <span>{{ player.name }}</span>
+        <small>OVR {{ player.ovr || 65 }} | {{ player.position || 'Sin posicion' }}</small>
+      </article>
+    </section>
+  </div>
+
+</section>

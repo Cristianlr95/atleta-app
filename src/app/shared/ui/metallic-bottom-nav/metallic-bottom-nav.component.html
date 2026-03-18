@@ -1,0 +1,18 @@
+﻿<nav class="metallic-bottom-nav" aria-label="Navegación inferior">
+  <button
+    *ngFor="let item of items"
+    type="button"
+    class="metallic-bottom-nav__item"
+    [attr.aria-label]="item.label"
+    [class.metallic-bottom-nav__item--active]="item.active"
+    [class.metallic-bottom-nav__item--cta]="item.variant === 'cta'"
+    (click)="onSelect(item.id)">
+    <ion-icon
+      [src]="resolveIconAsset(item)"
+      class="atleta-game-icon atleta-game-icon--nav"
+      aria-hidden="true">
+    </ion-icon>
+    <span class="metallic-bottom-nav__badge" *ngIf="(item.badgeCount ?? 0) > 0">{{ item.badgeCount }}</span>
+    <span>{{ item.label }}</span>
+  </button>
+</nav>

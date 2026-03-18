@@ -1,0 +1,44 @@
+﻿<ion-grid class="metallic-stats" [class.metallic-stats--compact]="compact">
+  <ion-row>
+    <ion-col
+      *ngFor="let stat of stats"
+      [size]="compact ? '6' : '12'"
+      size-sm="6"
+      size-lg="3"
+    >
+      <div class="metallic-stat">
+        <div class="metallic-stat__glow"></div>
+        <div class="metallic-stat__content">
+          <div class="metallic-stat__shine-top"></div>
+
+          <div class="metallic-stat__inner">
+            <div class="metallic-stat__info">
+              <ion-label class="metallic-stat__label">
+                {{ stat.label }}
+              </ion-label>
+              <ion-text class="metallic-stat__value" [ngClass]="stat.valueClass">
+                {{ stat.value }}
+              </ion-text>
+            </div>
+
+            <button
+              *ngIf="stat.icon"
+              type="button"
+              class="metallic-stat__icon-button"
+              [class.metallic-stat__icon-button--disabled]="!stat.description"
+              [attr.aria-label]="'Ver descripción de ' + stat.label"
+              (click)="showStatDescription(stat)"
+            >
+              <div class="metallic-stat__icon">
+                <ion-icon [src]="resolveIconAsset(stat.icon)"></ion-icon>
+              </div>
+            </button>
+          </div>
+
+          <div class="metallic-stat__corner metallic-stat__corner--tr"></div>
+          <div class="metallic-stat__corner metallic-stat__corner--bl"></div>
+        </div>
+      </div>
+    </ion-col>
+  </ion-row>
+</ion-grid>

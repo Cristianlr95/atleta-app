@@ -1,0 +1,11 @@
+﻿<article class="invitation-card">
+  <p class="invitation-card__title">{{ match?.type ?? 'PARTIDO' }} · {{ match?.team?.name ?? 'Equipo' }}</p>
+  <app-match-status-badge *ngIf="match" [status]="match.status"></app-match-status-badge>
+  <p class="invitation-card__meta">{{ match?.scheduledAt | date:'short' }} · {{ venueLabel || match?.venueName || match?.venueAddress || match?.location || 'Cancha por definir' }}</p>
+  <p class="invitation-card__meta">Invita: {{ match?.creatorName ?? 'Companero' }}</p>
+
+  <div class="invitation-card__actions">
+    <button type="button" (click)="onAccept()" [disabled]="disabled">Aceptar</button>
+    <button type="button" (click)="onDecline()" [disabled]="disabled">No puedo</button>
+  </div>
+</article>

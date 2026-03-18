@@ -1,0 +1,78 @@
+﻿<ion-content class="social-bg">
+  <div class="social-container">
+    <app-page-nav></app-page-nav>
+
+    <app-metallic-card title="Social" [titleIconAsset]="socialIconAsset">
+      <app-social-tabs
+        [activeTab]="facade.activeTab()"
+        [pendingFriends]="pendingFriends().length"
+        [pendingTeams]="pendingTeams().length"
+        [pendingMatches]="pendingMatches().length"
+        [unreadActivity]="facade.unreadCount()"
+        (tabChange)="facade.setActiveTab($event)">
+      </app-social-tabs>
+
+      <p class="social-message social-message--error" *ngIf="facade.errorMessage()">{{ facade.errorMessage() }}</p>
+      <button
+        *ngIf="facade.errorMessage()"
+        type="button"
+        class="social-retry"
+        (click)="onRetryLoad()">
+        Reintentar
+      </button>
+      <p class="social-message social-message--success" *ngIf="facade.successMessage()">{{ facade.successMessage() }}</p>
+
+      <app-activity-feed
+        *ngIf="facade.activeTab() === 'activity'"
+        [loading]="facade.isLoading()"
+        [items]="facade.activity()"
+        [unreadCount]="facade.unreadCount()"
+        (markAllRead)="facade.markAllActivityRead()"
+        (actionSelected)="onActivityAction($event)"
+        (openContext)="onOpenContext($event)">
+      </app-activity-feed>
+
+      <app-friends-panel
+        *ngIf="facade.activeTab() === 'friends'"
+        [pendingRequests]="pendingFriends()"
+        [acceptedFriendships]="acceptedFriendships()"
+        [candidates]="facade.friendCandidates()"
+        [loadingSearch]="facade.searchLoading()"
+        (search)="onFriendSearch($event)"
+        (sendRequest)="facade.sendFriendRequest($event)"
+        (respondRequest)="facade.respondFriendRequest($event.requestId, $event.accept)"
+        (openProfile)="onOpenProfile($event)">
+      </app-friends-panel>
+
+      <app-teams-panel
+        *ngIf="facade.activeTab() === 'teams'"
+        [principalTeam]="principalTeam()"
+        [createdTeams]="facade.createdTeams()"
+        [pendingInvites]="pendingTeams()"
+        [inviteCandidates]="facade.inviteCandidates()"
+        (openTeam)="onOpenTeam($event)"
+        (deleteTeam)="onDeleteTeam($event)"
+        (respondInvite)="facade.respondTeamInvite($event.inviteId, $event.accept)"
+        (searchInviteCandidate)="onInviteSearch($event)"
+        (sendInvite)="onSendTeamInvite($event)">
+      </app-teams-panel>
+
+      <app-match-invitations-panel
+        *ngIf="facade.activeTab() === 'matches'"
+        [pendingInvites]="pendingMatches()"
+        [confirmedMatches]="confirmedMatches()"
+        (respondInvite)="facade.respondMatchInvite($event.inviteId, $event.accept)"
+        (openMatch)="onOpenMatch($event)">
+      </app-match-invitations-panel>
+    </app-metallic-card>
+  </div>
+</ion-content>
+
+<ion-footer class="social-footer" translucent>
+  <ion-toolbar>
+    <app-metallic-bottom-nav
+      [items]="bottomNavItems"
+      (itemSelected)="onNavItemSelected($event)">
+    </app-metallic-bottom-nav>
+  </ion-toolbar>
+</ion-footer>

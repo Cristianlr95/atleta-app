@@ -1,0 +1,23 @@
+<section class="match-panel">
+  <h4>Invitaciones pendientes</h4>
+  <p class="match-panel__state" *ngIf="pendingInvites.length === 0">No tienes invitaciones pendientes.</p>
+  <div class="match-panel__list" *ngIf="pendingInvites.length > 0">
+    <article class="match-item" *ngFor="let invite of pendingInvites">
+      <p>{{ invite.requesterAlias }} te invito al partido #{{ invite.matchId }}</p>
+      <div class="match-item__actions">
+        <button type="button" (click)="respondInvite.emit({ inviteId: invite.id, accept: true })">Aceptar</button>
+        <button type="button" (click)="respondInvite.emit({ inviteId: invite.id, accept: false })">No puedo</button>
+      </div>
+    </article>
+  </div>
+
+  <h4>Partidos confirmados</h4>
+  <p class="match-panel__state" *ngIf="confirmedMatches.length === 0">Sin partidos confirmados por ahora.</p>
+  <div class="match-panel__list" *ngIf="confirmedMatches.length > 0">
+    <article class="match-item" *ngFor="let match of confirmedMatches">
+      <p>{{ match.title }}</p>
+      <small>{{ getCountdownLabel(match.scheduledAt) }}</small>
+      <button type="button" (click)="openMatch.emit(match.id)">Abrir detalle</button>
+    </article>
+  </div>
+</section>

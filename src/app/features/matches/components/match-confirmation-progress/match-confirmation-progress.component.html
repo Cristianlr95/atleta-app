@@ -1,0 +1,26 @@
+<section class="match-confirmation-progress">
+  <div class="match-confirmation-progress__head">
+    <p class="match-confirmation-progress__title">Confirmados {{ progress.confirmed }} / {{ progress.invited || match.invitedCount }}</p>
+    <p class="match-confirmation-progress__status">{{ statusMessage }}</p>
+  </div>
+
+  <app-metallic-progress
+    [value]="progress.confirmed"
+    [max]="match.minRequired"
+    label="Minimo para confirmar"
+    [showValue]="true">
+  </app-metallic-progress>
+
+  <p class="match-confirmation-progress__meta">
+    Minimo requerido: {{ match.minRequired }} jugadores
+  </p>
+
+  <div class="match-confirmation-progress__actions" *ngIf="isCreator">
+    <app-metallic-button type="button" variant="secondary" (click)="remindPending.emit()">
+      Recordar pendientes
+    </app-metallic-button>
+    <app-metallic-button type="button" variant="accent" (click)="inviteMore.emit()">
+      Invitar mas jugadores
+    </app-metallic-button>
+  </div>
+</section>

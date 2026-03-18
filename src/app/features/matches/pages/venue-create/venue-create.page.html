@@ -1,0 +1,24 @@
+<ion-content class="venue-create-bg">
+  <div class="venue-create-container">
+    <app-page-nav></app-page-nav>
+    <app-metallic-card title="Agregar Cancha" [titleIconAsset]="titleIconAsset">
+      <div class="venue-create__header">
+        <p>Selecciona en mapa por latitud/longitud o busca por direccion.</p>
+      </div>
+
+      <app-metallic-location-picker
+        [savedFields]="fields()"
+        [isSavingField]="loading()"
+        [selectedLat]="selectedLat()"
+        [selectedLng]="selectedLng()"
+        (coordinatesChange)="onCoordinatesChange($event)"
+        (saveField)="onSaveField($event)">
+      </app-metallic-location-picker>
+
+      <p class="venue-create__coords" *ngIf="hasCoordinates()">
+        Coordenadas seleccionadas: {{ selectedLat() }} / {{ selectedLng() }}
+      </p>
+      <p class="venue-create__error" *ngIf="saveError()">{{ saveError() }}</p>
+    </app-metallic-card>
+  </div>
+</ion-content>

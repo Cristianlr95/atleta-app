@@ -1,0 +1,21 @@
+<div class="metallic-progress-wrapper">
+  <div *ngIf="label || showValue" class="metallic-progress__info">
+    <ion-label *ngIf="label" class="metallic-progress__label">
+      {{ label }}
+    </ion-label>
+    <ion-label *ngIf="showValue" class="metallic-progress__value">
+      {{ value }}/{{ max }}
+    </ion-label>
+  </div>
+  
+  <div class="metallic-progress">
+    <div 
+      class="metallic-progress__fill"
+      [style.width.%]="percentage"
+    >
+      <div class="metallic-progress__shine"></div>
+      <div class="metallic-progress__glow"></div>
+    </div>
+    <div class="metallic-progress__grid"></div>
+  </div>
+</div>

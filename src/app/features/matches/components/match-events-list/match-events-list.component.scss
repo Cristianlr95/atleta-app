@@ -1,0 +1,43 @@
+﻿.events-list {
+  border: 1px solid rgba(126, 157, 210, 0.3);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.event-row ion-item {
+  --background: rgba(10, 16, 30, 0.92);
+  --color: #eaf2ff;
+}
+
+.event-icon {
+  font-size: 1.2rem;
+  margin-right: 10px;
+}
+
+.event-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.event-copy small {
+  color: #a8b7d4;
+}
+
+.events-empty {
+  border: 1px dashed rgba(126, 157, 210, 0.35);
+  border-radius: 12px;
+  padding: 14px;
+  color: #9eb1d4;
+}
+
+.events-add {
+  margin-top: 10px;
+  border: 1px dashed rgba(126, 157, 210, 0.55);
+  border-radius: 12px;
+  padding: 12px;
+  text-align: center;
+  font-weight: 700;
+  color: #dbe9ff;
+  cursor: pointer;
+}

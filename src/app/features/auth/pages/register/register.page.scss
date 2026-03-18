@@ -1,0 +1,67 @@
+﻿.register-bg {
+  --background: none;
+
+  background:
+    linear-gradient(rgba(10, 12, 20, 0.75), rgba(10, 12, 20, 0.85)),
+    url('/assets/backgrounds/stadium.png');
+
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.register-container {
+  min-height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 16px;
+}
+
+.register-form {
+  width: min(100%, 440px);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.register-submit {
+  align-self: center;
+}
+
+.register-message {
+  margin: 0;
+  text-align: center;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.register-message--error {
+  color: #ff8f9f;
+}
+
+.register-message--success {
+  color: #8ee0b0;
+}
+
+.register-link {
+  align-self: center;
+  border: 0;
+  background: transparent;
+  color: #c0c8d8;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: color 0.2s ease;
+
+  &:hover {
+    color: #e8eef5;
+  }
+
+  &:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+  }
+}

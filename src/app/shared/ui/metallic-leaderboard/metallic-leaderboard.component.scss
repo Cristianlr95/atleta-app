@@ -1,0 +1,129 @@
+﻿.leaderboard {
+  border: 1px solid rgba(122, 138, 160, 0.35);
+  border-radius: 12px;
+  background: linear-gradient(to bottom right, rgba(28, 32, 47, 0.82), rgba(20, 24, 36, 0.88));
+  padding: 12px;
+}
+
+.leaderboard__header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+
+  ion-icon {
+    font-size: 18px;
+    color: #d7deec;
+  }
+
+  h3 {
+    margin: 0;
+    color: #e8eef5;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+}
+
+.leaderboard__podium {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.leaderboard__podium-item {
+  border-radius: 10px;
+  border: 1px solid rgba(122, 138, 160, 0.36);
+  padding: 8px 10px;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 8px;
+
+  ion-icon {
+    font-size: 16px;
+    color: #d4dce8;
+  }
+}
+
+.leaderboard__podium-item--first {
+  border-color: rgba(255, 216, 112, 0.5);
+  background: linear-gradient(to right, rgba(76, 63, 22, 0.45), rgba(39, 33, 18, 0.25));
+}
+
+.leaderboard__podium-item--second {
+  border-color: rgba(188, 200, 221, 0.5);
+}
+
+.leaderboard__podium-item--third {
+  border-color: rgba(215, 162, 125, 0.5);
+}
+
+.leaderboard__podium-item--current {
+  box-shadow: 0 0 0 1px rgba(92, 219, 255, 0.45) inset, 0 0 12px rgba(92, 219, 255, 0.16);
+}
+
+.leaderboard__alias,
+.leaderboard__score,
+.leaderboard__row-rank,
+.leaderboard__row-alias,
+.leaderboard__row-meta,
+.leaderboard__row-score,
+.leaderboard__empty {
+  margin: 0;
+  font-family: 'Rajdhani', sans-serif;
+}
+
+.leaderboard__alias,
+.leaderboard__row-alias {
+  color: #e8eef5;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.leaderboard__score,
+.leaderboard__row-score {
+  color: #d4dce8;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.leaderboard__list {
+  display: grid;
+  gap: 6px;
+}
+
+.leaderboard__row {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid rgba(122, 138, 160, 0.26);
+  border-radius: 9px;
+  padding: 7px 8px;
+}
+
+.leaderboard__row--current {
+  border-color: rgba(92, 219, 255, 0.55);
+  box-shadow: 0 0 0 1px rgba(92, 219, 255, 0.22) inset;
+  background: linear-gradient(to right, rgba(16, 36, 52, 0.62), rgba(16, 26, 39, 0.4));
+}
+
+.leaderboard__row-rank {
+  color: #b5bfd3;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.leaderboard__row-meta {
+  color: #96a5bf;
+  font-size: 12px;
+}
+
+.leaderboard__empty {
+  text-align: center;
+  color: #b5bfd3;
+  font-size: 13px;
+  font-weight: 600;
+}

@@ -1,0 +1,12 @@
+<ion-app>
+  <ion-router-outlet></ion-router-outlet>
+  <ion-toast
+    [isOpen]="!!latestUnread()"
+    [header]="latestUnread()?.title ?? ''"
+    [message]="latestUnread()?.message ?? ''"
+    duration="3200"
+    position="top"
+    color="dark"
+    (didDismiss)="onToastDismissed()">
+  </ion-toast>
+</ion-app>

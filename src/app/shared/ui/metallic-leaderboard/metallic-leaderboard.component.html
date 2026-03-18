@@ -1,0 +1,34 @@
+﻿<div class="leaderboard">
+  <header class="leaderboard__header">
+    <ion-icon [src]="podiumIconAsset" aria-hidden="true"></ion-icon>
+    <h3>{{ title }}</h3>
+  </header>
+
+  <div class="leaderboard__podium" *ngIf="topRows.length > 0">
+    <article
+      class="leaderboard__podium-item"
+      *ngFor="let row of topRows"
+      [class.leaderboard__podium-item--first]="row.rank === 1"
+      [class.leaderboard__podium-item--second]="row.rank === 2"
+      [class.leaderboard__podium-item--third]="row.rank === 3"
+      [class.leaderboard__podium-item--current]="isCurrent(row)"
+    >
+      <ion-icon [src]="row.rank === 1 ? trophyIconAsset : medalIconAsset" aria-hidden="true"></ion-icon>
+      <p class="leaderboard__alias">#{{ row.rank }} {{ row.alias }}</p>
+      <p class="leaderboard__score">{{ row.scoreText }}</p>
+    </article>
+  </div>
+
+  <div class="leaderboard__list" *ngIf="remainingRows.length > 0">
+    <article class="leaderboard__row" *ngFor="let row of remainingRows" [class.leaderboard__row--current]="isCurrent(row)">
+      <p class="leaderboard__row-rank">#{{ row.rank }}</p>
+      <div class="leaderboard__row-main">
+        <p class="leaderboard__row-alias">{{ row.alias }}</p>
+        <p *ngIf="row.metaText" class="leaderboard__row-meta">{{ row.metaText }}</p>
+      </div>
+      <p class="leaderboard__row-score">{{ row.scoreText }}</p>
+    </article>
+  </div>
+
+  <p *ngIf="rows.length === 0" class="leaderboard__empty">Sin datos de ranking.</p>
+</div>

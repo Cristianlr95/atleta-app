@@ -1,0 +1,13 @@
+<section class="match-header" [style.--local-accent]="theme.localAccent" [style.--away-accent]="theme.awayAccent">
+  <div class="match-header__top">
+    <div>
+      <p class="match-header__title">{{ typeLabel }}</p>
+      <p class="match-header__meta">{{ scheduledAtLabel }}</p>
+    </div>
+    <app-match-status-badge [status]="match.status" [closePending]="!!match.closePending"></app-match-status-badge>
+  </div>
+
+  <div class="match-header__row" *ngIf="showCountdown">
+    <app-countdown-chip [scheduledAt]="match.scheduledAt"></app-countdown-chip>
+  </div>
+</section>

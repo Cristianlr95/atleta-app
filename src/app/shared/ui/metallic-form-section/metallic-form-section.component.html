@@ -1,0 +1,18 @@
+﻿<section class="metallic-form-section">
+  <header class="metallic-form-section__header" *ngIf="title || description">
+    <div class="metallic-form-section__title-row" *ngIf="title">
+      <ion-icon *ngIf="titleIconAsset" [src]="titleIconAsset" class="metallic-form-section__title-icon atleta-game-icon atleta-game-icon--sm"></ion-icon>
+      <h4 class="metallic-form-section__title">{{ title }}</h4>
+    </div>
+    <p
+      class="metallic-form-section__description"
+      [class.metallic-form-section__description--small]="descriptionSize === 'small'"
+      *ngIf="description">
+      {{ description }}
+    </p>
+  </header>
+
+  <div class="metallic-form-section__body">
+    <ng-content></ng-content>
+  </div>
+</section>

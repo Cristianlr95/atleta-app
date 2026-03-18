@@ -1,0 +1,43 @@
+<section class="associated-team">
+  <p class="associated-team__title">Tu equipo e integrantes</p>
+  <p class="associated-team__subtitle">Vista de los equipos en los que participas y su nomina activa.</p>
+
+  <p *ngIf="isLoading" class="associated-team__message">Cargando equipos...</p>
+  <p *ngIf="!isLoading && loadError" class="associated-team__message associated-team__message--error">
+    {{ loadError }}
+  </p>
+  <p *ngIf="!isLoading && !loadError && teams.length === 0" class="associated-team__message">
+    Aun no estas asociado a ningun equipo.
+  </p>
+
+  <div *ngIf="!isLoading && !loadError && teams.length > 0" class="associated-team__list">
+    <article class="associated-team__card" *ngFor="let team of teams">
+      <header class="associated-team__head">
+        <img
+          *ngIf="team.logoUrl"
+          class="associated-team__logo"
+          [src]="team.logoUrl"
+          [alt]="'Logo ' + team.nombre" />
+        <div class="associated-team__meta">
+          <p class="associated-team__name">{{ team.nombre }}</p>
+          <p class="associated-team__detail" *ngIf="team.anioFundacion">Fundado: {{ team.anioFundacion }}</p>
+          <p class="associated-team__detail">Integrantes: {{ membersForTeam(team.id).length }}</p>
+        </div>
+      </header>
+
+      <ul class="associated-team__members" *ngIf="membersForTeam(team.id).length > 0; else noMembers">
+        <li class="associated-team__member" *ngFor="let member of membersForTeam(team.id)">
+          <span class="associated-team__member-alias">{{ member.alias }}</span>
+          <span class="associated-team__member-meta">
+            {{ roleLabel(member.rol) }} | {{ member.primaryPositionName ?? 'Sin posicion principal' }}
+          </span>
+        </li>
+      </ul>
+
+      <ng-template #noMembers>
+        <p class="associated-team__empty">Este equipo no tiene integrantes activos para mostrar.</p>
+      </ng-template>
+    </article>
+  </div>
+</section>
+
