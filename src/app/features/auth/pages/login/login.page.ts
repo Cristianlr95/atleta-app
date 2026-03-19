@@ -38,7 +38,7 @@ export class LoginPage {
   readonly googleIconAsset = `${this.iconBase}/ic_brand_google_24.svg`;
   isSubmitting = false;
   authError: string | null = null;
-  private redirectToOnboarding = false;
+  private readonly redirectUrl: string | null;
 
   readonly loginForm = this.formBuilder.nonNullable.group({
     email: ['', [Validators.required, Validators.email]],
@@ -49,7 +49,7 @@ export class LoginPage {
     const next = this.route.snapshot.queryParamMap.get('next');
     const email = this.route.snapshot.queryParamMap.get('email');
 
-    this.redirectToOnboarding = next === 'player-onboarding';
+    this.redirectUrl = this.sanitizeRedirectUrl(next);
 
     if (email) {
       this.loginForm.patchValue({ email });
@@ -70,9 +70,12 @@ export class LoginPage {
       .pipe(finalize(() => (this.isSubmitting = false)))
       .subscribe({
         next: () => {
-          void this.navigationService.safeNavigate([
-            this.redirectToOnboarding ? '/player/onboarding' : '/home',
-          ]);
+          if (this.redirectUrl) {
+            void this.navigationService.safeNavigateByUrl(this.redirectUrl);
+            return;
+          }
+
+          void this.navigationService.safeNavigate(['/home']);
         },
         error: (error: ApiError) => {
           this.authError = this.userFeedbackService.loginError(error);
@@ -90,5 +93,17 @@ export class LoginPage {
 
   onCreateAccount(): void {
     void this.navigationService.safeNavigate(['/register']);
+  }
+
+  private sanitizeRedirectUrl(next: string | null): string | null {
+    if (!next) {
+      return null;
+    }
+
+    if (next === 'player-onboarding') {
+      return '/player/onboarding';
+    }
+
+    return next.startsWith('/') ? next : null;
   }
 }

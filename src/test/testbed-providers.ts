@@ -30,6 +30,7 @@ export function provideAuthMocks(session: AuthSession | null = null): Provider {
       currentSession: session,
       session$: of(session),
       isAuthenticated: Boolean(session),
+      getValidSession: () => session,
       startSession: () => void 0,
       clearSession: () => void 0,
     } satisfies Partial<AuthSessionService>,

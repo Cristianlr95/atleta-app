@@ -85,7 +85,7 @@ export class RegisterPage {
         next: () => {
           void this.navigationService.safeNavigate(['/login'], {
             queryParams: {
-              next: 'player-onboarding',
+              next: '/player/onboarding',
               email: formValue.email.trim().toLowerCase(),
             },
           });

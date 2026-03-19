@@ -5,15 +5,16 @@ import { catchError, map, switchMap } from 'rxjs/operators';
 import { UserApiService } from 'src/app/features/user/services/user-api.service';
 import { ApiError } from '../models/api-error.model';
 import { AuthSessionService } from '../services/auth-session.service';
+import { createLoginRedirect } from './auth.guard';
 
-export const onboardingCompletedGuard: CanActivateFn = (): Observable<boolean | UrlTree> => {
+export const onboardingCompletedGuard: CanActivateFn = (_route, state): Observable<boolean | UrlTree> => {
   const router = inject(Router);
   const authSessionService = inject(AuthSessionService);
   const userApiService = inject(UserApiService);
 
-  const session = authSessionService.currentSession;
+  const session = authSessionService.getValidSession();
   if (!session) {
-    return of(router.createUrlTree(['/login']));
+    return of(createLoginRedirect(router, state));
   }
 
   return userApiService.getPlayerProfile(session.user.atletaUuid).pipe(
@@ -30,7 +31,8 @@ export const onboardingCompletedGuard: CanActivateFn = (): Observable<boolean | 
       }
 
       if (error.status === 401 || error.status === 403) {
-        return of(router.createUrlTree(['/login']));
+        authSessionService.clearSession();
+        return of(createLoginRedirect(router, state));
       }
 
       return of(true);
@@ -38,14 +40,14 @@ export const onboardingCompletedGuard: CanActivateFn = (): Observable<boolean | 
   );
 };
 
-export const onboardingPendingGuard: CanActivateFn = (): Observable<boolean | UrlTree> => {
+export const onboardingPendingGuard: CanActivateFn = (_route, state): Observable<boolean | UrlTree> => {
   const router = inject(Router);
   const authSessionService = inject(AuthSessionService);
   const userApiService = inject(UserApiService);
 
-  const session = authSessionService.currentSession;
+  const session = authSessionService.getValidSession();
   if (!session) {
-    return of(router.createUrlTree(['/login']));
+    return of(createLoginRedirect(router, state));
   }
 
   return userApiService.getPlayerProfile(session.user.atletaUuid).pipe(
@@ -60,7 +62,8 @@ export const onboardingPendingGuard: CanActivateFn = (): Observable<boolean | Ur
       }
 
       if (error.status === 401 || error.status === 403) {
-        return of(router.createUrlTree(['/login']));
+        authSessionService.clearSession();
+        return of(createLoginRedirect(router, state));
       }
 
       return of(true);

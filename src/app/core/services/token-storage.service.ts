@@ -13,6 +13,10 @@ export class TokenStorageService {
     return `${this.config.storagePrefix}.refresh-token`;
   }
 
+  private get sessionKey(): string {
+    return `${this.config.storagePrefix}.auth-session`;
+  }
+
   getAccessToken(): string | null {
     return this.safeRead(this.accessTokenKey);
   }
@@ -28,9 +32,18 @@ export class TokenStorageService {
     }
   }
 
+  getSession(): string | null {
+    return this.safeRead(this.sessionKey);
+  }
+
+  setSession(session: string): void {
+    this.safeWrite(this.sessionKey, session);
+  }
+
   clear(): void {
     this.safeRemove(this.accessTokenKey);
     this.safeRemove(this.refreshTokenKey);
+    this.safeRemove(this.sessionKey);
   }
 
   private safeRead(key: string): string | null {
