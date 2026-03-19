@@ -65,6 +65,14 @@ export class MetallicPositionFieldPickerComponent {
     });
   }
 
+  get pitchNodes(): FieldPositionNode[] {
+    return this.nodes.filter((node) => node.role !== 'COACH');
+  }
+
+  get specialRoleNodes(): FieldPositionNode[] {
+    return this.nodes.filter((node) => node.role === 'COACH');
+  }
+
   get selectedLabel(): string {
     return this.nodes.find((node) => node.value === this.selectedValue)?.label ?? '';
   }
@@ -140,6 +148,14 @@ export class MetallicPositionFieldPickerComponent {
     return label.slice(0, 3).toUpperCase();
   }
 
+  roleDescription(role: FieldRole): string {
+    if (role === 'COACH') {
+      return 'Rol estrategico fuera del campo';
+    }
+
+    return 'Posicion disponible dentro del campo';
+  }
+
   private resolveRole(label: string): FieldRole {
     const normalized = this.normalize(label);
 
@@ -191,7 +207,7 @@ export class MetallicPositionFieldPickerComponent {
       ATTACKER: [
         { x: 50, y: 22 },
       ],
-      COACH: [{ x: 88, y: 112 }],
+      COACH: [{ x: 50, y: 50 }],
       UNKNOWN: [
         { x: 12, y: 12 },
         { x: 88, y: 12 },
