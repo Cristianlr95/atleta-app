@@ -180,6 +180,10 @@ export class MatchHistoryService {
     item: PlayerMatchHistoryItem,
     ratingHistory: RatingHistoryEntry | undefined,
   ): MatchOutcome | null {
+    if (!this.canCountOutcome(item)) {
+      return null;
+    }
+
     const outcomeFromMatch = toCanonicalMatchOutcome((item as { resultado?: unknown }).resultado);
     if (outcomeFromMatch) {
       return outcomeFromMatch;
@@ -191,6 +195,14 @@ export class MatchHistoryService {
     }
 
     return this.resolveOutcomeFromScore(item);
+  }
+
+  private canCountOutcome(item: PlayerMatchHistoryItem): boolean {
+    if (item.estado === 'INVALIDO') {
+      return false;
+    }
+
+    return item.estado === 'FINALIZADO' || (item.estado === 'INICIADO' && Boolean(item.closePending));
   }
 
   private resolveOutcomeFromScore(item: PlayerMatchHistoryItem): MatchOutcome | null {

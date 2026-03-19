@@ -43,6 +43,13 @@ interface TeamMemberView extends TeamActiveMember {
   ovr: number | null;
 }
 
+interface OutcomeSummary {
+  wins: number;
+  draws: number;
+  losses: number;
+  total: number;
+}
+
 @Component({
   selector: 'app-player-profile',
   standalone: true,
@@ -427,6 +434,7 @@ export class PlayerProfilePage implements OnDestroy {
         : null;
     this.overallBestRole = (overall?.bestRole as HexagonRole | undefined) ?? null;
     this.overallBestRoleRating = overall?.bestRoleRating ?? null;
+    const outcomeSummary = this.summarizeOutcomes(history);
 
     this.summaryStats = [
       {
@@ -449,7 +457,10 @@ export class PlayerProfilePage implements OnDestroy {
       },
       {
         label: 'Partidos Jugados',
-        value: overall?.totalMatchesPlayed ?? this.matchesFromRatings(ratings),
+        value:
+          outcomeSummary.total > 0
+            ? outcomeSummary.total
+            : overall?.totalMatchesPlayed ?? this.matchesFromRatings(ratings),
         icon: 'football-outline',
         description: 'Cantidad total de partidos registrados para tu perfil.',
       },
@@ -462,22 +473,31 @@ export class PlayerProfilePage implements OnDestroy {
       },
     ];
 
-    this.outcomeStats = this.buildOutcomeStats(history);
+    this.outcomeStats = this.buildOutcomeStats(outcomeSummary);
     this.memberTeams = teams;
     this.playerPositions = this.toPositionDisplay(positions);
   }
 
-  private buildOutcomeStats(history: MatchHistoryViewItem[]): Stat[] {
+  private buildOutcomeStats(summary: OutcomeSummary): Stat[] {
+    return [
+      { label: 'Victorias', value: summary.wins, icon: 'trophy-outline' },
+      { label: 'Empates', value: summary.draws, icon: 'stats-chart-outline' },
+      { label: 'Derrotas', value: summary.losses, icon: 'football-outline' },
+    ];
+  }
+
+  private summarizeOutcomes(history: MatchHistoryViewItem[]): OutcomeSummary {
     const outcomes = history.map((item) => item.outcome).filter((value): value is NonNullable<typeof value> => value !== null);
     const wins = outcomes.filter((outcome) => outcome === 'GANADO').length;
     const draws = outcomes.filter((outcome) => outcome === 'EMPATADO').length;
     const losses = outcomes.filter((outcome) => outcome === 'PERDIDO').length;
 
-    return [
-      { label: 'Victorias', value: wins, icon: 'trophy-outline' },
-      { label: 'Empates', value: draws, icon: 'stats-chart-outline' },
-      { label: 'Derrotas', value: losses, icon: 'football-outline' },
-    ];
+    return {
+      wins,
+      draws,
+      losses,
+      total: wins + draws + losses,
+    };
   }
 
   private applyDemo(name?: string, email?: string): void {
