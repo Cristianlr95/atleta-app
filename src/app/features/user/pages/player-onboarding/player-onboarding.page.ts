@@ -19,7 +19,6 @@ import { MetallicButtonComponent } from 'src/app/shared/ui/metallic-button/metal
 import { MetallicCardComponent } from 'src/app/shared/ui/metallic-card/metallic-card.component';
 import { MetallicFormSectionComponent } from 'src/app/shared/ui/metallic-form-section/metallic-form-section.component';
 import { MetallicInputComponent } from 'src/app/shared/ui/metallic-input/metallic-input.component';
-import { MetallicSelectComponent, MetallicSelectOption } from 'src/app/shared/ui/metallic-select/metallic-select.component';
 import {
   MetallicPositionFieldOption,
   MetallicPositionFieldPickerComponent,
@@ -41,7 +40,6 @@ import { UserApiService } from '../../services/user-api.service';
     MetallicFormSectionComponent,
     MetallicInputComponent,
     MetallicPositionFieldPickerComponent,
-    MetallicSelectComponent,
     MetallicButtonComponent,
   ],
 })
@@ -65,17 +63,12 @@ export class PlayerOnboardingPage implements OnDestroy {
   isSubmitting = false;
   submitError: string | null = null;
   selectedPositionIds: string[] = [];
-  readonly genderOptions: MetallicSelectOption[] = [
-    { label: 'Masculino', value: 'MASCULINO' },
-    { label: 'Femenino', value: 'FEMENINO' },
-  ];
 
   positionOptions: ReadonlyArray<MetallicPositionFieldOption> = [];
 
   readonly onboardingForm = this.formBuilder.nonNullable.group(
     {
       alias: ['', [Validators.required, Validators.maxLength(30)]],
-      genero: ['', [Validators.required]],
       primaryPositionId: ['', [Validators.required]],
       secondaryPositionId: ['', [Validators.required]],
       tertiaryPositionId: ['', [Validators.required]],
@@ -133,7 +126,6 @@ export class PlayerOnboardingPage implements OnDestroy {
     this.onboardingService
       .completeOnboarding({
         alias: formValue.alias.trim(),
-        genero: formValue.genero as 'MASCULINO' | 'FEMENINO',
         positions: [
           this.toPositionSelection(formValue.primaryPositionId, 1),
           this.toPositionSelection(formValue.secondaryPositionId, 2),

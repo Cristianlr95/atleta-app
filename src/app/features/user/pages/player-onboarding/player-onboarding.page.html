@@ -5,22 +5,13 @@
         <app-metallic-form-section
           title="Perfil"
           [titleIconAsset]="profileSectionIconAsset"
-          description="Define tu alias visible para la comunidad.">
+          description="Define tu alias visible para la comunidad. El genero se define al crear tu atleta.">
           <app-metallic-input
             formControlName="alias"
             label="Alias"
             type="text"
             placeholder="Ej: El10">
           </app-metallic-input>
-          <app-metallic-select
-            formControlName="genero"
-            label="Genero"
-            placeholder="Selecciona genero"
-            [options]="genderOptions">
-          </app-metallic-select>
-          <p *ngIf="onboardingForm.controls.genero.touched && onboardingForm.controls.genero.invalid" class="onboarding-error">
-            Debes seleccionar genero.
-          </p>
         </app-metallic-form-section>
 
         <app-metallic-form-section

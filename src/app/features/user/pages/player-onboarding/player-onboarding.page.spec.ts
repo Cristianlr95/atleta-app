@@ -9,8 +9,14 @@ import { PlayerOnboardingPage } from './player-onboarding.page';
 describe('PlayerOnboardingPage', () => {
   let component: PlayerOnboardingPage;
   let fixture: ComponentFixture<PlayerOnboardingPage>;
+  let onboardingService: jasmine.SpyObj<PlayerOnboardingService>;
 
   beforeEach(async () => {
+    onboardingService = jasmine.createSpyObj<PlayerOnboardingService>('PlayerOnboardingService', [
+      'completeOnboarding',
+    ]);
+    onboardingService.completeOnboarding.and.returnValue(of(void 0));
+
     await TestBed.configureTestingModule({
       imports: [PlayerOnboardingPage],
       providers: [
@@ -32,9 +38,7 @@ describe('PlayerOnboardingPage', () => {
         },
         {
           provide: PlayerOnboardingService,
-          useValue: {
-            completeOnboarding: () => of(void 0),
-          },
+          useValue: onboardingService,
         },
         {
           provide: Router,
@@ -68,5 +72,9 @@ describe('PlayerOnboardingPage', () => {
   it('should include DT option when API does not return it', () => {
     const labels = component.positionOptions.map((option) => option.label);
     expect(labels).toContain('DT');
+  });
+
+  it('should not ask for genero during onboarding', () => {
+    expect(component.onboardingForm.contains('genero')).toBeFalse();
   });
 });

@@ -1,7 +1,7 @@
-﻿import { Injectable, inject } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { forkJoin, map, Observable, switchMap, tap } from 'rxjs';
 import { AuthSessionService } from 'src/app/core/services/auth-session.service';
-import { AthleteGender, CreatePlayerProfileRequest } from '../../auth/models/auth.models';
+import { CreatePlayerProfileRequest } from '../../auth/models/auth.models';
 import { RatingsApiService } from '../../ratings/services/ratings-api.service';
 import { PositionPriorityLevel } from '../models/position.models';
 import { PlayerPositionStateService } from './player-position-state.service';
@@ -15,7 +15,6 @@ export interface CompletePlayerOnboardingPosition {
 
 export interface CompletePlayerOnboardingRequest {
   alias: string;
-  genero: AthleteGender;
   positions: CompletePlayerOnboardingPosition[];
 }
 
@@ -35,7 +34,6 @@ export class PlayerOnboardingService {
     const profileRequest: CreatePlayerProfileRequest = {
       atletaUuid: session.user.atletaUuid,
       alias: request.alias,
-      genero: request.genero,
     };
 
     return this.userApiService.createPlayerProfile(profileRequest).pipe(

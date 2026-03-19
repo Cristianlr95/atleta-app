@@ -17,7 +17,6 @@ export interface LoginRequest {
 export interface CreatePlayerProfileRequest {
   atletaUuid: string;
   alias?: string;
-  genero?: AthleteGender;
 }
 
 export interface AuthApiResponse extends AuthenticatedUser {
