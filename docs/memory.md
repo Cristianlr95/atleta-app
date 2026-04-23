@@ -1,0 +1,72 @@
+# Memory Vivo - Atleta Frontend
+
+Fecha de actualizacion: 2026-04-23
+Fuente: auditoria directa del repositorio `atleta-app`
+
+## Vision general del frontend
+- Aplicacion frontend de Atleta construida con Angular 20, Ionic 8 y Capacitor 8.
+- El foco real del producto hoy es competencia amateur de futbol: autenticacion, onboarding de jugador, equipos, creacion de partidos, confirmaciones, cierre competitivo, ranking y voto MVP.
+- El frontend esta organizado mayormente por features standalone (`auth`, `dashboard`, `matches`, `ratings`, `sessions`, `social`, `teams`, `user`, `fields`).
+- La experiencia visual esta muy marcada por una identidad "metallic / Winning Eleven": tipografias `Orbitron` y `Rajdhani`, fondos oscuros, gradientes metalicos y componentes UI reutilizables propios.
+
+## Proposito del repo
+- Resolver la experiencia web/mobile del jugador para autenticarse, completar su perfil, crear y gestionar partidos, responder invitaciones, consultar ranking y operar integraciones sociales y de notificaciones.
+
+## Estado actual real
+- El nucleo mas maduro del frontend es `matches`.
+- Las rutas activas reales son: `/login`, `/register`, `/home`, `/player/profile`, `/player/onboarding`, `/sessions/create`, `/matches`, `/matches/history`, `/matches/create`, `/matches/venues/new`, `/matches/:id`, `/matches/:id/close`, `/matches/:id/mvp-vote`, `/leaderboard`, `/stats`.
+- Rutas legacy o redireccionadas: `/ranking` -> `/leaderboard`, `/invitations` -> `/matches`, `/social` -> `/matches`.
+- El modulo social existe en codigo, pero hoy quedo huerfano desde routing porque `SocialPage` ya no tiene ruta accesible.
+- La pagina `stats` existe, pero hoy es solo una tarjeta placeholder para futura integracion.
+- Existen modos demo o fallbacks visuales en `player-onboarding`, `player-profile` y `matches-history`.
+- Hay cobertura E2E Playwright para login, crear partido, flujo de invitaciones, actualizacion live y MVP.
+
+## Decisiones tecnicas detectadas
+- Angular standalone routing con `loadComponent`.
+- Guards funcionales para autenticacion y onboarding.
+- Sesion local persistida en `localStorage`, derivando datos de usuario desde JWT si hace falta.
+- Consumo API centralizado con `ApiService` y `API_ENDPOINTS`.
+- Interceptores para auth token y normalizacion de errores HTTP.
+- Estado mixto: Angular signals para estado UI/local, RxJS para IO, stores propias con cache TTL (`ResourceStore`, `MatchStore`, `MvpVoteStore`, `InvitationsStore`).
+- `matches` mezcla persistencia backend con fallback local y optimismo UI.
+- Geolocalizacion de canchas basada en API propia de `fields`.
+- Push notifications preparadas con Capacitor, pero el registro definitivo de tokens aun no existe en backend.
+
+## Decisiones visuales/UI detectadas
+- Direccion estetica oscura, deportiva y "game-like".
+- Reutilizacion fuerte de componentes `metallic-*` para cards, botones, leaderboard, stats, inputs, bottom nav y selectores.
+- Iconografia custom en `src/assets/icons/atleta`.
+- Bottom navigation centrada en 4 secciones: inicio, partidos, ranking y perfil.
+
+## Aprendizajes y hallazgos
+- `matches` ya no es solo CRUD: contiene agenda, historial, detalle, balanceo automatico, cierre y MVP.
+- `sessions/create` hoy funciona como pantalla puente: desde ahi se deriva a crear partido o equipo.
+- `matches/history` y la pestana `history` de `matches-hub` duplican funcionalidad muy similar.
+- `social` mantiene bastante codigo utilizable, pero su ruta fue desactivada.
+- `NotificationBadgeService.refresh()` hoy no consulta backend y deja el badge server-side en `0`.
+- Hay varios strings con problemas de encoding/mojibake (por ejemplo textos rotos en labels y mensajes), senal de mezcla de codificacion en algunos archivos.
+- `capacitor.config.ts` sigue con `appId: 'io.ionic.starter'`.
+
+## Deuda tecnica
+- Ruta social inconsistente: modulo completo sin entrada real.
+- Uso de `localStorage` para access token y refresh token.
+- Repeticion de handlers de bottom nav y navegacion en muchas paginas.
+- Repeticion funcional entre `matches-history` y `matches-hub`.
+- Servicios de dominio con mucha responsabilidad, especialmente `MatchService`, `MatchStore` y `ActivityService`.
+- Falta de runtime config real: `apiBaseUrl` esta compilado en `environment.ts`.
+- `NotificationBadgeService` y push token sync estan incompletos.
+
+## Riesgos
+- Riesgo funcional: acciones que navegan a `/social` hoy pueden terminar en `/matches` por redirect y no abrir la experiencia esperada.
+- Riesgo de seguridad: tokens en `localStorage` quedan expuestos a XSS.
+- Riesgo operativo: configuracion de entorno muy fija para prod/dev, sin inyeccion runtime.
+- Riesgo de consistencia: mezcla de estado local, optimista y backend puede producir diferencias temporales si falla una sincronizacion.
+- Riesgo UX: hay pantallas maduras y otras claramente parciales.
+
+## Proximos pasos recomendados
+1. Decidir si `social` vuelve a ser ruta real o si su codigo se desmantela o integra dentro de `matches`.
+2. Unificar historial en una sola experiencia.
+3. Cerrar la deuda de notificaciones: badge real, registro de push token y backend asociado.
+4. Mover URLs/configuracion hacia una estrategia por entorno mas segura.
+5. Corregir encoding de strings.
+6. Separar mejor responsabilidades de `MatchService` y `MatchStore`.
