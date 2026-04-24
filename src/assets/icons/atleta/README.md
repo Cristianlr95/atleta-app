@@ -1,15 +1,18 @@
-﻿# Iconos ATLETA
+# Iconos Atleta
 
-Pack SVG para la app, estilo futurista deportivo metalico.
+## Proposito
+Pack SVG propio para la identidad visual de Atleta. Los iconos se usan en navegacion, acciones y componentes del sistema visual `metallic`.
 
 ## Uso en Ionic/Angular
 
-### Opcion A: `<img>`
+### Como imagen
 ```html
 <img src="assets/icons/atleta/ic_nav_home_24.svg" class="at-icon at-icon--default" alt="Inicio" />
 ```
 
-### Opcion B: Mascara CSS (permite color por clase)
+### Como mascara CSS
+Permite cambiar color por estado usando `currentColor`.
+
 ```html
 <span class="at-icon-mask at-icon--active" style="--icon-url: url('assets/icons/atleta/ic_nav_home_24.svg');"></span>
 ```
@@ -26,13 +29,12 @@ Pack SVG para la app, estilo futurista deportivo metalico.
   height: 24px;
   display: inline-block;
   background-color: currentColor;
-  -webkit-mask: var(--icon-url) center/contain no-repeat;
-  mask: var(--icon-url) center/contain no-repeat;
+  -webkit-mask: var(--icon-url) center / contain no-repeat;
+  mask: var(--icon-url) center / contain no-repeat;
 }
 ```
 
-## Clases de estado (paleta)
-
+## Estados recomendados
 ```css
 :root {
   --icon-default: #c6e7ff;
@@ -48,3 +50,6 @@ Pack SVG para la app, estilo futurista deportivo metalico.
 .at-icon--error { color: var(--icon-danger); }
 .at-icon--disabled { color: var(--icon-disabled); }
 ```
+
+## Estado
+Recurso visual implementado. Mantener nombres consistentes, tamanos predecibles y `alt` descriptivo cuando se rendericen como imagen.
