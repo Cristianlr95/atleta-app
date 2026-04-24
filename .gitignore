@@ -33,6 +33,14 @@ log.txt
 /node_modules
 npm-debug.log
 yarn-error.log
+.env
+.env.local
+.env.development
+.env.development.local
+.env.production
+.env.production.local
+!/.env.example
+src/assets/app-config.json
 
 # IDEs and editors
 .idea/

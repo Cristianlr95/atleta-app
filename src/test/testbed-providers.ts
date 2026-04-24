@@ -10,6 +10,7 @@ import { of } from 'rxjs';
 const defaultAppConfig: AppConfig = {
   apiBaseUrl: 'http://localhost:8080/api/v1',
   storagePrefix: 'atleta.test',
+  environmentName: 'test',
 };
 
 export function provideAppConfigMock(overrides?: Partial<AppConfig>): Provider {

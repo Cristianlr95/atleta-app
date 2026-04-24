@@ -6,25 +6,29 @@ import {
   inject,
   makeEnvironmentProviders,
 } from '@angular/core';
-import { appConfig } from './config/app-config';
 import { APP_CONFIG } from './config/app-config.token';
+import { AppConfigService } from './config/app-config.service';
 import { CoreModule } from './core.module';
 import { AuthTokenInterceptor } from './interceptors/auth-token.interceptor';
 import { HttpErrorInterceptor } from './interceptors/http-error.interceptor';
 import { AuthSessionInitializerService } from './services/auth-session-initializer.service';
 
-function initializeAuthSession(): () => Promise<void> {
+function initializeApplication(): () => Promise<void> {
+  const appConfigService = inject(AppConfigService);
   const authSessionInitializer = inject(AuthSessionInitializerService);
 
-  return () => authSessionInitializer.initSession();
+  return async () => {
+    await appConfigService.load();
+    await authSessionInitializer.initSession();
+  };
 }
 
 export function provideCore(): EnvironmentProviders {
   return makeEnvironmentProviders([
     importProvidersFrom(CoreModule.forRoot()),
     provideHttpClient(withInterceptorsFromDi()),
-    { provide: APP_CONFIG, useValue: appConfig },
-    { provide: APP_INITIALIZER, useFactory: initializeAuthSession, multi: true },
+    { provide: APP_CONFIG, useFactory: () => inject(AppConfigService).getConfig() },
+    { provide: APP_INITIALIZER, useFactory: initializeApplication, multi: true },
     { provide: HTTP_INTERCEPTORS, useClass: AuthTokenInterceptor, multi: true },
     { provide: HTTP_INTERCEPTORS, useClass: HttpErrorInterceptor, multi: true },
   ]);

@@ -1,0 +1,15 @@
+.git
+.gitignore
+.angular
+.vscode
+coverage
+dist
+node_modules
+test-results
+www
+frontend*.log
+backend*.log
+run-dev.log
+docs
+e2e
+*.md

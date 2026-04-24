@@ -1,100 +1,236 @@
-# Deployment y Operacion del Frontend
+# Deployment del Frontend Atleta
 
 Fecha de actualizacion: 2026-04-23
 
-## Como correr el frontend en desarrollo
+## 1. Resumen tecnico del proyecto
+- Framework principal: Ionic Angular standalone sobre Angular `20.x`.
+- Build tool: Angular CLI `20` con builder `@angular-devkit/build-angular:application`.
+- Salida de build: `www/`.
+- Routing: Angular Router con rutas standalone definidas en `src/app/app.routes.ts`.
+- Integracion movil: Capacitor `8` con `webDir: "www"`.
+- Servidor de desarrollo: `ng serve`.
+- Test E2E: Playwright.
+
+## 2. Hallazgos del estado actual
+### Build y configuracion
+- El proyecto ya separaba `development` y `production` con `fileReplacements`, pero el `apiBaseUrl` estaba compilado fijo en `environment.ts` y `environment.prod.ts`.
+- `ng build` sin flags generaba build de desarrollo porque el target `build` tenia `defaultConfiguration: "development"`.
+- No existia `.env.example`.
+- No habia artefactos Docker para despliegue como SPA estatica.
+
+### Integraciones y dependencias criticas
+- Backend consumido via `ApiService` base y `API_ENDPOINTS`.
+- Endpoints backend dependian de `APP_CONFIG.apiBaseUrl`.
+- Integraciones externas detectadas:
+  - Google Fonts en `src/theme/variables.scss`
+  - OpenStreetMap tiles en `venue-map.component.ts`
+  - Google Maps search links en `venue-selected-card.component.ts`
+
+### Riesgos detectados
+- URL backend hardcodeada por build.
+- Tokens de sesion almacenados en `localStorage`.
+- `capacitor.config.ts` aun usa `appId: "io.ionic.starter"`.
+- No habia estrategia formal para exponer solo variables publicas de frontend.
+
+## 3. Cambios implementados en esta preparacion
+- Se movio la configuracion publica del frontend a un runtime config generado en `src/assets/app-config.json`.
+- Se agrego el script `tools/config/sync-runtime-config.mjs` para:
+  - leer `.env`, `.env.development`, `.env.production` y variantes `.local`
+  - generar solo variables publicas permitidas
+  - validar que `ATLETA_API_BASE_URL` sea una URL absoluta segura
+  - rechazar variables frontend `ATLETA_*` no soportadas
+- Se agrego `AppConfigService` para cargar configuracion runtime antes de inicializar sesion.
+- `npm run build` ahora genera build de produccion reproducible.
+- `npm run build:dev` queda disponible para build de desarrollo.
+- Se agregaron `Dockerfile`, `.dockerignore` y configuracion Nginx para SPA.
+- El contenedor Docker escribe `assets/app-config.json` al arrancar, permitiendo cambiar backend sin recompilar la imagen.
+
+## 4. Variables de entorno soportadas
+Solo estas variables son validas para el frontend:
+
+```env
+ATLETA_APP_ENV=development
+ATLETA_ENV_NAME=development
+ATLETA_API_BASE_URL=http://localhost:8080/api/v1
+ATLETA_STORAGE_PREFIX=atleta.dev
+```
+
+### Reglas
+- No poner secretos en variables frontend.
+- No definir passwords, JWT secretos, client secrets o credenciales de base de datos en el frontend.
+- `ATLETA_API_BASE_URL` debe apuntar al backend publico que el navegador puede alcanzar.
+- `ATLETA_STORAGE_PREFIX` define el namespace de `localStorage`.
+
+## 5. Como correr en local
+### Opcion A: defaults locales
 1. Instalar dependencias:
-   - `npm install`
-2. Levantar el frontend:
+   - `npm ci`
+2. Levantar frontend:
    - `npm start`
-3. URL esperada por defecto:
+3. Backend esperado por defecto:
+   - `http://localhost:8080/api/v1`
+4. Frontend esperado:
    - `http://localhost:4200`
-4. Para E2E Playwright, el propio config levanta servidor en:
-   - `http://localhost:8100`
 
-## Scripts detectados
-- `npm start`
-- `npm run build`
-- `npm run watch`
-- `npm test`
-- `npm run lint`
-- `npm run e2e`
-- `npm run e2e:headed`
+### Opcion B: con `.env.development`
+1. Crear `.env.development` a partir de `.env.example`.
+2. Ajustar:
 
-## Variables de entorno detectadas
-No hay `.env` frontend nativo detectado. La configuracion esta compilada en:
-- `src/environments/environment.ts`
-- `src/environments/environment.prod.ts`
+```env
+ATLETA_APP_ENV=development
+ATLETA_ENV_NAME=development
+ATLETA_API_BASE_URL=http://localhost:8080/api/v1
+ATLETA_STORAGE_PREFIX=atleta.dev
+```
 
-Valores actuales:
-- Desarrollo:
-  - `apiBaseUrl: http://localhost:8080/api/v1`
-  - `storagePrefix: atleta`
-- Produccion:
-  - `apiBaseUrl: https://api.atleta.app/api/v1`
-  - `storagePrefix: atleta`
+3. Ejecutar:
+   - `npm start`
 
-## Build local
-- Build standard:
-  - `npm run build`
-- Angular genera salida en:
-  - `www/`
+## 6. Como construir el build
+### Produccion
+```bash
+npm ci
+npm run build
+```
 
-Observaciones:
-- `angular.json` usa configuracion `production` con file replacement.
-- No se detecto Dockerfile frontend ni pipeline de deploy frontend en este repo.
+Resultado:
+- bundle optimizado en `www/`
+- `outputHashing: all`
+- reemplazo de `environment.ts` por `environment.prod.ts`
+- runtime config publico generado antes del build
 
-## Capacitor / app movil
-- `capacitor.config.ts` existe.
-- `webDir` apunta a `www`.
-- Hallazgo: `appId` sigue siendo `io.ionic.starter`, lo que conviene corregir antes de un release movil real.
+### Desarrollo
+```bash
+npm ci
+npm run build:dev
+```
 
-## Recomendaciones de Docker
-Estado actual:
-- No aplica directamente porque no existe Dockerfile frontend en el repo.
+## 7. Como se define el endpoint backend por ambiente
+### Desarrollo local
+```env
+ATLETA_API_BASE_URL=http://localhost:8080/api/v1
+ATLETA_STORAGE_PREFIX=atleta.dev
+ATLETA_ENV_NAME=development
+```
 
-Si se necesitara Dockerizar:
-- Recomendado usar multi-stage:
-  - stage 1: `node` para `npm ci` + `npm run build`
-  - stage 2: `nginx:alpine` para servir `www`
-- Importante: no hardcodear `apiBaseUrl` si se piensa desplegar la misma imagen en varios entornos.
+### Produccion
+```env
+ATLETA_API_BASE_URL=https://api.atleta.app/api/v1
+ATLETA_STORAGE_PREFIX=atleta
+ATLETA_ENV_NAME=production
+```
 
-## Estrategia segura de despliegue a produccion
-- Tratar el frontend como app estatica.
-- Servir por HTTPS.
-- Mantener backend API en dominio separado, idealmente `api.atleta.app`.
-- Definir CORS estricto desde backend hacia dominios frontend permitidos.
-- Agregar versionado/cache control para assets.
-- Considerar runtime config si se requiere cambiar endpoint sin recompilar.
+### Staging sugerido
+```env
+ATLETA_API_BASE_URL=https://staging-api.atleta.app/api/v1
+ATLETA_STORAGE_PREFIX=atleta.staging
+ATLETA_ENV_NAME=staging
+```
 
-## Hosting recomendado
-- Recomendado para este estado del repo:
-  - Vercel
-  - Netlify
-  - Cloudflare Pages
-  - S3 + CloudFront
+## 8. Despliegue en Vercel
+Configuracion recomendada:
+- Framework preset: `Other`
+- Install command: `npm ci`
+- Build command: `npm run build`
+- Output directory: `www`
 
-## Manejo de secretos
-- El frontend no debe contener secretos reales.
-- Hoy no se detectan secretos inyectados desde `.env`, pero si hay URLs fijas compiladas.
-- Access token y refresh token se guardan en `localStorage`.
+Variables recomendadas en Vercel:
+- `ATLETA_APP_ENV=production`
+- `ATLETA_ENV_NAME=production`
+- `ATLETA_API_BASE_URL=https://api.atleta.app/api/v1`
+- `ATLETA_STORAGE_PREFIX=atleta`
 
-Riesgo:
-- `localStorage` expone la sesion a XSS.
+Notas:
+- Si usas preview deployments, define una variante preview o staging del backend.
+- Mantener el dominio frontend agregado al CORS del backend.
 
-## Configuracion de entornos dev/prod
-- Dev/prod se separan solo por `environment.ts` y `environment.prod.ts`.
-- No hay entorno `staging` frontend detectado.
-- No hay runtime config ni feature flags detectados.
+## 9. Despliegue en Netlify
+Configuracion recomendada:
+- Build command: `npm run build`
+- Publish directory: `www`
 
-## Buenas practicas de seguridad para frontend
-- Mantener CSP estricta si se despliega con dominio propio.
-- Revisar la carga de Google Fonts desde CDN si se requiere politica CSP cerrada.
-- Evitar guardar refresh token en `localStorage` si el modelo backend permite alternativa mas segura.
-- No exponer claves de terceros en el bundle.
+Variables recomendadas:
+- `ATLETA_APP_ENV=production`
+- `ATLETA_ENV_NAME=production`
+- `ATLETA_API_BASE_URL=https://api.atleta.app/api/v1`
+- `ATLETA_STORAGE_PREFIX=atleta`
 
-## Riesgos operativos detectados
-- `apiBaseUrl` esta hardcodeado por build, lo que dificulta despliegues multi-entorno.
-- `NotificationBadgeService.refresh()` no consulta backend.
-- Push token sync aun no esta integrado con backend.
-- Configuracion Capacitor aun luce base/template.
+Redirect SPA recomendado en `netlify.toml` si luego se agrega:
+- redirigir `/*` hacia `/index.html` con status `200`
+
+## 10. Despliegue con Docker
+### Build
+```bash
+docker build -t atleta-app .
+```
+
+### Run
+```bash
+docker run --rm -p 8081:80 \
+  -e ATLETA_ENV_NAME=production \
+  -e ATLETA_API_BASE_URL=https://api.atleta.app/api/v1 \
+  -e ATLETA_STORAGE_PREFIX=atleta \
+  atleta-app
+```
+
+Ventajas:
+- La imagen no necesita recompilarse para cambiar el endpoint.
+- Nginx resuelve rutas SPA con fallback a `index.html`.
+- `assets/app-config.json` se marca como `no-store`.
+
+## 11. Manejo de ambiente de desarrollo
+- Usar backend local en `http://localhost:8080`.
+- Mantener `ATLETA_STORAGE_PREFIX=atleta.dev` para no mezclar sesion con otros ambientes.
+- Si se conecta a staging desde local, usar prefix distinto:
+  - `ATLETA_STORAGE_PREFIX=atleta.staging.local`
+
+## 12. Manejo de ambiente de produccion
+- Publicar siempre bajo HTTPS.
+- Apuntar a un backend HTTPS con CORS estricto.
+- Usar `ATLETA_STORAGE_PREFIX=atleta`.
+- Evitar mezclar preview/prod con el mismo `storagePrefix`.
+- Preferir despliegue inmutable del bundle y cambiar solo `assets/app-config.json` cuando el hosting lo permita.
+
+## 13. Seguridad frontend recomendada
+- No exponer secretos ni credenciales en archivos `.env` del frontend.
+- Mantener allowlist estricta de variables publicas.
+- No usar `ATLETA_API_BASE_URL` con credenciales embebidas.
+- Revisar politica CSP si el despliegue final exige endurecimiento.
+- Evaluar self-hosting de fuentes para evitar dependencia externa de Google Fonts.
+- Evaluar migrar tokens fuera de `localStorage` si el backend soporta cookies `HttpOnly`.
+- Validar CORS, `X-Frame-Options`, `Referrer-Policy` y `Content-Security-Policy` desde el hosting/CDN.
+
+## 14. Problemas detectados y oportunidades de mejora
+### Hardcoded URLs detectadas
+- Antes de esta tarea:
+  - `src/environments/environment.ts`
+  - `src/environments/environment.prod.ts`
+- Se corrigio la URL backend hardcodeada para que pase por runtime config.
+
+### URLs externas aun presentes
+- Google Fonts
+- OpenStreetMap tiles
+- Google Maps search
+
+### Secretos expuestos
+- No se detectaron secretos reales en el bundle fuente revisado.
+- El mayor riesgo actual no es un secreto hardcodeado, sino almacenamiento de tokens en `localStorage`.
+
+### Configuraciones duplicadas o mejorables
+- La distincion dev/prod existia por Angular file replacement y ahora tambien por runtime config; esto es intencional y permite fallback seguro.
+- `capacitor.config.ts` sigue con identificador de plantilla.
+
+### Dependencias no criticas para produccion
+- Playwright, Karma y ESLint solo aplican a desarrollo/CI y ya viven en `devDependencies`.
+
+## 15. Checklist previo a despliegue
+- `npm ci` ejecuta sin errores
+- `npm run build` genera `www/`
+- `ATLETA_API_BASE_URL` apunta al backend correcto
+- Backend tiene CORS habilitado para el dominio frontend
+- `ATLETA_STORAGE_PREFIX` no colisiona con otros ambientes
+- No se agregaron secretos al frontend
+- Se validaron login, carga inicial y llamadas API principales
+- Se reviso si el hosting resuelve SPA fallback a `index.html`
+- Se confirmo disponibilidad HTTPS
+- Se evaluo el riesgo de tokens en `localStorage`

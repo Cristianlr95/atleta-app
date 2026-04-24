@@ -1,38 +1,33 @@
-# Changelog Inicial de Auditoria
+# Changelog
 
 ## 2026-04-23
 
-### Estado general
-- Se genero base documental viva del frontend a partir del codigo real del repositorio.
-- El estado actual muestra un frontend funcionalmente centrado en autenticacion, perfil competitivo, equipos, partidos, ranking y MVP.
-- El dominio mas avanzado es `matches`.
+### Preparacion inicial de despliegue frontend
+- Se preparo el frontend de Atleta para despliegue reproducible en desarrollo y produccion.
+- Se reemplazo la configuracion fija del backend por runtime config publico.
+- Se dejo el build de produccion como flujo principal de `npm run build`.
 
-### Modulos detectados
-- `auth`
-- `dashboard`
-- `fields`
-- `matches`
-- `ratings`
-- `sessions`
-- `social`
-- `teams`
-- `user`
-- `shared/ui`
-- `core`
+### Archivos creados o modificados
+- `package.json`
+- `angular.json`
+- `.gitignore`
+- `.env.example`
+- `Dockerfile`
+- `.dockerignore`
+- `docker/nginx/default.conf`
+- `docker/entrypoint/40-write-app-config.sh`
+- `tools/config/sync-runtime-config.mjs`
+- `src/environments/environment.ts`
+- `src/environments/environment.prod.ts`
+- `src/app/core/config/app-config.ts`
+- `src/app/core/config/app-config.service.ts`
+- `src/app/core/core.providers.ts`
+- `src/test/testbed-providers.ts`
+- `docs/deployment.md`
+- `docs/changelog.md`
 
-### Hallazgos importantes
-- La ruta `/social` redirige a `/matches`, aunque existe un modulo social completo en codigo.
-- La pagina `/stats` existe, pero hoy solo es placeholder.
-- `matches-history` y el historial dentro de `matches-hub` duplican bastante comportamiento.
-- El sistema de notificaciones push esta preparado en cliente, pero sin sincronizacion backend real del token.
-- `NotificationBadgeService.refresh()` no resuelve conteo remoto.
-- La sesion y tokens se persisten en `localStorage`.
-- `capacitor.config.ts` conserva `appId` de plantilla (`io.ionic.starter`).
-- Existen strings con problemas de encoding en varios archivos.
-
-### Oportunidades de mejora
-- Reintegrar o retirar el modulo social huerfano.
-- Consolidar historial de partidos en una sola experiencia.
-- Separar responsabilidades del dominio `matches`.
-- Endurecer configuracion y seguridad de sesion.
-- Completar estrategia real de notificaciones y badges.
+### Riesgos detectados
+- La sesion y tokens siguen almacenados en `localStorage`.
+- `capacitor.config.ts` conserva un `appId` de plantilla y no deberia salir asi a una release movil real.
+- El frontend sigue dependiendo de terceros para fuentes y mapas.
+- Si se requiere configuracion runtime fuera de Docker, el hosting debe permitir generar `assets/app-config.json` en build o despliegue.
