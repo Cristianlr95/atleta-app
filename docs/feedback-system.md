@@ -29,7 +29,7 @@ Mantener continuidad real del proyecto, evitar duplicacion y obligar a que cada 
 2. Actualizar `docs/funcionalidades.md` si cambia el estado de una funcionalidad.
 3. Actualizar `docs/architecture.md` si cambia estructura, stack o patron.
 4. Actualizar `docs/deployment.md` si cambia entorno, build o release.
-5. Agregar entrada en `docs/changelog.md`.
+5. Registrar cambios relevantes directamente en el documento vivo afectado.
 
 ## Checklist minimo de cierre por tarea
 - [ ] Se leyeron `memory.md`, `funcionalidades.md` y `architecture.md`
@@ -37,7 +37,7 @@ Mantener continuidad real del proyecto, evitar duplicacion y obligar a que cada 
 - [ ] Se reutilizaron componentes y servicios existentes cuando correspondia
 - [ ] No se duplico UI ni logica ya presente
 - [ ] Se actualizaron documentos impactados
-- [ ] Se registro hallazgo o cambio en `changelog.md`
+- [ ] Se registro hallazgo o cambio en el documento vivo correspondiente
 
 ## Hallazgos que siempre deben recordarse
 - `matches` es el dominio mas sensible y mas acoplado.
