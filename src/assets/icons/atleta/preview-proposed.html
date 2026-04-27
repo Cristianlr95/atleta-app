@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Atleta Icons Preview - Propuesta Game-Like</title>
+<style>
+  :root {
+    color-scheme: dark;
+    font-family: "Inter", "Segoe UI", Arial, sans-serif;
+    background: #050a13;
+    color: #eef6ff;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; min-height: 100vh; background: radial-gradient(circle at top left, rgba(99,198,255,0.15) 0%, transparent 35%), radial-gradient(circle at bottom right, rgba(126,182,255,0.12) 0%, transparent 25%), #050a13; }
+  header { padding: 24px 20px 12px; text-align: center; }
+  h1 { margin: 0; font-size: clamp(2rem, 2.5vw, 2.6rem); letter-spacing: -0.03em; }
+  p { margin: 14px auto 0; max-width: 760px; color: #a8cfff; line-height: 1.7; }
+  .section { padding: 26px 20px 36px; }
+  .section + .section { border-top: 1px solid rgba(255,255,255,0.06); }
+  .section-title { display: flex; align-items: center; gap: 12px; margin: 0 0 18px; font-size: 1.05rem; font-weight: 600; color: #cfe7ff; }
+  .badge { display: inline-flex; align-items: center; justify-content: center; min-width: 32px; height: 32px; border-radius: 999px; background: rgba(99,198,255,0.12); color: #63c6ff; font-size: 0.8rem; font-weight: 700; }
+  .grid { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); }
+  .card { border-radius: 18px; background: rgba(8, 17, 30, 0.92); border: 1px solid rgba(99,198,255,0.12); padding: 16px; display: grid; gap: 12px; align-items: center; justify-items: center; transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease; }
+  .card:hover { transform: translateY(-3px); border-color: rgba(99,198,255,0.28); box-shadow: 0 14px 40px rgba(39, 86, 150, 0.18); }
+  .icon-frame { width: 72px; height: 72px; border-radius: 22px; background: radial-gradient(circle at center, rgba(99,198,255,0.16), transparent 55%); display: grid; place-items: center; position: relative; }
+  .icon-frame::after { content: ''; position: absolute; inset: 0; border-radius: inherit; box-shadow: inset 0 0 0 1px rgba(255,255,255,0.05); }
+  .icon-frame svg, .icon-frame img { width: 44px; height: 44px; display: block; }
+  .icon-label { font-size: 0.82rem; text-align: center; line-height: 1.4; color: #d8e8ff; word-break: break-word; }
+  .preview-pair { display: grid; gap: 18px; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
+  .preview-pair .pair-card { background: rgba(8, 17, 30, 0.85); border: 1px solid rgba(255,255,255,0.08); border-radius: 22px; padding: 18px; }
+  .pair-card h2 { margin: 0 0 12px; font-size: 1rem; color: #c6e8ff; }
+  .pair-card .pair-grid { display: grid; gap: 10px; }
+  .pair-grid .pair-row { display: grid; grid-template-columns: 90px 1fr; gap: 10px; align-items: center; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
+  .pair-grid .pair-row:last-child { border-bottom: none; }
+  .pair-grid strong { display: inline-block; font-size: 0.86rem; color: #d8ecff; }
+  .pair-grid span { font-size: 0.82rem; color: #a0b9dd; }
+  .tagline { margin-top: 12px; font-size: 0.88rem; color: #96b8ff; }
+  svg.icon-proposed { width: 44px; height: 44px; fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; }
+  .icon-proposed path, .icon-proposed circle, .icon-proposed rect, .icon-proposed polygon, .icon-proposed line { vector-effect: non-scaling-stroke; }
+  .footer { margin: 0 auto; max-width: 760px; padding-bottom: 24px; color: #7d99bf; font-size: 0.9rem; }
+</style>
+</head>
+<body>
+  <header>
+    <h1>Atleta Icons Preview — Propuesta Game-Like</h1>
+    <p>Galería de propuesta para rediseñar los iconos desde cero. Mantiene la base del diseño actual pero agrega más vida, dinamismo, carácter de juego y estilo deportivo.</p>
+  </header>
+
+  <section class="section">
+    <div class="section-title"><span class="badge">01</span> Iconos actuales</div>
+    <div class="grid">
+<div class="card"><div class="icon-frame"><img src="./ic_action_accept_24.svg" alt="ic_action_accept_24"/></div><div class="icon-label">ic_action_accept_24.svg</div></div>
+<div class="card"><div class="icon-frame"><img src="./ic_action_edit_24.svg" alt="ic_action_edit_24"/></div><div class="icon-label">ic_action_edit_24.svg</div></div>
+<div class="card"><div class="icon-frame"><img src="./ic_action_filter_24.svg" alt="ic_action_filter_24"/></div><div class="icon-label">ic_action_filter_24.svg</div></div>
+<div class="card"><div class="icon-frame"><img src="./ic_action_reject_24.svg" alt="ic_action_reject_24"/></div><div class="icon-label">ic_action_reject_24.svg</div></div>
+<div class="card"><div class="icon-frame"><img src="./ic_action_save_24.svg" alt="ic_action_save_24"/></div><div class="icon-label">ic_action_save_24.svg</div></div>
+<div class="card"><div class="icon-frame"><img src="./ic_action_search_24.svg" alt="ic_action_search_24"/></div><div class="icon-label">ic_action_search_24.svg</div></div>
+<div class="card"><div class="icon-frame"><img src="./ic_comp_trophy_24.svg" alt="ic_comp_trophy_24"/></div><div class="icon-label">ic_comp_trophy_24.svg</div></div>
+<div class="card"><div class="icon-frame"><img src="./ic_match_create_24.svg" alt="ic_match_create_24"/></div><div class="icon-label">ic_match_create_24.svg</div></div>
+<div class="card"><div class="icon-frame"><img src="./ic_nav_home_24.svg" alt="ic_nav_home_24"/></div><div class="icon-label">ic_nav_home_24.svg</div></div>
+<div class="card"><div class="icon-frame"><img src="./ic_nav_matches_24.svg" alt="ic_nav_matches_24"/></div><div class="icon-label">ic_nav_matches_24.svg</div></div>
+<div class="card"><div class="icon-frame"><img src="./ic_nav_profile_24.svg" alt="ic_nav_profile_24"/></div><div class="icon-label">ic_nav_profile_24.svg</div></div>
+<div class="card"><div class="icon-frame"><img src="./ic_nav_ranking_24.svg" alt="ic_nav_ranking_24"/></div><div class="icon-label">ic_nav_ranking_24.svg</div></div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-title"><span class="badge">02</span> Propuesta desde cero</div>
+    <p class="tagline">Estos iconos son un prototipo de estilo: líneas más expresivas, volúmenes dinámicos, detalles de juego y placas luminosas para dar más carácter sin perder la identidad deportiva.</p>
+    <div class="grid">
+<div class="card"><div class="icon-frame"><svg class="icon-proposed" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8" fill="currentColor" opacity="0.16"/><path d="M12 6v12M6 12h12" stroke-width="1.8"/></svg></div><div class="icon-label">ic_action_accept_24.svg<br/><strong>Propuesta: escudo + estrella</strong></div></div>
+<div class="card"><div class="icon-frame"><svg class="icon-proposed" viewBox="0 0 24 24"><path d="M6 17.5c0-1.1 1-2 2.2-2h7.6c1.2 0 2.2.9 2.2 2V18H6v-.5Z" fill="currentColor" opacity="0.14"/><path d="M8 6.5h8M8 10h8M8 13.5h5" stroke-width="1.8"/></svg></div><div class="icon-label">ic_action_edit_24.svg<br/><strong>Propuesta: lápiz moderno</strong></div></div>
+<div class="card"><div class="icon-frame"><svg class="icon-proposed" viewBox="0 0 24 24"><path d="M7 5h10l2 4-2 4H7l-2-4 2-4Z" fill="currentColor" opacity="0.14"/><path d="M7 5h10l2 4-2 4H7l-2-4 2-4Z" stroke-width="1.8"/><path d="M8 9h8" stroke-width="1.8"/></svg></div><div class="icon-label">ic_action_filter_24.svg<br/><strong>Propuesta: embudo con luz</strong></div></div>
+<div class="card"><div class="icon-frame"><svg class="icon-proposed" viewBox="0 0 24 24"><circle cx="12" cy="12" r="7.2" fill="currentColor" opacity="0.1"/><path d="M8.5 8.5l7 7M8.5 15.5l7-7" stroke-width="1.8"/></svg></div><div class="icon-label">ic_action_reject_24.svg<br/><strong>Propuesta: cruz potente</strong></div></div>
+<div class="card"><div class="icon-frame"><svg class="icon-proposed" viewBox="0 0 24 24"><path d="M6 8.5h12v7H6z" fill="currentColor" opacity="0.14"/><path d="M7.5 9.8h9" stroke-width="1.8"/><path d="M7.5 13.2h9" stroke-width="1.8"/><path d="M9 16.5h6" stroke-width="1.8"/></svg></div><div class="icon-label">ic_action_save_24.svg<br/><strong>Propuesta: interfaz compacta</strong></div></div>
+<div class="card"><div class="icon-frame"><svg class="icon-proposed" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="5.5" stroke-width="1.8"/><path d="M14.7 14.7l4 4" stroke-width="1.8"/><circle cx="10.5" cy="10.5" r="2.2" fill="currentColor" opacity="0.24"/></svg></div><div class="icon-label">ic_action_search_24.svg<br/><strong>Propuesta: lupa limpia</strong></div></div>
+<div class="card"><div class="icon-frame"><svg class="icon-proposed" viewBox="0 0 24 24"><path d="M8 8h8v5H8z" fill="currentColor" opacity="0.18"/><path d="M7 15h10l1.2 2H5.8L7 15Z" fill="currentColor" opacity="0.08"/><path d="M8 8h8v5H8z" stroke-width="1.8"/><path d="M12 8v5" stroke-width="1.8"/><path d="M9 18h6" stroke-width="1.8"/></svg></div><div class="icon-label">ic_comp_trophy_24.svg<br/><strong>Propuesta: copa deportiva</strong></div></div>
+<div class="card"><div class="icon-frame"><svg class="icon-proposed" viewBox="0 0 24 24"><rect x="5" y="8" width="14" height="10" rx="2.2" fill="currentColor" opacity="0.12"/><path d="M8 12h8" stroke-width="1.8"/><path d="M8 15h8" stroke-width="1.8"/><path d="M10.5 8V6" stroke-width="1.8"/><path d="M13.5 8V6" stroke-width="1.8"/></svg></div><div class="icon-label">ic_match_calendar_24.svg<br/><strong>Propuesta: calendario deportivo</strong></div></div>
+<div class="card"><div class="icon-frame"><svg class="icon-proposed" viewBox="0 0 24 24"><circle cx="12" cy="12" r="7" fill="currentColor" opacity="0.14"/><path d="M12 7.5v9M7.5 12h9" stroke-width="1.8"/><path d="M12 12l2.8-2.8" stroke-width="1.8"/></svg></div><div class="icon-label">ic_match_create_24.svg<br/><strong>Propuesta: pelota + plus</strong></div></div>
+<div class="card"><div class="icon-frame"><svg class="icon-proposed" viewBox="0 0 24 24"><rect x="6" y="7" width="12" height="10" rx="2.6" fill="currentColor" opacity="0.1"/><path d="M8.5 12h7" stroke-width="1.8"/><path d="M12 9l1.7 3.5L15.5 12" stroke-width="1.8"/></svg></div><div class="icon-label">ic_match_format_24.svg<br/><strong>Propuesta: formato basado en retículas</strong></div></div>
+<div class="card"><div class="icon-frame"><svg class="icon-proposed" viewBox="0 0 24 24"><path d="M5.5 7.5h13L14 16h-4L5.5 7.5Z" fill="currentColor" opacity="0.12"/><path d="M8 12h8" stroke-width="1.8"/><path d="M12 8.5l3.5 5.5" stroke-width="1.8"/></svg></div><div class="icon-label">ic_match_invite_24.svg<br/><strong>Propuesta: invitación dinámica</strong></div></div>
+<div class="card"><div class="icon-frame"><svg class="icon-proposed" viewBox="0 0 24 24"><path d="M6 7h4l1.5 4-1.5 6H6V7Z" fill="currentColor" opacity="0.12"/><path d="M18 7h-4l-1.5 4 1.5 6H18V7Z" fill="currentColor" opacity="0.12"/><path d="M8 11h8" stroke-width="1.8"/><path d="M8 15h8" stroke-width="1.8"/></svg></div><div class="icon-label">ic_match_lineup_24.svg<br/><strong>Propuesta: alineación táctica</strong></div></div>
+<div class="card"><div class="icon-frame"><svg class="icon-proposed" viewBox="0 0 24 24"><path d="M12 4.5c4.2 0 7.5 3.4 7.5 7.5S16.2 19.5 12 19.5 4.5 16.1 4.5 12 7.8 4.5 12 4.5Z" fill="currentColor" opacity="0.16"/><path d="M12 7.5v9M7.5 12h9" stroke-width="1.8"/><path d="M16.4 7.6l-1.2 2.4" stroke-width="1.8"/></svg></div><div class="icon-label">ic_match_location_24.svg<br/><strong>Propuesta: ubicación con energía</strong></div></div>
+<div class="card"><div class="icon-frame"><svg class="icon-proposed" viewBox="0 0 24 24"><path d="M5.5 6.5h13a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1h-13a1 1 0 0 1-1-1v-9a1 1 0 0 1 1-1Z" fill="currentColor" opacity="0.1"/><path d="M7.5 10h9" stroke-width="1.8"/><path d="M7.5 13h6" stroke-width="1.8"/><path d="M7.5 16h3" stroke-width="1.8"/></svg></div><div class="icon-label">ic_match_rules_24.svg<br/><strong>Propuesta: reglas claras</strong></div></div>
+<div class="card"><div class="icon-frame"><svg class="icon-proposed" viewBox="0 0 24 24"><circle cx="8.5" cy="8.5" r="2.4" fill="currentColor" opacity="0.16"/><circle cx="15.5" cy="8.5" r="2.4" fill="currentColor" opacity="0.16"/><path d="M6.8 12.5h10.4" stroke-width="1.8"/><path d="M12 11l2.2 4" stroke-width="1.8"/></svg></div><div class="icon-label">ic_match_teams_24.svg<br/><strong>Propuesta: equipo VS equipo</strong></div></div>
+<div class="card"><div class="icon-frame"><svg class="icon-proposed" viewBox="0 0 24 24"><circle cx="12" cy="12" r="7" fill="currentColor" opacity="0.12"/><path d="M12 7v5l3 1.8" stroke-width="1.8"/><path d="M12 7v5l-3 1.8" stroke-width="1.8"/></svg></div><div class="icon-label">ic_match_time_24.svg<br/><strong>Propuesta: reloj deportivo</strong></div></div>
+<div class="card"><div class="icon-frame"><svg class="icon-proposed" viewBox="0 0 24 24"><path d="M6.5 5.5h11a1.5 1.5 0 0 1 1.5 1.5v10a1.5 1.5 0 0 1-1.5 1.5H6.5a1.5 1.5 0 0 1-1.5-1.5v-10a1.5 1.5 0 0 1 1.5-1.5Z" fill="currentColor" opacity="0.1"/><path d="M11 17.5h2" stroke-width="1.8"/><path d="M12 6.2v11" stroke-width="1.8"/><path d="M9 9.5h6" stroke-width="1.8"/></svg></div><div class="icon-label">ic_nav_home_24.svg<br/><strong>Propuesta: casa estadio</strong></div></div>
+<div class="card"><div class="icon-frame"><svg class="icon-proposed" viewBox="0 0 24 24"><path d="M6 7.5h12v9H6z" fill="currentColor" opacity="0.14"/><path d="M6 10.5h12" stroke-width="1.8"/><path d="M9 15h6" stroke-width="1.8"/><path d="M6 7.5l3 3" stroke-width="1.8"/><path d="M18 7.5l-3 3" stroke-width="1.8"/></svg></div><div class="icon-label">ic_nav_matches_24.svg<br/><strong>Propuesta: marcador</strong></div></div>
+<div class="card"><div class="icon-frame"><svg class="icon-proposed" viewBox="0 0 24 24"><circle cx="12" cy="8" r="3" fill="currentColor" opacity="0.16"/><path d="M8.3 18c.7-2.5 1.1-3.5 1.7-4.2.5-.6 1.3-.7 1.9-.7.7 0 1.4.2 1.9.7.6.7 1 1.7 1.7 4.2" stroke-width="1.8"/><path d="M9.5 8.3h5" stroke-width="1.8"/></svg></div><div class="icon-label">ic_nav_profile_24.svg<br/><strong>Propuesta: atleta</strong></div></div>
+<div class="card"><div class="icon-frame"><svg class="icon-proposed" viewBox="0 0 24 24"><polygon points="7 17.5 12 7 17 17.5" fill="currentColor" opacity="0.14"/><path d="M7 17.5h10" stroke-width="1.8"/><path d="M10.5 12.5l1.5-4 1.5 4" stroke-width="1.8"/></svg></div><div class="icon-label">ic_nav_ranking_24.svg<br/><strong>Propuesta: podio</strong></div></div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-title"><span class="badge">03</span> Estado del sistema</div>
+    <p class="tagline">En caso de que aceptes el estilo, el resto del conjunto se rediseñará siguiendo la misma estética: contornos vibrantes, rellenos suaves, movimiento sugerido y un lenguaje sólido de iconos deportivos.</p>
+    <div class="preview-pair">
+      <div class="pair-card">
+        <h2>Propuesta de estilo</h2>
+        <div class="pair-grid">
+          <div class="pair-row"><strong>Base</strong><span>Marcos redondeados + opacidades suaves + brillo interno.</span></div>
+          <div class="pair-row"><strong>Stroke</strong><span>Grosor 1.8 - 2.0px con lineas redondeadas.</span></div>
+          <div class="pair-row"><strong>Color</strong><span>currentColor para compatibilidad con tema oscuro y efectos glow.</span></div>
+          <div class="pair-row"><strong>Detalles</strong><span>Pequeños acentos de energía, rayos y estrellas, para sensación de juego.</span></div>
+          <div class="pair-row"><strong>Tipología</strong><span>Iconos deportivos, UI y estados responsivos.</span></div>
+        </div>
+      </div>
+      <div class="pair-card">
+        <h2>Qué se evaluará</h2>
+        <div class="pair-grid">
+          <div class="pair-row"><strong>Claridad</strong><span>Identificar iconos inmediatamente en navegación y acciones.</span></div>
+          <div class="pair-row"><strong>Carácter</strong><span>Que el conjunto se sienta más lúdico y atlético.</span></div>
+          <div class="pair-row"><strong>Consistencia</strong><span>Mis mismas reglas visuales aplicadas a todos los iconos.</span></div>
+          <div class="pair-row"><strong>Compatibilidad</strong><span>Validar que se vean bien sin romper el tema oscuro actual.</span></div>
+          <div class="pair-row"><strong>Escalabilidad</strong><span>Fácil de extender con nuevos iconos.</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">Abre este archivo en el navegador para revisar la propuesta. Si te agrada el enfoque, puedo aplicar la misma paleta y estilo a todos los iconos del pack desde cero.</footer>
+</body>
+</html>
