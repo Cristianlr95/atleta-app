@@ -7,34 +7,53 @@
   --font-family-body: 'Rajdhani', sans-serif;
   
   // Colores principales - Estilo Winning Eleven 10
-  --background: #1a1d2e;
-  --foreground: #e8e8f0;
-  --card: #252938;
-  --card-foreground: #e8e8f0;
-  --popover: #2a2e42;
-  --popover-foreground: #e8e8f0;
+  --background: #080d17;
+  --foreground: #edf4ff;
+  --card: #171f31;
+  --card-foreground: #edf4ff;
+  --popover: #1c263a;
+  --popover-foreground: #edf4ff;
   
   // Colores plateados metálicos
-  --primary: #c0c8d8;
-  --primary-foreground: #1a1d2e;
-  --secondary: #7a8aa0;
+  --primary: #d7e2f2;
+  --primary-foreground: #07101f;
+  --secondary: #6f829e;
   --secondary-foreground: #ffffff;
-  --muted: #3a3f54;
-  --muted-foreground: #9aa5b8;
-  --accent: #8895ab;
-  --accent-foreground: #ffffff;
+  --muted: #263149;
+  --muted-foreground: #aebcd2;
+  --accent: #80e7b2;
+  --accent-foreground: #06150f;
+  --atleta-blue: #58c7ff;
+  --atleta-green: #80e7b2;
+  --atleta-gold: #ffd46b;
+  --atleta-red: #ff6b7c;
   
   // Otros
-  --destructive: #d4183d;
+  --destructive: #ef476f;
   --destructive-foreground: #ffffff;
-  --border: rgba(192, 200, 216, 0.2);
-  --input-background: #2a2e42;
+  --border: rgba(176, 199, 231, 0.22);
+  --input-background: rgba(9, 15, 27, 0.84);
   --radius: 0.5rem;
+  --atleta-page-bg:
+    radial-gradient(circle at 20% 0%, rgba(88, 199, 255, 0.18), transparent 34%),
+    radial-gradient(circle at 92% 16%, rgba(128, 231, 178, 0.12), transparent 30%),
+    linear-gradient(145deg, #050913 0%, #101827 46%, #050913 100%);
+  --atleta-stadium-overlay:
+    linear-gradient(180deg, rgba(4, 8, 15, 0.76) 0%, rgba(7, 12, 22, 0.9) 60%, rgba(3, 6, 12, 0.96) 100%),
+    radial-gradient(circle at 50% 0%, rgba(88, 199, 255, 0.16), transparent 44%);
+  --surface-1: rgba(18, 27, 43, 0.84);
+  --surface-2: rgba(10, 16, 28, 0.78);
+  --surface-3: rgba(27, 38, 58, 0.9);
+  --line-soft: rgba(176, 199, 231, 0.22);
+  --line-strong: rgba(205, 221, 245, 0.48);
+  --glow-blue: rgba(88, 199, 255, 0.34);
+  --glow-green: rgba(128, 231, 178, 0.28);
+  --shadow-deep: 0 18px 48px rgba(0, 0, 0, 0.48);
   
   // Gradientes metálicos
-  --metallic-gradient: linear-gradient(135deg, #a8b4c4 0%, #d4dce8 25%, #e8eef5 50%, #d4dce8 75%, #a8b4c4 100%);
-  --metallic-dark: linear-gradient(135deg, #5a6578 0%, #7a8aa0 25%, #9aa5b8 50%, #7a8aa0 75%, #5a6578 100%);
-  --metallic-shine: linear-gradient(180deg, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0) 50%, rgba(0,0,0,0.1) 100%);
+  --metallic-gradient: linear-gradient(135deg, #91a2ba 0%, #d7e2f2 34%, #f7fbff 50%, #b8c7dc 72%, #6f829e 100%);
+  --metallic-dark: linear-gradient(135deg, #3d4c66 0%, #6f829e 45%, #9fb0c9 100%);
+  --metallic-shine: linear-gradient(180deg, rgba(255,255,255,0.24) 0%, rgba(255,255,255,0) 52%, rgba(0,0,0,0.18) 100%);
 }
 
 // Reset y estilos base
@@ -46,10 +65,12 @@
 
 body {
   font-family: var(--font-family-body);
-  background: linear-gradient(to bottom right, #0f1219, #1a1d2e, #252938);
+  background: var(--atleta-page-bg);
   color: var(--foreground);
   min-height: 100vh;
   overflow-x: hidden;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
 }
 
 h1, h2, h3, h4, h5, h6 {

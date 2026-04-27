@@ -5,68 +5,82 @@
 
 .metallic-progress {
   position: relative;
-  height: 24px;
-  background: #1a1d2e;
-  border: 2px solid #3a3f54;
-  border-radius: 8px;
+  height: 22px;
+  background: rgba(7, 13, 24, 0.88);
+  border: 1px solid rgba(176, 199, 231, 0.3);
+  border-radius: 999px;
   overflow: hidden;
-  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.5);
-  
+  box-shadow:
+    inset 0 2px 8px rgba(0, 0, 0, 0.5),
+    0 0 0 1px rgba(255, 255, 255, 0.04);
+
   &__info {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: 12px;
     margin-bottom: 8px;
   }
-  
+
   &__label {
-    color: #c0c8d8;
+    color: #cbd9ee;
     text-transform: uppercase;
     letter-spacing: 0.05em;
     font-family: var(--font-family-body);
-    font-weight: 600;
+    font-weight: 700;
     font-size: 0.875rem;
   }
-  
+
   &__value {
-    color: #9aa5b8;
+    color: #e5f2ff;
     font-family: var(--font-family-display);
     font-weight: 700;
     font-size: 0.875rem;
   }
-  
+
   &__fill {
     position: absolute;
     left: 0;
     top: 0;
     bottom: 0;
-    background: linear-gradient(to right, #5a6578, #c0c8d8, #7a8aa0);
+    background: linear-gradient(90deg, #58c7ff 0%, #80e7b2 62%, #ffd46b 100%);
     transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 0 18px rgba(88, 199, 255, 0.36);
   }
-  
+
   &__shine {
     position: absolute;
     inset: 0;
-    background: linear-gradient(to bottom, rgba(255,255,255,0.3), transparent, rgba(0,0,0,0.2));
+    background: linear-gradient(to bottom, rgba(255,255,255,0.28), transparent, rgba(0,0,0,0.16));
   }
-  
+
   &__glow {
     position: absolute;
     inset: 0;
-    background: linear-gradient(to right, transparent, rgba(255,255,255,0.4), transparent);
+    background: linear-gradient(to right, transparent, rgba(255,255,255,0.36), transparent);
     animation: shimmer 2s infinite;
   }
-  
+
   &__grid {
     position: absolute;
     inset: 0;
     background: repeating-linear-gradient(
       90deg,
-      rgba(192, 200, 216, 0.1) 0px,
-      rgba(192, 200, 216, 0.1) 1px,
+      rgba(255, 255, 255, 0.12) 0,
+      rgba(255, 255, 255, 0.12) 1px,
       transparent 1px,
       transparent 20px
     );
     pointer-events: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .metallic-progress__fill {
+    transition: none;
+  }
+
+  .metallic-progress__glow {
+    animation: none;
   }
 }
