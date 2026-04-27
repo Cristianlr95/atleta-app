@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Atleta</string>
+    <string name="title_activity_main">Atleta</string>
+    <string name="package_name">com.cristianlr.atleta</string>
+    <string name="custom_url_scheme">com.cristianlr.atleta</string>
+</resources>

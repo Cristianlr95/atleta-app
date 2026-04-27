@@ -7,7 +7,7 @@
   --atleta-icon-nav-deep: rgba(70, 58, 142, 0.58);
   background:
     linear-gradient(rgba(10, 12, 20, 0.78), rgba(10, 12, 20, 0.9)),
-    url('/assets/backgrounds/stadium.png');
+    url("/assets/backgrounds/stadium.png");
 
   background-size: cover;
   background-position: center;
@@ -37,7 +37,7 @@
 .profile-name {
   margin: 0;
   color: #e8eef5;
-  font-family: 'Orbitron', sans-serif;
+  font-family: "Orbitron", sans-serif;
   font-size: 22px;
   letter-spacing: 0.04em;
   line-height: 1.1;
@@ -47,7 +47,7 @@
 .profile-email {
   margin: 0;
   color: #c7d2e6;
-  font-family: 'Rajdhani', sans-serif;
+  font-family: "Rajdhani", sans-serif;
   font-size: 16px;
   line-height: 1.2;
 }
@@ -55,7 +55,7 @@
 .profile-message {
   margin: 0;
   text-align: center;
-  font-family: 'Rajdhani', sans-serif;
+  font-family: "Rajdhani", sans-serif;
   font-size: 15px;
   font-weight: 700;
 }
@@ -102,7 +102,7 @@
   border-radius: 8px;
   background: rgba(12, 19, 31, 0.72);
   color: #edf4ff;
-  font-family: 'Rajdhani', sans-serif;
+  font-family: "Rajdhani", sans-serif;
   font-size: 12px;
   font-weight: 700;
   padding: 5px 10px;
@@ -138,7 +138,7 @@
 .profile-team__name {
   margin: 0;
   color: #e8eef5;
-  font-family: 'Rajdhani', sans-serif;
+  font-family: "Rajdhani", sans-serif;
   font-size: 16px;
   font-weight: 700;
   line-height: 1.1;
@@ -148,7 +148,7 @@
 .profile-team__detail {
   margin: 0;
   color: #afc1dc;
-  font-family: 'Rajdhani', sans-serif;
+  font-family: "Rajdhani", sans-serif;
   font-size: 13px;
 }
 
@@ -167,7 +167,7 @@
 .profile-team-invite__title {
   margin: 0;
   color: #dce8fa;
-  font-family: 'Rajdhani', sans-serif;
+  font-family: "Rajdhani", sans-serif;
   font-size: 13px;
   font-weight: 700;
 }
@@ -175,7 +175,7 @@
 .profile-team-invite__subtitle {
   margin: 0;
   color: #afc1dc;
-  font-family: 'Rajdhani', sans-serif;
+  font-family: "Rajdhani", sans-serif;
   font-size: 12px;
   font-weight: 700;
 }
@@ -202,14 +202,14 @@
 .profile-team-members__item p {
   margin: 0;
   color: #e8eef5;
-  font-family: 'Rajdhani', sans-serif;
+  font-family: "Rajdhani", sans-serif;
   font-size: 13px;
   font-weight: 700;
 }
 
 .profile-team-members__item small {
   color: #afc1dc;
-  font-family: 'Rajdhani', sans-serif;
+  font-family: "Rajdhani", sans-serif;
   font-size: 12px;
 }
 
@@ -218,7 +218,7 @@
   border-radius: 999px;
   background: rgba(12, 19, 31, 0.72);
   color: #e6f0ff;
-  font-family: 'Rajdhani', sans-serif;
+  font-family: "Rajdhani", sans-serif;
   font-size: 11px;
   font-weight: 700;
   padding: 2px 8px;
@@ -240,7 +240,7 @@
   border: 1px solid rgba(126, 144, 168, 0.4);
   background: rgba(8, 13, 22, 0.7);
   color: #eaf3ff;
-  font-family: 'Rajdhani', sans-serif;
+  font-family: "Rajdhani", sans-serif;
   font-size: 14px;
   padding: 0 10px;
 }
@@ -275,14 +275,14 @@
 .profile-team-invite__meta p {
   margin: 0;
   color: #e8eef5;
-  font-family: 'Rajdhani', sans-serif;
+  font-family: "Rajdhani", sans-serif;
   font-size: 13px;
   font-weight: 700;
 }
 
 .profile-team-invite__meta small {
   color: #afc1dc;
-  font-family: 'Rajdhani', sans-serif;
+  font-family: "Rajdhani", sans-serif;
   font-size: 12px;
 }
 
@@ -311,4 +311,3 @@
     font-size: 15px;
   }
 }
-
