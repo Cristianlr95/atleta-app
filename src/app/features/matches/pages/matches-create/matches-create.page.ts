@@ -123,7 +123,7 @@ export class MatchesCreatePage {
 
     if (this.step() === 3) {
       return (
-        this.selectedPlayerIds().length > 0 &&
+        this.totalInvitedWithCreator() >= this.schedule().minRequired &&
         !!this.kitColors().home &&
         !!this.kitColors().away &&
         this.kitColors().home !== this.kitColors().away
@@ -131,6 +131,18 @@ export class MatchesCreatePage {
     }
 
     return true;
+  });
+
+  readonly totalInvitedWithCreator = computed(() => this.selectedPlayerIds().length + 1);
+
+  readonly viabilityLabel = computed(() => {
+    const total = this.totalInvitedWithCreator();
+    const minRequired = this.schedule().minRequired;
+    if (total >= minRequired) {
+      return `${total}/${minRequired} convocados. Partido viable si todos confirman.`;
+    }
+
+    return `${total}/${minRequired} convocados. Faltan ${minRequired - total} para armar partido.`;
   });
 
   ionViewWillEnter(): void {

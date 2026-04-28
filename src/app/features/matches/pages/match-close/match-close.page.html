@@ -31,6 +31,9 @@
             <span>Local asignados: {{ assignedHomeGoals() }} / {{ homeScore() }}</span>
             <span>Visita asignados: {{ assignedAwayGoals() }} / {{ awayScore() }}</span>
           </div>
+          <p class="helper-copy helper-copy--warning" *ngIf="!scoreboardMatchesAssignedGoals()">
+            Para cerrar el acta, los goles asignados deben coincidir con el marcador. Un 0-0 tambien es valido.
+          </p>
 
           <div #playersTableWrap class="players-table-wrap players-table-scroll" *ngIf="players().length > 0; else noPlayersState">
             <section class="team-section">

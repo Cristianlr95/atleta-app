@@ -112,19 +112,14 @@ export class MatchesApiService extends ApiService {
     );
   }
 
-  getMatchMvp(matchId: number, voterUserId?: string) {
-    return this.get<MatchMvpResponse>(`${API_ENDPOINTS.matches.base}/${matchId}/mvp`, {
-      params: voterUserId ? { voterUserId } : undefined,
-    });
+  getMatchMvp(matchId: number) {
+    return this.get<MatchMvpResponse>(`${API_ENDPOINTS.matches.base}/${matchId}/mvp`);
   }
 
-  voteMatchMvp(matchId: number, voterUserId: string, votedUserId: string) {
+  voteMatchMvp(matchId: number, votedUserId: string) {
     return this.post<MatchMvpResponse, { votedUserId: string }>(
       `${API_ENDPOINTS.matches.base}/${matchId}/mvp/vote`,
       { votedUserId },
-      {
-        params: { voterUserId },
-      },
     );
   }
 

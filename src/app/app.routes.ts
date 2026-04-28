@@ -42,7 +42,7 @@ export const routes: Routes = [
   },
   {
     path: 'sessions/create',
-    canActivate: [authGuard],
+    canActivate: [authGuard, onboardingCompletedGuard],
     loadComponent: () =>
       import('./features/sessions/pages/create-session/create-session.page').then(
         (m) => m.CreateSessionPage,
@@ -50,7 +50,7 @@ export const routes: Routes = [
   },
   {
     path: 'matches/history',
-    canActivate: [authGuard],
+    canActivate: [authGuard, onboardingCompletedGuard],
     loadComponent: () =>
       import('./features/matches/pages/matches-history/matches-history.page').then(
         (m) => m.MatchesHistoryPage,
@@ -58,7 +58,7 @@ export const routes: Routes = [
   },
   {
     path: 'matches',
-    canActivate: [authGuard],
+    canActivate: [authGuard, onboardingCompletedGuard],
     loadComponent: () =>
       import('./features/matches/pages/matches-hub/matches-hub.page').then(
         (m) => m.MatchesHubPage,
@@ -66,7 +66,7 @@ export const routes: Routes = [
   },
   {
     path: 'matches/create',
-    canActivate: [authGuard],
+    canActivate: [authGuard, onboardingCompletedGuard],
     loadComponent: () =>
       import('./features/matches/pages/matches-create/matches-create.page').then(
         (m) => m.MatchesCreatePage,
@@ -74,7 +74,7 @@ export const routes: Routes = [
   },
   {
     path: 'matches/venues/new',
-    canActivate: [authGuard],
+    canActivate: [authGuard, onboardingCompletedGuard],
     loadComponent: () =>
       import('./features/matches/pages/venue-create/venue-create.page').then(
         (m) => m.VenueCreatePage,
@@ -82,7 +82,7 @@ export const routes: Routes = [
   },
   {
     path: 'matches/:id/mvp-vote',
-    canActivate: [authGuard],
+    canActivate: [authGuard, onboardingCompletedGuard],
     loadComponent: () =>
       import('./features/matches/pages/match-mvp-vote/match-mvp-vote.page').then(
         (m) => m.MatchMvpVotePage,
@@ -90,7 +90,7 @@ export const routes: Routes = [
   },
   {
     path: 'matches/:id/close',
-    canActivate: [authGuard],
+    canActivate: [authGuard, onboardingCompletedGuard],
     loadComponent: () =>
       import('./features/matches/pages/match-close/match-close.page').then(
         (m) => m.MatchClosePage,
@@ -98,7 +98,7 @@ export const routes: Routes = [
   },
   {
     path: 'matches/:id',
-    canActivate: [authGuard],
+    canActivate: [authGuard, onboardingCompletedGuard],
     loadComponent: () =>
       import('./features/matches/pages/match-detail/match-detail.page').then(
         (m) => m.MatchDetailPage,
@@ -111,7 +111,7 @@ export const routes: Routes = [
   },
   {
     path: 'leaderboard',
-    canActivate: [authGuard],
+    canActivate: [authGuard, onboardingCompletedGuard],
     loadComponent: () =>
       import('./features/ratings/pages/leaderboard/leaderboard.page').then(
         (m) => m.LeaderboardPage,
@@ -124,7 +124,7 @@ export const routes: Routes = [
   },
   {
     path: 'stats',
-    canActivate: [authGuard],
+    canActivate: [authGuard, onboardingCompletedGuard],
     loadComponent: () =>
       import('./features/social/pages/stats/stats.page').then(
         (m) => m.StatsPage,

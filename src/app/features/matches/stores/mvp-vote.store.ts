@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
-import { catchError, firstValueFrom, of, timeout } from 'rxjs';
-import { AuthSessionService } from 'src/app/core/services/auth-session.service';
+import { catchError, firstValueFrom, timeout } from 'rxjs';
 import { ResourceStore } from 'src/app/core/store/resource-store';
 import { MatchMvpResponse, MatchMvpState } from '../models/match-mvp.models';
 import { MatchService } from '../services/match.service';
@@ -14,7 +13,6 @@ export class MvpVoteStore extends ResourceStore<MatchMvpState> {
   constructor(
     private readonly matchService: MatchService,
     private readonly matchesApiService: MatchesApiService,
-    private readonly authSessionService: AuthSessionService,
   ) {
     super();
   }
@@ -29,13 +27,12 @@ export class MvpVoteStore extends ResourceStore<MatchMvpState> {
 
   async vote(routeMatchId: string, votedUserId: string): Promise<MatchMvpState | null> {
     const entry = this.getData(routeMatchId);
-    const voterUserId = this.authSessionService.currentSession?.user?.atletaUuid ?? null;
-    if (!entry || !voterUserId) {
-      throw new Error('No se pudo identificar el votante.');
+    if (!entry) {
+      throw new Error('No se pudo cargar la votacion MVP.');
     }
 
     const response = await firstValueFrom(
-      this.matchesApiService.voteMatchMvp(entry.backendMatchId, voterUserId, votedUserId).pipe(
+      this.matchesApiService.voteMatchMvp(entry.backendMatchId, votedUserId).pipe(
         timeout(this.requestTimeoutMs),
       ),
     );
@@ -51,9 +48,8 @@ export class MvpVoteStore extends ResourceStore<MatchMvpState> {
       throw new Error('No se pudo cargar el partido para MVP.');
     }
 
-    const voterUserId = this.authSessionService.currentSession?.user?.atletaUuid;
     const response = await firstValueFrom(
-      this.matchesApiService.getMatchMvp(match.backendMatchId, voterUserId).pipe(
+      this.matchesApiService.getMatchMvp(match.backendMatchId).pipe(
         timeout(this.requestTimeoutMs),
         catchError((error) => {
           throw error;

@@ -64,11 +64,11 @@ export class MatchMvpVotePage implements OnDestroy {
   );
   readonly votesProgressLabel = computed(() => `${this.totalRecordedVotes()}/${this.totalEligibleVotes()} votos`);
   readonly voteCards = computed(() =>
-    this.candidates().map((candidate, index) => ({
+    this.candidates().map((candidate) => ({
       userId: candidate.userId,
       name: candidate.alias || candidate.userId,
-      teamLabel: index % 2 === 0 ? 'Equipo Local' : 'Equipo Visita',
-      accent: index % 2 === 0 ? '#4a88d6' : '#d66e4a',
+      teamLabel: 'Participante confirmado',
+      accent: this.myVote() === candidate.userId ? '#d6b04a' : '#4a88d6',
     })),
   );
 

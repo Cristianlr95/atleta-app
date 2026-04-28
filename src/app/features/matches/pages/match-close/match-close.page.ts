@@ -189,10 +189,14 @@ export class MatchClosePage {
 
   readonly canContinue = computed(() => {
     if (this.step() === 1) {
-      return this.homeScore() > 0 || this.awayScore() > 0;
+      return this.players().length > 0 && this.scoreboardMatchesAssignedGoals();
     }
     return true;
   });
+
+  readonly scoreboardMatchesAssignedGoals = computed(() =>
+    this.assignedHomeGoals() === this.homeScore() && this.assignedAwayGoals() === this.awayScore(),
+  );
 
   constructor() {
     effect(() => {

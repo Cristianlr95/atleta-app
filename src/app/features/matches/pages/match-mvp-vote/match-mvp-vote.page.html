@@ -34,16 +34,23 @@
           </ng-template>
         </app-metallic-form-section>
 
-        <app-metallic-form-section title="Tendencia de votos" description="Ranking actual de votacion.">
+        <app-metallic-form-section
+          [title]="isOpen() ? 'Progreso de votacion' : 'Resultado de votos'"
+          [description]="isOpen() ? 'La tendencia se muestra al cerrar para evitar presion o voto tactico.' : 'Ranking final de votacion.'">
           <div class="mvp-progress-chip" *ngIf="totalEligibleVotes() > 0">{{ votesProgressLabel() }}</div>
-          <div class="mvp-tally-list" *ngIf="tally().length > 0; else noTally">
+          <div class="mvp-tally-list" *ngIf="!isOpen() && tally().length > 0; else noTally">
             <div class="mvp-tally-item" *ngFor="let item of tally(); let idx = index">
               <span>#{{ idx + 1 }} {{ item.alias || item.userId }}</span>
               <strong>{{ item.votes }}</strong>
             </div>
           </div>
           <ng-template #noTally>
-            <p class="mvp-vote-message">Aun no hay votos registrados.</p>
+            <p class="mvp-vote-message" *ngIf="isOpen(); else closedNoTally">
+              La tendencia queda oculta hasta el cierre para proteger la votacion.
+            </p>
+            <ng-template #closedNoTally>
+              <p class="mvp-vote-message">No hay votos registrados.</p>
+            </ng-template>
           </ng-template>
         </app-metallic-form-section>
 
