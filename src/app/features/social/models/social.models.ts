@@ -36,6 +36,26 @@ export interface SocialNotificationItem {
   createdAt?: string;
 }
 
+export interface UnreadNotificationCount {
+  unreadCount: number;
+}
+
+export interface RegisterPushTokenPayload {
+  token: string;
+  platform: string;
+  deviceId?: string;
+}
+
+export interface PushTokenRecord {
+  id: number;
+  playerUuid: string;
+  platform: string;
+  deviceId?: string;
+  active: boolean;
+  lastSeenAt?: string;
+  createdAt?: string;
+}
+
 export interface CreateFriendRequestPayload {
   requesterUuid: string;
   targetUuid: string;

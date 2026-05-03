@@ -40,6 +40,8 @@
     matchInvitesBatch: '/social/match-invites/batch',
     matchInvitesByMatch: '/social/match-invites/by-match',
     notifications: '/social/notifications',
+    notificationUnreadCount: '/social/notifications/unread-count',
+    pushTokens: '/social/notifications/push-tokens',
     reminders: '/social/notifications/reminders/forms',
     searchPlayers: '/social/players/search',
   },
