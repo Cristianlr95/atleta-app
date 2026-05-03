@@ -3,6 +3,9 @@
 ## Descripcion
 Frontend de Atleta, una aplicacion para futbol amateur centrada en identidad competitiva, organizacion de partidos, equipos, posiciones, ranking y seguimiento del rendimiento del jugador.
 
+## Repositorios relacionados
+- Backend/API: [Cristianlr95/atleta-server](https://github.com/Cristianlr95/atleta-server)
+
 ## Problema que resuelve
 En ligas y grupos de futbol amateur, la coordinacion de partidos, convocatorias, equipos y rendimiento suele resolverse por chats y registros informales. Atleta App propone una experiencia centralizada donde los jugadores pueden gestionar su perfil, participar en partidos, revisar invitaciones y consultar rankings conectados al backend.
 
@@ -103,7 +106,7 @@ npm run e2e
 ```
 
 ## Estado del proyecto
-Proyecto en desarrollo avanzado para frontend. Los flujos principales de autenticacion, onboarding, partidos, equipos, perfil y ranking estan implementados. Hay funcionalidades parciales y deuda tecnica identificada en social, estadisticas, push remoto, consolidacion de historial y manejo de sesion.
+Proyecto en estado funcional avanzado. Los flujos principales de autenticacion, onboarding, partidos, equipos, perfil competitivo y ranking estan implementados de extremo a extremo sobre una API propia. El repositorio tambien incluye configuracion de despliegue, pruebas automatizadas y estructura preparada para evolucionar modulos complementarios.
 
 ## Funcionalidades implementadas
 - Login, registro y restauracion de sesion.
@@ -132,8 +135,8 @@ Proyecto en desarrollo avanzado para frontend. Los flujos principales de autenti
 ## Valor profesional del proyecto
 Este frontend demuestra dominio de Angular moderno, Ionic, arquitectura por features, componentes reutilizables, manejo de estado con signals/RxJS, consumo de APIs REST, experiencia mobile-first, pruebas automatizadas y preparacion de despliegue con configuracion runtime.
 
-## Mejoras visuales sugeridas
-- Capturas de onboarding, perfil competitivo, hub de partidos, detalle de partido y leaderboard.
-- GIF del flujo crear partido -> invitar jugadores -> cerrar partido.
-- Diagrama de navegacion principal y dependencias con backend.
-- Comparativa responsive mobile/desktop.
+## Que conviene revisar primero
+- Flujo de autenticacion y onboarding del jugador.
+- Modulo de partidos: creacion, detalle, cierre y votacion MVP.
+- Perfil competitivo con OVR, rol destacado y posiciones.
+- Integracion con el backend propio de Atleta para datos, ranking y estado de sesion.

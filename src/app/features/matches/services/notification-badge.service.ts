@@ -1,5 +1,7 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
+import { firstValueFrom } from 'rxjs';
 import { AuthSessionService } from 'src/app/core/services/auth-session.service';
+import { SocialApiService } from 'src/app/features/social/services/social-api.service';
 import { NotificationService } from './notification.service';
 import { InvitationsStore } from '../stores/invitations.store';
 
@@ -8,6 +10,7 @@ export class NotificationBadgeService {
   private readonly authSessionService = inject(AuthSessionService);
   private readonly invitationsStore = inject(InvitationsStore);
   private readonly notificationService = inject(NotificationService);
+  private readonly socialApiService = inject(SocialApiService);
 
   private readonly serverPendingCount = signal(0);
 
@@ -26,6 +29,7 @@ export class NotificationBadgeService {
       return;
     }
 
-    this.serverPendingCount.set(0);
+    const response = await firstValueFrom(this.socialApiService.getUnreadNotificationCount());
+    this.serverPendingCount.set(Math.max(0, response.unreadCount ?? 0));
   }
 }
