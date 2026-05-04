@@ -155,8 +155,9 @@ Atleta Frontend es una aplicacion para jugadores de futbol amateur centrada en i
 
 ## Funcionalidades recomendadas
 
-### Consolidar historial de partidos - `Recomendada`
-- Unificar `matches-history` y la vista history dentro de `matches-hub`.
+### Consolidar historial de partidos - `Implementada`
+- El historial vive en la pestana `history` de `matches-hub`.
+- `/matches/history` se mantiene como ruta compatible que abre esa pestana.
 
 ### Unificar entrada de "social" - `En progreso`
 - `SocialPage` ya esta reintegrada en `/social`; falta validar si debe tener entrada visible propia en la navegacion principal.

@@ -107,8 +107,7 @@ a:focus-visible {
 
 .home-bg,
 .matches-hub-bg,
-.leaderboard-bg,
-.matches-history-bg {
+.leaderboard-bg {
   background: var(--atleta-page-bg);
 }
 
@@ -124,7 +123,6 @@ a:focus-visible {
 .venue-create-container,
 .match-close-container,
 .mvp-vote-container,
-.matches-history-container,
 .stats-container,
 .social-container {
   width: min(100%, 940px);

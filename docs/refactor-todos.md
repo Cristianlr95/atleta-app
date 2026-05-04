@@ -9,7 +9,6 @@
 - TODO [ionic-lifecycle]: move primary data load from `ngOnInit` to `ionViewWillEnter` for critical pages:
   - `src/app/features/matches/pages/invitations/invitations.page.ts`
   - `src/app/features/matches/pages/matches-create/matches-create.page.ts`
-  - `src/app/features/matches/pages/matches-history/matches-history.page.ts`
   - `src/app/features/social/pages/social.page.ts`
 - TODO [ionic-lifecycle-remaining]: migrate remaining page load paths still using `ngOnInit`:
   - `src/app/features/matches/pages/match-detail/match-detail.page.ts:153`

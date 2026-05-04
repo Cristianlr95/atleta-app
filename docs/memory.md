@@ -18,7 +18,7 @@ Fuente: auditoria directa del repositorio `atleta-app`
 - Rutas legacy o redireccionadas: `/ranking` -> `/leaderboard`.
 - El modulo social quedo rehabilitado como ruta protegida: `/social` abre `SocialPage` y `/invitations` abre la misma experiencia en la pestana de partidos.
 - La pagina `stats` existe, pero hoy es solo una tarjeta placeholder para futura integracion.
-- Existen modos demo o fallbacks visuales en `player-onboarding`, `player-profile` y `matches-history`.
+- Existen modos demo o fallbacks visuales en `player-onboarding` y `player-profile`.
 - Hay cobertura E2E Playwright para login, crear partido, flujo de invitaciones, actualizacion live y MVP.
 
 ## Decisiones tecnicas detectadas
@@ -41,7 +41,7 @@ Fuente: auditoria directa del repositorio `atleta-app`
 ## Aprendizajes y hallazgos
 - `matches` ya no es solo CRUD: contiene agenda, historial, detalle, balanceo automatico, cierre y MVP.
 - `sessions/create` hoy funciona como pantalla puente: desde ahi se deriva a crear partido o equipo.
-- `matches/history` y la pestana `history` de `matches-hub` duplican funcionalidad muy similar.
+- `/matches/history` se conserva como ruta compatible, pero abre la pestana `history` de `matches-hub` como fuente unica.
 - `social` mantiene bastante codigo utilizable y vuelve a estar conectado al routing real.
 - `NotificationBadgeService.refresh()` hoy no consulta backend y deja el badge server-side en `0`.
 - Hay varios strings con problemas de encoding/mojibake (por ejemplo textos rotos en labels y mensajes), senal de mezcla de codificacion en algunos archivos.
@@ -51,7 +51,7 @@ Fuente: auditoria directa del repositorio `atleta-app`
 - Ruta social rehabilitada: el siguiente riesgo es validar la consistencia funcional de sus tabs con backend real.
 - Uso de `localStorage` para access token y refresh token.
 - Repeticion de handlers de bottom nav y navegacion en muchas paginas.
-- Repeticion funcional entre `matches-history` y `matches-hub`.
+- La repeticion funcional entre `matches-history` y `matches-hub` fue consolidada retirando la pagina legacy.
 - Servicios de dominio con mucha responsabilidad, especialmente `MatchService`, `MatchStore` y `ActivityService`.
 - Falta de runtime config real: `apiBaseUrl` esta compilado en `environment.ts`.
 - `NotificationBadgeService` y push token sync estan incompletos.
@@ -65,7 +65,7 @@ Fuente: auditoria directa del repositorio `atleta-app`
 
 ## Proximos pasos recomendados
 1. Validar `social` como ruta real en mobile/web y cubrir `/social?tab=matches`, `/social?tab=friends`, `/social?tab=teams` y `/invitations`.
-2. Unificar historial en una sola experiencia.
+2. Validar `/matches/history` como entrada compatible al historial unificado del hub.
 3. Cerrar la deuda de notificaciones: badge real, registro de push token y backend asociado.
 4. Mover URLs/configuracion hacia una estrategia por entorno mas segura.
 5. Corregir encoding de strings.

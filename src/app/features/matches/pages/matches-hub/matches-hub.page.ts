@@ -1,6 +1,7 @@
-ï»¿import { CommonModule } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { Component, OnDestroy, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
 import { IonicModule } from '@ionic/angular';
 import { finalize, firstValueFrom, forkJoin, of, Subject } from 'rxjs';
 import { catchError, map, switchMap, takeUntil } from 'rxjs/operators';
@@ -78,6 +79,7 @@ interface PendingMatchSummary {
 })
 export class MatchesHubPage implements OnDestroy {
   private readonly authSessionService = inject(AuthSessionService);
+  private readonly route = inject(ActivatedRoute);
   private readonly matchesApiService = inject(MatchesApiService);
   private readonly matchHistoryService = inject(MatchHistoryService);
   private readonly socialApiService = inject(SocialApiService);
@@ -119,6 +121,7 @@ export class MatchesHubPage implements OnDestroy {
   }
 
   ionViewWillEnter(): void {
+    this.applyRequestedTab();
     void this.initializeView();
   }
 
@@ -129,6 +132,13 @@ export class MatchesHubPage implements OnDestroy {
 
   onTabChange(tab: MatchesTab): void {
     this.selectedTab = tab;
+  }
+
+  private applyRequestedTab(): void {
+    const requestedTab = this.route.snapshot.queryParamMap.get('tab') ?? this.route.snapshot.data['defaultMatchesTab'];
+    if (requestedTab === 'upcoming' || requestedTab === 'history' || requestedTab === 'create') {
+      this.selectedTab = requestedTab;
+    }
   }
 
   onOpenMatch(matchId: number): void {
@@ -219,7 +229,7 @@ export class MatchesHubPage implements OnDestroy {
   private loadData(): void {
     const session = this.authSessionService.currentSession;
     if (!session) {
-      this.errorMessage = 'Inicia sesiÃ³n para ver tus partidos.';
+      this.errorMessage = 'Inicia sesión para ver tus partidos.';
       this.upcomingMatches = [];
       this.matchHistoryItems = [];
       return;
@@ -447,7 +457,7 @@ export class MatchesHubPage implements OnDestroy {
     }
 
     if (teams.length === 1) {
-      return `${teams[0]} Â· ${this.modalityLabel(item.modalidad)}`;
+      return `${teams[0]} · ${this.modalityLabel(item.modalidad)}`;
     }
 
     return `Partido ${this.modalityLabel(item.modalidad)}`;

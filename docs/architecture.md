@@ -95,7 +95,7 @@ Observacion:
 
 ## Problemas estructurales detectados
 - `social` existe como modulo y vuelve a estar conectado a routing real mediante `/social` y `/invitations`.
-- `matches-history` y `matches-hub` repiten parte del historial y filtros.
+- El historial de partidos quedo consolidado en `matches-hub`; `/matches/history` funciona como entrada compatible hacia la pestana `history`.
 - `MatchService` concentra demasiadas responsabilidades.
 - `ActivityService` mezcla fetch, transformacion a feed y acciones sociales.
 - Repeticion de handlers de bottom nav en muchas paginas.
@@ -105,7 +105,7 @@ Observacion:
 ## Oportunidades de mejora arquitectonica
 1. Validar el estado objetivo del dominio social con pruebas mobile/web y contratos FE-BE.
 2. Separar `MatchService` en capas mas chicas.
-3. Consolidar historial de partidos en una sola pantalla o componente compartido.
+3. Validar contratos y estados vacios del historial consolidado en `matches-hub`.
 4. Extraer un shell/layout compartido para bottom nav y page container.
 5. Centralizar reglas de negocio repetidas de `matches`.
 6. Implementar runtime config para `apiBaseUrl`.

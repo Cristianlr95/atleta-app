@@ -43,5 +43,5 @@ Mantener continuidad real del proyecto, evitar duplicacion y obligar a que cada 
 - `matches` es el dominio mas sensible y mas acoplado.
 - `social` tiene codigo existente, pero hoy su ruta esta redirigida.
 - `stats` no esta desarrollada mas alla de una vista placeholder.
-- Hay duplicacion funcional entre `matches-history` y el tab de historial dentro de `matches-hub`.
+- La duplicacion funcional entre `matches-history` y el tab de historial fue resuelta manteniendo `matches-hub` como fuente unica.
 - El sistema de notificaciones/push esta incompleto.

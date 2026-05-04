@@ -51,9 +51,10 @@ export const routes: Routes = [
   {
     path: 'matches/history',
     canActivate: [authGuard, onboardingCompletedGuard],
+    data: { defaultMatchesTab: 'history' },
     loadComponent: () =>
-      import('./features/matches/pages/matches-history/matches-history.page').then(
-        (m) => m.MatchesHistoryPage,
+      import('./features/matches/pages/matches-hub/matches-hub.page').then(
+        (m) => m.MatchesHubPage,
       ),
   },
   {
