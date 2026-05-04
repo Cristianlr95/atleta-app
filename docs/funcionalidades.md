@@ -146,13 +146,14 @@ Atleta Frontend es una aplicacion para jugadores de futbol amateur centrada en i
 ### Registro real de push token en backend - `Implementada`
 - El token se persiste localmente y se registra en backend con `deviceId` estable por usuario.
 
-### Badge server-side real - `Pendiente`
-- El conteo remoto no esta implementado.
+### Badge server-side real - `Implementada`
+- El conteo remoto consulta `/social/notifications/unread-count` y se combina con invitaciones pendientes locales.
 
 ### Rehabilitar o retirar modulo social - `Decidido`
 - Decision: rehabilitar `social` como ruta secundaria del flujo competitivo, no retirarlo.
 - Motivo: sus servicios y modelos ya son dependencias reales de perfil, equipos, invitaciones y notificaciones.
-- Pendiente posterior: validar UX mobile, estados vacios y consistencia tras aceptar/rechazar solicitudes.
+- Validacion automatizada: `SocialPage` cubre tab por query/data, dedupe de carga, badge y navegacion inferior.
+- Pendiente posterior: validar UX mobile y consistencia contra backend real tras aceptar/rechazar solicitudes.
 
 ## Funcionalidades recomendadas
 

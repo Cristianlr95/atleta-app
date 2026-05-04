@@ -49,7 +49,7 @@ Fuente: auditoria directa del repositorio `atleta-app`
 - `capacitor.config.ts` sigue con `appId: 'io.ionic.starter'`.
 
 ## Deuda tecnica
-- Ruta social rehabilitada: el siguiente riesgo es validar la consistencia funcional de sus tabs con backend real.
+- Ruta social rehabilitada: las tabs principales quedan cubiertas con tests unitarios; sigue pendiente validacion manual mobile/web contra backend real.
 - Uso de `localStorage` para access token y refresh token.
 - Repeticion de handlers de bottom nav y navegacion en muchas paginas.
 - La repeticion funcional entre `matches-history` y `matches-hub` fue consolidada retirando la pagina legacy.
@@ -58,16 +58,15 @@ Fuente: auditoria directa del repositorio `atleta-app`
 - El badge server-side y el registro de push token estan conectados; queda pendiente validar proveedor push remoto real.
 
 ## Riesgos
-- Riesgo funcional: las tabs de `social` dependen de multiples endpoints; hay que validar estados vacios, errores parciales y consistencia tras aceptar/rechazar invitaciones.
+- Riesgo funcional: las tabs de `social` dependen de multiples endpoints; hay que validar estados vacios, errores parciales y consistencia real tras aceptar/rechazar invitaciones.
 - Riesgo de seguridad: tokens en `localStorage` quedan expuestos a XSS.
 - Riesgo operativo: configuracion de entorno muy fija para prod/dev, sin inyeccion runtime.
 - Riesgo de consistencia: mezcla de estado local, optimista y backend puede producir diferencias temporales si falla una sincronizacion.
 - Riesgo UX: hay pantallas maduras y otras claramente parciales.
 
 ## Proximos pasos recomendados
-1. Validar `social` como ruta real en mobile/web y cubrir `/social?tab=matches`, `/social?tab=friends`, `/social?tab=teams` y `/invitations`.
+1. Validar `social` en dispositivo/mobile web contra backend real, especialmente estados vacios y acciones aceptar/rechazar.
 2. Validar `/matches/history` como entrada compatible al historial unificado del hub.
 3. Validar envio push remoto con proveedor real y comportamiento en dispositivo fisico.
-4. Mover URLs/configuracion hacia una estrategia por entorno mas segura.
-5. Corregir encoding de strings.
-6. Separar mejor responsabilidades de `MatchService` y `MatchStore`.
+4. Corregir encoding de strings.
+5. Separar mejor responsabilidades de `MatchService` y `MatchStore`.

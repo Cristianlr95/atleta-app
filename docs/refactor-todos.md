@@ -7,9 +7,8 @@
 - TODO [lint-output-native]: rename native output alias in:
   - `src/app/features/social/components/friends-panel/friends-panel.component.ts:20`
 - TODO [ionic-lifecycle]: move primary data load from `ngOnInit` to `ionViewWillEnter` for critical pages:
-  - `src/app/features/matches/pages/invitations/invitations.page.ts`
   - `src/app/features/matches/pages/matches-create/matches-create.page.ts`
-  - `src/app/features/social/pages/social.page.ts`
+- DONE [social-page-load]: `src/app/features/social/pages/social.page.ts` usa `ionViewWillEnter` con `PageLoadGuard` y cobertura de tabs/rutas.
 - TODO [ionic-lifecycle-remaining]: migrate remaining page load paths still using `ngOnInit`:
   - `src/app/features/matches/pages/match-detail/match-detail.page.ts:153`
   - `src/app/features/matches/pages/venue-create/venue-create.page.ts:58`
