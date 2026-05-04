@@ -13,11 +13,18 @@ export class NotificationBadgeService {
   private readonly socialApiService = inject(SocialApiService);
 
   private readonly serverPendingCount = signal(0);
+  private readonly refreshErrorStore = signal(false);
+
+  readonly refreshError = this.refreshErrorStore.asReadonly();
 
   readonly totalPending = computed(() => {
+    const remoteOrFallbackPending = Math.max(
+      this.serverPendingCount(),
+      this.invitationsStore.pendingInvitations().length,
+    );
+
     return (
-      this.serverPendingCount() +
-      this.invitationsStore.pendingInvitations().length +
+      remoteOrFallbackPending +
       this.notificationService.pendingCount
     );
   });
@@ -26,10 +33,17 @@ export class NotificationBadgeService {
     const session = this.authSessionService.currentSession;
     if (!session) {
       this.serverPendingCount.set(0);
+      this.refreshErrorStore.set(false);
       return;
     }
 
-    const response = await firstValueFrom(this.socialApiService.getUnreadNotificationCount());
-    this.serverPendingCount.set(Math.max(0, response.unreadCount ?? 0));
+    try {
+      const response = await firstValueFrom(this.socialApiService.getUnreadNotificationCount());
+      this.serverPendingCount.set(Math.max(0, response.unreadCount ?? 0));
+      this.refreshErrorStore.set(false);
+    } catch {
+      this.serverPendingCount.set(0);
+      this.refreshErrorStore.set(true);
+    }
   }
 }

@@ -44,4 +44,4 @@ Mantener continuidad real del proyecto, evitar duplicacion y obligar a que cada 
 - `social` tiene codigo existente, pero hoy su ruta esta redirigida.
 - `stats` no esta desarrollada mas alla de una vista placeholder.
 - La duplicacion funcional entre `matches-history` y el tab de historial fue resuelta manteniendo `matches-hub` como fuente unica.
-- El sistema de notificaciones/push esta incompleto.
+- Badge server-side y registro de push token estan conectados; falta validar proveedor push remoto real.

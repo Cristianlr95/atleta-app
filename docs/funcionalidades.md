@@ -123,13 +123,13 @@ Atleta Frontend es una aplicacion para jugadores de futbol amateur centrada en i
 - Existe la pagina `/stats`.
 - Actualmente solo muestra un mensaje de futura integracion.
 
-### Badge de notificaciones - `Parcial`
+### Badge de notificaciones - `Implementada`
 - Hay agregacion local de pendientes.
-- `NotificationBadgeService.refresh()` no consulta backend ni actualiza conteos remotos.
+- `NotificationBadgeService.refresh()` consulta `/social/notifications/unread-count` y usa invitaciones pendientes como fallback.
 
 ### Push notifications remotas - `Parcial`
 - La infraestructura cliente existe.
-- El token se guarda localmente, pero no se sincroniza con endpoint backend definitivo.
+- El token se sincroniza con `/social/notifications/push-tokens`; queda pendiente validar envio remoto con proveedor real.
 
 ### Modos demo - `Parcial`
 - Algunas pantallas caen a modo demo si falta sesion o falla carga.
@@ -142,8 +142,8 @@ Atleta Frontend es una aplicacion para jugadores de futbol amateur centrada en i
 ### Recuperacion de password - `Pendiente`
 - Existe el handler `onForgotPassword()`, pero no hace nada.
 
-### Registro real de push token en backend - `Pendiente`
-- Solo hay persistencia local.
+### Registro real de push token en backend - `Implementada`
+- El token se persiste localmente y se registra en backend con `deviceId` estable por usuario.
 
 ### Badge server-side real - `Pendiente`
 - El conteo remoto no esta implementado.

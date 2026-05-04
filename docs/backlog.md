@@ -11,12 +11,12 @@ Fecha: 2026-03-02
 | CORE-01 | Endurecer cierre de partido y checklist de consistencia | Matches/Events | P1 | existente | `match-close.page.ts`, `MatchService.changeMatchStatus` | Cierre consistente con score/eventos/actor validados y mensajes claros |
 | CORE-02 | Confirmaciones e invitaciones live robustas | Social/Matches | P1 | existente | `InvitationsStore`, `MatchStore`, `SocialService`, SSE `/matches/{id}/live` | Estado sincronizado en cliente tras aceptar/rechazar y refresco live |
 | CORE-03 | MVP competitivo y ventana operativa | MVP | P1 | existente | `MatchMvpService`, `match-mvp-vote.page.ts`, `mvp-vote.store.ts` | Votacion disponible solo en ventana valida y cierre al expirar |
-| CORE-04 | Registro real de push tokens | Notifications | P1 | faltante | FE TODO: `push-token-sync.service.ts` | Endpoint BE + persistencia + sync FE implementados |
+| CORE-04 | Registro real de push tokens | Notifications | P1 | implementado | `push-token-sync.service.ts`, `/social/notifications/push-tokens` | Endpoint BE + persistencia + sync FE implementados y cubiertos por tests |
 | IMP-01 | Normalizar seguridad dev/prod | Auth/Seguridad | P2 | parcial | `SecurityConfig.java` | Reglas de auth equivalentes para pruebas funcionales en dev/staging |
 | IMP-02 | Reducir endpoints huerfanos o asignar owner | Arquitectura | P2 | parcial | Controllers BE vs uso FE en `src/app/features/**/services` | Lista de endpoints sin consumo reducida o documentada con plan |
 | IMP-03 | Contratos FE?BE smoke automatizados | Calidad | P2 | parcial | Karma unit tests y compilacion, falta smoke de contratos HTTP | Suite valida auth, matches, teams, ratings y mvp contra backend |
 
 ## Prioridad operativa P1
-1. Ejecutar `CORE-04` para push notifications reales.
+1. Validar envio push remoto con proveedor/dispositivo real.
 2. Avanzar con smoke contracts (`IMP-03`) para prevenir regresiones FE?BE.
 3. Normalizar seguridad entre entornos (`IMP-01`).

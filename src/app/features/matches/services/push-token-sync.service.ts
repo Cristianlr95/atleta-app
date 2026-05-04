@@ -8,16 +8,20 @@ import { SocialApiService } from 'src/app/features/social/services/social-api.se
 export class PushTokenSyncService {
   private readonly storageKey = 'atleta_push_token';
   private readonly syncedStorageKey = 'atleta_push_token_synced';
+  private readonly deviceIdStorageKey = 'atleta_push_device_id';
   private readonly authSessionService = inject(AuthSessionService);
   private readonly socialApiService = inject(SocialApiService);
   private readonly lastSyncedTokenStore = signal<string | null>(null);
+  private readonly syncErrorStore = signal(false);
 
   readonly lastSyncedToken = this.lastSyncedTokenStore.asReadonly();
+  readonly syncError = this.syncErrorStore.asReadonly();
 
   constructor() {
     this.authSessionService.session$?.subscribe((session) => {
       if (!session) {
         this.lastSyncedTokenStore.set(null);
+        this.syncErrorStore.set(false);
         return;
       }
 
@@ -26,7 +30,7 @@ export class PushTokenSyncService {
         this.getStoredToken();
 
       if (storedToken) {
-        void this.registerToken(storedToken);
+        void this.registerToken(storedToken).catch(() => void 0);
       }
     });
   }
@@ -52,15 +56,22 @@ export class PushTokenSyncService {
       return;
     }
 
-    await firstValueFrom(
-      this.socialApiService.registerPushToken({
-        token: normalizedToken,
-        platform: Capacitor.getPlatform(),
-      }),
-    );
+    try {
+      await firstValueFrom(
+        this.socialApiService.registerPushToken({
+          token: normalizedToken,
+          platform: Capacitor.getPlatform(),
+          deviceId: this.getOrCreateDeviceId(playerUuid),
+        }),
+      );
 
-    localStorage.setItem(this.syncedKey(playerUuid), normalizedToken);
-    this.lastSyncedTokenStore.set(normalizedToken);
+      localStorage.setItem(this.syncedKey(playerUuid), normalizedToken);
+      this.lastSyncedTokenStore.set(normalizedToken);
+      this.syncErrorStore.set(false);
+    } catch (error) {
+      this.syncErrorStore.set(true);
+      throw error;
+    }
   }
 
   getStoredToken(): string | null {
@@ -77,5 +88,17 @@ export class PushTokenSyncService {
 
   private syncedKey(playerUuid: string): string {
     return `${this.syncedStorageKey}:${playerUuid}`;
+  }
+
+  private getOrCreateDeviceId(playerUuid: string): string {
+    const key = `${this.deviceIdStorageKey}:${playerUuid}`;
+    const existing = localStorage.getItem(key);
+    if (existing) {
+      return existing;
+    }
+
+    const generated = `web-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
+    localStorage.setItem(key, generated);
+    return generated;
   }
 }

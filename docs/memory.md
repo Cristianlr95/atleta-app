@@ -43,7 +43,7 @@ Fuente: auditoria directa del repositorio `atleta-app`
 - `sessions/create` hoy funciona como pantalla puente: desde ahi se deriva a crear partido o equipo.
 - `/matches/history` se conserva como ruta compatible, pero abre la pestana `history` de `matches-hub` como fuente unica.
 - `social` mantiene bastante codigo utilizable y vuelve a estar conectado al routing real.
-- `NotificationBadgeService.refresh()` hoy no consulta backend y deja el badge server-side en `0`.
+- `NotificationBadgeService.refresh()` consulta el contador server-side y usa invitaciones pendientes como fallback sin duplicar conteos.
 - Hay varios strings con problemas de encoding/mojibake (por ejemplo textos rotos en labels y mensajes), senal de mezcla de codificacion en algunos archivos.
 - `capacitor.config.ts` sigue con `appId: 'io.ionic.starter'`.
 
@@ -54,7 +54,7 @@ Fuente: auditoria directa del repositorio `atleta-app`
 - La repeticion funcional entre `matches-history` y `matches-hub` fue consolidada retirando la pagina legacy.
 - Servicios de dominio con mucha responsabilidad, especialmente `MatchService`, `MatchStore` y `ActivityService`.
 - Falta de runtime config real: `apiBaseUrl` esta compilado en `environment.ts`.
-- `NotificationBadgeService` y push token sync estan incompletos.
+- El badge server-side y el registro de push token estan conectados; queda pendiente validar proveedor push remoto real.
 
 ## Riesgos
 - Riesgo funcional: las tabs de `social` dependen de multiples endpoints; hay que validar estados vacios, errores parciales y consistencia tras aceptar/rechazar invitaciones.
@@ -66,7 +66,7 @@ Fuente: auditoria directa del repositorio `atleta-app`
 ## Proximos pasos recomendados
 1. Validar `social` como ruta real en mobile/web y cubrir `/social?tab=matches`, `/social?tab=friends`, `/social?tab=teams` y `/invitations`.
 2. Validar `/matches/history` como entrada compatible al historial unificado del hub.
-3. Cerrar la deuda de notificaciones: badge real, registro de push token y backend asociado.
+3. Validar envio push remoto con proveedor real y comportamiento en dispositivo fisico.
 4. Mover URLs/configuracion hacia una estrategia por entorno mas segura.
 5. Corregir encoding de strings.
 6. Separar mejor responsabilidades de `MatchService` y `MatchStore`.

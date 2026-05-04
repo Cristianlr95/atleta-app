@@ -129,7 +129,7 @@ Proyecto en estado funcional avanzado. Los flujos principales de autenticacion, 
 - Consolidar historial de partidos duplicado.
 - Separar responsabilidades del dominio `matches`.
 - Fortalecer estrategia de token y sesion.
-- Completar integracion de push remoto y badge server-side.
+- Validar envio push remoto con proveedor real y dispositivo fisico.
 - Ampliar E2E para flujos criticos.
 
 ## Valor profesional del proyecto
