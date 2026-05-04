@@ -42,7 +42,7 @@ Fecha de actualizacion: 2026-04-23
 - `matches`: dominio mas robusto, con paginas, componentes, modelos, stores, servicios y utilidades.
 - `ratings`: leaderboard y consumo de ratings.
 - `sessions`: pantalla puente para crear partido o equipo.
-- `social`: pagina, facade, activity service y componentes listos, hoy desacoplados del routing activo.
+- `social`: pagina, facade, activity service y componentes listos, conectado nuevamente como ruta protegida secundaria.
 - `shared/ui`: biblioteca interna "metallic".
 
 ## Patron detectado
@@ -94,7 +94,7 @@ Observacion:
 - Smoke E2E para login, crear partido, invitaciones, live updates y MVP.
 
 ## Problemas estructurales detectados
-- `social` existe como modulo, pero no esta conectado a routing real.
+- `social` existe como modulo y vuelve a estar conectado a routing real mediante `/social` y `/invitations`.
 - `matches-history` y `matches-hub` repiten parte del historial y filtros.
 - `MatchService` concentra demasiadas responsabilidades.
 - `ActivityService` mezcla fetch, transformacion a feed y acciones sociales.
@@ -103,7 +103,7 @@ Observacion:
 - Mezcla de `Promise`, `Observable`, `signal` y efectos dentro del mismo flujo.
 
 ## Oportunidades de mejora arquitectonica
-1. Definir el estado objetivo del dominio social.
+1. Validar el estado objetivo del dominio social con pruebas mobile/web y contratos FE-BE.
 2. Separar `MatchService` en capas mas chicas.
 3. Consolidar historial de partidos en una sola pantalla o componente compartido.
 4. Extraer un shell/layout compartido para bottom nav y page container.

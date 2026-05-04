@@ -106,8 +106,12 @@ export const routes: Routes = [
   },
   {
     path: 'invitations',
-    redirectTo: 'matches',
-    pathMatch: 'full',
+    canActivate: [authGuard, onboardingCompletedGuard],
+    data: { defaultSocialTab: 'matches' },
+    loadComponent: () =>
+      import('./features/social/pages/social.page').then(
+        (m) => m.SocialPage,
+      ),
   },
   {
     path: 'leaderboard',
@@ -132,7 +136,10 @@ export const routes: Routes = [
   },
   {
     path: 'social',
-    redirectTo: 'matches',
-    pathMatch: 'full',
+    canActivate: [authGuard, onboardingCompletedGuard],
+    loadComponent: () =>
+      import('./features/social/pages/social.page').then(
+        (m) => m.SocialPage,
+      ),
   },
 ];

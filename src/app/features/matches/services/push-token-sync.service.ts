@@ -15,7 +15,7 @@ export class PushTokenSyncService {
   readonly lastSyncedToken = this.lastSyncedTokenStore.asReadonly();
 
   constructor() {
-    this.authSessionService.session$.subscribe((session) => {
+    this.authSessionService.session$?.subscribe((session) => {
       if (!session) {
         this.lastSyncedTokenStore.set(null);
         return;

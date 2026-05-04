@@ -15,8 +15,8 @@ Fuente: auditoria directa del repositorio `atleta-app`
 ## Estado actual real
 - El nucleo mas maduro del frontend es `matches`.
 - Las rutas activas reales son: `/login`, `/register`, `/home`, `/player/profile`, `/player/onboarding`, `/sessions/create`, `/matches`, `/matches/history`, `/matches/create`, `/matches/venues/new`, `/matches/:id`, `/matches/:id/close`, `/matches/:id/mvp-vote`, `/leaderboard`, `/stats`.
-- Rutas legacy o redireccionadas: `/ranking` -> `/leaderboard`, `/invitations` -> `/matches`, `/social` -> `/matches`.
-- El modulo social existe en codigo, pero hoy quedo huerfano desde routing porque `SocialPage` ya no tiene ruta accesible.
+- Rutas legacy o redireccionadas: `/ranking` -> `/leaderboard`.
+- El modulo social quedo rehabilitado como ruta protegida: `/social` abre `SocialPage` y `/invitations` abre la misma experiencia en la pestana de partidos.
 - La pagina `stats` existe, pero hoy es solo una tarjeta placeholder para futura integracion.
 - Existen modos demo o fallbacks visuales en `player-onboarding`, `player-profile` y `matches-history`.
 - Hay cobertura E2E Playwright para login, crear partido, flujo de invitaciones, actualizacion live y MVP.
@@ -42,13 +42,13 @@ Fuente: auditoria directa del repositorio `atleta-app`
 - `matches` ya no es solo CRUD: contiene agenda, historial, detalle, balanceo automatico, cierre y MVP.
 - `sessions/create` hoy funciona como pantalla puente: desde ahi se deriva a crear partido o equipo.
 - `matches/history` y la pestana `history` de `matches-hub` duplican funcionalidad muy similar.
-- `social` mantiene bastante codigo utilizable, pero su ruta fue desactivada.
+- `social` mantiene bastante codigo utilizable y vuelve a estar conectado al routing real.
 - `NotificationBadgeService.refresh()` hoy no consulta backend y deja el badge server-side en `0`.
 - Hay varios strings con problemas de encoding/mojibake (por ejemplo textos rotos en labels y mensajes), senal de mezcla de codificacion en algunos archivos.
 - `capacitor.config.ts` sigue con `appId: 'io.ionic.starter'`.
 
 ## Deuda tecnica
-- Ruta social inconsistente: modulo completo sin entrada real.
+- Ruta social rehabilitada: el siguiente riesgo es validar la consistencia funcional de sus tabs con backend real.
 - Uso de `localStorage` para access token y refresh token.
 - Repeticion de handlers de bottom nav y navegacion en muchas paginas.
 - Repeticion funcional entre `matches-history` y `matches-hub`.
@@ -57,14 +57,14 @@ Fuente: auditoria directa del repositorio `atleta-app`
 - `NotificationBadgeService` y push token sync estan incompletos.
 
 ## Riesgos
-- Riesgo funcional: acciones que navegan a `/social` hoy pueden terminar en `/matches` por redirect y no abrir la experiencia esperada.
+- Riesgo funcional: las tabs de `social` dependen de multiples endpoints; hay que validar estados vacios, errores parciales y consistencia tras aceptar/rechazar invitaciones.
 - Riesgo de seguridad: tokens en `localStorage` quedan expuestos a XSS.
 - Riesgo operativo: configuracion de entorno muy fija para prod/dev, sin inyeccion runtime.
 - Riesgo de consistencia: mezcla de estado local, optimista y backend puede producir diferencias temporales si falla una sincronizacion.
 - Riesgo UX: hay pantallas maduras y otras claramente parciales.
 
 ## Proximos pasos recomendados
-1. Decidir si `social` vuelve a ser ruta real o si su codigo se desmantela o integra dentro de `matches`.
+1. Validar `social` como ruta real en mobile/web y cubrir `/social?tab=matches`, `/social?tab=friends`, `/social?tab=teams` y `/invitations`.
 2. Unificar historial en una sola experiencia.
 3. Cerrar la deuda de notificaciones: badge real, registro de push token y backend asociado.
 4. Mover URLs/configuracion hacia una estrategia por entorno mas segura.

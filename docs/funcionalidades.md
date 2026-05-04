@@ -113,10 +113,11 @@ Atleta Frontend es una aplicacion para jugadores de futbol amateur centrada en i
 
 ## Funcionalidades parciales
 
-### Social hub - `Parcial`
+### Social hub - `Rehabilitado parcial`
 - Existe una pantalla `SocialPage` con tabs de actividad, amigos, equipos y partidos.
 - Tiene facade, activity feed, paneles de solicitudes y acciones.
-- Hoy no esta accesible desde routing porque `/social` redirige a `/matches`.
+- `/social` vuelve a estar accesible desde routing protegido.
+- `/invitations` reutiliza `SocialPage` entrando en la tab de partidos.
 
 ### Stats - `Parcial`
 - Existe la pagina `/stats`.
@@ -147,16 +148,18 @@ Atleta Frontend es una aplicacion para jugadores de futbol amateur centrada en i
 ### Badge server-side real - `Pendiente`
 - El conteo remoto no esta implementado.
 
-### Rehabilitar o retirar modulo social - `Pendiente`
-- El codigo existe, pero el routing lo dejo fuera del producto navegable.
+### Rehabilitar o retirar modulo social - `Decidido`
+- Decision: rehabilitar `social` como ruta secundaria del flujo competitivo, no retirarlo.
+- Motivo: sus servicios y modelos ya son dependencias reales de perfil, equipos, invitaciones y notificaciones.
+- Pendiente posterior: validar UX mobile, estados vacios y consistencia tras aceptar/rechazar solicitudes.
 
 ## Funcionalidades recomendadas
 
 ### Consolidar historial de partidos - `Recomendada`
 - Unificar `matches-history` y la vista history dentro de `matches-hub`.
 
-### Unificar entrada de "social" - `Recomendada`
-- Reintegrar `SocialPage` o absorber sus paneles dentro de una ruta activa.
+### Unificar entrada de "social" - `En progreso`
+- `SocialPage` ya esta reintegrada en `/social`; falta validar si debe tener entrada visible propia en la navegacion principal.
 
 ### Configuracion runtime de backend - `Recomendada`
 - Evitar `apiBaseUrl` compilado fijo para despliegues.

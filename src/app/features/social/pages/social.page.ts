@@ -90,13 +90,21 @@ export class SocialPage implements OnDestroy {
 
   private async loadOnEnter(): Promise<void> {
     await this.enterLoadGuard.runSingle(async () => {
-      const requestedTab = this.route.snapshot.queryParamMap.get('tab');
-      if (requestedTab === 'activity' || requestedTab === 'friends' || requestedTab === 'teams' || requestedTab === 'matches') {
+      const requestedTab = this.resolveRequestedTab();
+      if (requestedTab) {
         this.facade.setActiveTab(requestedTab);
       }
       await this.facade.initialize();
       await this.notificationBadgeService.refresh();
     });
+  }
+
+  private resolveRequestedTab(): 'activity' | 'friends' | 'teams' | 'matches' | null {
+    const requestedTab = this.route.snapshot.queryParamMap.get('tab') ?? this.route.snapshot.data['defaultSocialTab'];
+    if (requestedTab === 'activity' || requestedTab === 'friends' || requestedTab === 'teams' || requestedTab === 'matches') {
+      return requestedTab;
+    }
+    return null;
   }
 
   ngOnDestroy(): void {
