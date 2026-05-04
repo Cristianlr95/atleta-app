@@ -4,6 +4,7 @@ export interface AppConfig {
   apiBaseUrl: string;
   storagePrefix: string;
   environmentName: string;
+  googleClientId?: string;
 }
 
 export const defaultAppConfig: AppConfig = normalizeAppConfig(environment.defaultAppConfig, {
@@ -19,11 +20,13 @@ export function normalizeAppConfig(
   const apiBaseUrl = normalizeApiBaseUrl(config?.apiBaseUrl ?? fallback.apiBaseUrl);
   const storagePrefix = normalizeStoragePrefix(config?.storagePrefix ?? fallback.storagePrefix);
   const environmentName = normalizeEnvironmentName(config?.environmentName ?? fallback.environmentName);
+  const googleClientId = normalizeOptionalString(config?.googleClientId ?? fallback.googleClientId);
 
   return {
     apiBaseUrl,
     storagePrefix,
     environmentName,
+    googleClientId,
   };
 }
 
@@ -55,4 +58,10 @@ function normalizeEnvironmentName(value: string): string {
   const normalized = value.trim();
 
   return normalized || 'development';
+}
+
+function normalizeOptionalString(value: string | undefined): string | undefined {
+  const normalized = value?.trim();
+
+  return normalized || undefined;
 }

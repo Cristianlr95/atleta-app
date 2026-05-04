@@ -60,6 +60,7 @@ ATLETA_STORAGE_PREFIX=atleta.dev
 - No definir passwords, JWT secretos, client secrets o credenciales de base de datos en el frontend.
 - `ATLETA_API_BASE_URL` debe apuntar al backend publico que el navegador puede alcanzar.
 - `ATLETA_STORAGE_PREFIX` define el namespace de `localStorage`.
+- `ATLETA_GOOGLE_CLIENT_ID` es opcional y habilita el login Google en frontend; nunca usar client secret en el cliente.
 
 ## 5. Como correr en local
 ### Opcion A: defaults locales

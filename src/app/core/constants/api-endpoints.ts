@@ -1,6 +1,7 @@
 ﻿export const API_ENDPOINTS = {
   auth: {
     login: '/athletes/login',
+    googleLogin: '/athletes/auth/google',
     registerAthlete: '/athletes/register',
     createPlayerProfile: '/player-profiles',
   },

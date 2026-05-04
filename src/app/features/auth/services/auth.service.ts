@@ -23,6 +23,13 @@ export class AuthService {
     );
   }
 
+  loginWithGoogleIdToken(idToken: string): Observable<AuthSession> {
+    return this.authApiService.loginWithGoogle({ idToken }).pipe(
+      map((response) => this.toSession(response, null)),
+      tap((session) => this.authSessionService.startSession(session)),
+    );
+  }
+
   register(payload: RegisterAthleteRequest): Observable<AuthenticatedUser> {
     return this.authApiService.registerAthlete(payload).pipe(map((response) => this.toUser(response)));
   }

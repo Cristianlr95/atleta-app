@@ -6,6 +6,7 @@ import { ApiService } from 'src/app/core/services/api.service';
 import {
   AuthApiResponse,
   CreatePlayerProfileRequest,
+  GoogleLoginRequest,
   LoginRequest,
   RegisterAthleteRequest,
 } from '../models/auth.models';
@@ -16,6 +17,10 @@ export class AuthApiService extends ApiService {
     return this.http.post<AuthApiResponse>(this.url(API_ENDPOINTS.auth.login), payload, {
       observe: 'response',
     });
+  }
+
+  loginWithGoogle(payload: GoogleLoginRequest): Observable<AuthApiResponse> {
+    return this.post<AuthApiResponse, GoogleLoginRequest>(API_ENDPOINTS.auth.googleLogin, payload);
   }
 
   registerAthlete(payload: RegisterAthleteRequest): Observable<AuthApiResponse> {

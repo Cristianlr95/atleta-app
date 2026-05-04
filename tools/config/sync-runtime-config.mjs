@@ -25,6 +25,7 @@ const runtimeConfig = {
   apiBaseUrl: resolveApiBaseUrl(mode, resolvedEnv.ATLETA_API_BASE_URL),
   storagePrefix: resolveStoragePrefix(mode, resolvedEnv.ATLETA_STORAGE_PREFIX),
   environmentName: resolvedEnv.ATLETA_ENV_NAME?.trim() || mode,
+  googleClientId: resolveOptionalPublicId(resolvedEnv.ATLETA_GOOGLE_CLIENT_ID),
 };
 
 const outputDir = path.join(rootDir, 'src', 'assets');
@@ -85,13 +86,19 @@ function parseEnvFile(content) {
 function validateNoSensitiveFrontendEnv(env) {
   const unsupportedKeys = Object.keys(env).filter((key) =>
     /^ATLETA_/i.test(key) &&
-    !['ATLETA_API_BASE_URL', 'ATLETA_STORAGE_PREFIX', 'ATLETA_ENV_NAME', 'ATLETA_APP_ENV'].includes(key),
+    ![
+      'ATLETA_API_BASE_URL',
+      'ATLETA_STORAGE_PREFIX',
+      'ATLETA_ENV_NAME',
+      'ATLETA_APP_ENV',
+      'ATLETA_GOOGLE_CLIENT_ID',
+    ].includes(key),
   );
 
   if (unsupportedKeys.length > 0) {
     throw new Error(
       `Unsupported frontend environment variables detected: ${unsupportedKeys.join(', ')}. ` +
-        'Only ATLETA_API_BASE_URL, ATLETA_STORAGE_PREFIX, ATLETA_ENV_NAME and ATLETA_APP_ENV are allowed.',
+        'Only public frontend variables are allowed.',
     );
   }
 }
@@ -121,4 +128,9 @@ function resolveStoragePrefix(mode, value) {
   }
 
   return normalized;
+}
+
+function resolveOptionalPublicId(value) {
+  const normalized = value?.trim();
+  return normalized || undefined;
 }

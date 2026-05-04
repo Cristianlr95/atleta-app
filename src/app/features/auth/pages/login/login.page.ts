@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { IonicModule } from '@ionic/angular';
+import { firstValueFrom } from 'rxjs';
 import { finalize } from 'rxjs/operators';
 import { ApiError } from 'src/app/core/models/api-error.model';
 import { NavigationService } from 'src/app/core/services/navigation.service';
@@ -11,6 +12,7 @@ import { MetallicButtonComponent } from 'src/app/shared/ui/metallic-button/metal
 import { MetallicInputComponent } from 'src/app/shared/ui/metallic-input/metallic-input.component';
 import { MetallicCardComponent } from 'src/app/shared/ui/metallic-card/metallic-card.component';
 import { AuthService } from '../../services/auth.service';
+import { GoogleIdentityService } from '../../services/google-identity.service';
 
 @Component({
   selector: 'app-login',
@@ -29,6 +31,7 @@ import { AuthService } from '../../services/auth.service';
 export class LoginPage {
   private readonly formBuilder = inject(FormBuilder);
   private readonly authService = inject(AuthService);
+  private readonly googleIdentityService = inject(GoogleIdentityService);
   private readonly navigationService = inject(NavigationService);
   private readonly route = inject(ActivatedRoute);
   private readonly userFeedbackService = inject(UserFeedbackService);
@@ -70,12 +73,7 @@ export class LoginPage {
       .pipe(finalize(() => (this.isSubmitting = false)))
       .subscribe({
         next: () => {
-          if (this.redirectUrl) {
-            void this.navigationService.safeNavigateByUrl(this.redirectUrl);
-            return;
-          }
-
-          void this.navigationService.safeNavigate(['/home']);
+          this.navigateAfterLogin();
         },
         error: (error: ApiError) => {
           this.authError = this.userFeedbackService.loginError(error);
@@ -87,8 +85,25 @@ export class LoginPage {
     // Navigate to recover-password flow.
   }
 
-  onContinueWithGoogle(): void {
-    // Trigger Google auth flow.
+  async onContinueWithGoogle(): Promise<void> {
+    if (this.isSubmitting) {
+      return;
+    }
+
+    this.authError = null;
+    this.isSubmitting = true;
+
+    try {
+      const idToken = await this.googleIdentityService.requestIdToken();
+      await firstValueFrom(this.authService.loginWithGoogleIdToken(idToken));
+      this.navigateAfterLogin();
+    } catch (error) {
+      this.authError = error instanceof Error
+        ? error.message
+        : 'No se pudo iniciar sesion con Google.';
+    } finally {
+      this.isSubmitting = false;
+    }
   }
 
   onCreateAccount(): void {
@@ -105,5 +120,14 @@ export class LoginPage {
     }
 
     return next.startsWith('/') ? next : null;
+  }
+
+  private navigateAfterLogin(): void {
+    if (this.redirectUrl) {
+      void this.navigationService.safeNavigateByUrl(this.redirectUrl);
+      return;
+    }
+
+    void this.navigationService.safeNavigate(['/home']);
   }
 }

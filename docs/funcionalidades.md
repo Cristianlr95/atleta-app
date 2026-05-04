@@ -136,8 +136,9 @@ Atleta Frontend es una aplicacion para jugadores de futbol amateur centrada en i
 
 ## Funcionalidades pendientes
 
-### Google auth - `Pendiente`
-- El login tiene CTA "Continuar con Google", pero el metodo no implementa flujo real.
+### Google auth - `Implementada configurable`
+- El login usa Google Identity Services cuando `ATLETA_GOOGLE_CLIENT_ID` esta configurado.
+- El id token se envia a `/athletes/auth/google` y reutiliza la sesion JWT existente.
 
 ### Recuperacion de password - `Pendiente`
 - Existe el handler `onForgotPassword()`, pero no hace nada.

@@ -18,6 +18,7 @@ Fuente: auditoria directa del repositorio `atleta-app`
 - Rutas legacy o redireccionadas: `/ranking` -> `/leaderboard`.
 - El modulo social quedo rehabilitado como ruta protegida: `/social` abre `SocialPage` y `/invitations` abre la misma experiencia en la pestana de partidos.
 - La pagina `stats` existe, pero hoy es solo una tarjeta placeholder para futura integracion.
+- Google auth en frontend queda conectado, condicionado a `ATLETA_GOOGLE_CLIENT_ID`.
 - Existen modos demo o fallbacks visuales en `player-onboarding` y `player-profile`.
 - Hay cobertura E2E Playwright para login, crear partido, flujo de invitaciones, actualizacion live y MVP.
 
