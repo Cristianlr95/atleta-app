@@ -82,7 +82,7 @@ export class LoginPage {
   }
 
   onForgotPassword(): void {
-    // Navigate to recover-password flow.
+    this.authError = 'El reset por email aun no esta disponible. Si puedes entrar, cambia tu contrasena desde Perfil > Seguridad de cuenta.';
   }
 
   async onContinueWithGoogle(): Promise<void> {

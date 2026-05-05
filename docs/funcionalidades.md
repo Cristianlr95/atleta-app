@@ -140,8 +140,10 @@ Atleta Frontend es una aplicacion para jugadores de futbol amateur centrada en i
 - El login usa Google Identity Services cuando `ATLETA_GOOGLE_CLIENT_ID` esta configurado.
 - El id token se envia a `/athletes/auth/google` y reutiliza la sesion JWT existente.
 
-### Recuperacion de password - `Pendiente`
-- Existe el handler `onForgotPassword()`, pero no hace nada.
+### Password de cuenta - `Parcial`
+- Cambio de contrasena autenticado implementado en Perfil > Seguridad de cuenta usando `PUT /athletes/{atletaUuid}/password`.
+- El boton "Olvidaste tu contrasena" ya no queda sin respuesta; informa que el reset por email aun requiere contrato backend.
+- Pendiente: reset por email/token cuando exista endpoint backend publico y flujo de entrega seguro.
 
 ### Registro real de push token en backend - `Implementada`
 - El token se persiste localmente y se registra en backend con `deviceId` estable por usuario.

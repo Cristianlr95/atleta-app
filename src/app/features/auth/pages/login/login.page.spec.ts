@@ -81,6 +81,12 @@ describe('LoginPage', () => {
     expect(authService.loginWithGoogleIdToken).not.toHaveBeenCalled();
     expect(component.authError).toBe('Google auth no esta configurado.');
   });
+
+  it('explains the available password flow instead of doing nothing', () => {
+    component.onForgotPassword();
+
+    expect(component.authError).toContain('Perfil > Seguridad de cuenta');
+  });
 });
 
 function buildSession(): AuthSession {

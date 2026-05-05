@@ -38,7 +38,7 @@
         [acceptedFriendships]="acceptedFriendships()"
         [candidates]="facade.friendCandidates()"
         [loadingSearch]="facade.searchLoading()"
-        (search)="onFriendSearch($event)"
+        (searchChange)="onFriendSearch($event)"
         (sendRequest)="facade.sendFriendRequest($event)"
         (respondRequest)="facade.respondFriendRequest($event.requestId, $event.accept)"
         (openProfile)="onOpenProfile($event)">

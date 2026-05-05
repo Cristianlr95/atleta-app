@@ -1,4 +1,4 @@
-import { Injectable, computed, signal } from '@angular/core';
+import { Injectable, computed, inject, signal } from '@angular/core';
 import { catchError, firstValueFrom, of, timeout } from 'rxjs';
 import { ResourceStore } from 'src/app/core/store/resource-store';
 import { TeamApiService } from 'src/app/features/teams/services/team-api.service';
@@ -29,20 +29,21 @@ interface MatchStorePatch {
 export class MatchStore extends ResourceStore<MatchState> {
   private readonly ttlMs = 20000;
   private readonly requestTimeoutMs = 5000;
+  private readonly processedLiveEventLimit = 500;
+  private readonly matchService = inject(MatchService);
+  private readonly matchesApiService = inject(MatchesApiService);
+  private readonly socialApiService = inject(SocialApiService);
+  private readonly teamApiService = inject(TeamApiService);
+  private readonly venueService = inject(VenueService);
+  private readonly invitationsStore = inject(InvitationsStore);
   private readonly liveVersionStore = signal<Record<string, number>>({});
   private readonly processedLiveEventsStore = signal<Record<string, true>>({});
+  private processedLiveEventIds: string[] = [];
 
   readonly liveVersion = this.liveVersionStore.asReadonly();
   readonly hasData = (matchId: string) => computed(() => !!this.selectState(matchId)().data);
 
-  constructor(
-    private readonly matchService: MatchService,
-    private readonly matchesApiService: MatchesApiService,
-    private readonly socialApiService: SocialApiService,
-    private readonly teamApiService: TeamApiService,
-    private readonly venueService: VenueService,
-    private readonly invitationsStore: InvitationsStore,
-  ) {
+  constructor() {
     super();
   }
 
@@ -145,10 +146,7 @@ export class MatchStore extends ResourceStore<MatchState> {
       }
     }
 
-    this.processedLiveEventsStore.update((state) => ({
-      ...state,
-      [event.id]: true,
-    }));
+    this.markLiveEventProcessed(event.id);
     return true;
   }
 
@@ -156,7 +154,22 @@ export class MatchStore extends ResourceStore<MatchState> {
     super.clear(matchId);
     if (!matchId) {
       this.processedLiveEventsStore.set({});
+      this.processedLiveEventIds = [];
     }
+  }
+
+  private markLiveEventProcessed(eventId: string): void {
+    this.processedLiveEventIds.push(eventId);
+    const overflow = this.processedLiveEventIds.length - this.processedLiveEventLimit;
+    const prunedIds = overflow > 0 ? this.processedLiveEventIds.splice(0, overflow) : [];
+
+    this.processedLiveEventsStore.update((state) => {
+      const next: Record<string, true> = { ...state, [eventId]: true };
+      for (const prunedId of prunedIds) {
+        delete next[prunedId];
+      }
+      return next;
+    });
   }
 
   private async fetchMatchState(routeMatchId: string): Promise<MatchState | null> {

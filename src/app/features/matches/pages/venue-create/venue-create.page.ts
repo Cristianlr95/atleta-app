@@ -1,9 +1,10 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, computed, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { IonicModule } from '@ionic/angular';
 import { catchError, firstValueFrom, of, timeout } from 'rxjs';
 import { NavigationService } from 'src/app/core/services/navigation.service';
+import { PageLoadGuard } from 'src/app/core/utils/page-load-guard';
 import { FieldLocationsApiService } from 'src/app/features/fields/services/field-locations-api.service';
 import {
   MetallicLocationPickerComponent,
@@ -26,10 +27,11 @@ import { PageNavComponent } from 'src/app/shared/ui/page-nav/page-nav.component'
   templateUrl: './venue-create.page.html',
   styleUrls: ['./venue-create.page.scss'],
 })
-export class VenueCreatePage implements OnInit {
+export class VenueCreatePage {
   private readonly fieldLocationsApiService = inject(FieldLocationsApiService);
   private readonly navigationService = inject(NavigationService);
   private readonly route = inject(ActivatedRoute);
+  private readonly enterLoadGuard = new PageLoadGuard();
 
   readonly titleIconAsset = 'assets/icons/atleta/ic_match_location_24.svg';
 
@@ -42,8 +44,8 @@ export class VenueCreatePage implements OnInit {
 
   readonly hasCoordinates = computed(() => this.selectedLat() !== null && this.selectedLng() !== null);
 
-  async ngOnInit(): Promise<void> {
-    void this.loadFields();
+  ionViewWillEnter(): void {
+    void this.enterLoadGuard.runSingle(() => this.loadFields());
   }
 
   async onSaveField(payload: SaveFieldLocationRequest): Promise<void> {

@@ -6,6 +6,7 @@ import { AppToastService } from 'src/app/core/services/app-toast.service';
 import { AuthSessionService } from 'src/app/core/services/auth-session.service';
 import { ErrorMapperService } from 'src/app/core/services/error-mapper.service';
 import { NavigationService } from 'src/app/core/services/navigation.service';
+import { PageLoadGuard } from 'src/app/core/utils/page-load-guard';
 import { buildMainBottomNav } from 'src/app/shared/navigation/main-bottom-nav';
 import { MetallicButtonComponent } from 'src/app/shared/ui/metallic-button/metallic-button.component';
 import {
@@ -95,6 +96,7 @@ export class MatchDetailPage implements OnDestroy {
   private autoPersistedTeamsSignature: string | null = null;
   private autoPersistTeamsInFlight = false;
   private lastLoadedMvpRouteMatchId: string | null = null;
+  private readonly enterLoadGuard = new PageLoadGuard();
 
   readonly resource = computed(() => this.matchStore.getStateSnapshot(this.routeMatchId()));
   readonly loadingMatch = computed(() => this.resource().loading && !this.resource().data);
@@ -425,9 +427,17 @@ export class MatchDetailPage implements OnDestroy {
   }
 
   ionViewWillEnter(): void {
-    void this.notificationBadgeService.refresh();
-    void this.invitationsStore.loadPendingInvitations();
-    void this.loadRouteMatch(true);
+    void this.loadOnEnter();
+  }
+
+  private async loadOnEnter(): Promise<void> {
+    await this.enterLoadGuard.runSingle(async () => {
+      await Promise.all([
+        this.notificationBadgeService.refresh(),
+        this.invitationsStore.loadPendingInvitations(),
+        this.loadRouteMatch(true),
+      ]);
+    });
   }
 
   ionViewWillLeave(): void {

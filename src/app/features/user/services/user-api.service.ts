@@ -16,6 +16,13 @@ export class UserApiService extends ApiService {
     return this.get<AthleteProfile>(`${API_ENDPOINTS.users.athletes}/${atletaUuid}`);
   }
 
+  changePassword(atletaUuid: string, payload: { currentPassword: string; newPassword: string }) {
+    return this.put<void, { currentPassword: string; newPassword: string }>(
+      `${API_ENDPOINTS.users.athletes}/${atletaUuid}/password`,
+      payload,
+    );
+  }
+
   getPlayerProfile(atletaUuid: string) {
     return this.get<PlayerProfile>(`${API_ENDPOINTS.users.playerProfiles}/${atletaUuid}`);
   }

@@ -17,7 +17,7 @@ export class FriendsPanelComponent {
   @Input() candidates: SocialPlayerLookupItem[] = [];
   @Input() loadingSearch = false;
 
-  @Output() search = new EventEmitter<string>();
+  @Output() searchChange = new EventEmitter<string>();
   @Output() sendRequest = new EventEmitter<string>();
   @Output() respondRequest = new EventEmitter<{ requestId: number; accept: boolean }>();
   @Output() openProfile = new EventEmitter<string>();
@@ -26,7 +26,7 @@ export class FriendsPanelComponent {
 
   onSearchQueryChange(value: string): void {
     this.query = value;
-    this.search.emit(value);
+    this.searchChange.emit(value);
   }
 
   formatCandidate(candidate: SocialPlayerLookupItem): string {

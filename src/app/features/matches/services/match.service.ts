@@ -1,4 +1,4 @@
-import { computed, effect, Injectable, signal } from '@angular/core';
+import { computed, effect, inject, Injectable, signal } from '@angular/core';
 import { firstValueFrom, timeout } from 'rxjs';
 import { AuthSessionService } from 'src/app/core/services/auth-session.service';
 import {
@@ -29,6 +29,11 @@ interface TeamAssignmentSnapshot {
 @Injectable({ providedIn: 'root' })
 export class MatchService {
   private static readonly TEAM_ASSIGNMENTS_KEY = 'atleta.match.team-assignments.v1';
+  private readonly authSessionService = inject(AuthSessionService);
+  private readonly matchesApiService = inject(MatchesApiService);
+  private readonly invitationService = inject(InvitationService);
+  private readonly invitationsStore = inject(InvitationsStore);
+  private readonly notificationService = inject(NotificationService);
   private readonly matchesStore = signal<Match[]>([]);
   private readonly isSubmittingStore = signal(false);
   private readonly teamAssignmentsStore = signal<Record<string, TeamAssignmentSnapshot>>(this.loadTeamAssignments());
@@ -43,13 +48,7 @@ export class MatchService {
     ),
   );
 
-  constructor(
-    private readonly authSessionService: AuthSessionService,
-    private readonly matchesApiService: MatchesApiService,
-    private readonly invitationService: InvitationService,
-    private readonly invitationsStore: InvitationsStore,
-    private readonly notificationService: NotificationService,
-  ) {
+  constructor() {
     effect(() => {
       const invitations = this.invitationsStore.invitations();
       const matchIds = [...new Set(invitations.map((item) => item.matchId))];

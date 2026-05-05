@@ -68,6 +68,47 @@
   color: #9fc0f6;
 }
 
+.profile-message--success {
+  color: #a7f3c3;
+}
+
+.profile-password-form {
+  display: grid;
+  gap: 10px;
+}
+
+.profile-password-field {
+  display: grid;
+  gap: 5px;
+  color: #dce8fa;
+  font-family: "Rajdhani", sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.profile-password-field input {
+  width: 100%;
+  min-width: 0;
+  height: 38px;
+  border-radius: 8px;
+  border: 1px solid rgba(126, 144, 168, 0.4);
+  background: rgba(7, 12, 20, 0.68);
+  color: #edf4ff;
+  font-family: "Rajdhani", sans-serif;
+  font-size: 15px;
+  outline: none;
+  padding: 0 10px;
+}
+
+.profile-password-field input:focus {
+  border-color: rgba(159, 192, 246, 0.82);
+  box-shadow: 0 0 0 2px rgba(86, 139, 229, 0.18);
+}
+
+.profile-password-submit {
+  justify-self: start;
+}
+
 .profile-teams {
   display: grid;
   grid-template-columns: 1fr;

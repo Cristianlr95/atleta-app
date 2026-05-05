@@ -20,6 +20,68 @@
       </p>
 
       <app-metallic-form-section
+        title="Seguridad de cuenta"
+        [titleIconAsset]="securitySectionIconAsset"
+        description="Cambia tu contrasena local. Si entras con Google, conserva este bloque solo si tambien tienes clave local."
+      >
+        <form class="profile-password-form" (ngSubmit)="onChangePassword()">
+          <label class="profile-password-field">
+            <span>Contrasena actual</span>
+            <input
+              type="password"
+              name="currentPassword"
+              autocomplete="current-password"
+              [(ngModel)]="currentPassword"
+              [disabled]="passwordChangeLoading"
+            />
+          </label>
+
+          <label class="profile-password-field">
+            <span>Nueva contrasena</span>
+            <input
+              type="password"
+              name="newPassword"
+              autocomplete="new-password"
+              [(ngModel)]="newPassword"
+              [disabled]="passwordChangeLoading"
+            />
+          </label>
+
+          <label class="profile-password-field">
+            <span>Confirmar nueva contrasena</span>
+            <input
+              type="password"
+              name="confirmNewPassword"
+              autocomplete="new-password"
+              [(ngModel)]="confirmNewPassword"
+              [disabled]="passwordChangeLoading"
+            />
+          </label>
+
+          <p
+            class="profile-message profile-message--warning"
+            *ngIf="passwordChangeError"
+          >
+            {{ passwordChangeError }}
+          </p>
+          <p
+            class="profile-message profile-message--success"
+            *ngIf="passwordChangeMessage"
+          >
+            {{ passwordChangeMessage }}
+          </p>
+
+          <button
+            type="submit"
+            class="profile-team__btn profile-password-submit"
+            [disabled]="passwordChangeLoading"
+          >
+            {{ passwordChangeLoading ? 'Actualizando...' : 'Actualizar contrasena' }}
+          </button>
+        </form>
+      </app-metallic-form-section>
+
+      <app-metallic-form-section
         title="Mis equipos"
         [titleIconAsset]="teamsSectionIconAsset"
         description="Equipos donde participas actualmente."

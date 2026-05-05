@@ -1,16 +1,13 @@
 import { Location } from '@angular/common';
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { NavigationExtras, Router } from '@angular/router';
 
 @Injectable({ providedIn: 'root' })
 export class NavigationService {
+  private readonly router = inject(Router);
+  private readonly location = inject(Location);
   private lockedUntil = 0;
   private readonly lockMs = 450;
-
-  constructor(
-    private readonly router: Router,
-    private readonly location: Location,
-  ) {}
 
   async safeNavigate(commands: readonly string[], extras?: NavigationExtras): Promise<boolean> {
     if (!this.canNavigate()) {

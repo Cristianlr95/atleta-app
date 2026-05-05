@@ -122,11 +122,9 @@ Proyecto en estado funcional avanzado. Los flujos principales de autenticacion, 
 - Stats: pantalla existente con contenido de futura integracion.
 - Push remoto: registro de token y badge conectados; falta validar proveedor/dispositivo real.
 - Google auth: login frontend conectado a Google Identity Services y `/athletes/auth/google`; requiere `ATLETA_GOOGLE_CLIENT_ID`.
-- Recuperacion de password: handler existente sin comportamiento final.
+- Password: cambio autenticado disponible desde Perfil; reset por email queda pendiente de contrato backend.
 
 ## Proximas mejoras
-- Rehabilitar o retirar el modulo social.
-- Consolidar historial de partidos duplicado.
 - Separar responsabilidades del dominio `matches`.
 - Fortalecer estrategia de token y sesion.
 - Validar envio push remoto con proveedor real y dispositivo fisico.

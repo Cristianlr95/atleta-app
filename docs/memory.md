@@ -54,8 +54,9 @@ Fuente: auditoria directa del repositorio `atleta-app`
 - Repeticion de handlers de bottom nav y navegacion en muchas paginas.
 - La repeticion funcional entre `matches-history` y `matches-hub` fue consolidada retirando la pagina legacy.
 - Servicios de dominio con mucha responsabilidad, especialmente `MatchService`, `MatchStore` y `ActivityService`.
-- Falta de runtime config real: `apiBaseUrl` esta compilado en `environment.ts`.
+- Runtime config existe para backend y Google client id; queda pendiente revisar estrategia completa de secretos/sesion.
 - El badge server-side y el registro de push token estan conectados; queda pendiente validar proveedor push remoto real.
+- `MatchStore` ya poda IDs de eventos live procesados para evitar crecimiento indefinido.
 
 ## Riesgos
 - Riesgo funcional: las tabs de `social` dependen de multiples endpoints; hay que validar estados vacios, errores parciales y consistencia real tras aceptar/rechazar invitaciones.
@@ -69,4 +70,5 @@ Fuente: auditoria directa del repositorio `atleta-app`
 2. Validar `/matches/history` como entrada compatible al historial unificado del hub.
 3. Validar envio push remoto con proveedor real y comportamiento en dispositivo fisico.
 4. Corregir encoding de strings.
-5. Separar mejor responsabilidades de `MatchService` y `MatchStore`.
+5. Implementar reset de password por email/token cuando exista contrato backend.
+6. Separar mejor responsabilidades de `MatchService` y `MatchStore`.
