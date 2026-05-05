@@ -41,7 +41,7 @@ Mantener continuidad real del proyecto, evitar duplicacion y obligar a que cada 
 
 ## Hallazgos que siempre deben recordarse
 - `matches` es el dominio mas sensible y mas acoplado.
-- `social` tiene codigo existente, pero hoy su ruta esta redirigida.
-- `stats` no esta desarrollada mas alla de una vista placeholder.
+- `social` tiene codigo existente y su ruta esta rehabilitada.
+- `stats` ya tiene una primera version read-only conectada a ratings e historial.
 - La duplicacion funcional entre `matches-history` y el tab de historial fue resuelta manteniendo `matches-hub` como fuente unica.
 - Badge server-side y registro de push token estan conectados; falta validar proveedor push remoto real.

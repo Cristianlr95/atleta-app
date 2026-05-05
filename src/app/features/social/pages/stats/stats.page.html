@@ -1,8 +1,72 @@
 <ion-content class="stats-bg">
   <div class="stats-container">
     <app-page-nav></app-page-nav>
+
     <app-metallic-card title="Estadisticas" [titleIconAsset]="titleIconAsset">
-      <p class="stats-message">Esta vista quedo lista para integrar eventos de rendimiento, MVP y rachas.</p>
+      <p class="stats-kicker">Lectura competitiva</p>
+      <p class="stats-message" *ngIf="isLoading">Actualizando rendimiento...</p>
+      <p class="stats-message stats-message--error" *ngIf="errorMessage">{{ errorMessage }}</p>
+      <button *ngIf="errorMessage" type="button" class="stats-retry" (click)="onRetry()">Reintentar</button>
+
+      <app-metallic-stats [stats]="summaryStats" [compact]="true"></app-metallic-stats>
+
+      <div class="stats-insight">
+        <span>Insight</span>
+        <p>{{ insight }}</p>
+      </div>
+
+      <app-metallic-form-section
+        title="Mapa por rol"
+        [titleIconAsset]="rolesIconAsset"
+        description="Puntaje actual por posicion competitiva."
+      >
+        <div class="stats-roles" *ngIf="roleStats.length > 0; else noRoles">
+          <article class="stats-role" *ngFor="let role of roleStats">
+            <div class="stats-role__top">
+              <span>{{ role.label }}</span>
+              <strong>{{ role.rating > 0 ? (role.rating | number: '1.1-1') : '--' }}</strong>
+            </div>
+            <div class="stats-role__bar" aria-hidden="true">
+              <span [style.width.%]="role.progress"></span>
+            </div>
+            <small>{{ role.matchesPlayed }} partidos registrados</small>
+          </article>
+        </div>
+        <ng-template #noRoles>
+          <p class="stats-message">Aun no hay ratings por rol para mostrar.</p>
+        </ng-template>
+      </app-metallic-form-section>
+
+      <app-metallic-form-section
+        title="Ultimos partidos"
+        [titleIconAsset]="trendIconAsset"
+        description="Resumen rapido del historial usado para la tendencia."
+      >
+        <div class="stats-matches" *ngIf="recentMatches.length > 0; else noMatches">
+          <article class="stats-match" *ngFor="let match of recentMatches" [ngClass]="match.resultClass">
+            <div>
+              <p>{{ match.title }}</p>
+              <small>{{ match.detail }}</small>
+            </div>
+          </article>
+        </div>
+        <ng-template #noMatches>
+          <p class="stats-message">Juega o cierra partidos para construir historial competitivo.</p>
+        </ng-template>
+      </app-metallic-form-section>
+
+      <button type="button" class="stats-leaderboard" (click)="onOpenLeaderboard()">
+        Ver ranking completo
+      </button>
     </app-metallic-card>
   </div>
 </ion-content>
+
+<ion-footer class="stats-footer" translucent>
+  <ion-toolbar>
+    <app-metallic-bottom-nav
+      [items]="bottomNavItems"
+      (itemSelected)="onNavItemSelected($event)">
+    </app-metallic-bottom-nav>
+  </ion-toolbar>
+</ion-footer>

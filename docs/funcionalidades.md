@@ -119,9 +119,10 @@ Atleta Frontend es una aplicacion para jugadores de futbol amateur centrada en i
 - `/social` vuelve a estar accesible desde routing protegido.
 - `/invitations` reutiliza `SocialPage` entrando en la tab de partidos.
 
-### Stats - `Parcial`
+### Stats - `Implementada read-only`
 - Existe la pagina `/stats`.
-- Actualmente solo muestra un mensaje de futura integracion.
+- Muestra OVR actual, rol destacado, efectividad, G+A, mapa por rol y ultimos partidos.
+- Consume ratings e historial existentes; no realiza acciones mutables.
 
 ### Badge de notificaciones - `Implementada`
 - Hay agregacion local de pendientes.

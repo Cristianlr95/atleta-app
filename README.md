@@ -118,8 +118,8 @@ Proyecto en estado funcional avanzado. Los flujos principales de autenticacion, 
 - Runtime config para backend por ambiente.
 
 ## Funcionalidades en desarrollo o parciales
-- Social hub: existe codigo y facade, pero la ruta activa redirige a partidos.
-- Stats: pantalla existente con contenido de futura integracion.
+- Social hub: ruta rehabilitada con tabs de actividad, amigos, equipos y partidos.
+- Stats: resumen read-only conectado a ratings e historial competitivo.
 - Push remoto: registro de token y badge conectados; falta validar proveedor/dispositivo real.
 - Google auth: login frontend conectado a Google Identity Services y `/athletes/auth/google`; requiere `ATLETA_GOOGLE_CLIENT_ID`.
 - Password: cambio autenticado disponible desde Perfil; reset por email queda pendiente de contrato backend.
