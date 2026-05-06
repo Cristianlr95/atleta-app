@@ -78,7 +78,7 @@ Fuente: auditoria directa del repositorio `atleta-app`
 ## Evidencia actual
 
 - `npm run build` exitoso; mantiene warnings no bloqueantes existentes de glob Stencil y budget menor en `metallic-position-field-picker`.
-- `npm test -- --watch=false --browsers=ChromeHeadless` exitoso con 80 tests OK.
+- `npm test -- --watch=false --browsers=ChromeHeadless` exitoso con 92 tests OK.
 
 ## Riesgos
 - Riesgo funcional: las tabs de `social` dependen de multiples endpoints; hay que validar estados vacios, errores parciales y consistencia real tras aceptar/rechazar invitaciones.
