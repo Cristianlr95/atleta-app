@@ -6,6 +6,12 @@ import { NavigationExtras, Router } from '@angular/router';
 export class NavigationService {
   private readonly router = inject(Router);
   private readonly location = inject(Location);
+  private readonly mainBottomRoutes: Record<string, readonly string[]> = {
+    home: ['/home'],
+    matches: ['/matches'],
+    ranking: ['/leaderboard'],
+    profile: ['/player/profile'],
+  };
   private lockedUntil = 0;
   private readonly lockMs = 450;
 
@@ -41,6 +47,15 @@ export class NavigationService {
 
   async goToProfile(): Promise<boolean> {
     return this.safeNavigate(['/player/profile']);
+  }
+
+  async goToMainBottomSection(itemId: string): Promise<boolean> {
+    const commands = this.mainBottomRoutes[itemId];
+    if (!commands) {
+      return false;
+    }
+
+    return this.safeNavigate(commands);
   }
 
   async goBackOrProfile(): Promise<boolean> {

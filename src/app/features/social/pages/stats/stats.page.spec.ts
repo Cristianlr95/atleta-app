@@ -24,7 +24,7 @@ describe('StatsPage', () => {
     matchHistoryService = jasmine.createSpyObj<MatchHistoryService>('MatchHistoryService', [
       'getPlayerHistory',
     ]);
-    navigationService = jasmine.createSpyObj<NavigationService>('NavigationService', ['safeNavigate']);
+    navigationService = jasmine.createSpyObj<NavigationService>('NavigationService', ['safeNavigate', 'goToMainBottomSection']);
     notificationBadgeService = jasmine.createSpyObj<NotificationBadgeService>('NotificationBadgeService', [
       'refresh',
       'totalPending',
@@ -79,6 +79,7 @@ describe('StatsPage', () => {
       buildHistoryItem(3, 'EMPATADO', 1, 0, 'No'),
     ]));
     navigationService.safeNavigate.and.resolveTo(true);
+    navigationService.goToMainBottomSection.and.resolveTo(true);
     notificationBadgeService.refresh.and.resolveTo();
     notificationBadgeService.totalPending.and.returnValue(2);
 

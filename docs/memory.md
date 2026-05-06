@@ -11,9 +11,9 @@ Fuente: auditoria directa del repositorio `atleta-app`
 
 ## Avance porcentual
 
-- Avance estimado del proyecto Atleta frontend: 83%.
-- Avance anterior registrado: 82%.
-- Delta de esta tarea: +1 punto porcentual por reconciliar documentacion de configuracion movil: Capacitor/Android ya usan `com.cristianlr.atleta` y se elimino la deuda obsoleta del identificador starter de Ionic.
+- Avance estimado del proyecto Atleta frontend: 84%.
+- Avance anterior registrado: 83%.
+- Delta de esta tarea: +1 punto porcentual por centralizar la navegacion del bottom nav principal en `NavigationService`, reemplazando handlers duplicados en pantallas principales y agregando cobertura unitaria.
 
 ## Proposito del repo
 - Resolver la experiencia web/mobile del jugador para autenticarse, completar su perfil, crear y gestionar partidos, responder invitaciones, consultar ranking y operar integraciones sociales y de notificaciones.
@@ -55,11 +55,12 @@ Fuente: auditoria directa del repositorio `atleta-app`
 - `NotificationBadgeService.refresh()` consulta el contador server-side y usa invitaciones pendientes como fallback sin duplicar conteos.
 - Los archivos de texto auditados quedaron en UTF-8 valido y sin candidatos tipicos de mojibake o controles de bullet.
 - Capacitor y Android estan alineados con `appId`/`applicationId` real `com.cristianlr.atleta`.
+- La navegacion del bottom nav principal delega en `NavigationService.goToMainBottomSection()`, con rutas canonicas cubiertas por test unitario.
 
 ## Deuda tecnica
 - Ruta social rehabilitada: las tabs principales quedan cubiertas con tests unitarios; sigue pendiente validacion manual mobile/web contra backend real.
 - Uso de `localStorage` para access token y refresh token.
-- Repeticion de handlers de bottom nav y navegacion en muchas paginas.
+- La repeticion de handlers de bottom nav fue reducida; las paginas principales conservan un handler fino que delega en `NavigationService`.
 - La repeticion funcional entre `matches-history` y `matches-hub` fue consolidada retirando la pagina legacy.
 - Servicios de dominio con mucha responsabilidad, especialmente `MatchService`, `MatchStore` y `ActivityService`.
 - Runtime config existe para backend y Google client id; queda pendiente revisar estrategia completa de secretos/sesion.

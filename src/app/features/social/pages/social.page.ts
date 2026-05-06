@@ -127,21 +127,7 @@ export class SocialPage implements OnDestroy {
   }
 
   onNavItemSelected(itemId: string): void {
-    if (itemId === 'home') {
-      void this.navigationService.safeNavigate(['/home']);
-      return;
-    }
-    if (itemId === 'matches') {
-      void this.navigationService.safeNavigate(['/matches']);
-      return;
-    }
-    if (itemId === 'ranking') {
-      void this.navigationService.safeNavigate(['/leaderboard']);
-      return;
-    }
-    if (itemId === 'profile') {
-      void this.navigationService.safeNavigate(['/player/profile']);
-    }
+    void this.navigationService.goToMainBottomSection(itemId);
   }
 
   onActivityAction(event: { activityId: string; action: ActivityActionType }): void {

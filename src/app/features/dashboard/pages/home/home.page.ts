@@ -82,24 +82,7 @@ export class HomePage {
   }
 
   onNavItemSelected(itemId: string): void {
-    if (itemId === 'home') {
-      void this.navigationService.safeNavigate(['/home']);
-      return;
-    }
-
-    if (itemId === 'matches') {
-      void this.navigationService.safeNavigate(['/matches']);
-      return;
-    }
-
-    if (itemId === 'ranking') {
-      void this.navigationService.safeNavigate(['/leaderboard']);
-      return;
-    }
-
-    if (itemId === 'profile') {
-      void this.navigationService.safeNavigate(['/player/profile']);
-    }
+    void this.navigationService.goToMainBottomSection(itemId);
   }
 
   private loadHomeData(): void {

@@ -30,9 +30,11 @@ describe('SocialPage', () => {
     navigationService = jasmine.createSpyObj<NavigationService>('NavigationService', [
       'safeNavigate',
       'safeNavigateByUrl',
+      'goToMainBottomSection',
     ]);
     navigationService.safeNavigate.and.resolveTo(true);
     navigationService.safeNavigateByUrl.and.resolveTo(true);
+    navigationService.goToMainBottomSection.and.resolveTo(true);
     notificationBadgeService = buildNotificationBadgeMock();
 
     await TestBed.configureTestingModule({
@@ -152,10 +154,10 @@ describe('SocialPage', () => {
     component.onNavItemSelected('ranking');
     component.onNavItemSelected('profile');
 
-    expect(navigationService.safeNavigate).toHaveBeenCalledWith(['/home']);
-    expect(navigationService.safeNavigate).toHaveBeenCalledWith(['/matches']);
-    expect(navigationService.safeNavigate).toHaveBeenCalledWith(['/leaderboard']);
-    expect(navigationService.safeNavigate).toHaveBeenCalledWith(['/player/profile']);
+    expect(navigationService.goToMainBottomSection).toHaveBeenCalledWith('home');
+    expect(navigationService.goToMainBottomSection).toHaveBeenCalledWith('matches');
+    expect(navigationService.goToMainBottomSection).toHaveBeenCalledWith('ranking');
+    expect(navigationService.goToMainBottomSection).toHaveBeenCalledWith('profile');
   });
 });
 
