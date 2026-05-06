@@ -11,9 +11,9 @@ Fuente: auditoria directa del repositorio `atleta-app`
 
 ## Avance porcentual
 
-- Avance estimado del proyecto Atleta frontend: 85%.
-- Avance anterior registrado: 84%.
-- Delta de esta tarea: +1 punto porcentual por robustecer Social: al aceptar/rechazar invitaciones de partido desde Social ahora se refresca tambien el badge compartido de pendientes, con cobertura unitaria.
+- Avance estimado del proyecto Atleta frontend: 86%.
+- Avance anterior registrado: 85%.
+- Delta de esta tarea: +1 punto porcentual por endurecer estados de partidos confirmados en Social: fechas faltantes o invalidas ya no renderizan contadores `NaN` y quedan cubiertas por spec del panel.
 
 ## Proposito del repo
 - Resolver la experiencia web/mobile del jugador para autenticarse, completar su perfil, crear y gestionar partidos, responder invitaciones, consultar ranking y operar integraciones sociales y de notificaciones.
@@ -57,6 +57,7 @@ Fuente: auditoria directa del repositorio `atleta-app`
 - Capacitor y Android estan alineados con `appId`/`applicationId` real `com.cristianlr.atleta`.
 - La navegacion del bottom nav principal delega en `NavigationService.goToMainBottomSection()`, con rutas canonicas cubiertas por test unitario.
 - Social refresca `NotificationBadgeService` despues de responder invitaciones de partido desde la tab de partidos o desde acciones de actividad.
+- El panel social de partidos maneja fechas faltantes/invalidas con fallback estable antes de mostrar cuenta regresiva.
 
 ## Deuda tecnica
 - Ruta social rehabilitada: tabs principales y refresco de badge tras responder invitaciones quedan cubiertos con tests unitarios; sigue pendiente validacion manual mobile/web contra backend real.
