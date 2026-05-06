@@ -34,13 +34,19 @@
   </div>
 
   <h4>Invitar jugador a equipo</h4>
-  <p class="teams-panel__state">Flujo: Social > Equipos > elige equipo > invita por alias/nombre.</p>
-  <app-metallic-select label="Equipo" [options]="teamOptions" [(ngModel)]="inviteTeamId"></app-metallic-select>
+  <p class="teams-panel__state" *ngIf="teamOptions.length > 0">Elige un equipo y busca al jugador por alias o nombre.</p>
+  <p class="teams-panel__state" *ngIf="teamOptions.length === 0">Crea un equipo antes de invitar jugadores.</p>
+  <app-metallic-select
+    label="Equipo"
+    [options]="teamOptions"
+    [disabled]="teamOptions.length === 0"
+    [(ngModel)]="inviteTeamId">
+  </app-metallic-select>
   <app-metallic-input label="Buscar jugador" type="text" [(ngModel)]="inviteQuery" (ngModelChange)="searchInviteCandidate.emit($event)"></app-metallic-input>
   <div class="teams-panel__list" *ngIf="inviteCandidates.length > 0">
     <article class="teams-item" *ngFor="let player of inviteCandidates">
       <p>{{ player.alias || player.athleteName || player.atletaUuid }}</p>
-      <button type="button" (click)="onSendInvite(player.atletaUuid)">Invitar</button>
+      <button type="button" [disabled]="!canInvitePlayers" (click)="onSendInvite(player.atletaUuid)">Invitar</button>
     </article>
   </div>
 </section>

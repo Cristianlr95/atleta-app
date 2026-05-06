@@ -32,8 +32,12 @@ export class TeamsPanelComponent {
     return this.createdTeams.map((team) => ({ label: team.nombre, value: String(team.id) }));
   }
 
+  get canInvitePlayers(): boolean {
+    return this.teamOptions.length > 0 && this.inviteTeamId.trim().length > 0 && Number.isFinite(Number(this.inviteTeamId));
+  }
+
   onSendInvite(targetUuid: string): void {
-    if (!this.inviteTeamId) {
+    if (!this.canInvitePlayers) {
       return;
     }
     this.sendInvite.emit({ teamId: Number(this.inviteTeamId), targetUuid });
