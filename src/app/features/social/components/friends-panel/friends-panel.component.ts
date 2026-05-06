@@ -30,6 +30,10 @@ export class FriendsPanelComponent {
     this.searchChange.emit(value);
   }
 
+  get showNoSearchResults(): boolean {
+    return this.query.trim().length >= 2 && !this.loadingSearch && this.candidates.length === 0;
+  }
+
   formatCandidate(candidate: SocialPlayerLookupItem): string {
     if (candidate.alias && candidate.athleteName) {
       return `${candidate.alias} (${candidate.athleteName})`;

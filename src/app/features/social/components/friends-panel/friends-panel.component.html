@@ -14,6 +14,7 @@
   <h4>Buscar jugador</h4>
   <app-metallic-input [ngModel]="query" (ngModelChange)="onSearchQueryChange($event)" label="Alias, nombre o email" type="text"></app-metallic-input>
   <p class="friends-panel__state" *ngIf="loadingSearch">Buscando jugadores...</p>
+  <p class="friends-panel__state" *ngIf="showNoSearchResults">No encontramos jugadores con esa busqueda.</p>
   <div class="friends-panel__list" *ngIf="candidates.length > 0">
     <article class="friends-item" *ngFor="let candidate of candidates">
       <p>{{ formatCandidate(candidate) }}</p>

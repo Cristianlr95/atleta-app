@@ -38,4 +38,16 @@ describe('FriendsPanelComponent', () => {
 
     expect(profileUuid).toBe('friend');
   });
+
+  it('shows an empty search state only after a meaningful query finishes', () => {
+    component.query = 'n';
+    expect(component.showNoSearchResults).toBeFalse();
+
+    component.query = 'nueve';
+    component.loadingSearch = true;
+    expect(component.showNoSearchResults).toBeFalse();
+
+    component.loadingSearch = false;
+    expect(component.showNoSearchResults).toBeTrue();
+  });
 });
