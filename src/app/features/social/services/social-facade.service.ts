@@ -241,6 +241,7 @@ export class SocialFacadeService {
       this.friendCandidatesStore.set(players.filter((item) => item.atletaUuid !== this.playerUuid));
       this.errorMessageStore.set(null);
     } catch (error) {
+      this.friendCandidatesStore.set([]);
       this.errorMessageStore.set(this.errorMapper.toUserMessage(error, 'social'));
     } finally {
       this.searchLoadingStore.set(false);
@@ -260,6 +261,7 @@ export class SocialFacadeService {
       this.inviteCandidatesStore.set(players.filter((item) => item.atletaUuid !== this.playerUuid));
       this.errorMessageStore.set(null);
     } catch (error) {
+      this.inviteCandidatesStore.set([]);
       this.errorMessageStore.set(this.errorMapper.toUserMessage(error, 'social'));
     } finally {
       this.searchLoadingStore.set(false);

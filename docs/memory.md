@@ -11,9 +11,9 @@ Fuente: auditoria directa del repositorio `atleta-app`
 
 ## Avance porcentual
 
-- Avance estimado del proyecto Atleta frontend: 89%.
-- Avance anterior registrado: 88%.
-- Delta de esta tarea: +1 punto porcentual por mejorar estados vacios de busqueda en Social/Amigos: la UI diferencia consulta corta, carga y cero resultados, con spec del panel.
+- Avance estimado del proyecto Atleta frontend: 90%.
+- Avance anterior registrado: 89%.
+- Delta de esta tarea: +1 punto porcentual por robustecer busquedas sociales ante errores: candidatos previos de amigos/equipos se limpian si falla el endpoint, evitando resultados stale, con specs del facade.
 
 ## Proposito del repo
 - Resolver la experiencia web/mobile del jugador para autenticarse, completar su perfil, crear y gestionar partidos, responder invitaciones, consultar ranking y operar integraciones sociales y de notificaciones.
@@ -61,6 +61,7 @@ Fuente: auditoria directa del repositorio `atleta-app`
 - El panel social de equipos deshabilita la accion de invitar jugadores hasta que exista y se seleccione un equipo creado.
 - El panel social de amigos resuelve el perfil del otro jugador usando el UUID del usuario actual.
 - La busqueda de amigos muestra un estado sin resultados solo despues de una consulta util y sin carga activa.
+- Las busquedas sociales limpian candidatos previos cuando falla el endpoint para no mezclar error actual con resultados antiguos.
 
 ## Deuda tecnica
 - Ruta social rehabilitada: tabs principales y refresco de badge tras responder invitaciones quedan cubiertos con tests unitarios; sigue pendiente validacion manual mobile/web contra backend real.
