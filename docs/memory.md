@@ -9,6 +9,12 @@ Fuente: auditoria directa del repositorio `atleta-app`
 - El frontend esta organizado mayormente por features standalone (`auth`, `dashboard`, `matches`, `ratings`, `sessions`, `social`, `teams`, `user`, `fields`).
 - La experiencia visual esta muy marcada por una identidad "metallic / Winning Eleven": tipografias `Orbitron` y `Rajdhani`, fondos oscuros, gradientes metalicos y componentes UI reutilizables propios.
 
+## Avance porcentual
+
+- Avance estimado del proyecto Atleta: 79%.
+- Avance anterior registrado: 78%.
+- Delta de esta tarea: +1 punto porcentual por asegurar ratings con JWT en backend y dejar cobertura automatizada.
+
 ## Proposito del repo
 - Resolver la experiencia web/mobile del jugador para autenticarse, completar su perfil, crear y gestionar partidos, responder invitaciones, consultar ranking y operar integraciones sociales y de notificaciones.
 
@@ -58,7 +64,7 @@ Fuente: auditoria directa del repositorio `atleta-app`
 - Runtime config existe para backend y Google client id; queda pendiente revisar estrategia completa de secretos/sesion.
 - El badge server-side y el registro de push token estan conectados; queda pendiente validar proveedor push remoto real.
 - `MatchStore` ya poda IDs de eventos live procesados para evitar crecimiento indefinido.
-- `api-contracts.smoke.spec.ts` protege rutas FE criticas contra desalineacion con backend; sigue pendiente smoke contra backend real levantado.
+- `api-contracts.smoke.spec.ts` protege rutas FE criticas contra desalineacion con backend; el backend ya tiene smoke MVC y cobertura JWT para ratings.
 
 ## Riesgos
 - Riesgo funcional: las tabs de `social` dependen de multiples endpoints; hay que validar estados vacios, errores parciales y consistencia real tras aceptar/rechazar invitaciones.
@@ -71,7 +77,7 @@ Fuente: auditoria directa del repositorio `atleta-app`
 1. Validar `social` en dispositivo/mobile web contra backend real, especialmente estados vacios y acciones aceptar/rechazar.
 2. Validar `/matches/history` como entrada compatible al historial unificado del hub.
 3. Validar envio push remoto con proveedor real y comportamiento en dispositivo fisico.
-4. Agregar smoke de contratos contra backend real para auth, matches, teams, ratings y MVP.
+4. Agregar smoke E2E opcional con frontend y backend levantados cuando existan datos/credenciales estables.
 5. Corregir encoding de strings.
 6. Implementar reset de password por email/token cuando exista contrato backend.
 7. Separar mejor responsabilidades de `MatchService` y `MatchStore`.
