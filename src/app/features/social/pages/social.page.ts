@@ -198,6 +198,10 @@ export class SocialPage implements OnDestroy {
     void this.navigationService.safeNavigate(['/matches', String(matchId)]);
   }
 
+  async onRespondMatchInvite(event: { inviteId: number; accept: boolean }): Promise<void> {
+    await this.respondMatchInvite(event.inviteId, event.accept);
+  }
+
   onRetryLoad(): void {
     void this.loadOnEnter();
   }
@@ -223,7 +227,7 @@ export class SocialPage implements OnDestroy {
       return;
     }
     if (item.id.startsWith('match-')) {
-      void this.facade.respondMatchInvite(item.target.requestId, true);
+      void this.respondMatchInvite(item.target.requestId, true);
     }
   }
 
@@ -240,8 +244,13 @@ export class SocialPage implements OnDestroy {
       return;
     }
     if (item.id.startsWith('match-')) {
-      void this.facade.respondMatchInvite(item.target.requestId, false);
+      void this.respondMatchInvite(item.target.requestId, false);
     }
+  }
+
+  private async respondMatchInvite(inviteId: number, accept: boolean): Promise<void> {
+    await this.facade.respondMatchInvite(inviteId, accept);
+    await this.notificationBadgeService.refresh();
   }
 }
 

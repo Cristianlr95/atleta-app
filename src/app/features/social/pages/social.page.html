@@ -61,7 +61,7 @@
         *ngIf="facade.activeTab() === 'matches'"
         [pendingInvites]="pendingMatches()"
         [confirmedMatches]="confirmedMatches()"
-        (respondInvite)="facade.respondMatchInvite($event.inviteId, $event.accept)"
+        (respondInvite)="onRespondMatchInvite($event)"
         (openMatch)="onOpenMatch($event)">
       </app-match-invitations-panel>
     </app-metallic-card>

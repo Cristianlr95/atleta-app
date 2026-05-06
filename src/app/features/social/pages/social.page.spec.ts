@@ -159,6 +159,13 @@ describe('SocialPage', () => {
     expect(navigationService.goToMainBottomSection).toHaveBeenCalledWith('ranking');
     expect(navigationService.goToMainBottomSection).toHaveBeenCalledWith('profile');
   });
+
+  it('refreshes shared badges after responding to match invites', async () => {
+    await component.onRespondMatchInvite({ inviteId: 21, accept: true });
+
+    expect(facade.respondMatchInvite).toHaveBeenCalledOnceWith(21, true);
+    expect(notificationBadgeService.refresh).toHaveBeenCalledTimes(1);
+  });
 });
 
 function buildSocialFacadeMock() {

@@ -11,9 +11,9 @@ Fuente: auditoria directa del repositorio `atleta-app`
 
 ## Avance porcentual
 
-- Avance estimado del proyecto Atleta frontend: 84%.
-- Avance anterior registrado: 83%.
-- Delta de esta tarea: +1 punto porcentual por centralizar la navegacion del bottom nav principal en `NavigationService`, reemplazando handlers duplicados en pantallas principales y agregando cobertura unitaria.
+- Avance estimado del proyecto Atleta frontend: 85%.
+- Avance anterior registrado: 84%.
+- Delta de esta tarea: +1 punto porcentual por robustecer Social: al aceptar/rechazar invitaciones de partido desde Social ahora se refresca tambien el badge compartido de pendientes, con cobertura unitaria.
 
 ## Proposito del repo
 - Resolver la experiencia web/mobile del jugador para autenticarse, completar su perfil, crear y gestionar partidos, responder invitaciones, consultar ranking y operar integraciones sociales y de notificaciones.
@@ -56,9 +56,10 @@ Fuente: auditoria directa del repositorio `atleta-app`
 - Los archivos de texto auditados quedaron en UTF-8 valido y sin candidatos tipicos de mojibake o controles de bullet.
 - Capacitor y Android estan alineados con `appId`/`applicationId` real `com.cristianlr.atleta`.
 - La navegacion del bottom nav principal delega en `NavigationService.goToMainBottomSection()`, con rutas canonicas cubiertas por test unitario.
+- Social refresca `NotificationBadgeService` despues de responder invitaciones de partido desde la tab de partidos o desde acciones de actividad.
 
 ## Deuda tecnica
-- Ruta social rehabilitada: las tabs principales quedan cubiertas con tests unitarios; sigue pendiente validacion manual mobile/web contra backend real.
+- Ruta social rehabilitada: tabs principales y refresco de badge tras responder invitaciones quedan cubiertos con tests unitarios; sigue pendiente validacion manual mobile/web contra backend real.
 - Uso de `localStorage` para access token y refresh token.
 - La repeticion de handlers de bottom nav fue reducida; las paginas principales conservan un handler fino que delega en `NavigationService`.
 - La repeticion funcional entre `matches-history` y `matches-hub` fue consolidada retirando la pagina legacy.
