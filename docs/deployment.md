@@ -29,7 +29,7 @@ Fecha de actualizacion: 2026-04-23
 ### Riesgos detectados
 - URL backend hardcodeada por build.
 - Tokens de sesion almacenados en `localStorage`.
-- `capacitor.config.ts` aun usa `appId: "io.ionic.starter"`.
+- Capacitor y Android ya usan el identificador real `com.cristianlr.atleta`; queda pendiente validar firma/canales de distribucion cuando exista release movil.
 - No habia estrategia formal para exponer solo variables publicas de frontend.
 
 ## 3. Cambios implementados en esta preparacion

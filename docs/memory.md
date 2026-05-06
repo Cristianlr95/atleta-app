@@ -11,9 +11,9 @@ Fuente: auditoria directa del repositorio `atleta-app`
 
 ## Avance porcentual
 
-- Avance estimado del proyecto Atleta frontend: 82%.
-- Avance anterior registrado: 81%.
-- Delta de esta tarea: +1 punto porcentual por normalizar archivos de texto a UTF-8 valido y corregir mojibake visible en hub de partidos, helper E2E y backlog.
+- Avance estimado del proyecto Atleta frontend: 83%.
+- Avance anterior registrado: 82%.
+- Delta de esta tarea: +1 punto porcentual por reconciliar documentacion de configuracion movil: Capacitor/Android ya usan `com.cristianlr.atleta` y se elimino la deuda obsoleta del identificador starter de Ionic.
 
 ## Proposito del repo
 - Resolver la experiencia web/mobile del jugador para autenticarse, completar su perfil, crear y gestionar partidos, responder invitaciones, consultar ranking y operar integraciones sociales y de notificaciones.
@@ -39,7 +39,7 @@ Fuente: auditoria directa del repositorio `atleta-app`
 - Estado mixto: Angular signals para estado UI/local, RxJS para IO, stores propias con cache TTL (`ResourceStore`, `MatchStore`, `MvpVoteStore`, `InvitationsStore`).
 - `matches` mezcla persistencia backend con fallback local y optimismo UI.
 - Geolocalizacion de canchas basada en API propia de `fields`.
-- Push notifications preparadas con Capacitor, pero el registro definitivo de tokens aun no existe en backend.
+- Push notifications preparadas con Capacitor y registro de tokens conectado; queda pendiente validacion de proveedor remoto real.
 
 ## Decisiones visuales/UI detectadas
 - Direccion estetica oscura, deportiva y "game-like".
@@ -54,7 +54,7 @@ Fuente: auditoria directa del repositorio `atleta-app`
 - `social` mantiene bastante codigo utilizable y vuelve a estar conectado al routing real.
 - `NotificationBadgeService.refresh()` consulta el contador server-side y usa invitaciones pendientes como fallback sin duplicar conteos.
 - Los archivos de texto auditados quedaron en UTF-8 valido y sin candidatos tipicos de mojibake o controles de bullet.
-- `capacitor.config.ts` sigue con `appId: 'io.ionic.starter'`.
+- Capacitor y Android estan alineados con `appId`/`applicationId` real `com.cristianlr.atleta`.
 
 ## Deuda tecnica
 - Ruta social rehabilitada: las tabs principales quedan cubiertas con tests unitarios; sigue pendiente validacion manual mobile/web contra backend real.
