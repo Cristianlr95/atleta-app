@@ -21,6 +21,7 @@ Fuente: auditoria directa del repositorio `atleta-app`
 - Google auth en frontend queda conectado, condicionado a `ATLETA_GOOGLE_CLIENT_ID`.
 - Existen modos demo o fallbacks visuales en `player-onboarding` y `player-profile`.
 - Hay cobertura E2E Playwright para login, crear partido, flujo de invitaciones, actualizacion live y MVP.
+- Hay smoke unitario de contratos HTTP para servicios FE de auth, matches/MVP, teams y ratings.
 
 ## Decisiones tecnicas detectadas
 - Angular standalone routing con `loadComponent`.
@@ -57,6 +58,7 @@ Fuente: auditoria directa del repositorio `atleta-app`
 - Runtime config existe para backend y Google client id; queda pendiente revisar estrategia completa de secretos/sesion.
 - El badge server-side y el registro de push token estan conectados; queda pendiente validar proveedor push remoto real.
 - `MatchStore` ya poda IDs de eventos live procesados para evitar crecimiento indefinido.
+- `api-contracts.smoke.spec.ts` protege rutas FE criticas contra desalineacion con backend; sigue pendiente smoke contra backend real levantado.
 
 ## Riesgos
 - Riesgo funcional: las tabs de `social` dependen de multiples endpoints; hay que validar estados vacios, errores parciales y consistencia real tras aceptar/rechazar invitaciones.
@@ -69,6 +71,7 @@ Fuente: auditoria directa del repositorio `atleta-app`
 1. Validar `social` en dispositivo/mobile web contra backend real, especialmente estados vacios y acciones aceptar/rechazar.
 2. Validar `/matches/history` como entrada compatible al historial unificado del hub.
 3. Validar envio push remoto con proveedor real y comportamiento en dispositivo fisico.
-4. Corregir encoding de strings.
-5. Implementar reset de password por email/token cuando exista contrato backend.
-6. Separar mejor responsabilidades de `MatchService` y `MatchStore`.
+4. Agregar smoke de contratos contra backend real para auth, matches, teams, ratings y MVP.
+5. Corregir encoding de strings.
+6. Implementar reset de password por email/token cuando exista contrato backend.
+7. Separar mejor responsabilidades de `MatchService` y `MatchStore`.

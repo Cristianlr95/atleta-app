@@ -14,7 +14,7 @@ Fecha: 2026-03-02
 | CORE-04 | Registro real de push tokens | Notifications | P1 | implementado | `push-token-sync.service.ts`, `/social/notifications/push-tokens` | Endpoint BE + persistencia + sync FE implementados y cubiertos por tests |
 | IMP-01 | Normalizar seguridad dev/prod | Auth/Seguridad | P2 | parcial | `SecurityConfig.java` | Reglas de auth equivalentes para pruebas funcionales en dev/staging |
 | IMP-02 | Reducir endpoints huerfanos o asignar owner | Arquitectura | P2 | parcial | Controllers BE vs uso FE en `src/app/features/**/services` | Lista de endpoints sin consumo reducida o documentada con plan |
-| IMP-03 | Contratos FE?BE smoke automatizados | Calidad | P2 | parcial | Karma unit tests y compilacion, falta smoke de contratos HTTP | Suite valida auth, matches, teams, ratings y mvp contra backend |
+| IMP-03 | Contratos FE?BE smoke automatizados | Calidad | P2 | parcial | `src/app/core/contracts/api-contracts.smoke.spec.ts` valida rutas HTTP de auth, matches, teams, ratings y MVP desde servicios FE; falta smoke contra backend real | Suite valida auth, matches, teams, ratings y mvp contra backend |
 
 ## Prioridad operativa P1
 1. Validar envio push remoto con proveedor/dispositivo real.

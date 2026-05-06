@@ -111,6 +111,11 @@ Atleta Frontend es una aplicacion para jugadores de futbol amateur centrada en i
 - Soporte web notification.
 - Soporte local notification con Capacitor.
 
+### Smoke de contratos HTTP FE - `Parcial`
+- Existe cobertura unitaria para rutas de servicios API en auth, matches/MVP, teams y ratings.
+- Valida metodo HTTP, URL base `/api/v1`, path y query params criticos con `HttpTestingController`.
+- Pendiente: smoke automatizado contra backend real levantado.
+
 ## Funcionalidades parciales
 
 ### Social hub - `Rehabilitado parcial`
@@ -192,6 +197,7 @@ Atleta Frontend es una aplicacion para jugadores de futbol amateur centrada en i
 - Social: `/social/friendships`, `/social/team-invites`, `/social/match-invites`, `/social/notifications`, `/social/players/search`
 - Fields: `/fields`
 - Ratings: `/ratings/player/{id}/overall`, `/ratings/player/{id}`, `/ratings/player/{id}/history`, `/ratings/leaderboard`
+- Smoke unitario FE: `src/app/core/contracts/api-contracts.smoke.spec.ts`
 
 ## Checklist para futuras tareas
 - [ ] Leer `docs/memory.md`

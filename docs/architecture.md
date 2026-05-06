@@ -92,6 +92,7 @@ Observacion:
 ## Testing detectado
 - Unit tests parciales en servicios y componentes clave.
 - Smoke E2E para login, crear partido, invitaciones, live updates y MVP.
+- Smoke unitario de contratos HTTP FE para auth, matches/MVP, teams y ratings con `HttpTestingController`.
 
 ## Problemas estructurales detectados
 - `social` existe como modulo y vuelve a estar conectado a routing real mediante `/social` y `/invitations`.
@@ -104,9 +105,10 @@ Observacion:
 
 ## Oportunidades de mejora arquitectonica
 1. Validar el estado objetivo del dominio social con pruebas mobile/web y contratos FE-BE.
-2. Separar `MatchService` en capas mas chicas.
-3. Validar contratos y estados vacios del historial consolidado en `matches-hub`.
-4. Extraer un shell/layout compartido para bottom nav y page container.
-5. Centralizar reglas de negocio repetidas de `matches`.
-6. Implementar runtime config para `apiBaseUrl`.
-7. Revisar estrategia de almacenamiento de tokens.
+2. Completar smoke de contratos contra backend real levantado.
+3. Separar `MatchService` en capas mas chicas.
+4. Validar contratos y estados vacios del historial consolidado en `matches-hub`.
+5. Extraer un shell/layout compartido para bottom nav y page container.
+6. Centralizar reglas de negocio repetidas de `matches`.
+7. Implementar runtime config para `apiBaseUrl`.
+8. Revisar estrategia de almacenamiento de tokens.
