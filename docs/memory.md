@@ -11,9 +11,9 @@ Fuente: auditoria directa del repositorio `atleta-app`
 
 ## Avance porcentual
 
-- Avance estimado del proyecto Atleta frontend: 87%.
-- Avance anterior registrado: 86%.
-- Delta de esta tarea: +1 punto porcentual por endurecer invitaciones de equipo en Social: no se puede emitir invitacion sin equipo creado/seleccionado, el UI lo comunica y queda cubierto por spec del panel.
+- Avance estimado del proyecto Atleta frontend: 88%.
+- Avance anterior registrado: 87%.
+- Delta de esta tarea: +1 punto porcentual por corregir navegacion de amigos aceptados en Social: "Ver perfil" abre al otro jugador aunque el usuario actual haya enviado la solicitud, con spec del panel.
 
 ## Proposito del repo
 - Resolver la experiencia web/mobile del jugador para autenticarse, completar su perfil, crear y gestionar partidos, responder invitaciones, consultar ranking y operar integraciones sociales y de notificaciones.
@@ -59,6 +59,7 @@ Fuente: auditoria directa del repositorio `atleta-app`
 - Social refresca `NotificationBadgeService` despues de responder invitaciones de partido desde la tab de partidos o desde acciones de actividad.
 - El panel social de partidos maneja fechas faltantes/invalidas con fallback estable antes de mostrar cuenta regresiva.
 - El panel social de equipos deshabilita la accion de invitar jugadores hasta que exista y se seleccione un equipo creado.
+- El panel social de amigos resuelve el perfil del otro jugador usando el UUID del usuario actual.
 
 ## Deuda tecnica
 - Ruta social rehabilitada: tabs principales y refresco de badge tras responder invitaciones quedan cubiertos con tests unitarios; sigue pendiente validacion manual mobile/web contra backend real.

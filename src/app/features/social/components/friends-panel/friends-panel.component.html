@@ -30,7 +30,7 @@
     <article class="friends-item" *ngFor="let item of acceptedFriendships">
       <p>{{ item.requesterAlias }} y {{ item.targetAlias }}</p>
       <div class="friends-item__actions">
-        <button type="button" (click)="openProfile.emit(item.requesterUuid)">Ver perfil</button>
+        <button type="button" (click)="openProfile.emit(getFriendProfileUuid(item))">Ver perfil</button>
       </div>
     </article>
   </div>

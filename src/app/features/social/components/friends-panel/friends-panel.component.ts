@@ -16,6 +16,7 @@ export class FriendsPanelComponent {
   @Input() acceptedFriendships: SocialRequestItem[] = [];
   @Input() candidates: SocialPlayerLookupItem[] = [];
   @Input() loadingSearch = false;
+  @Input() currentPlayerUuid: string | null = null;
 
   @Output() searchChange = new EventEmitter<string>();
   @Output() sendRequest = new EventEmitter<string>();
@@ -34,5 +35,13 @@ export class FriendsPanelComponent {
       return `${candidate.alias} (${candidate.athleteName})`;
     }
     return candidate.alias || candidate.athleteName || candidate.atletaUuid;
+  }
+
+  getFriendProfileUuid(item: SocialRequestItem): string {
+    if (item.requesterUuid === this.currentPlayerUuid && item.targetUuid) {
+      return item.targetUuid;
+    }
+
+    return item.requesterUuid;
   }
 }

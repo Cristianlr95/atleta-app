@@ -38,6 +38,7 @@
         [acceptedFriendships]="acceptedFriendships()"
         [candidates]="facade.friendCandidates()"
         [loadingSearch]="facade.searchLoading()"
+        [currentPlayerUuid]="facade.playerUuid"
         (searchChange)="onFriendSearch($event)"
         (sendRequest)="facade.sendFriendRequest($event)"
         (respondRequest)="facade.respondFriendRequest($event.requestId, $event.accept)"
