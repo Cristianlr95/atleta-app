@@ -10,7 +10,7 @@
 .home-container {
   max-width: 880px;
   margin: 0 auto;
-  padding: 16px 14px 96px;
+  padding: 16px 16px 96px;
 }
 
 .home-identity {
@@ -208,5 +208,26 @@
 @media (max-width: 640px) {
   .home-status-grid {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (min-width: 900px) {
+  .home-container {
+    padding-top: 32px;
+  }
+}
+
+@media (max-width: 420px) {
+  .home-identity {
+    align-items: flex-start;
+  }
+
+  .home-avatar {
+    height: 50px;
+    width: 50px;
+  }
+
+  .home-name {
+    font-size: 1.05rem;
   }
 }

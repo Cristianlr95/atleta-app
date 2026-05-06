@@ -22,4 +22,42 @@ describe('MetallicBottomNavComponent', () => {
   it('should create', () => {
     expect(component).toBeTruthy();
   });
+
+  it('marks the active item as the current page', () => {
+    component.items = [
+      { id: 'home', label: 'Inicio', icon: '', active: true },
+      { id: 'matches', label: 'Partidos', icon: '' },
+    ];
+    fixture.detectChanges();
+
+    const activeButton: HTMLButtonElement | null = fixture.nativeElement.querySelector(
+      '.metallic-bottom-nav__item--active',
+    );
+
+    expect(activeButton?.getAttribute('aria-current')).toBe('page');
+  });
+
+  it('does not emit when tapping the active item', () => {
+    spyOn(component.itemSelected, 'emit');
+    component.items = [
+      { id: 'home', label: 'Inicio', icon: '', active: true },
+      { id: 'matches', label: 'Partidos', icon: '' },
+    ];
+
+    component.onSelect('home');
+
+    expect(component.itemSelected.emit).not.toHaveBeenCalled();
+  });
+
+  it('renders pending badge with an accessible label', () => {
+    component.items = [
+      { id: 'matches', label: 'Partidos', icon: '', badgeCount: 3 },
+    ];
+    fixture.detectChanges();
+
+    const badge: HTMLElement | null = fixture.nativeElement.querySelector('.metallic-bottom-nav__badge');
+
+    expect(badge?.textContent?.trim()).toBe('3');
+    expect(badge?.getAttribute('aria-label')).toBe('3 pendientes');
+  });
 });

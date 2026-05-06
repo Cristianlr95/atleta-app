@@ -46,6 +46,10 @@
   --atleta-icon-nav-deep: rgba(50, 79, 122, 0.55);
 }
 
+* {
+  box-sizing: border-box;
+}
+
 html,
 body,
 ion-app {
@@ -78,6 +82,26 @@ input,
 select,
 textarea {
   font: inherit;
+}
+
+h1,
+h2,
+h3,
+p,
+ion-card-title,
+ion-card-subtitle,
+ion-label,
+ion-note,
+.metallic-card,
+.home-status-card,
+.home-feed__item {
+  overflow-wrap: anywhere;
+}
+
+ion-button,
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
 }
 
 button:focus-visible,
@@ -209,5 +233,29 @@ ion-icon {
 
   .atleta-game-icon:hover {
     transform: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .login-container,
+  .register-container,
+  .home-container,
+  .matches-hub-container,
+  .matches-create-container,
+  .match-detail-container,
+  .profile-container,
+  .leaderboard-container,
+  .session-container,
+  .venue-create-container,
+  .match-close-container,
+  .mvp-vote-container,
+  .stats-container,
+  .social-container {
+    padding-inline: 1rem;
+  }
+
+  ion-modal::part(content) {
+    width: 100%;
+    min-height: 100%;
   }
 }

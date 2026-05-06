@@ -4,6 +4,7 @@
     type="button"
     class="metallic-bottom-nav__item"
     [attr.aria-label]="item.label"
+    [attr.aria-current]="item.active ? 'page' : null"
     [class.metallic-bottom-nav__item--active]="item.active"
     [class.metallic-bottom-nav__item--cta]="item.variant === 'cta'"
     (click)="onSelect(item.id)">
@@ -12,7 +13,12 @@
       class="atleta-game-icon atleta-game-icon--nav"
       aria-hidden="true">
     </ion-icon>
-    <span class="metallic-bottom-nav__badge" *ngIf="(item.badgeCount ?? 0) > 0">{{ item.badgeCount }}</span>
+    <span
+      class="metallic-bottom-nav__badge"
+      *ngIf="(item.badgeCount ?? 0) > 0"
+      [attr.aria-label]="item.badgeCount + ' pendientes'">
+      {{ item.badgeCount }}
+    </span>
     <span>{{ item.label }}</span>
   </button>
 </nav>

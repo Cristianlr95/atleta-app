@@ -1,6 +1,6 @@
 # Memory Vivo - Atleta Frontend
 
-Fecha de actualizacion: 2026-04-23
+Fecha de actualizacion: 2026-05-06
 Fuente: auditoria directa del repositorio `atleta-app`
 
 ## Vision general del frontend
@@ -11,9 +11,9 @@ Fuente: auditoria directa del repositorio `atleta-app`
 
 ## Avance porcentual
 
-- Avance estimado del proyecto Atleta: 80%.
-- Avance anterior registrado: 79%.
-- Delta de esta tarea: +1 punto porcentual por agregar evidencia backend contra suplantacion de UUID en endpoints sensibles consumidos por el frontend.
+- Avance estimado del proyecto Atleta frontend: 81%.
+- Avance anterior registrado: 80%.
+- Delta de esta tarea: +1 punto porcentual por endurecer UX mobile: ajustes responsive globales/home, bottom nav sin desbordes, estado activo accesible, badge con etiqueta y cobertura unitaria.
 
 ## Proposito del repo
 - Resolver la experiencia web/mobile del jugador para autenticarse, completar su perfil, crear y gestionar partidos, responder invitaciones, consultar ranking y operar integraciones sociales y de notificaciones.
@@ -66,6 +66,12 @@ Fuente: auditoria directa del repositorio `atleta-app`
 - El badge server-side y el registro de push token estan conectados; queda pendiente validar proveedor push remoto real.
 - `MatchStore` ya poda IDs de eventos live procesados para evitar crecimiento indefinido.
 - `api-contracts.smoke.spec.ts` protege rutas FE criticas contra desalineacion con backend; el backend ya tiene smoke MVC y cobertura JWT para ratings.
+- La navegacion inferior compartida quedo reforzada para mobile: ancho estable, textos con ellipsis, foco tactil consistente, `aria-current` en item activo y badge accesible para pendientes.
+
+## Evidencia actual
+
+- `npm run build` exitoso; mantiene warnings no bloqueantes existentes de glob Stencil y budget menor en `metallic-position-field-picker`.
+- `npm test -- --watch=false --browsers=ChromeHeadless` exitoso con 80 tests OK.
 
 ## Riesgos
 - Riesgo funcional: las tabs de `social` dependen de multiples endpoints; hay que validar estados vacios, errores parciales y consistencia real tras aceptar/rechazar invitaciones.
@@ -77,9 +83,8 @@ Fuente: auditoria directa del repositorio `atleta-app`
 
 ## Proximos pasos recomendados
 1. Validar `social` en dispositivo/mobile web contra backend real, especialmente estados vacios y acciones aceptar/rechazar.
-2. Validar `/matches/history` como entrada compatible al historial unificado del hub.
-3. Validar envio push remoto con proveedor real y comportamiento en dispositivo fisico.
-4. Agregar smoke E2E opcional con frontend y backend levantados cuando existan datos/credenciales estables.
-5. Corregir encoding de strings.
-6. Implementar reset de password por email/token cuando exista contrato backend.
-7. Separar mejor responsabilidades de `MatchService` y `MatchStore`.
+2. Validar envio push remoto con proveedor real y comportamiento en dispositivo fisico.
+3. Agregar smoke E2E opcional con frontend y backend levantados cuando existan datos/credenciales estables.
+4. Corregir encoding de strings.
+5. Implementar reset de password por email/token cuando exista contrato backend.
+6. Separar mejor responsabilidades de `MatchService` y `MatchStore`.
