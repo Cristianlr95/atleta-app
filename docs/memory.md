@@ -11,9 +11,9 @@ Fuente: auditoria directa del repositorio `atleta-app`
 
 ## Avance porcentual
 
-- Avance estimado del proyecto Atleta: 79%.
-- Avance anterior registrado: 78%.
-- Delta de esta tarea: +1 punto porcentual por asegurar ratings con JWT en backend y dejar cobertura automatizada.
+- Avance estimado del proyecto Atleta: 80%.
+- Avance anterior registrado: 79%.
+- Delta de esta tarea: +1 punto porcentual por agregar evidencia backend contra suplantacion de UUID en endpoints sensibles consumidos por el frontend.
 
 ## Proposito del repo
 - Resolver la experiencia web/mobile del jugador para autenticarse, completar su perfil, crear y gestionar partidos, responder invitaciones, consultar ranking y operar integraciones sociales y de notificaciones.
@@ -28,6 +28,7 @@ Fuente: auditoria directa del repositorio `atleta-app`
 - Existen modos demo o fallbacks visuales en `player-onboarding` y `player-profile`.
 - Hay cobertura E2E Playwright para login, crear partido, flujo de invitaciones, actualizacion live y MVP.
 - Hay smoke unitario de contratos HTTP para servicios FE de auth, matches/MVP, teams y ratings.
+- El smoke MVC backend protege que equipos/partidos/eventos/MVP usen el subject JWT como identidad efectiva ante UUIDs manipulados desde cliente.
 
 ## Decisiones tecnicas detectadas
 - Angular standalone routing con `loadComponent`.
@@ -69,6 +70,7 @@ Fuente: auditoria directa del repositorio `atleta-app`
 ## Riesgos
 - Riesgo funcional: las tabs de `social` dependen de multiples endpoints; hay que validar estados vacios, errores parciales y consistencia real tras aceptar/rechazar invitaciones.
 - Riesgo de seguridad: tokens en `localStorage` quedan expuestos a XSS.
+- Riesgo de autorizacion reducido en flujos principales de equipos/partidos/MVP: el backend ya tiene regresion para no confiar en UUIDs de cliente.
 - Riesgo operativo: configuracion de entorno muy fija para prod/dev, sin inyeccion runtime.
 - Riesgo de consistencia: mezcla de estado local, optimista y backend puede producir diferencias temporales si falla una sincronizacion.
 - Riesgo UX: hay pantallas maduras y otras claramente parciales.

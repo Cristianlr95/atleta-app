@@ -12,11 +12,11 @@ Fecha: 2026-03-02
 | CORE-02 | Confirmaciones e invitaciones live robustas | Social/Matches | P1 | existente | `InvitationsStore`, `MatchStore`, `SocialService`, SSE `/matches/{id}/live` | Estado sincronizado en cliente tras aceptar/rechazar y refresco live |
 | CORE-03 | MVP competitivo y ventana operativa | MVP | P1 | existente | `MatchMvpService`, `match-mvp-vote.page.ts`, `mvp-vote.store.ts` | Votacion disponible solo en ventana valida y cierre al expirar |
 | CORE-04 | Registro real de push tokens | Notifications | P1 | implementado | `push-token-sync.service.ts`, `/social/notifications/push-tokens` | Endpoint BE + persistencia + sync FE implementados y cubiertos por tests |
-| IMP-01 | Normalizar seguridad dev/prod | Auth/Seguridad | P2 | parcial | `SecurityConfig.java`; `JwtAuthenticationIntegrationTest` cubre ratings sin JWT y leaderboard con JWT | Reglas de auth equivalentes para pruebas funcionales en dev/staging |
+| IMP-01 | Normalizar seguridad dev/prod | Auth/Seguridad | P2 | parcial | `SecurityConfig.java`; `JwtAuthenticationIntegrationTest` cubre ratings sin JWT y leaderboard con JWT; `ApiContractSmokeTest` cubre JWT subject en equipos/partidos/eventos/MVP | Reglas de auth equivalentes para pruebas funcionales en dev/staging |
 | IMP-02 | Reducir endpoints huerfanos o asignar owner | Arquitectura | P2 | parcial | Controllers BE vs uso FE en `src/app/features/**/services` | Lista de endpoints sin consumo reducida o documentada con plan |
 | IMP-03 | Contratos FE?BE smoke automatizados | Calidad | P2 | parcial | FE: `src/app/core/contracts/api-contracts.smoke.spec.ts`; BE: `ApiContractSmokeTest` valida controllers de auth, matches/MVP, teams y ratings; falta smoke E2E opcional con servicios levantados | Suite valida auth, matches, teams, ratings y mvp contra backend |
 
 ## Prioridad operativa P1
 1. Validar envio push remoto con proveedor/dispositivo real.
 2. Avanzar con smoke contracts (`IMP-03`) para prevenir regresiones FE?BE.
-3. Normalizar seguridad entre entornos (`IMP-01`).
+3. Completar autorizacion de dominio restante en social/perfil (`IMP-01`).
