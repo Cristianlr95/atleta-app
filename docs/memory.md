@@ -11,9 +11,9 @@ Fuente: auditoria directa del repositorio `atleta-app`
 
 ## Avance porcentual
 
-- Avance estimado del proyecto Atleta frontend: 81%.
-- Avance anterior registrado: 80%.
-- Delta de esta tarea: +1 punto porcentual por endurecer UX mobile: ajustes responsive globales/home, bottom nav sin desbordes, estado activo accesible, badge con etiqueta y cobertura unitaria.
+- Avance estimado del proyecto Atleta frontend: 82%.
+- Avance anterior registrado: 81%.
+- Delta de esta tarea: +1 punto porcentual por normalizar archivos de texto a UTF-8 valido y corregir mojibake visible en hub de partidos, helper E2E y backlog.
 
 ## Proposito del repo
 - Resolver la experiencia web/mobile del jugador para autenticarse, completar su perfil, crear y gestionar partidos, responder invitaciones, consultar ranking y operar integraciones sociales y de notificaciones.
@@ -53,7 +53,7 @@ Fuente: auditoria directa del repositorio `atleta-app`
 - `/matches/history` se conserva como ruta compatible, pero abre la pestana `history` de `matches-hub` como fuente unica.
 - `social` mantiene bastante codigo utilizable y vuelve a estar conectado al routing real.
 - `NotificationBadgeService.refresh()` consulta el contador server-side y usa invitaciones pendientes como fallback sin duplicar conteos.
-- Hay varios strings con problemas de encoding/mojibake (por ejemplo textos rotos en labels y mensajes), senal de mezcla de codificacion en algunos archivos.
+- Los archivos de texto auditados quedaron en UTF-8 valido y sin candidatos tipicos de mojibake o controles de bullet.
 - `capacitor.config.ts` sigue con `appId: 'io.ionic.starter'`.
 
 ## Deuda tecnica
@@ -85,6 +85,5 @@ Fuente: auditoria directa del repositorio `atleta-app`
 1. Validar `social` en dispositivo/mobile web contra backend real, especialmente estados vacios y acciones aceptar/rechazar.
 2. Validar envio push remoto con proveedor real y comportamiento en dispositivo fisico.
 3. Agregar smoke E2E opcional con frontend y backend levantados cuando existan datos/credenciales estables.
-4. Corregir encoding de strings.
-5. Implementar reset de password por email/token cuando exista contrato backend.
-6. Separar mejor responsabilidades de `MatchService` y `MatchStore`.
+4. Implementar reset de password por email/token cuando exista contrato backend.
+5. Separar mejor responsabilidades de `MatchService` y `MatchStore`.

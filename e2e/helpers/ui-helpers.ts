@@ -9,8 +9,8 @@ export async function loginWithUi(page: Page, credentials: E2EUserCredentials): 
   await page.goto('/login');
 
   await page.locator('input[placeholder="tu@email.com"]').fill(credentials.email);
-  await page.locator('input[placeholder="••••••••"]').fill(credentials.password);
-  await page.getByRole('button', { name: 'Iniciar sesión' }).click();
+  await page.locator('input[placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢"]').fill(credentials.password);
+  await page.getByRole('button', { name: 'Iniciar sesiÃ³n' }).click();
 
   await expect(page).not.toHaveURL(/\/login$/);
 }

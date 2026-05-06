@@ -229,7 +229,7 @@ export class MatchesHubPage implements OnDestroy {
   private loadData(): void {
     const session = this.authSessionService.currentSession;
     if (!session) {
-      this.errorMessage = 'Inicia sesión para ver tus partidos.';
+      this.errorMessage = 'Inicia sesiÃ³n para ver tus partidos.';
       this.upcomingMatches = [];
       this.matchHistoryItems = [];
       return;
@@ -457,7 +457,7 @@ export class MatchesHubPage implements OnDestroy {
     }
 
     if (teams.length === 1) {
-      return `${teams[0]} · ${this.modalityLabel(item.modalidad)}`;
+      return `${teams[0]} Â· ${this.modalityLabel(item.modalidad)}`;
     }
 
     return `Partido ${this.modalityLabel(item.modalidad)}`;
