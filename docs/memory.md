@@ -28,7 +28,8 @@ Fuente: auditoria directa del repositorio `atleta-app`
 - Existen modos demo o fallbacks visuales en `player-onboarding` y `player-profile`.
 - Hay cobertura E2E Playwright para login, crear partido, flujo de invitaciones, actualizacion live y MVP.
 - Hay smoke unitario de contratos HTTP para servicios FE de auth, player profile/trust score, matches/MVP, teams y ratings.
-- El smoke MVC backend protege que equipos/partidos/eventos/MVP usen el subject JWT como identidad efectiva ante UUIDs manipulados desde cliente.
+- El smoke MVC backend protege que perfiles/trust score/equipos/partidos/eventos/MVP usen el subject JWT como identidad efectiva ante UUIDs manipulados desde cliente.
+- La politica backend vigente define las lecturas globales consumidas por la app (catalogos, canchas, proximos partidos, busquedas, trust score range y leaderboard) como privadas bajo JWT.
 
 ## Decisiones tecnicas detectadas
 - Angular standalone routing con `loadComponent`.
@@ -72,7 +73,7 @@ Fuente: auditoria directa del repositorio `atleta-app`
 - Runtime config existe para backend y Google client id; queda pendiente revisar estrategia completa de secretos/sesion.
 - El badge server-side y el registro de push token estan conectados; queda pendiente validar proveedor push remoto real.
 - `MatchStore` ya poda IDs de eventos live procesados para evitar crecimiento indefinido.
-- `api-contracts.smoke.spec.ts` protege rutas FE criticas contra desalineacion con backend, incluyendo `PUT /player-profiles/trust-score` sin `playerUuid` en body; el backend ya tiene smoke MVC y cobertura JWT para ratings.
+- `api-contracts.smoke.spec.ts` protege rutas FE criticas contra desalineacion con backend, incluyendo `PUT /player-profiles/trust-score` sin `playerUuid` en body; el backend ya tiene smoke MVC para profile/trust score y cobertura JWT para ratings/lecturas globales.
 - La navegacion inferior compartida quedo reforzada para mobile: ancho estable, textos con ellipsis, foco tactil consistente, `aria-current` en item activo y badge accesible para pendientes.
 
 ## Evidencia actual
