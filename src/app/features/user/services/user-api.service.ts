@@ -8,7 +8,12 @@ import {
   PlayerAssignedPosition,
   PlayerPosition,
 } from '../models/position.models';
-import { AthleteProfile, PlayerProfile } from '../models/user.models';
+import {
+  AthleteProfile,
+  PlayerProfile,
+  TrustLogEntry,
+  UpdateTrustScoreRequest,
+} from '../models/user.models';
 
 @Injectable({ providedIn: 'root' })
 export class UserApiService extends ApiService {
@@ -31,6 +36,19 @@ export class UserApiService extends ApiService {
     return this.post<PlayerProfile, CreatePlayerProfileRequest>(
       API_ENDPOINTS.users.playerProfiles,
       payload,
+    );
+  }
+
+  updateTrustScore(payload: UpdateTrustScoreRequest) {
+    return this.put<PlayerProfile, UpdateTrustScoreRequest>(
+      API_ENDPOINTS.users.playerProfileTrustScore,
+      payload,
+    );
+  }
+
+  getTrustHistory(atletaUuid: string) {
+    return this.get<TrustLogEntry[]>(
+      `${API_ENDPOINTS.users.playerProfiles}/${atletaUuid}/trust-history`,
     );
   }
 

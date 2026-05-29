@@ -11,9 +11,9 @@ Fuente: auditoria directa del repositorio `atleta-app`
 
 ## Avance porcentual
 
-- Avance estimado del proyecto Atleta frontend: 90%.
-- Avance anterior registrado: 89%.
-- Delta de esta tarea: +1 punto porcentual por robustecer busquedas sociales ante errores: candidatos previos de amigos/equipos se limpian si falla el endpoint, evitando resultados stale, con specs del facade.
+- Avance estimado del proyecto Atleta frontend: 91%.
+- Avance anterior registrado: 90%.
+- Delta de esta tarea: +1 punto porcentual por alinear contratos FE-BE de perfil/trust score con el backend: servicio frontend, smoke contract y request sin `playerUuid` manipulable.
 
 ## Proposito del repo
 - Resolver la experiencia web/mobile del jugador para autenticarse, completar su perfil, crear y gestionar partidos, responder invitaciones, consultar ranking y operar integraciones sociales y de notificaciones.
@@ -27,7 +27,7 @@ Fuente: auditoria directa del repositorio `atleta-app`
 - Google auth en frontend queda conectado, condicionado a `ATLETA_GOOGLE_CLIENT_ID`.
 - Existen modos demo o fallbacks visuales en `player-onboarding` y `player-profile`.
 - Hay cobertura E2E Playwright para login, crear partido, flujo de invitaciones, actualizacion live y MVP.
-- Hay smoke unitario de contratos HTTP para servicios FE de auth, matches/MVP, teams y ratings.
+- Hay smoke unitario de contratos HTTP para servicios FE de auth, player profile/trust score, matches/MVP, teams y ratings.
 - El smoke MVC backend protege que equipos/partidos/eventos/MVP usen el subject JWT como identidad efectiva ante UUIDs manipulados desde cliente.
 
 ## Decisiones tecnicas detectadas
@@ -72,13 +72,13 @@ Fuente: auditoria directa del repositorio `atleta-app`
 - Runtime config existe para backend y Google client id; queda pendiente revisar estrategia completa de secretos/sesion.
 - El badge server-side y el registro de push token estan conectados; queda pendiente validar proveedor push remoto real.
 - `MatchStore` ya poda IDs de eventos live procesados para evitar crecimiento indefinido.
-- `api-contracts.smoke.spec.ts` protege rutas FE criticas contra desalineacion con backend; el backend ya tiene smoke MVC y cobertura JWT para ratings.
+- `api-contracts.smoke.spec.ts` protege rutas FE criticas contra desalineacion con backend, incluyendo `PUT /player-profiles/trust-score` sin `playerUuid` en body; el backend ya tiene smoke MVC y cobertura JWT para ratings.
 - La navegacion inferior compartida quedo reforzada para mobile: ancho estable, textos con ellipsis, foco tactil consistente, `aria-current` en item activo y badge accesible para pendientes.
 
 ## Evidencia actual
 
 - `npm run build` exitoso; mantiene warnings no bloqueantes existentes de glob Stencil y budget menor en `metallic-position-field-picker`.
-- `npm test -- --watch=false --browsers=ChromeHeadless` exitoso con 92 tests OK.
+- `npm test -- --watch=false --browsers=ChromeHeadless --include src/app/core/contracts/api-contracts.smoke.spec.ts` exitoso con 5 tests OK.
 
 ## Riesgos
 - Riesgo funcional: las tabs de `social` dependen de multiples endpoints; hay que validar estados vacios, errores parciales y consistencia real tras aceptar/rechazar invitaciones.

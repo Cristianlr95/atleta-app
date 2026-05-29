@@ -9,6 +9,7 @@ import { AuthApiService } from '../../features/auth/services/auth-api.service';
 import { MatchesApiService } from '../../features/matches/services/matches-api.service';
 import { RatingsApiService } from '../../features/ratings/services/ratings-api.service';
 import { TeamApiService } from '../../features/teams/services/team-api.service';
+import { UserApiService } from '../../features/user/services/user-api.service';
 import { CreateMatchRequest } from '../../features/matches/models/match.models';
 import { UpdateRatingsRequest } from '../../features/ratings/models/rating.models';
 
@@ -89,6 +90,36 @@ describe('API contracts smoke', () => {
     const deleteRequest = expectRequest('DELETE', '/teams/77');
     expect(deleteRequest.request.params.get('actorUuid')).toBe(creatorUuid);
     deleteRequest.flush({});
+  });
+
+  it('keeps player profile endpoints aligned with backend routes', () => {
+    const service = TestBed.inject(UserApiService);
+    const atletaUuid = '11111111-1111-1111-1111-111111111111';
+
+    service.getPlayerProfile(atletaUuid).subscribe();
+    expectRequest('GET', `/player-profiles/${atletaUuid}`).flush({});
+
+    service.createPlayerProfile({ atletaUuid, alias: 'Demo10' }).subscribe();
+    expectRequest('POST', '/player-profiles').flush({});
+
+    service.getPlayerPositions(atletaUuid).subscribe();
+    expectRequest('GET', `/player-profiles/${atletaUuid}/positions`).flush([]);
+
+    service.updateTrustScore({
+      cambio: 10,
+      motivo: 'Good behavior',
+      matchId: 42,
+    }).subscribe();
+    const trustScoreRequest = expectRequest('PUT', '/player-profiles/trust-score');
+    expect(trustScoreRequest.request.body).toEqual({
+      cambio: 10,
+      motivo: 'Good behavior',
+      matchId: 42,
+    });
+    trustScoreRequest.flush({});
+
+    service.getTrustHistory(atletaUuid).subscribe();
+    expectRequest('GET', `/player-profiles/${atletaUuid}/trust-history`).flush([]);
   });
 
   it('keeps match and MVP endpoints aligned with backend routes', () => {

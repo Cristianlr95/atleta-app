@@ -112,8 +112,9 @@ Atleta Frontend es una aplicacion para jugadores de futbol amateur centrada en i
 - Soporte local notification con Capacitor.
 
 ### Smoke de contratos HTTP FE - `Parcial`
-- Existe cobertura unitaria para rutas de servicios API en auth, matches/MVP, teams y ratings.
+- Existe cobertura unitaria para rutas de servicios API en auth, player profile/trust score, matches/MVP, teams y ratings.
 - Valida metodo HTTP, URL base `/api/v1`, path y query params criticos con `HttpTestingController`.
+- Protege que `PUT /player-profiles/trust-score` se envie sin `playerUuid` en body, delegando identidad al JWT del backend.
 - Pendiente: smoke automatizado contra backend real levantado.
 
 ## Funcionalidades parciales
@@ -191,7 +192,7 @@ Atleta Frontend es una aplicacion para jugadores de futbol amateur centrada en i
 
 ## Integraciones con backend
 - Auth: `/athletes/login`, `/athletes/register`
-- User/Profile: `/player-profiles`, `/player-profiles/{uuid}`, `/player-profiles/{uuid}/positions`, `/positions`
+- User/Profile: `/player-profiles`, `/player-profiles/{uuid}`, `/player-profiles/{uuid}/positions`, `/player-profiles/trust-score`, `/player-profiles/{uuid}/trust-history`, `/positions`
 - Teams: `/teams`, `/teams/by-player/{uuid}`, `/teams/by-creator/{uuid}`, `/teams/{id}/members/active`, `/teams/logo`
 - Matches: `/matches`, `/matches/by-player/{uuid}`, `/matches/by-player-or-creator/{uuid}`, `/matches/{id}`, `/matches/{id}/status`, `/matches/{id}/teams/{teamId}`, `/matches/{id}/teams/assignment`, `/matches/events`, `/matches/{id}/close/preview`, `/matches/{id}/mvp`, `/matches/{id}/mvp/vote`
 - Social: `/social/friendships`, `/social/team-invites`, `/social/match-invites`, `/social/notifications`, `/social/players/search`

@@ -21,6 +21,7 @@
     athletes: '/athletes',
     playerProfiles: '/player-profiles',
     playerProfilePositions: '/player-profiles/positions',
+    playerProfileTrustScore: '/player-profiles/trust-score',
     positions: '/positions',
   },
   teams: {
