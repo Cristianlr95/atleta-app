@@ -19,24 +19,24 @@ import { MatchesApiService } from './matches-api.service';
 import { InvitationService } from './invitation.service';
 import { NotificationService } from './notification.service';
 import { InvitationsStore } from '../stores/invitations.store';
-
-interface TeamAssignmentSnapshot {
-  homeIds: string[];
-  awayIds: string[];
-  updatedAt: string;
-}
+import {
+  MatchTeamAssignmentPersistenceService,
+  TeamAssignmentSnapshot,
+} from './match-team-assignment-persistence.service';
 
 @Injectable({ providedIn: 'root' })
 export class MatchService {
-  private static readonly TEAM_ASSIGNMENTS_KEY = 'atleta.match.team-assignments.v1';
   private readonly authSessionService = inject(AuthSessionService);
   private readonly matchesApiService = inject(MatchesApiService);
   private readonly invitationService = inject(InvitationService);
   private readonly invitationsStore = inject(InvitationsStore);
   private readonly notificationService = inject(NotificationService);
+  private readonly teamAssignmentPersistenceService = inject(MatchTeamAssignmentPersistenceService);
   private readonly matchesStore = signal<Match[]>([]);
   private readonly isSubmittingStore = signal(false);
-  private readonly teamAssignmentsStore = signal<Record<string, TeamAssignmentSnapshot>>(this.loadTeamAssignments());
+  private readonly teamAssignmentsStore = signal<Record<string, TeamAssignmentSnapshot>>(
+    this.teamAssignmentPersistenceService.loadAll(),
+  );
   private readonly pendingStatusRecalc = new Set<string>();
   private statusRecalcTimer?: ReturnType<typeof setTimeout>;
 
@@ -57,11 +57,7 @@ export class MatchService {
 
     effect(() => {
       const assignments = this.teamAssignmentsStore();
-      try {
-        localStorage.setItem(MatchService.TEAM_ASSIGNMENTS_KEY, JSON.stringify(assignments));
-      } catch {
-        // no-op
-      }
+      this.teamAssignmentPersistenceService.saveAll(assignments);
     });
   }
 
@@ -706,46 +702,19 @@ export class MatchService {
   }
 
   private persistTeamAssignment(match: Match, homePlayers: Player[], awayPlayers: Player[]): void {
-    const key = this.getAssignmentKey(match);
+    const key = this.teamAssignmentPersistenceService.keyForMatch(match);
     if (!key) {
       return;
     }
 
     this.teamAssignmentsStore.update((state) => ({
       ...state,
-      [key]: {
-        homeIds: homePlayers.map((player) => player.uuid),
-        awayIds: awayPlayers.map((player) => player.uuid),
-        updatedAt: new Date().toISOString(),
-      },
+      [key]: this.teamAssignmentPersistenceService.createSnapshot(homePlayers, awayPlayers),
     }));
   }
 
   private getTeamAssignmentByBackendId(backendMatchId: number): TeamAssignmentSnapshot | null {
-    return this.teamAssignmentsStore()[`backend-${backendMatchId}`] ?? null;
-  }
-
-  private getAssignmentKey(match: Match): string | null {
-    if (match.backendMatchId) {
-      return `backend-${match.backendMatchId}`;
-    }
-    if (match.id) {
-      return `local-${match.id}`;
-    }
-    return null;
-  }
-
-  private loadTeamAssignments(): Record<string, TeamAssignmentSnapshot> {
-    try {
-      const raw = localStorage.getItem(MatchService.TEAM_ASSIGNMENTS_KEY);
-      if (!raw) {
-        return {};
-      }
-      const parsed = JSON.parse(raw) as Record<string, TeamAssignmentSnapshot>;
-      return parsed && typeof parsed === 'object' ? parsed : {};
-    } catch {
-      return {};
-    }
+    return this.teamAssignmentsStore()[this.teamAssignmentPersistenceService.keyForBackendMatch(backendMatchId)] ?? null;
   }
 
   private async withTimeout<T>(promise: Promise<T>, timeoutMs: number, fallback: T): Promise<T> {

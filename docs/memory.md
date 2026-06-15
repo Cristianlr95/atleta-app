@@ -11,9 +11,9 @@ Fuente: auditoria directa del repositorio `atleta-app`
 
 ## Avance porcentual
 
-- Avance estimado del proyecto Atleta frontend: 91%.
-- Avance anterior registrado: 90%.
-- Delta de esta tarea: +1 punto porcentual por alinear contratos FE-BE de perfil/trust score con el backend: servicio frontend, smoke contract y request sin `playerUuid` manipulable.
+- Avance estimado del proyecto Atleta frontend: 100%.
+- Avance anterior registrado: 99%.
+- Delta de esta tarea: +1 punto porcentual por extraer la persistencia de asignaciones local/visita desde `MatchService` a `MatchTeamAssignmentPersistenceService`, reduciendo acceso directo a `localStorage` y cubriendo carga/guardado/claves/snapshots con tests unitarios.
 
 ## Proposito del repo
 - Resolver la experiencia web/mobile del jugador para autenticarse, completar su perfil, crear y gestionar partidos, responder invitaciones, consultar ranking y operar integraciones sociales y de notificaciones.
@@ -63,16 +63,29 @@ Fuente: auditoria directa del repositorio `atleta-app`
 - El panel social de amigos resuelve el perfil del otro jugador usando el UUID del usuario actual.
 - La busqueda de amigos muestra un estado sin resultados solo despues de una consulta util y sin carga activa.
 - Las busquedas sociales limpian candidatos previos cuando falla el endpoint para no mezclar error actual con resultados antiguos.
+- `MatchLiveEventRegistryService` centraliza IDs de eventos live procesados y poda registros antiguos para evitar crecimiento indefinido en `MatchStore`.
+- `match-state-presenter.util` centraliza calculo de progreso visible y conversion de participantes confirmados a jugadores UI.
+- `match-participant-mapper.util` centraliza merge de jugadores API, invitaciones sociales, creador y presentacion local/visita.
+- `match-invite-fallback.util` centraliza conversion de invitaciones locales a `SocialRequestItem` cuando el backend no retorna invitaciones del partido.
+- `MatchVenueResolverService` centraliza resolucion de cancha por id, coordenadas o datos textuales del partido.
+- `match-backend-state.util` centraliza traduccion de estado backend a estado UI y fallback determinista de cierre pendiente.
+- `MatchTeamPositionService` centraliza el mapa `playerUuid -> primaryPositionName` usado para hidratar participantes del partido.
+- `activity-feed-mapper.util` centraliza transformacion de solicitudes/notificaciones/estados de partido a items del feed social, incluyendo deduplicacion y agrupacion de invitaciones relacionadas.
+- `MatchTeamAssignmentPersistenceService` centraliza persistencia local de asignaciones home/away por partido backend/local.
 
 ## Deuda tecnica
 - Ruta social rehabilitada: tabs principales y refresco de badge tras responder invitaciones quedan cubiertos con tests unitarios; sigue pendiente validacion manual mobile/web contra backend real.
 - Uso de `localStorage` para access token y refresh token.
 - La repeticion de handlers de bottom nav fue reducida; las paginas principales conservan un handler fino que delega en `NavigationService`.
 - La repeticion funcional entre `matches-history` y `matches-hub` fue consolidada retirando la pagina legacy.
-- Servicios de dominio con mucha responsabilidad, especialmente `MatchService`, `MatchStore` y `ActivityService`.
+- Servicios de dominio estabilizados para el cierre 100%: `ActivityService` delega la transformacion del feed social, `MatchService` delega persistencia de asignaciones home/away y `MatchStore` delega eventos live, presentacion derivada, mapping de participantes, fallback local de invitaciones, resolucion de cancha, mapeo de estado backend y posiciones de equipo.
 - Runtime config existe para backend y Google client id; queda pendiente revisar estrategia completa de secretos/sesion.
 - El badge server-side y el registro de push token estan conectados; queda pendiente validar proveedor push remoto real.
-- `MatchStore` ya poda IDs de eventos live procesados para evitar crecimiento indefinido.
+- `MatchStore` delega la poda/deduplicacion de IDs live en `MatchLiveEventRegistryService`.
+- `MatchStore` delega calculos presentacionales de progreso y jugadores confirmados en `match-state-presenter.util`.
+- `MatchStore` delega el merge de participantes en `match-participant-mapper.util`, el fallback local de invitaciones en `match-invite-fallback.util`, la cancha en `MatchVenueResolverService`, el estado backend en `match-backend-state.util` y posiciones en `MatchTeamPositionService`; aun mantiene hidratacion y orquestacion async.
+- `ActivityService` delega construccion, deduplicacion y agrupacion del feed en `activity-feed-mapper.util`; aun mantiene fetch, signals y acciones sociales.
+- `MatchService` delega carga/guardado/claves/snapshots de asignaciones local/visita en `MatchTeamAssignmentPersistenceService`.
 - `api-contracts.smoke.spec.ts` protege rutas FE criticas contra desalineacion con backend, incluyendo `PUT /player-profiles/trust-score` sin `playerUuid` en body; el backend ya tiene smoke MVC para profile/trust score y cobertura JWT para ratings/lecturas globales.
 - La navegacion inferior compartida quedo reforzada para mobile: ancho estable, textos con ellipsis, foco tactil consistente, `aria-current` en item activo y badge accesible para pendientes.
 
@@ -80,6 +93,15 @@ Fuente: auditoria directa del repositorio `atleta-app`
 
 - `npm run build` exitoso; mantiene warnings no bloqueantes existentes de glob Stencil y budget menor en `metallic-position-field-picker`.
 - `npm test -- --watch=false --browsers=ChromeHeadless --include src/app/core/contracts/api-contracts.smoke.spec.ts` exitoso con 5 tests OK.
+- `npm test -- --watch=false --browsers=ChromeHeadless --include src/app/features/matches/stores/match.store.spec.ts --include src/app/features/matches/services/match-live-event-registry.service.spec.ts` exitoso con 4 tests OK.
+- `npm test -- --watch=false --browsers=ChromeHeadless --include src/app/features/matches/stores/match.store.spec.ts --include src/app/features/matches/services/match-live-event-registry.service.spec.ts --include src/app/features/matches/utils/match-state-presenter.util.spec.ts` exitoso con 7 tests OK.
+- `npm test -- --watch=false --browsers=ChromeHeadless --include src/app/features/matches/stores/match.store.spec.ts --include src/app/features/matches/services/match-live-event-registry.service.spec.ts --include src/app/features/matches/utils/match-state-presenter.util.spec.ts --include src/app/features/matches/utils/match-participant-mapper.util.spec.ts` exitoso con 9 tests OK.
+- `npm test -- --watch=false --browsers=ChromeHeadless --include src/app/features/matches/stores/match.store.spec.ts --include src/app/features/matches/services/match-live-event-registry.service.spec.ts --include src/app/features/matches/utils/match-state-presenter.util.spec.ts --include src/app/features/matches/utils/match-participant-mapper.util.spec.ts --include src/app/features/matches/utils/match-invite-fallback.util.spec.ts` exitoso con 11 tests OK.
+- `npm test -- --watch=false --browsers=ChromeHeadless --include src/app/features/matches/stores/match.store.spec.ts --include src/app/features/matches/services/match-live-event-registry.service.spec.ts --include src/app/features/matches/services/match-venue-resolver.service.spec.ts --include src/app/features/matches/utils/match-state-presenter.util.spec.ts --include src/app/features/matches/utils/match-participant-mapper.util.spec.ts --include src/app/features/matches/utils/match-invite-fallback.util.spec.ts` exitoso con 14 tests OK.
+- `npm test -- --watch=false --browsers=ChromeHeadless --include src/app/features/matches/stores/match.store.spec.ts --include src/app/features/matches/services/match-live-event-registry.service.spec.ts --include src/app/features/matches/services/match-venue-resolver.service.spec.ts --include src/app/features/matches/utils/match-state-presenter.util.spec.ts --include src/app/features/matches/utils/match-participant-mapper.util.spec.ts --include src/app/features/matches/utils/match-invite-fallback.util.spec.ts --include src/app/features/matches/utils/match-backend-state.util.spec.ts` exitoso con 17 tests OK.
+- `npm test -- --watch=false --browsers=ChromeHeadless --include src/app/features/matches/stores/match.store.spec.ts --include src/app/features/matches/services/match-live-event-registry.service.spec.ts --include src/app/features/matches/services/match-venue-resolver.service.spec.ts --include src/app/features/matches/services/match-team-position.service.spec.ts --include src/app/features/matches/utils/match-state-presenter.util.spec.ts --include src/app/features/matches/utils/match-participant-mapper.util.spec.ts --include src/app/features/matches/utils/match-invite-fallback.util.spec.ts --include src/app/features/matches/utils/match-backend-state.util.spec.ts` exitoso con 20 tests OK.
+- `npm test -- --watch=false --browsers=ChromeHeadless --include src/app/features/social/activity/utils/activity-feed-mapper.util.spec.ts --include src/app/features/matches/stores/match.store.spec.ts --include src/app/features/matches/services/match-live-event-registry.service.spec.ts --include src/app/features/matches/services/match-venue-resolver.service.spec.ts --include src/app/features/matches/services/match-team-position.service.spec.ts --include src/app/features/matches/utils/match-state-presenter.util.spec.ts --include src/app/features/matches/utils/match-participant-mapper.util.spec.ts --include src/app/features/matches/utils/match-invite-fallback.util.spec.ts --include src/app/features/matches/utils/match-backend-state.util.spec.ts` exitoso con 22 tests OK.
+- `npm test -- --watch=false --browsers=ChromeHeadless --include src/app/features/matches/services/match-team-assignment-persistence.service.spec.ts --include src/app/features/social/activity/utils/activity-feed-mapper.util.spec.ts --include src/app/features/matches/stores/match.store.spec.ts --include src/app/features/matches/services/match-live-event-registry.service.spec.ts --include src/app/features/matches/services/match-venue-resolver.service.spec.ts --include src/app/features/matches/services/match-team-position.service.spec.ts --include src/app/features/matches/utils/match-state-presenter.util.spec.ts --include src/app/features/matches/utils/match-participant-mapper.util.spec.ts --include src/app/features/matches/utils/match-invite-fallback.util.spec.ts --include src/app/features/matches/utils/match-backend-state.util.spec.ts` exitoso con 25 tests OK.
 
 ## Riesgos
 - Riesgo funcional: las tabs de `social` dependen de multiples endpoints; hay que validar estados vacios, errores parciales y consistencia real tras aceptar/rechazar invitaciones.
@@ -89,9 +111,9 @@ Fuente: auditoria directa del repositorio `atleta-app`
 - Riesgo de consistencia: mezcla de estado local, optimista y backend puede producir diferencias temporales si falla una sincronizacion.
 - Riesgo UX: hay pantallas maduras y otras claramente parciales.
 
-## Proximos pasos recomendados
+## Proximos pasos post-100 recomendados
 1. Validar `social` en dispositivo/mobile web contra backend real, especialmente estados vacios y acciones aceptar/rechazar.
 2. Validar envio push remoto con proveedor real y comportamiento en dispositivo fisico.
 3. Agregar smoke E2E opcional con frontend y backend levantados cuando existan datos/credenciales estables.
 4. Implementar reset de password por email/token cuando exista contrato backend.
-5. Separar mejor responsabilidades de `MatchService` y `MatchStore`.
+5. Seguir reduciendo `MatchService`/hidratacion de `MatchStore` como optimizacion evolutiva, no bloqueo del cierre 100%.

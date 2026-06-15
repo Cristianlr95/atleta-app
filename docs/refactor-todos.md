@@ -10,4 +10,6 @@
   - `src/app/features/matches/pages/match-detail/match-detail.page.ts`
   - `src/app/features/matches/pages/venue-create/venue-create.page.ts`
 - DONE [social-page-load]: `src/app/features/social/pages/social.page.ts` usa `ionViewWillEnter` con `PageLoadGuard` y cobertura de tabs/rutas.
-- DONE [live-event-pruning]: `MatchStore` limita IDs de eventos live procesados y tiene cobertura unitaria.
+- DONE [live-event-pruning]: `MatchLiveEventRegistryService` limita IDs de eventos live procesados y `MatchStore` lo usa para deduplicar actualizaciones.
+- DONE [activity-feed-mapper]: `activity-feed-mapper.util` centraliza transformacion, deduplicacion y agrupacion del feed social fuera de `ActivityService`.
+- DONE [match-team-assignment-persistence]: `MatchTeamAssignmentPersistenceService` centraliza carga, guardado, claves y snapshots de asignaciones local/visita fuera de `MatchService`.
