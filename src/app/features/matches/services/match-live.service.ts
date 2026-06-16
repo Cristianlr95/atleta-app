@@ -14,6 +14,8 @@ interface MatchLiveState {
 @Injectable({ providedIn: 'root' })
 export class MatchLiveService implements OnDestroy {
   private readonly appConfig = inject(APP_CONFIG);
+  private readonly matchService = inject(MatchService);
+  private readonly matchStore = inject(MatchStore);
   private readonly liveStateStore = signal<Record<string, MatchLiveState>>({});
   private readonly livePulseStore = signal<Record<string, number>>({});
   private readonly timers = new Map<string, number>();
@@ -27,10 +29,7 @@ export class MatchLiveService implements OnDestroy {
   readonly liveState = this.liveStateStore.asReadonly();
   readonly livePulse = this.livePulseStore.asReadonly();
 
-  constructor(
-    private readonly matchService: MatchService,
-    private readonly matchStore: MatchStore,
-  ) {
+  constructor() {
     if (typeof document !== 'undefined') {
       document.addEventListener('visibilitychange', this.visibilityHandler);
     }

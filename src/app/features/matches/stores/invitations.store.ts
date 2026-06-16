@@ -1,4 +1,4 @@
-import { computed, Injectable, signal } from '@angular/core';
+import { computed, Injectable, inject, signal } from '@angular/core';
 import { AuthSessionService } from 'src/app/core/services/auth-session.service';
 import { ErrorMapperService } from 'src/app/core/services/error-mapper.service';
 import { Invitation, PlayerInvitationStatus } from '../models/progressive-match.models';
@@ -6,6 +6,9 @@ import { InvitationService } from '../services/invitation.service';
 
 @Injectable({ providedIn: 'root' })
 export class InvitationsStore {
+  private readonly invitationApi = inject(InvitationService);
+  private readonly errorMapper = inject(ErrorMapperService);
+  private readonly authSessionService = inject(AuthSessionService);
   private readonly invitationStore = signal<Invitation[]>([]);
   private readonly loadingStore = signal(false);
   private readonly errorStore = signal<string | null>(null);
@@ -31,12 +34,6 @@ export class InvitationsStore {
       );
     }),
   );
-
-  constructor(
-    private readonly invitationApi: InvitationService,
-    private readonly errorMapper: ErrorMapperService,
-    private readonly authSessionService: AuthSessionService,
-  ) {}
 
   async loadPendingInvitations(): Promise<boolean> {
     this.loadingStore.set(true);

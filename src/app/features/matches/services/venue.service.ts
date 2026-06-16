@@ -1,4 +1,4 @@
-﻿import { Injectable } from '@angular/core';
+﻿import { Injectable, inject } from '@angular/core';
 import { catchError, firstValueFrom, of, timeout } from 'rxjs';
 import { CreateFieldLocationRequest, FieldLocation } from 'src/app/features/fields/models/field-location.models';
 import { FieldLocationsApiService } from 'src/app/features/fields/services/field-locations-api.service';
@@ -6,13 +6,12 @@ import { Venue } from '../models/progressive-match.models';
 
 @Injectable({ providedIn: 'root' })
 export class VenueService {
+  private readonly fieldLocationsApiService = inject(FieldLocationsApiService);
   private readonly requestTimeoutMs = 4000;
   private readonly cacheTtlMs = 30000;
   private cacheExpiresAt = 0;
   private cachedFields: FieldLocation[] = [];
   private inFlightFields: Promise<FieldLocation[]> | null = null;
-
-  constructor(private readonly fieldLocationsApiService: FieldLocationsApiService) {}
 
   async getActiveVenues(): Promise<Venue[]> {
     const fields = await this.fetchFieldsSafe();

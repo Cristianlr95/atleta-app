@@ -1,4 +1,4 @@
-import { Injectable, computed, signal } from '@angular/core';
+import { Injectable, computed, inject, signal } from '@angular/core';
 import { firstValueFrom, forkJoin, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { MatchService } from 'src/app/features/matches/services/match.service';
@@ -19,6 +19,9 @@ import { buildActivityItems, dedupeActivityById, groupSimilarActivityEvents } fr
 
 @Injectable({ providedIn: 'root' })
 export class ActivityService {
+  private readonly socialApiService = inject(SocialApiService);
+  private readonly teamApiService = inject(TeamApiService);
+  private readonly matchService = inject(MatchService);
   private readonly playerUuid = signal<string | null>(null);
   private readonly loadingStore = signal(false);
   private readonly errorStore = signal<string | null>(null);
@@ -38,12 +41,6 @@ export class ActivityService {
   readonly notifications = this.notificationsStore.asReadonly();
   readonly teams = this.teamsStore.asReadonly();
   readonly unreadCount = computed(() => this.activityStore().filter((item) => !item.isRead).length);
-
-  constructor(
-    private readonly socialApiService: SocialApiService,
-    private readonly teamApiService: TeamApiService,
-    private readonly matchService: MatchService,
-  ) {}
 
   async fetchActivity(playerUuid: string): Promise<void> {
     this.playerUuid.set(playerUuid);

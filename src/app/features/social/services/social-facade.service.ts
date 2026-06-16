@@ -1,4 +1,4 @@
-import { Injectable, computed, signal } from '@angular/core';
+import { Injectable, computed, inject, signal } from '@angular/core';
 import { AuthSessionService } from 'src/app/core/services/auth-session.service';
 import { ErrorMapperService } from 'src/app/core/services/error-mapper.service';
 import { PlayerInvitationStatus } from 'src/app/features/matches/models/progressive-match.models';
@@ -10,6 +10,10 @@ export type SocialTabId = 'activity' | 'friends' | 'teams' | 'matches';
 
 @Injectable({ providedIn: 'root' })
 export class SocialFacadeService {
+  private readonly activityService = inject(ActivityService);
+  private readonly authSessionService = inject(AuthSessionService);
+  private readonly matchStore = inject(MatchStore);
+  private readonly errorMapper = inject(ErrorMapperService);
   private readonly activeTabStore = signal<SocialTabId>('activity');
   private readonly friendCandidatesStore = signal<SocialPlayerLookupItem[]>([]);
   private readonly inviteCandidatesStore = signal<SocialPlayerLookupItem[]>([]);
@@ -66,13 +70,6 @@ export class SocialFacadeService {
   get playerUuid(): string | null {
     return this.authSessionService.currentSession?.user.atletaUuid ?? null;
   }
-
-  constructor(
-    private readonly activityService: ActivityService,
-    private readonly authSessionService: AuthSessionService,
-    private readonly matchStore: MatchStore,
-    private readonly errorMapper: ErrorMapperService,
-  ) {}
 
   async initialize(): Promise<void> {
     this.clearMessages();

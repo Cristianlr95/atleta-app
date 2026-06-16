@@ -1,5 +1,5 @@
 ﻿import { CommonModule } from '@angular/common';
-import { Component, Input } from '@angular/core';
+import { Component, Input, inject } from '@angular/core';
 import { AlertController } from '@ionic/angular';
 import { IonIcon } from '@ionic/angular/standalone';
 
@@ -27,6 +27,8 @@ interface RolePoint {
   styleUrls: ['./metallic-role-hexagon.component.scss'],
 })
 export class MetallicRoleHexagonComponent {
+  private readonly alertController = inject(AlertController);
+
   private static readonly ORDER: HexagonRole[] = [
     'ATAQUE',
     'MEDIOCAMPO',
@@ -54,8 +56,6 @@ export class MetallicRoleHexagonComponent {
   }
 
   private internalStats: HexagonRoleStat[] = [];
-
-  constructor(private readonly alertController: AlertController) {}
 
   get size(): number {
     return this.compact ? 212 : 280;

@@ -6,7 +6,7 @@ import {
   Token,
 } from '@capacitor/push-notifications';
 import { LocalNotifications } from '@capacitor/local-notifications';
-import { Injectable, signal } from '@angular/core';
+import { Injectable, inject, signal } from '@angular/core';
 import { InAppNotification } from '../models/progressive-match.models';
 import { PushTokenSyncService } from './push-token-sync.service';
 
@@ -147,13 +147,14 @@ class CapacitorPushNotificationAdapter implements NotificationAdapter {
 
 @Injectable({ providedIn: 'root' })
 export class NotificationService {
+  private readonly pushTokenSyncService = inject(PushTokenSyncService);
   private readonly inAppQueue = signal<InAppNotification[]>([]);
 
   private readonly adapters: NotificationAdapter[];
 
   readonly notifications = this.inAppQueue.asReadonly();
 
-  constructor(private readonly pushTokenSyncService: PushTokenSyncService) {
+  constructor() {
     this.adapters = [
       new CapacitorPushNotificationAdapter(
         async (token) => this.pushTokenSyncService.registerToken(token),

@@ -1,4 +1,5 @@
 import { signal } from '@angular/core';
+import { TestBed } from '@angular/core/testing';
 import { AuthSessionService } from 'src/app/core/services/auth-session.service';
 import { ErrorMapperService } from 'src/app/core/services/error-mapper.service';
 import { MatchStore } from 'src/app/features/matches/stores/match.store';
@@ -11,23 +12,36 @@ describe('SocialFacadeService', () => {
 
   beforeEach(() => {
     activityService = buildActivityServiceMock();
-    facade = new SocialFacadeService(
-      activityService,
-      {
+    TestBed.configureTestingModule({
+      providers: [
+        SocialFacadeService,
+        { provide: ActivityService, useValue: activityService },
+        {
+          provide: AuthSessionService,
+          useValue: {
         currentSession: {
           user: {
             atletaUuid: 'me',
           },
         },
-      } as AuthSessionService,
-      {
-        optimisticPatchByBackendMatchId: jasmine.createSpy('optimisticPatchByBackendMatchId'),
-        refreshByBackendMatchId: jasmine.createSpy('refreshByBackendMatchId').and.resolveTo(),
-      } as unknown as MatchStore,
-      {
-        toUserMessage: jasmine.createSpy('toUserMessage').and.returnValue('No se pudo completar la accion.'),
-      } as unknown as ErrorMapperService,
-    );
+          } as AuthSessionService,
+        },
+        {
+          provide: MatchStore,
+          useValue: {
+            optimisticPatchByBackendMatchId: jasmine.createSpy('optimisticPatchByBackendMatchId'),
+            refreshByBackendMatchId: jasmine.createSpy('refreshByBackendMatchId').and.resolveTo(),
+          } as unknown as MatchStore,
+        },
+        {
+          provide: ErrorMapperService,
+          useValue: {
+            toUserMessage: jasmine.createSpy('toUserMessage').and.returnValue('No se pudo completar la accion.'),
+          } as unknown as ErrorMapperService,
+        },
+      ],
+    });
+    facade = TestBed.inject(SocialFacadeService);
   });
 
   it('clears stale friend candidates when search fails', async () => {
