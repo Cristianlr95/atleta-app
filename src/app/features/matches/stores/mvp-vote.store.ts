@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { catchError, firstValueFrom, timeout } from 'rxjs';
 import { ResourceStore } from 'src/app/core/store/resource-store';
 import { MatchMvpResponse, MatchMvpState } from '../models/match-mvp.models';
@@ -7,15 +7,10 @@ import { MatchesApiService } from '../services/matches-api.service';
 
 @Injectable({ providedIn: 'root' })
 export class MvpVoteStore extends ResourceStore<MatchMvpState> {
+  private readonly matchService = inject(MatchService);
+  private readonly matchesApiService = inject(MatchesApiService);
   private readonly ttlMs = 5000;
   private readonly requestTimeoutMs = 5000;
-
-  constructor(
-    private readonly matchService: MatchService,
-    private readonly matchesApiService: MatchesApiService,
-  ) {
-    super();
-  }
 
   load(routeMatchId: string): Promise<MatchMvpState | null> {
     return this.loadWithPolicy(routeMatchId, () => this.fetchState(routeMatchId), { ttlMs: this.ttlMs });

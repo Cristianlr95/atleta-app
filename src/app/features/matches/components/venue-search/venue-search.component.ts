@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges, inject } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { IonicModule } from '@ionic/angular';
@@ -18,6 +18,11 @@ import { VenueService } from '../../services/venue.service';
   styleUrls: ['./venue-search.component.scss'],
 })
 export class VenueSearchComponent implements OnInit, OnChanges {
+  private readonly venueService = inject(VenueService);
+  private readonly formBuilder = inject(FormBuilder);
+  private readonly navigationService = inject(NavigationService);
+  private readonly route = inject(ActivatedRoute);
+
   @Input() selectedVenue: Venue | null = null;
   @Output() venueSelected = new EventEmitter<Venue>();
 
@@ -33,12 +38,7 @@ export class VenueSearchComponent implements OnInit, OnChanges {
 
   private readonly queryChange$ = new Subject<string>();
 
-  constructor(
-    private readonly venueService: VenueService,
-    private readonly formBuilder: FormBuilder,
-    private readonly navigationService: NavigationService,
-    private readonly route: ActivatedRoute,
-  ) {
+  constructor() {
     this.queryChange$
       .pipe(
         debounceTime(280),

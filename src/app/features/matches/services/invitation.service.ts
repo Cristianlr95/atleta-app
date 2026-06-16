@@ -1,5 +1,5 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { catchError, firstValueFrom, timeout, throwError } from 'rxjs';
 import { AuthSessionService } from 'src/app/core/services/auth-session.service';
 import { HttpErrorService } from 'src/app/core/services/http-error.service';
@@ -10,14 +10,11 @@ import { NotificationService } from './notification.service';
 
 @Injectable({ providedIn: 'root' })
 export class InvitationService {
+  private readonly socialApiService = inject(SocialApiService);
+  private readonly authSessionService = inject(AuthSessionService);
+  private readonly notificationService = inject(NotificationService);
+  private readonly httpErrorService = inject(HttpErrorService);
   private readonly requestTimeoutMs = 5000;
-
-  constructor(
-    private readonly socialApiService: SocialApiService,
-    private readonly authSessionService: AuthSessionService,
-    private readonly notificationService: NotificationService,
-    private readonly httpErrorService: HttpErrorService,
-  ) {}
 
   async sendInvitations(match: Match, players: Player[]): Promise<Invitation[]> {
     const session = this.authSessionService.currentSession;

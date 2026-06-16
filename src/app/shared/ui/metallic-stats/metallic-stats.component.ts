@@ -1,5 +1,5 @@
 ﻿import { CommonModule } from '@angular/common';
-import { Component, Input } from '@angular/core';
+import { Component, Input, inject } from '@angular/core';
 import { AlertController, IonicModule } from '@ionic/angular';
 
 export interface Stat {
@@ -18,6 +18,7 @@ export interface Stat {
   imports: [CommonModule, IonicModule],
 })
 export class MetallicStatsComponent {
+  private readonly alertController = inject(AlertController);
   private readonly iconBase = 'assets/icons/atleta';
   private readonly iconMap: Record<string, string> = {
     'trophy-outline': `${this.iconBase}/ic_comp_trophy_24.svg`,
@@ -28,8 +29,6 @@ export class MetallicStatsComponent {
 
   @Input() stats: Stat[] = [];
   @Input() compact = false;
-
-  constructor(private readonly alertController: AlertController) {}
 
   resolveIconAsset(icon?: string): string | null {
     if (!icon) {

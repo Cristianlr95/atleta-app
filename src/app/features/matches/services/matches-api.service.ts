@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { API_ENDPOINTS } from 'src/app/core/constants/api-endpoints';
 import { AuthSessionService } from 'src/app/core/services/auth-session.service';
 import { ApiService } from 'src/app/core/services/api.service';
@@ -23,9 +23,7 @@ import { MatchMvpResponse } from '../models/match-mvp.models';
 
 @Injectable({ providedIn: 'root' })
 export class MatchesApiService extends ApiService {
-  constructor(private readonly authSessionService: AuthSessionService) {
-    super();
-  }
+  private readonly authSessionService = inject(AuthSessionService);
 
   createMatch(payload: CreateMatchRequest) {
     return this.post<MatchResponse, CreateMatchRequest>(API_ENDPOINTS.matches.base, payload);
