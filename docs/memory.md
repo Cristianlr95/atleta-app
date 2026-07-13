@@ -72,6 +72,8 @@ Fuente: auditoria directa del repositorio `atleta-app`
 - `MatchTeamPositionService` centraliza el mapa `playerUuid -> primaryPositionName` usado para hidratar participantes del partido.
 - `activity-feed-mapper.util` centraliza transformacion de solicitudes/notificaciones/estados de partido a items del feed social, incluyendo deduplicacion y agrupacion de invitaciones relacionadas.
 - `MatchTeamAssignmentPersistenceService` centraliza persistencia local de asignaciones home/away por partido backend/local.
+- `home-activity.util` centraliza el feed reciente del inicio y evita afirmar victorias/XP sin evidencia de resultado real.
+- CI de frontend agregado en `.github/workflows/ci.yml` para `npm ci`, lint, unit tests, build y audit critico de dependencias runtime.
 
 ## Deuda tecnica
 - Ruta social rehabilitada: tabs principales y refresco de badge tras responder invitaciones quedan cubiertos con tests unitarios; sigue pendiente validacion manual mobile/web contra backend real.
@@ -91,6 +93,7 @@ Fuente: auditoria directa del repositorio `atleta-app`
 
 ## Evidencia actual
 
+- `npm run lint` exitoso.
 - `npm run build` exitoso; mantiene warnings no bloqueantes existentes de glob Stencil y budget menor en `metallic-position-field-picker`.
 - `npm test -- --watch=false --browsers=ChromeHeadless --include src/app/core/contracts/api-contracts.smoke.spec.ts` exitoso con 5 tests OK.
 - `npm test -- --watch=false --browsers=ChromeHeadless --include src/app/features/matches/stores/match.store.spec.ts --include src/app/features/matches/services/match-live-event-registry.service.spec.ts` exitoso con 4 tests OK.
@@ -102,6 +105,7 @@ Fuente: auditoria directa del repositorio `atleta-app`
 - `npm test -- --watch=false --browsers=ChromeHeadless --include src/app/features/matches/stores/match.store.spec.ts --include src/app/features/matches/services/match-live-event-registry.service.spec.ts --include src/app/features/matches/services/match-venue-resolver.service.spec.ts --include src/app/features/matches/services/match-team-position.service.spec.ts --include src/app/features/matches/utils/match-state-presenter.util.spec.ts --include src/app/features/matches/utils/match-participant-mapper.util.spec.ts --include src/app/features/matches/utils/match-invite-fallback.util.spec.ts --include src/app/features/matches/utils/match-backend-state.util.spec.ts` exitoso con 20 tests OK.
 - `npm test -- --watch=false --browsers=ChromeHeadless --include src/app/features/social/activity/utils/activity-feed-mapper.util.spec.ts --include src/app/features/matches/stores/match.store.spec.ts --include src/app/features/matches/services/match-live-event-registry.service.spec.ts --include src/app/features/matches/services/match-venue-resolver.service.spec.ts --include src/app/features/matches/services/match-team-position.service.spec.ts --include src/app/features/matches/utils/match-state-presenter.util.spec.ts --include src/app/features/matches/utils/match-participant-mapper.util.spec.ts --include src/app/features/matches/utils/match-invite-fallback.util.spec.ts --include src/app/features/matches/utils/match-backend-state.util.spec.ts` exitoso con 22 tests OK.
 - `npm test -- --watch=false --browsers=ChromeHeadless --include src/app/features/matches/services/match-team-assignment-persistence.service.spec.ts --include src/app/features/social/activity/utils/activity-feed-mapper.util.spec.ts --include src/app/features/matches/stores/match.store.spec.ts --include src/app/features/matches/services/match-live-event-registry.service.spec.ts --include src/app/features/matches/services/match-venue-resolver.service.spec.ts --include src/app/features/matches/services/match-team-position.service.spec.ts --include src/app/features/matches/utils/match-state-presenter.util.spec.ts --include src/app/features/matches/utils/match-participant-mapper.util.spec.ts --include src/app/features/matches/utils/match-invite-fallback.util.spec.ts --include src/app/features/matches/utils/match-backend-state.util.spec.ts` exitoso con 25 tests OK.
+- `npm test -- --watch=false --browsers=ChromeHeadless --include src/app/features/dashboard/utils/home-activity.util.spec.ts` exitoso con 5 tests OK.
 
 ## Riesgos
 - Riesgo funcional: las tabs de `social` dependen de multiples endpoints; hay que validar estados vacios, errores parciales y consistencia real tras aceptar/rechazar invitaciones.
@@ -109,7 +113,7 @@ Fuente: auditoria directa del repositorio `atleta-app`
 - Riesgo de autorizacion reducido en flujos principales de equipos/partidos/MVP: el backend ya tiene regresion para no confiar en UUIDs de cliente.
 - Riesgo operativo: configuracion de entorno muy fija para prod/dev, sin inyeccion runtime.
 - Riesgo de consistencia: mezcla de estado local, optimista y backend puede producir diferencias temporales si falla una sincronizacion.
-- Riesgo UX: hay pantallas maduras y otras claramente parciales.
+- Riesgo UX: hay pantallas maduras y otras parciales; el feed de inicio ya evita mensajes de victoria/XP sin evidencia.
 
 ## Proximos pasos post-100 recomendados
 1. Validar `social` en dispositivo/mobile web contra backend real, especialmente estados vacios y acciones aceptar/rechazar.

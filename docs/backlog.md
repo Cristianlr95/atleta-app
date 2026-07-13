@@ -12,9 +12,10 @@ Fecha: 2026-03-02
 | CORE-02 | Confirmaciones e invitaciones live robustas | Social/Matches | P1 | existente | `InvitationsStore`, `MatchStore`, `SocialService`, SSE `/matches/{id}/live` | Estado sincronizado en cliente tras aceptar/rechazar y refresco live |
 | CORE-03 | MVP competitivo y ventana operativa | MVP | P1 | existente | `MatchMvpService`, `match-mvp-vote.page.ts`, `mvp-vote.store.ts` | Votacion disponible solo en ventana valida y cierre al expirar |
 | CORE-04 | Registro real de push tokens | Notifications | P1 | implementado | `push-token-sync.service.ts`, `/social/notifications/push-tokens` | Endpoint BE + persistencia + sync FE implementados y cubiertos por tests |
+| CORE-05 | Feed de inicio sin datos inventados | Dashboard | P1 | implementado | `home-activity.util.ts`, `home-activity.util.spec.ts` | Actividad reciente refleja victoria/empate/derrota/MVP solo cuando hay evidencia en historial |
 | IMP-01 | Normalizar seguridad dev/prod | Auth/Seguridad | P2 | parcial | `SecurityConfig.java`; `JwtAuthenticationIntegrationTest` cubre ratings, leaderboard y lecturas globales sin/con JWT; `ApiContractSmokeTest` cubre JWT subject en perfiles/trust score/equipos/partidos/eventos/MVP | Reglas de auth equivalentes para pruebas funcionales en dev/staging |
 | IMP-02 | Reducir endpoints huerfanos o asignar owner | Arquitectura | P2 | parcial | Controllers BE vs uso FE en `src/app/features/**/services` | Lista de endpoints sin consumo reducida o documentada con plan |
-| IMP-03 | Contratos FE?BE smoke automatizados | Calidad | P2 | parcial | FE: `src/app/core/contracts/api-contracts.smoke.spec.ts` valida auth, profile/trust score, matches/MVP, teams y ratings; BE: `ApiContractSmokeTest` valida controllers de auth, player profiles/trust score, matches/MVP, teams y ratings; falta smoke E2E opcional con servicios levantados | Suite valida auth, profile, matches, teams, ratings y mvp contra backend |
+| IMP-03 | Contratos FE?BE smoke automatizados | Calidad | P2 | parcial | FE: `src/app/core/contracts/api-contracts.smoke.spec.ts`; BE: `ApiContractSmokeTest`; CI FE `.github/workflows/ci.yml`; falta smoke E2E opcional con servicios levantados | Suite valida auth, profile, matches, teams, ratings y mvp contra backend |
 
 ## Prioridad operativa P1
 1. Validar envio push remoto con proveedor/dispositivo real.

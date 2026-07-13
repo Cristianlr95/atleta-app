@@ -15,12 +15,7 @@ import {
 } from 'src/app/shared/ui/metallic-bottom-nav/metallic-bottom-nav.component';
 import { MetallicCardComponent } from 'src/app/shared/ui/metallic-card/metallic-card.component';
 import { MetallicFormSectionComponent } from 'src/app/shared/ui/metallic-form-section/metallic-form-section.component';
-
-interface HomeActivityItem {
-  id: string;
-  text: string;
-  variant: 'xp' | 'mvp' | 'rank' | 'match';
-}
+import { buildHomeActivity, HomeActivityItem } from '../../utils/home-activity.util';
 
 @Component({
   selector: 'app-home-page',
@@ -137,7 +132,7 @@ export class HomePage {
     }
 
     this.streakValue = this.computeParticipationStreak(history);
-    this.activities = this.buildActivity(history);
+    this.activities = buildHomeActivity(history);
   }
 
   private resolveCurrentMatch(history: MatchHistoryViewItem[], now: number): MatchHistoryViewItem | undefined {
@@ -194,31 +189,6 @@ export class HomePage {
       streak += 1;
     }
     return streak;
-  }
-
-  private buildActivity(history: MatchHistoryViewItem[]): HomeActivityItem[] {
-    const top = [...history]
-      .sort((a, b) => (b.scheduledAtEpoch ?? 0) - (a.scheduledAtEpoch ?? 0))
-      .slice(0, 4);
-
-    if (top.length === 0) {
-      return [
-        { id: 'activity-1', text: 'Completa tu primer partido para desbloquear actividad reciente.', variant: 'xp' },
-      ];
-    }
-
-    return top.map((item, index) => ({
-      id: `activity-${item.id}`,
-      text:
-        index === 0
-          ? `Ganaste +${Math.max(30, item.goals * 20 + item.assists * 15)} XP en tu último partido.`
-          : item.outcome === 'GANADO'
-            ? `Tu equipo ganó ${item.scoreLabel} y sumó momentum competitivo.`
-            : item.mvpLabel === 'Si'
-              ? 'Fuiste destacado como MVP en un partido reciente.'
-              : `Partido ${item.statusLabel.toLowerCase()} (${item.modalityLabel}).`,
-      variant: index === 0 ? 'xp' : item.mvpLabel === 'Si' ? 'mvp' : item.outcome === 'GANADO' ? 'rank' : 'match',
-    }));
   }
 
   private resolveDivision(level: number): string {
