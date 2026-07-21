@@ -374,14 +374,3 @@
     justify-self: end;
   }
 }
-
-@media (min-width: 960px) {
-  .field-picker__layout {
-    grid-template-columns: minmax(0, 1.2fr) minmax(280px, 0.55fr);
-    gap: 18px;
-  }
-
-  .field-picker__role-panel {
-    justify-content: center;
-  }
-}
