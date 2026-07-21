@@ -41,6 +41,14 @@ export const routes: Routes = [
       ),
   },
   {
+    path: 'player/onboarding-status',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./features/user/pages/onboarding-recovery/onboarding-recovery.page').then(
+        (m) => m.OnboardingRecoveryPage,
+      ),
+  },
+  {
     path: 'sessions/create',
     canActivate: [authGuard, onboardingCompletedGuard],
     loadComponent: () =>

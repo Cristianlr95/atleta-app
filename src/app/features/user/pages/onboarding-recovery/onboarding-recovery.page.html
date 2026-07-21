@@ -1,0 +1,22 @@
+<ion-content class="onboarding-recovery-bg">
+  <main class="onboarding-recovery-container">
+    <app-metallic-card title="Validacion de perfil">
+      <section class="onboarding-recovery" aria-labelledby="onboarding-recovery-title">
+        <p class="onboarding-recovery__eyebrow">
+          {{ reason === 'offline' ? 'Sin conexion' : 'Servicio no disponible' }}
+        </p>
+        <h1 id="onboarding-recovery-title">No pudimos validar tu perfil</h1>
+        <p>{{ message }}</p>
+
+        <div class="onboarding-recovery__actions">
+          <app-metallic-button type="button" variant="primary" (click)="onRetry()">
+            {{ retrying ? 'Reintentando...' : 'Reintentar' }}
+          </app-metallic-button>
+          <app-metallic-button type="button" variant="secondary" (click)="onLogout()">
+            {{ logoutLoading ? 'Cerrando sesion...' : 'Cerrar sesion' }}
+          </app-metallic-button>
+        </div>
+      </section>
+    </app-metallic-card>
+  </main>
+</ion-content>
