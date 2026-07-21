@@ -55,6 +55,20 @@ describe('MatchTeamAssignmentPersistenceService', () => {
       updatedAt: '2026-06-15T12:00:00.000Z',
     });
   });
+
+  it('removes persisted assignments when the session is cleared', () => {
+    service.saveAll({
+      'backend-42': {
+        homeIds: ['a'],
+        awayIds: ['b'],
+        updatedAt: '2026-06-15T12:00:00.000Z',
+      },
+    });
+
+    service.clear();
+
+    expect(localStorage.getItem('atleta.match.team-assignments.v1')).toBeNull();
+  });
 });
 
 function player(uuid: string): Player {

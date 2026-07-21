@@ -10,11 +10,13 @@ import {
 import { AuthSessionService } from 'src/app/core/services/auth-session.service';
 import { AuthApiResponse, LoginRequest, RegisterAthleteRequest } from '../models/auth.models';
 import { AuthApiService } from './auth-api.service';
+import { SessionDataCleanupService } from './session-data-cleanup.service';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private readonly authApiService = inject(AuthApiService);
   private readonly authSessionService = inject(AuthSessionService);
+  private readonly sessionDataCleanupService = inject(SessionDataCleanupService);
 
   login(credentials: LoginRequest): Observable<AuthSession> {
     return this.authApiService.login(credentials).pipe(
@@ -35,7 +37,12 @@ export class AuthService {
   }
 
   logout(): void {
-    this.authSessionService.clearSession();
+    const playerUuid = this.authSessionService.currentSession?.user.atletaUuid;
+    try {
+      this.sessionDataCleanupService.clear(playerUuid);
+    } finally {
+      this.authSessionService.clearSession();
+    }
   }
 
   get isAuthenticated(): boolean {

@@ -82,6 +82,21 @@
       </app-metallic-form-section>
 
       <app-metallic-form-section
+        title="Sesion"
+        [titleIconAsset]="securitySectionIconAsset"
+        description="Cierra la sesion en este dispositivo y elimina los datos locales asociados a tu cuenta."
+      >
+        <button
+          type="button"
+          class="profile-logout-button"
+          [disabled]="logoutLoading"
+          (click)="onLogout()"
+        >
+          {{ logoutLoading ? 'Cerrando sesion...' : 'Cerrar sesion' }}
+        </button>
+      </app-metallic-form-section>
+
+      <app-metallic-form-section
         title="Mis equipos"
         [titleIconAsset]="teamsSectionIconAsset"
         description="Equipos donde participas actualmente."

@@ -109,6 +109,28 @@
   justify-self: start;
 }
 
+.profile-logout-button {
+  min-height: 42px;
+  border: 1px solid rgba(235, 116, 116, 0.72);
+  border-radius: 9px;
+  background: rgba(72, 20, 27, 0.58);
+  color: #ffdada;
+  font-family: "Rajdhani", sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  padding: 9px 16px;
+}
+
+.profile-logout-button:focus-visible {
+  outline: 2px solid #9fc0f6;
+  outline-offset: 3px;
+}
+
+.profile-logout-button:disabled {
+  cursor: wait;
+  opacity: 0.62;
+}
+
 .profile-teams {
   display: grid;
   grid-template-columns: 1fr;
