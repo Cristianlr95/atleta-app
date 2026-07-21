@@ -15,11 +15,22 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 24px 16px;
+  width: 100%;
+  min-width: 0;
+  padding: clamp(12px, 3vw, 32px) clamp(10px, 2.5vw, 24px);
+}
+
+.onboarding-card {
+  display: block;
+  width: min(100%, 760px);
+  max-width: 100%;
+  min-width: 0;
 }
 
 .onboarding-form {
-  width: min(100%, 430px);
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
   display: flex;
   flex-direction: column;
   gap: 14px;
@@ -54,4 +65,10 @@
 
 .onboarding-error {
   color: #ff8f9f;
+}
+
+@media (max-width: 360px) {
+  .onboarding-container {
+    padding-inline: 8px;
+  }
 }

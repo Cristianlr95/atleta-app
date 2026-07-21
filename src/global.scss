@@ -54,6 +54,79 @@ html,
 body,
 ion-app {
   background: var(--atleta-page-bg);
+  width: 100%;
+  max-width: 100%;
+  overflow-x: clip;
+}
+
+ion-router-outlet,
+ion-router-outlet > .ion-page,
+ion-content::part(scroll) {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+}
+
+app-metallic-card,
+app-metallic-form-section,
+app-metallic-position-field-picker {
+  display: block;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.field-picker {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  container-type: inline-size;
+}
+
+.field-picker__layout,
+.field-picker__role-content {
+  min-width: 0;
+}
+
+.field-picker__role-description {
+  overflow-wrap: anywhere;
+}
+
+@container (min-width: 660px) {
+  .field-picker__layout {
+    grid-template-columns: minmax(0, 1.2fr) minmax(280px, 0.55fr);
+    gap: 18px;
+  }
+
+  .field-picker__role-panel {
+    justify-content: center;
+  }
+}
+
+@media (max-width: 360px) {
+  .field-picker__position {
+    width: 44px;
+    height: 44px;
+    font-size: 8px;
+  }
+
+  .field-picker__role-panel,
+  .field-picker__role-card {
+    padding: 12px;
+  }
+
+  .field-picker__role-card {
+    gap: 8px;
+  }
+
+  .field-picker__role-badge {
+    min-width: 42px;
+    height: 42px;
+    font-size: 19px;
+  }
+
+  .field-picker__role-name {
+    font-size: 18px;
+  }
 }
 
 ion-content {
