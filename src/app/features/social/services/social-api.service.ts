@@ -108,6 +108,10 @@ export class SocialApiService extends ApiService {
     return this.post<PushTokenRecord, RegisterPushTokenPayload>(API_ENDPOINTS.social.pushTokens, payload);
   }
 
+  revokePushToken(deviceId: string) {
+    return this.delete<void>(API_ENDPOINTS.social.pushTokens, { params: { deviceId } });
+  }
+
   searchPlayers(query: string) {
     return this.get<SocialPlayerLookupItem[]>(API_ENDPOINTS.social.searchPlayers, {
       params: { q: query },

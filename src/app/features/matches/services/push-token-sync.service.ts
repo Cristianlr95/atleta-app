@@ -79,6 +79,10 @@ export class PushTokenSyncService {
   }
 
   clearForUser(playerUuid: string): void {
+    const deviceId = localStorage.getItem(`${this.deviceIdStorageKey}:${playerUuid}`);
+    if (deviceId && this.authSessionService.currentSession?.user.atletaUuid === playerUuid) {
+      void firstValueFrom(this.socialApiService.revokePushToken(deviceId)).catch(() => void 0);
+    }
     try {
       localStorage.removeItem(this.userTokenKey(playerUuid));
       localStorage.removeItem(this.syncedKey(playerUuid));
