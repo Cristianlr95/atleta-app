@@ -172,4 +172,9 @@ export const routes: Routes = [
         (m) => m.SocialPage,
       ),
   },
+  {
+    path: '**',
+    loadComponent: () =>
+      import('./features/not-found/not-found.page').then((m) => m.NotFoundPage),
+  },
 ];
