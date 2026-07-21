@@ -5,6 +5,7 @@ import {
   CreateFriendRequestPayload,
   CreateMatchInvitePayload,
   CreateMatchInvitesBatchPayload,
+  MatchInviteDeliveryResult,
   CreateTeamInvitePayload,
   PushTokenRecord,
   RegisterPushTokenPayload,
@@ -65,6 +66,13 @@ export class SocialApiService extends ApiService {
   createMatchInvitesBatch(payload: CreateMatchInvitesBatchPayload) {
     return this.post<SocialRequestItem[], CreateMatchInvitesBatchPayload>(
       API_ENDPOINTS.social.matchInvitesBatch,
+      payload,
+    );
+  }
+
+  createMatchInvitesBatchDetailed(payload: CreateMatchInvitesBatchPayload) {
+    return this.post<MatchInviteDeliveryResult[], CreateMatchInvitesBatchPayload>(
+      API_ENDPOINTS.social.matchInvitesBatchDetailed,
       payload,
     );
   }

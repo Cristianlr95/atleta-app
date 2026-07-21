@@ -41,6 +41,7 @@
     teamInvites: '/social/team-invites',
     matchInvites: '/social/match-invites',
     matchInvitesBatch: '/social/match-invites/batch',
+    matchInvitesBatchDetailed: '/social/match-invites/batch/detailed',
     matchInvitesByMatch: '/social/match-invites/by-match',
     notifications: '/social/notifications',
     notificationUnreadCount: '/social/notifications/unread-count',
