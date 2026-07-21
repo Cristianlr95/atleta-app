@@ -7,6 +7,7 @@ import { NavigationService } from 'src/app/core/services/navigation.service';
 import { AuthService } from 'src/app/features/auth/services/auth.service';
 import { MatchHistoryViewItem } from 'src/app/features/matches/services/match-history.service';
 import { MatchHistoryService } from 'src/app/features/matches/services/match-history.service';
+import { MatchType } from 'src/app/features/matches/models/progressive-match.models';
 import { RatingsApiService } from 'src/app/features/ratings/services/ratings-api.service';
 import { provideAppConfigMock, provideHttpTesting } from 'src/test/testbed-providers';
 import { PlayerProfile } from '../../models/user.models';
@@ -217,6 +218,8 @@ function buildHistoryItem(
     id,
     scheduledAtEpoch: null,
     modality: 'CINCO_VS_CINCO',
+    matchType: MatchType.FRIENDLY,
+    typeLabel: 'Amistoso',
     status: 'FINALIZADO',
     displayStatusKey: 'FINISHED',
     modalityLabel: '5 vs 5',

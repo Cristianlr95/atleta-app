@@ -11,6 +11,7 @@ import { RatingsApiService } from '../../features/ratings/services/ratings-api.s
 import { TeamApiService } from '../../features/teams/services/team-api.service';
 import { UserApiService } from '../../features/user/services/user-api.service';
 import { CreateMatchRequest } from '../../features/matches/models/match.models';
+import { MatchType } from '../../features/matches/models/progressive-match.models';
 import { UpdateRatingsRequest } from '../../features/ratings/models/rating.models';
 
 describe('API contracts smoke', () => {
@@ -138,6 +139,7 @@ describe('API contracts smoke', () => {
     const createPayload: CreateMatchRequest = {
       creadorUuid: creatorUuid,
       modalidad: 'CINCO_VS_CINCO',
+      matchType: MatchType.FRIENDLY,
       categoriaGenero: 'MIXTO',
       fechaHoraProgramada: '2026-05-07T20:00:00',
     };

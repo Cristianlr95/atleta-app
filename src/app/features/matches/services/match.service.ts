@@ -14,6 +14,7 @@ import {
   PlayerInvitationStatus,
   Venue,
 } from '../models/progressive-match.models';
+import { toCanonicalMatchType } from '../models/match-type.mapper';
 import { MatchPlayerSummary } from '../models/match.models';
 import { MatchesApiService } from './matches-api.service';
 import { InvitationService } from './invitation.service';
@@ -127,6 +128,7 @@ export class MatchService {
         this.matchesApiService.createMatch({
           creadorUuid: session.user.atletaUuid,
           modalidad: draft.modality,
+          matchType: draft.type,
           categoriaGenero: draft.genderCategory,
           fechaHoraProgramada: this.toApiLocalDateTime(draft.scheduledAt),
           latitud: draft.latitude,
@@ -463,7 +465,7 @@ export class MatchService {
       Number.isFinite(latitude) && Number.isFinite(longitude)
         ? `Lat/Lng: ${latitude!.toFixed(6)}, ${longitude!.toFixed(6)}`
         : 'Cancha por definir';
-    const resolvedType = this.resolveMatchType(response, existingMatch);
+    const resolvedType = toCanonicalMatchType(response.matchType, existingMatch?.type);
 
     const hasBackendTeamSides = (response.players ?? []).some(
       (item) => item.teamSide === 'LOCAL' || item.teamSide === 'VISITA',
@@ -617,27 +619,6 @@ export class MatchService {
     }
 
     return initial;
-  }
-
-  private resolveMatchType(
-    response: import('../models/match.models').MatchResponse,
-    existingMatch: Match | undefined,
-  ): MatchType {
-    if (existingMatch?.type) {
-      return existingMatch.type;
-    }
-
-    const teamIds = new Set(
-      (response.matchTeams ?? [])
-        .map((item) => item.team?.id)
-        .filter((id): id is number => typeof id === 'number' && Number.isFinite(id)),
-    );
-
-    if (teamIds.size <= 1) {
-      return MatchType.INTERNAL;
-    }
-
-    return MatchType.POINTS;
   }
 
   private mapBackendStatus(status: import('../models/match.models').MatchStatus, _scheduledAt?: string): MatchStatus {
