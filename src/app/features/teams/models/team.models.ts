@@ -36,3 +36,12 @@ export interface TeamActiveMember {
   primaryPositionId: number | null;
   primaryPositionName: string | null;
 }
+
+export interface TeamLeaderboardEntry {
+  rank: number;
+  playerProfileId: string;
+  alias: string;
+  score: number | null;
+  matchesPlayed: number;
+  rated: boolean;
+}

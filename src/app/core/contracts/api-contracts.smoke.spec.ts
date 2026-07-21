@@ -89,6 +89,9 @@ describe('API contracts smoke', () => {
     service.getActiveMembers(77).subscribe();
     expectRequest('GET', '/teams/77/members/active').flush([]);
 
+    service.getLeaderboard(77).subscribe();
+    expectRequest('GET', '/teams/77/leaderboard').flush([]);
+
     service.deleteTeam(77, creatorUuid).subscribe();
     const deleteRequest = expectRequest('DELETE', '/teams/77');
     expect(deleteRequest.request.params.get('actorUuid')).toBe(creatorUuid);
