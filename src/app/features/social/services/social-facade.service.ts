@@ -270,6 +270,15 @@ export class SocialFacadeService {
     this.errorMessageStore.set(null);
   }
 
+  clearSessionState(): void {
+    this.activityService.clear();
+    this.activeTabStore.set('activity');
+    this.friendCandidatesStore.set([]);
+    this.inviteCandidatesStore.set([]);
+    this.searchLoadingStore.set(false);
+    this.clearMessages();
+  }
+
   private async executeAction(action: () => Promise<void>, context: 'social'): Promise<void> {
     this.errorMessageStore.set(null);
     try {

@@ -48,6 +48,18 @@ export class MatchService {
     ),
   );
 
+  clearSessionState(): void {
+    if (this.statusRecalcTimer) {
+      clearTimeout(this.statusRecalcTimer);
+      this.statusRecalcTimer = undefined;
+    }
+    this.pendingStatusRecalc.clear();
+    this.matchesStore.set([]);
+    this.isSubmittingStore.set(false);
+    this.teamAssignmentsStore.set({});
+    this.teamAssignmentPersistenceService.clear();
+  }
+
   constructor() {
     effect(() => {
       const invitations = this.invitationsStore.invitations();

@@ -48,4 +48,13 @@ describe('NavigationService', () => {
     expect(navigated).toBeFalse();
     expect(router.navigate).not.toHaveBeenCalled();
   });
+
+  it('always replaces the current history entry after logout', async () => {
+    (service as unknown as { lockedUntil: number }).lockedUntil = Date.now() + 10_000;
+
+    const navigated = await service.goToLoginAfterLogout();
+
+    expect(navigated).toBeTrue();
+    expect(router.navigate).toHaveBeenCalledOnceWith(['/login'], { replaceUrl: true });
+  });
 });

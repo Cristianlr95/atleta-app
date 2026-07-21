@@ -3,6 +3,8 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { of } from 'rxjs';
 import { AppToastService } from 'src/app/core/services/app-toast.service';
 import { AuthSessionService } from 'src/app/core/services/auth-session.service';
+import { NavigationService } from 'src/app/core/services/navigation.service';
+import { AuthService } from 'src/app/features/auth/services/auth.service';
 import { MatchHistoryViewItem } from 'src/app/features/matches/services/match-history.service';
 import { MatchHistoryService } from 'src/app/features/matches/services/match-history.service';
 import { RatingsApiService } from 'src/app/features/ratings/services/ratings-api.service';
@@ -18,6 +20,8 @@ describe('PlayerProfilePage', () => {
   let authSessionService: { currentSession: unknown };
   let userApiService: jasmine.SpyObj<UserApiService>;
   let appToastService: jasmine.SpyObj<AppToastService>;
+  let authService: jasmine.SpyObj<AuthService>;
+  let navigationService: jasmine.SpyObj<NavigationService>;
 
   beforeEach(async () => {
     authSessionService = {
@@ -33,6 +37,11 @@ describe('PlayerProfilePage', () => {
     appToastService.success.and.resolveTo();
     appToastService.error.and.resolveTo();
     appToastService.info.and.resolveTo();
+    authService = jasmine.createSpyObj<AuthService>('AuthService', ['logout']);
+    navigationService = jasmine.createSpyObj<NavigationService>('NavigationService', [
+      'goToLoginAfterLogout',
+    ]);
+    navigationService.goToLoginAfterLogout.and.resolveTo(true);
 
     await TestBed.configureTestingModule({
       imports: [PlayerProfilePage],
@@ -50,6 +59,14 @@ describe('PlayerProfilePage', () => {
         {
           provide: AppToastService,
           useValue: appToastService,
+        },
+        {
+          provide: AuthService,
+          useValue: authService,
+        },
+        {
+          provide: NavigationService,
+          useValue: navigationService,
         },
         {
           provide: RatingsApiService,
@@ -181,6 +198,14 @@ describe('PlayerProfilePage', () => {
 
     expect(userApiService.changePassword).not.toHaveBeenCalled();
     expect(component.passwordChangeError).toBe('La confirmacion no coincide con la nueva contrasena.');
+  });
+
+  it('clears the authenticated session and replaces the history entry on logout', async () => {
+    await component.onLogout();
+
+    expect(authService.logout).toHaveBeenCalledTimes(1);
+    expect(navigationService.goToLoginAfterLogout).toHaveBeenCalledTimes(1);
+    expect(component.logoutLoading).toBeFalse();
   });
 });
 

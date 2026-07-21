@@ -78,6 +78,18 @@ export class PushTokenSyncService {
     return localStorage.getItem(this.storageKey);
   }
 
+  clearForUser(playerUuid: string): void {
+    try {
+      localStorage.removeItem(this.userTokenKey(playerUuid));
+      localStorage.removeItem(this.syncedKey(playerUuid));
+      localStorage.removeItem(`${this.deviceIdStorageKey}:${playerUuid}`);
+    } catch {
+      // Browser storage can be unavailable in private mode or tests.
+    }
+    this.lastSyncedTokenStore.set(null);
+    this.syncErrorStore.set(false);
+  }
+
   private getStoredTokenForUser(playerUuid: string): string | null {
     return localStorage.getItem(this.userTokenKey(playerUuid));
   }

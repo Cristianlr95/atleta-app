@@ -9,6 +9,7 @@ import { AuthSessionService } from 'src/app/core/services/auth-session.service';
 import { AppToastService } from 'src/app/core/services/app-toast.service';
 import { ErrorMapperService } from 'src/app/core/services/error-mapper.service';
 import { NavigationService } from 'src/app/core/services/navigation.service';
+import { AuthService } from 'src/app/features/auth/services/auth.service';
 import { MatchHistoryService, MatchHistoryViewItem } from 'src/app/features/matches/services/match-history.service';
 import { NotificationBadgeService } from 'src/app/features/matches/services/notification-badge.service';
 import { OverallRating, RatingByRole, RoleType } from 'src/app/features/ratings/models/rating.models';
@@ -69,6 +70,7 @@ interface OutcomeSummary {
 })
 export class PlayerProfilePage implements OnDestroy {
   private readonly authSessionService = inject(AuthSessionService);
+  private readonly authService = inject(AuthService);
   private readonly userApiService = inject(UserApiService);
   private readonly ratingsApiService = inject(RatingsApiService);
   private readonly matchHistoryService = inject(MatchHistoryService);
@@ -132,6 +134,7 @@ export class PlayerProfilePage implements OnDestroy {
   passwordChangeLoading = false;
   passwordChangeMessage: string | null = null;
   passwordChangeError: string | null = null;
+  logoutLoading = false;
 
   constructor() {
     this.isDemoMode = this.route.snapshot.queryParamMap.get('demo') === '1';
@@ -165,6 +168,24 @@ export class PlayerProfilePage implements OnDestroy {
 
   onNavItemSelected(itemId: string): void {
     void this.navigationService.goToMainBottomSection(itemId);
+  }
+
+  async onLogout(): Promise<void> {
+    if (this.logoutLoading) {
+      return;
+    }
+
+    this.logoutLoading = true;
+    this.stopAutoRefresh();
+    this.leave$.next();
+    this.clearInviteSearchTimer();
+
+    try {
+      this.authService.logout();
+    } finally {
+      await this.navigationService.goToLoginAfterLogout();
+      this.logoutLoading = false;
+    }
   }
 
   async onChangePassword(): Promise<void> {

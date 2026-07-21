@@ -178,4 +178,10 @@ export class InvitationsStore {
       }),
     );
   }
+
+  clear(): void {
+    this.invitationStore.set([]);
+    this.loadingStore.set(false);
+    this.errorStore.set(null);
+  }
 }

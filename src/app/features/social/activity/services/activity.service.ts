@@ -144,4 +144,16 @@ export class ActivityService {
   groupSimilarEvents(items: ActivityItem[]): ActivityItem[] {
     return groupSimilarActivityEvents(items);
   }
+
+  clear(): void {
+    this.playerUuid.set(null);
+    this.loadingStore.set(false);
+    this.errorStore.set(null);
+    this.activityStore.set([]);
+    this.friendshipsStore.set([]);
+    this.teamInvitesStore.set([]);
+    this.matchInvitesStore.set([]);
+    this.notificationsStore.set([]);
+    this.teamsStore.set([]);
+  }
 }

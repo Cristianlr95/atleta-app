@@ -49,6 +49,15 @@ export class NavigationService {
     return this.safeNavigate(['/player/profile']);
   }
 
+  async goToLoginAfterLogout(): Promise<boolean> {
+    this.lock();
+    try {
+      return await this.router.navigate(['/login'], { replaceUrl: true });
+    } catch {
+      return false;
+    }
+  }
+
   async goToMainBottomSection(itemId: string): Promise<boolean> {
     const commands = this.mainBottomRoutes[itemId];
     if (!commands) {

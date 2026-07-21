@@ -46,4 +46,9 @@ export class NotificationBadgeService {
       this.refreshErrorStore.set(true);
     }
   }
+
+  clear(): void {
+    this.serverPendingCount.set(0);
+    this.refreshErrorStore.set(false);
+  }
 }
