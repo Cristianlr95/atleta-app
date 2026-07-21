@@ -7,6 +7,7 @@
   },
   matches: {
     base: '/matches',
+    orchestrated: '/matches/orchestrated',
     byPlayer: '/matches/by-player',
     byPlayerOrCreator: '/matches/by-player-or-creator',
     join: '/matches/join',

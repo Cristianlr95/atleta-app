@@ -1,4 +1,5 @@
 import { MatchType } from './progressive-match.models';
+import { SocialRequestItem } from '../../social/models/social.models';
 
 export type MatchModality = 'CINCO_VS_CINCO' | 'SEIS_VS_SEIS' | 'SIETE_VS_SIETE';
 export type MatchGenderCategory = 'MIXTO' | 'SOLO_MUJERES' | 'SOLO_HOMBRES';
@@ -23,6 +24,19 @@ export interface CreateMatchRequest {
   latitud?: number;
   longitud?: number;
   cuota?: number;
+}
+
+export interface CreateMatchOrchestratedRequest {
+  match: CreateMatchRequest;
+  teamId: number;
+  targetUuids: string[];
+  invitationMessage?: string;
+}
+
+export interface OrchestratedMatchCreationResponse {
+  match: MatchResponse;
+  invitations: SocialRequestItem[];
+  replayed: boolean;
 }
 
 export interface JoinMatchRequest {

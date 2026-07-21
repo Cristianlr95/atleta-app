@@ -95,6 +95,7 @@ export interface MatchParticipant {
 
 export interface Match {
   id: string;
+  creationIdempotencyKey?: string;
   backendMatchId?: number;
   creatorUuid: string;
   creatorName: string;
