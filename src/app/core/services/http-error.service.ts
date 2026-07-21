@@ -30,7 +30,7 @@ export class HttpErrorService {
       return undefined;
     }
 
-    const raw = payload['code'];
+    const raw = payload['code'] ?? payload['errorCode'];
     return typeof raw === 'string' && raw.trim().length > 0 ? raw : undefined;
   }
 }

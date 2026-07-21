@@ -147,6 +147,16 @@ describe('API contracts smoke', () => {
     service.createMatch(createPayload).subscribe();
     expectRequest('POST', '/matches').flush({});
 
+    service.createMatchOrchestrated({
+      match: createPayload,
+      teamId: 7,
+      targetUuids: [playerUuid],
+    }, 'match-create-contract-123').subscribe();
+    const orchestratedRequest = expectRequest('POST', '/matches/orchestrated');
+    expect(orchestratedRequest.request.headers.get('Idempotency-Key')).toBe('match-create-contract-123');
+    expect(orchestratedRequest.request.body.targetUuids).toEqual([playerUuid]);
+    orchestratedRequest.flush({});
+
     service.getById(42).subscribe();
     expectRequest('GET', '/matches/42').flush({});
 

@@ -7,6 +7,7 @@ import {
   ConfirmMatchEventRequest,
   ConfirmMatchPlayerRequest,
   CreateMatchRequest,
+  CreateMatchOrchestratedRequest,
   ImportTeamPlayersRequest,
   JoinMatchRequest,
   MatchPlayerSummary,
@@ -17,6 +18,7 @@ import {
   RemoveMatchPlayerRequest,
   MatchStatus,
   PlayerMatchHistoryItem,
+  OrchestratedMatchCreationResponse,
   UpdateMatchTeamAssignmentsRequest,
 } from '../models/match.models';
 import { MatchMvpResponse } from '../models/match-mvp.models';
@@ -27,6 +29,14 @@ export class MatchesApiService extends ApiService {
 
   createMatch(payload: CreateMatchRequest) {
     return this.post<MatchResponse, CreateMatchRequest>(API_ENDPOINTS.matches.base, payload);
+  }
+
+  createMatchOrchestrated(payload: CreateMatchOrchestratedRequest, idempotencyKey: string) {
+    return this.post<OrchestratedMatchCreationResponse, CreateMatchOrchestratedRequest>(
+      API_ENDPOINTS.matches.orchestrated,
+      payload,
+      { headers: { 'Idempotency-Key': idempotencyKey } },
+    );
   }
 
   getById(matchId: number) {

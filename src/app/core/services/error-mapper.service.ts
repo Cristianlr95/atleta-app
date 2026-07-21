@@ -11,6 +11,9 @@ export class ErrorMapperService {
     const raw = this.extractRawMessage(error, apiError).toLowerCase();
 
     if (context === 'matches') {
+      if (apiError?.code === 'MATCH_CREATION_FAILED' && apiError.message.trim()) {
+        return apiError.message;
+      }
       if (raw.includes('sin genero definido')) {
         return 'Hay jugadores sin genero definido. Completa su perfil antes de armar equipos.';
       }
