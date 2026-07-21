@@ -1,0 +1,39 @@
+<ion-content class="detail-bg">
+  <main class="detail-container">
+    <app-page-nav></app-page-nav>
+
+    <app-metallic-card title="Perfil de jugador" [titleIconAsset]="titleIconAsset">
+      <p class="detail-status" *ngIf="isLoading">Cargando perfil...</p>
+
+      <section class="detail-error" *ngIf="errorMessage">
+        <h2>{{ notFound ? 'Jugador no encontrado' : 'No se pudo cargar' }}</h2>
+        <p>{{ errorMessage }}</p>
+        <div class="detail-actions">
+          <button type="button" *ngIf="!notFound" (click)="onRetry()">Reintentar</button>
+          <button type="button" (click)="onBackToSocial()">Volver a Social</button>
+        </div>
+      </section>
+
+      <article class="detail-profile" *ngIf="profile as player">
+        <div class="detail-avatar" aria-hidden="true">{{ (player.alias || 'A').charAt(0) }}</div>
+        <p class="detail-kicker">Jugador Atleta</p>
+        <h1>{{ player.alias || 'Jugador sin alias' }}</h1>
+        <dl class="detail-facts">
+          <div><dt>Genero</dt><dd>{{ genderLabel(player.genero) }}</dd></div>
+          <div><dt>Confianza</dt><dd>{{ player.trustScore ?? '--' }}</dd></div>
+        </dl>
+
+        <section class="detail-section">
+          <h2>Posiciones</h2>
+          <ol *ngIf="player.positions?.length; else noPositions">
+            <li *ngFor="let assignment of player.positions">
+              <strong>{{ assignment.position?.nombre || 'Posicion' }}</strong>
+              <span>Prioridad {{ assignment.prioridad }}</span>
+            </li>
+          </ol>
+          <ng-template #noPositions><p class="detail-status">Sin posiciones publicadas.</p></ng-template>
+        </section>
+      </article>
+    </app-metallic-card>
+  </main>
+</ion-content>

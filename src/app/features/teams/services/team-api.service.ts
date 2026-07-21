@@ -23,6 +23,10 @@ export class TeamApiService extends ApiService {
     return this.get<TeamSummary[]>(`${API_ENDPOINTS.teams.byPlayer}/${playerUuid}`);
   }
 
+  getById(teamId: number) {
+    return this.get<TeamSummary>(`${API_ENDPOINTS.teams.base}/${teamId}`);
+  }
+
   getActiveMembers(teamId: number) {
     return this.get<TeamActiveMember[]>(`${API_ENDPOINTS.teams.base}/${teamId}/members/active`);
   }

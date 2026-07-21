@@ -33,6 +33,22 @@ export const routes: Routes = [
       ),
   },
   {
+    path: 'players/:uuid',
+    canActivate: [authGuard, onboardingCompletedGuard],
+    loadComponent: () =>
+      import('./features/user/pages/public-player-detail/public-player-detail.page').then(
+        (m) => m.PublicPlayerDetailPage,
+      ),
+  },
+  {
+    path: 'teams/:id',
+    canActivate: [authGuard, onboardingCompletedGuard],
+    loadComponent: () =>
+      import('./features/teams/pages/team-detail/team-detail.page').then(
+        (m) => m.TeamDetailPage,
+      ),
+  },
+  {
     path: 'player/onboarding',
     canActivate: [authGuard, onboardingPendingGuard],
     loadComponent: () =>

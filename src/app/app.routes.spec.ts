@@ -28,4 +28,12 @@ describe('app routes', () => {
     expect(route?.data?.['defaultMatchesTab']).toBe('history');
     expect(route?.canActivate?.length).toBeGreaterThan(0);
   });
+
+  it('exposes guarded player and team detail routes', () => {
+    for (const path of ['players/:uuid', 'teams/:id']) {
+      const route = routes.find((item) => item.path === path);
+      expect(route?.loadComponent).toBeDefined();
+      expect(route?.canActivate?.length).toBe(2);
+    }
+  });
 });

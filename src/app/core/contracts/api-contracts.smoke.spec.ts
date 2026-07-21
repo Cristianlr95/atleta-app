@@ -83,6 +83,9 @@ describe('API contracts smoke', () => {
     service.getByPlayer(playerUuid).subscribe();
     expectRequest('GET', `/teams/by-player/${playerUuid}`).flush([]);
 
+    service.getById(77).subscribe();
+    expectRequest('GET', '/teams/77').flush({});
+
     service.getActiveMembers(77).subscribe();
     expectRequest('GET', '/teams/77/members/active').flush([]);
 
@@ -98,6 +101,9 @@ describe('API contracts smoke', () => {
 
     service.getPlayerProfile(atletaUuid).subscribe();
     expectRequest('GET', `/player-profiles/${atletaUuid}`).flush({});
+
+    service.getPublicPlayerProfile(atletaUuid).subscribe();
+    expectRequest('GET', `/player-profiles/${atletaUuid}/public`).flush({});
 
     service.createPlayerProfile({ atletaUuid, alias: 'Demo10' }).subscribe();
     expectRequest('POST', '/player-profiles').flush({});
