@@ -41,6 +41,7 @@ export class LoginPage {
   readonly googleIconAsset = `${this.iconBase}/ic_brand_google_24.svg`;
   isSubmitting = false;
   authError: string | null = null;
+  readonly authNotice: string | null;
   private readonly redirectUrl: string | null;
 
   readonly loginForm = this.formBuilder.nonNullable.group({
@@ -51,6 +52,9 @@ export class LoginPage {
   constructor() {
     const next = this.route.snapshot.queryParamMap.get('next');
     const email = this.route.snapshot.queryParamMap.get('email');
+    this.authNotice = this.route.snapshot.queryParamMap.get('reset') === 'success'
+      ? 'Contrasena actualizada. Inicia sesion con tu nueva clave.'
+      : null;
 
     this.redirectUrl = this.sanitizeRedirectUrl(next);
 
@@ -82,7 +86,7 @@ export class LoginPage {
   }
 
   onForgotPassword(): void {
-    this.authError = 'El reset por email aun no esta disponible. Si puedes entrar, cambia tu contrasena desde Perfil > Seguridad de cuenta.';
+    void this.navigationService.safeNavigate(['/password-reset']);
   }
 
   async onContinueWithGoogle(): Promise<void> {

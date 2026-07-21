@@ -4,6 +4,10 @@
     googleLogin: '/athletes/auth/google',
     registerAthlete: '/athletes/register',
     createPlayerProfile: '/player-profiles',
+    refresh: '/athletes/auth/refresh',
+    logout: '/athletes/auth/logout',
+    passwordResetRequest: '/athletes/password-reset/request',
+    passwordResetConfirm: '/athletes/password-reset/confirm',
   },
   matches: {
     base: '/matches',

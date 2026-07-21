@@ -78,4 +78,14 @@ export class UserFeedbackService {
 
     return 'No fue posible completar tu configuracion. Intenta nuevamente.';
   }
+
+  passwordResetError(error: ApiError): string {
+    if (error.status === 0) {
+      return 'No se pudo conectar al servidor. Intenta nuevamente cuando recuperes conexion.';
+    }
+    if (error.status === 400) {
+      return 'El enlace es invalido, vencio o ya fue utilizado. Solicita uno nuevo.';
+    }
+    return 'No se pudo completar la recuperacion. Intenta nuevamente.';
+  }
 }

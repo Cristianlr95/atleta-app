@@ -68,6 +68,18 @@ describe('API contracts smoke', () => {
       alias: 'Demo10',
     }).subscribe();
     expectRequest('POST', '/player-profiles').flush({});
+
+    service.refresh({ refreshToken: 'refresh-1' }).subscribe();
+    expectRequest('POST', '/athletes/auth/refresh').flush({});
+
+    service.logout({ refreshToken: 'refresh-2' }).subscribe();
+    expectRequest('POST', '/athletes/auth/logout').flush({});
+
+    service.requestPasswordReset({ email: 'jugador@atleta.test' }).subscribe();
+    expectRequest('POST', '/athletes/password-reset/request').flush({});
+
+    service.confirmPasswordReset({ token: 'reset-token', newPassword: 'secret-2' }).subscribe();
+    expectRequest('POST', '/athletes/password-reset/confirm').flush({});
   });
 
   it('keeps team endpoints aligned with backend routes', () => {

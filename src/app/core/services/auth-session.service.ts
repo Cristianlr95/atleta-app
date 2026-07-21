@@ -57,6 +57,19 @@ export class AuthSessionService {
     return updated;
   }
 
+  replaceTokens(accessToken: string, refreshToken: string): AuthSession | null {
+    const current = this.sessionSubject.value ?? this.readPersistedSession();
+    if (!current) {
+      return null;
+    }
+    const updated: AuthSession = {
+      ...current,
+      tokens: { accessToken, refreshToken },
+    };
+    this.startSession(updated);
+    return updated;
+  }
+
   private restoreSession(): AuthSession | null {
     const accessToken = this.tokenStorage.getAccessToken();
     if (!accessToken) {
@@ -84,7 +97,17 @@ export class AuthSessionService {
   }
 
   private validateSession(session: AuthSession): AuthSession | null {
-    if (!session.tokens.accessToken || this.isTokenExpired(session.tokens.accessToken)) {
+    if (!session.tokens.accessToken) {
+      this.clearSession();
+      return null;
+    }
+
+    if (this.isTokenExpired(session.tokens.accessToken)) {
+      if (session.tokens.refreshToken) {
+        this.persistSession(session);
+        this.sessionSubject.next(session);
+        return null;
+      }
       this.clearSession();
       return null;
     }

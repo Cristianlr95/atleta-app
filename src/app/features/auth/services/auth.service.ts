@@ -1,5 +1,5 @@
 import { Injectable, inject } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, firstValueFrom } from 'rxjs';
 import { map, tap } from 'rxjs/operators';
 import { ApiError } from 'src/app/core/models/api-error.model';
 import {
@@ -36,13 +36,32 @@ export class AuthService {
     return this.authApiService.registerAthlete(payload).pipe(map((response) => this.toUser(response)));
   }
 
-  logout(): void {
+  async logout(): Promise<void> {
     const playerUuid = this.authSessionService.currentSession?.user.atletaUuid;
+    const refreshToken = this.authSessionService.currentSession?.tokens.refreshToken;
     try {
-      this.sessionDataCleanupService.clear(playerUuid);
+      if (refreshToken) {
+        try {
+          await firstValueFrom(this.authApiService.logout({ refreshToken }));
+        } catch {
+          // Local logout must remain available while offline.
+        }
+      }
     } finally {
-      this.authSessionService.clearSession();
+      try {
+        this.sessionDataCleanupService.clear(playerUuid);
+      } finally {
+        this.authSessionService.clearSession();
+      }
     }
+  }
+
+  requestPasswordReset(email: string): Observable<void> {
+    return this.authApiService.requestPasswordReset({ email: email.trim() });
+  }
+
+  confirmPasswordReset(token: string, newPassword: string): Observable<void> {
+    return this.authApiService.confirmPasswordReset({ token, newPassword });
   }
 
   get isAuthenticated(): boolean {
