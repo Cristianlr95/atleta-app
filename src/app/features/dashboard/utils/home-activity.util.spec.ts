@@ -1,4 +1,5 @@
 import { MatchHistoryViewItem } from 'src/app/features/matches/services/match-history.service';
+import { MatchType } from 'src/app/features/matches/models/progressive-match.models';
 import { buildHomeActivity } from './home-activity.util';
 
 describe('buildHomeActivity', () => {
@@ -53,6 +54,8 @@ function history(overrides: Partial<MatchHistoryViewItem>): MatchHistoryViewItem
     id: 1,
     scheduledAtEpoch: 1,
     modality: 'CINCO_VS_CINCO',
+    matchType: MatchType.FRIENDLY,
+    typeLabel: 'Amistoso',
     status: 'FINALIZADO',
     displayStatusKey: 'FINISHED',
     modalityLabel: '5 vs 5',
