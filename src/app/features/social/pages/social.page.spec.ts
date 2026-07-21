@@ -166,6 +166,25 @@ describe('SocialPage', () => {
     expect(facade.respondMatchInvite).toHaveBeenCalledOnceWith(21, true);
     expect(notificationBadgeService.refresh).toHaveBeenCalledTimes(1);
   });
+
+  it('opens the exact player and team selected in Social', () => {
+    component.onOpenProfile('22222222-2222-2222-2222-222222222222');
+    component.onOpenTeam(77);
+
+    expect(navigationService.safeNavigate).toHaveBeenCalledWith([
+      '/players',
+      '22222222-2222-2222-2222-222222222222',
+    ]);
+    expect(navigationService.safeNavigate).toHaveBeenCalledWith(['/teams', '77']);
+  });
+
+  it('opens activity context using its player or team identifier', () => {
+    component.onOpenContext({ target: { teamId: 91 } } as never);
+    component.onOpenContext({ target: { userId: 'player-uuid' } } as never);
+
+    expect(navigationService.safeNavigate).toHaveBeenCalledWith(['/teams', '91']);
+    expect(navigationService.safeNavigate).toHaveBeenCalledWith(['/players', 'player-uuid']);
+  });
 });
 
 function buildSocialFacadeMock() {

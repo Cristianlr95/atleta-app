@@ -1,0 +1,26 @@
+<ion-content class="team-bg">
+  <main class="team-container">
+    <app-page-nav></app-page-nav>
+    <app-metallic-card title="Detalle de equipo" [titleIconAsset]="titleIconAsset">
+      <p class="team-status" *ngIf="isLoading">Cargando equipo...</p>
+      <section class="team-error" *ngIf="errorMessage">
+        <h2>{{ notFound ? 'Equipo no encontrado' : 'No se pudo cargar' }}</h2><p>{{ errorMessage }}</p>
+        <div class="team-actions"><button *ngIf="!notFound" type="button" (click)="onRetry()">Reintentar</button><button type="button" (click)="onBackToSocial()">Volver a Social</button></div>
+      </section>
+      <article *ngIf="team as selectedTeam">
+        <header class="team-hero">
+          <img *ngIf="selectedTeam.logoUrl" [src]="selectedTeam.logoUrl" [alt]="'Logo de ' + selectedTeam.nombre">
+          <div class="team-shield" *ngIf="!selectedTeam.logoUrl" aria-hidden="true">{{ selectedTeam.nombre.charAt(0) }}</div>
+          <div><p>Equipo Atleta</p><h1>{{ selectedTeam.nombre }}</h1><span *ngIf="selectedTeam.anioFundacion">Fundado en {{ selectedTeam.anioFundacion }}</span></div>
+        </header>
+        <dl class="team-stats" *ngIf="selectedTeam.stats as stats">
+          <div><dt>PJ</dt><dd>{{ stats.partidosJugados }}</dd></div><div><dt>PG</dt><dd>{{ stats.partidosGanados }}</dd></div><div><dt>Pts</dt><dd>{{ stats.puntos }}</dd></div><div><dt>DG</dt><dd>{{ stats.diferenciagoles }}</dd></div>
+        </dl>
+        <section class="team-members"><h2>Plantel activo</h2>
+          <button class="team-member" type="button" *ngFor="let member of members" (click)="onOpenPlayer(member.playerUuid)"><span><strong>{{ member.alias }}</strong><small>{{ member.primaryPositionName || 'Sin posicion' }}</small></span><em>{{ member.rol }}</em></button>
+          <p class="team-status" *ngIf="members.length === 0">No hay integrantes activos.</p>
+        </section>
+      </article>
+    </app-metallic-card>
+  </main>
+</ion-content>

@@ -7,6 +7,19 @@ export interface TeamSummary {
   };
   logoUrl?: string | null;
   anioFundacion?: number | null;
+  createdAt?: string;
+  stats?: TeamStats | null;
+}
+
+export interface TeamStats {
+  partidosJugados: number;
+  partidosGanados: number;
+  partidosEmpatados: number;
+  partidosPerdidos: number;
+  golesAnotados: number;
+  golesRecibidos: number;
+  diferenciagoles: number;
+  puntos: number;
 }
 
 export interface CreateTeamRequest {

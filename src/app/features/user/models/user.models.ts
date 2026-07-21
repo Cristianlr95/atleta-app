@@ -3,8 +3,20 @@
 export interface PlayerProfile {
   atletaUuid: string;
   alias?: string;
+  genero?: 'MASCULINO' | 'FEMENINO' | 'OTRO';
   trustScore?: number;
   createdAt?: string;
+  positions?: PlayerPublicPosition[];
+}
+
+export interface PlayerPublicPosition {
+  id: number;
+  position?: {
+    id: number;
+    nombre: string;
+  };
+  prioridad: number;
+  xp: number;
 }
 
 export interface AthleteProfile extends AuthenticatedUser {

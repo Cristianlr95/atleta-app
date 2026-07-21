@@ -32,6 +32,12 @@ export class UserApiService extends ApiService {
     return this.get<PlayerProfile>(`${API_ENDPOINTS.users.playerProfiles}/${atletaUuid}`);
   }
 
+  getPublicPlayerProfile(atletaUuid: string) {
+    return this.get<PlayerProfile>(
+      `${API_ENDPOINTS.users.playerProfiles}/${atletaUuid}/public`,
+    );
+  }
+
   createPlayerProfile(payload: CreatePlayerProfileRequest) {
     return this.post<PlayerProfile, CreatePlayerProfileRequest>(
       API_ENDPOINTS.users.playerProfiles,
