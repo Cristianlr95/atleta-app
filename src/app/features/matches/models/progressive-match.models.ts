@@ -32,6 +32,13 @@ export enum PlayerInvitationStatus {
   PENDING = 'PENDING',
 }
 
+export enum InvitationDeliveryStatus {
+  PENDING = 'PENDING',
+  SENT = 'SENT',
+  FAILED = 'FAILED',
+  RETRYING = 'RETRYING',
+}
+
 export interface MatchTheme {
   id: string;
   localAccent: string;
@@ -77,6 +84,8 @@ export interface Invitation {
   targetUuid: string;
   targetName: string;
   status: PlayerInvitationStatus;
+  deliveryStatus?: InvitationDeliveryStatus;
+  deliveryMessage?: string;
   createdAt: string;
   respondedAt?: string;
 }

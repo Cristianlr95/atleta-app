@@ -188,6 +188,7 @@ export class MatchStore extends ResourceStore<MatchState> {
     ]);
 
     const apiHydratedMatch = matchResponse ? this.matchService.syncMatchFromApi(matchResponse) : loadedMatch;
+    this.invitationsStore.hydrateMatchInvitations(apiHydratedMatch.id, backendMatchId, invites);
     const effectiveInvites = withLocalMatchInviteFallback(
       apiHydratedMatch,
       invites,

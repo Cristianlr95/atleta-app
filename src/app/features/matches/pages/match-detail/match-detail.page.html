@@ -44,6 +44,28 @@
       </app-metallic-form-section>
 
       <app-metallic-form-section
+        *ngIf="isCreator() && deliveryInvitations().length > 0"
+        title="Entrega de invitaciones"
+        [titleIconAsset]="participantsIconAsset"
+        description="Confirma que cada convocatoria fue recibida por el servidor.">
+        <p class="match-detail-delivery-summary">{{ deliverySummary() }}</p>
+        <ul *ngIf="failedDeliveryInvitations().length > 0" class="match-detail-delivery-failures">
+          <li *ngFor="let invitation of failedDeliveryInvitations()">
+            {{ invitation.targetName }}: {{ invitation.deliveryMessage || 'Entrega no confirmada.' }}
+          </li>
+        </ul>
+        <div class="match-detail-actions" *ngIf="failedDeliveryInvitations().length > 0">
+          <app-metallic-button
+            type="button"
+            variant="secondary"
+            [disabled]="inviteRetryLoading()"
+            (click)="onRetryFailedInvitations()">
+            {{ inviteRetryLoading() ? 'Reintentando...' : 'Reintentar fallidas' }}
+          </app-metallic-button>
+        </div>
+      </app-metallic-form-section>
+
+      <app-metallic-form-section
         title="Confirmaciones y participantes"
         [titleIconAsset]="progressIconAsset"
         description="Aqui ves progreso y estado de cada jugador en un solo lugar.">

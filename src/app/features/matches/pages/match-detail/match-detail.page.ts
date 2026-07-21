@@ -27,7 +27,12 @@ import { VenueSelectedCardComponent } from '../../components/venue-selected-card
 import { DEFAULT_MATCH_THEME_ID, MATCH_THEMES } from '../../models/match-theme.constants';
 import { MatchViewState, toMatchViewState } from '../../models/match-view-state.models';
 import { MatchState, lifecycleToUserLabel } from '../../models/match-state.models';
-import { MatchStatus, Player, PlayerInvitationStatus } from '../../models/progressive-match.models';
+import {
+  InvitationDeliveryStatus,
+  MatchStatus,
+  Player,
+  PlayerInvitationStatus,
+} from '../../models/progressive-match.models';
 import { MatchLiveService } from '../../services/match-live.service';
 import { MatchService } from '../../services/match.service';
 import { NotificationService } from '../../services/notification.service';
@@ -84,6 +89,7 @@ export class MatchDetailPage implements OnDestroy {
   readonly teamBalanceFeedback = signal<string | null>(null);
   readonly teamAssignmentError = signal<string | null>(null);
   readonly inviteActionLoading = signal(false);
+  readonly inviteRetryLoading = signal(false);
 
   private readonly routeMatchId = signal('');
   private readonly localMatchId = signal('');
@@ -132,6 +138,30 @@ export class MatchDetailPage implements OnDestroy {
     const currentUser = this.authSessionService.currentSession?.user?.atletaUuid?.trim().toLowerCase();
     const creatorUuid = this.match()?.creatorUuid?.trim().toLowerCase();
     return !!currentUser && !!creatorUuid && creatorUuid === currentUser;
+  });
+
+  readonly deliveryInvitations = computed(() => {
+    const match = this.match();
+    if (!match) {
+      return [];
+    }
+    return this.invitationsStore
+      .getMatchInvitations(match.id)
+      .filter((invitation) => invitation.targetUuid !== match.creatorUuid);
+  });
+  readonly failedDeliveryInvitations = computed(() =>
+    this.deliveryInvitations().filter(
+      (invitation) => invitation.deliveryStatus === InvitationDeliveryStatus.FAILED,
+    ),
+  );
+  readonly deliverySummary = computed(() => {
+    const invitations = this.deliveryInvitations();
+    const sent = invitations.filter(
+      (invitation) => invitation.deliveryStatus === InvitationDeliveryStatus.SENT,
+    ).length;
+    const failed = this.failedDeliveryInvitations().length;
+    const pending = invitations.length - sent - failed;
+    return `${sent} enviadas · ${pending} pendientes · ${failed} fallidas`;
   });
 
   readonly canShowTeams = computed(() => {
@@ -503,6 +533,29 @@ export class MatchDetailPage implements OnDestroy {
       await this.appToastService.success('Recordatorio enviado a pendientes.');
     } catch (error) {
       await this.appToastService.error(this.errorMapper.toUserMessage(error, 'matches'));
+    }
+  }
+
+  async onRetryFailedInvitations(): Promise<void> {
+    const match = this.match();
+    if (!match || this.inviteRetryLoading() || this.failedDeliveryInvitations().length === 0) {
+      return;
+    }
+
+    this.inviteRetryLoading.set(true);
+    try {
+      const result = await this.matchService.retryFailedInvitations(match.id);
+      if (result.failed > 0) {
+        await this.appToastService.error(
+          `Se reenviaron ${result.sent}; ${result.failed} invitaciones siguen fallando.`,
+        );
+      } else {
+        await this.appToastService.success(`Reintento completado: ${result.sent} invitaciones enviadas.`);
+      }
+    } catch (error) {
+      await this.appToastService.error(this.errorMapper.toUserMessage(error, 'invitations'));
+    } finally {
+      this.inviteRetryLoading.set(false);
     }
   }
 

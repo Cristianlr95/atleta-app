@@ -7,6 +7,7 @@ import {
   MatchSize,
   MatchDraftInput,
   Invitation,
+  InvitationDeliveryStatus,
   MatchProgressView,
   MatchStatus,
   MatchType,
@@ -18,6 +19,7 @@ import { toCanonicalMatchType } from '../models/match-type.mapper';
 import { MatchPlayerSummary } from '../models/match.models';
 import { MatchesApiService } from './matches-api.service';
 import { NotificationService } from './notification.service';
+import { InvitationService } from './invitation.service';
 import { InvitationsStore } from '../stores/invitations.store';
 import {
   MatchTeamAssignmentPersistenceService,
@@ -29,6 +31,7 @@ export class MatchService {
   private readonly authSessionService = inject(AuthSessionService);
   private readonly matchesApiService = inject(MatchesApiService);
   private readonly invitationsStore = inject(InvitationsStore);
+  private readonly invitationService = inject(InvitationService);
   private readonly notificationService = inject(NotificationService);
   private readonly teamAssignmentPersistenceService = inject(MatchTeamAssignmentPersistenceService);
   private readonly matchesStore = signal<Match[]>([]);
@@ -163,7 +166,17 @@ export class MatchService {
       const committedInvites = optimisticInvites.map((invite) => {
         const serverInvite = serverInvitesByTarget.get(invite.targetUuid);
         if (!serverInvite) {
-          return invite;
+          return {
+            ...invite,
+            deliveryStatus:
+              invite.targetUuid === session.user.atletaUuid
+                ? InvitationDeliveryStatus.SENT
+                : InvitationDeliveryStatus.FAILED,
+            deliveryMessage:
+              invite.targetUuid === session.user.atletaUuid
+                ? undefined
+                : 'El servidor no confirmo la entrega de esta invitacion.',
+          };
         }
         return {
           ...invite,
@@ -175,6 +188,8 @@ export class MatchService {
               : serverInvite.status === 'RECHAZADA'
                 ? PlayerInvitationStatus.DECLINED
                 : PlayerInvitationStatus.PENDING,
+          deliveryStatus: InvitationDeliveryStatus.SENT,
+          deliveryMessage: undefined,
         };
       });
       this.invitationsStore.upsertInvitations(committedInvites);
@@ -183,6 +198,38 @@ export class MatchService {
       return this.getMatchById(updatedDraft.id);
     } finally {
       this.isSubmittingStore.set(false);
+    }
+  }
+
+  async retryFailedInvitations(matchId: string): Promise<{ sent: number; failed: number }> {
+    const match = this.getMatchById(matchId);
+    if (!match) {
+      throw new Error('No se encontro el partido para reintentar invitaciones.');
+    }
+
+    const failed = this.invitationsStore
+      .getMatchInvitations(matchId)
+      .filter((item) => item.deliveryStatus === InvitationDeliveryStatus.FAILED);
+    if (failed.length === 0) {
+      return { sent: 0, failed: 0 };
+    }
+
+    const failedIds = failed.map((item) => item.id);
+    this.invitationsStore.setDeliveryStatus(failedIds, InvitationDeliveryStatus.RETRYING);
+    try {
+      const retried = await this.invitationService.retryFailedInvitations(match, failed);
+      this.invitationsStore.upsertInvitations(retried);
+      return {
+        sent: retried.filter((item) => item.deliveryStatus === InvitationDeliveryStatus.SENT).length,
+        failed: retried.filter((item) => item.deliveryStatus === InvitationDeliveryStatus.FAILED).length,
+      };
+    } catch (error) {
+      this.invitationsStore.setDeliveryStatus(
+        failedIds,
+        InvitationDeliveryStatus.FAILED,
+        'No fue posible completar el reintento.',
+      );
+      throw error;
     }
   }
 
@@ -751,6 +798,7 @@ export class MatchService {
       targetUuid: player.uuid,
       targetName: player.name,
       status: player.uuid === creatorUuid ? PlayerInvitationStatus.ACCEPTED : PlayerInvitationStatus.PENDING,
+      deliveryStatus: InvitationDeliveryStatus.PENDING,
       createdAt: now,
     }));
   }
