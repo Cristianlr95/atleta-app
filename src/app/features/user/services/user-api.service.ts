@@ -11,6 +11,7 @@ import {
 import {
   AthleteProfile,
   PlayerProfile,
+  UpdatePlayerProfileRequest,
   TrustLogEntry,
   UpdateTrustScoreRequest,
 } from '../models/user.models';
@@ -41,6 +42,13 @@ export class UserApiService extends ApiService {
   createPlayerProfile(payload: CreatePlayerProfileRequest) {
     return this.post<PlayerProfile, CreatePlayerProfileRequest>(
       API_ENDPOINTS.users.playerProfiles,
+      payload,
+    );
+  }
+
+  updatePlayerProfile(atletaUuid: string, payload: UpdatePlayerProfileRequest) {
+    return this.put<PlayerProfile, UpdatePlayerProfileRequest>(
+      `${API_ENDPOINTS.users.playerProfiles}/${atletaUuid}`,
       payload,
     );
   }
