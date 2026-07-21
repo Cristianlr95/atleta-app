@@ -8,6 +8,7 @@ import { catchError, finalize, takeUntil } from 'rxjs/operators';
 import { AuthSessionService } from 'src/app/core/services/auth-session.service';
 import { AppToastService } from 'src/app/core/services/app-toast.service';
 import { ErrorMapperService } from 'src/app/core/services/error-mapper.service';
+import { ApiError } from 'src/app/core/models/api-error.model';
 import { NavigationService } from 'src/app/core/services/navigation.service';
 import { AuthService } from 'src/app/features/auth/services/auth.service';
 import { MatchHistoryService, MatchHistoryViewItem } from 'src/app/features/matches/services/match-history.service';
@@ -22,6 +23,11 @@ import {
 } from 'src/app/shared/ui/metallic-bottom-nav/metallic-bottom-nav.component';
 import { MetallicCardComponent } from 'src/app/shared/ui/metallic-card/metallic-card.component';
 import { MetallicFormSectionComponent } from 'src/app/shared/ui/metallic-form-section/metallic-form-section.component';
+import { MetallicButtonComponent } from 'src/app/shared/ui/metallic-button/metallic-button.component';
+import {
+  MetallicPositionFieldOption,
+  MetallicPositionFieldPickerComponent,
+} from 'src/app/shared/ui/metallic-position-field-picker/metallic-position-field-picker.component';
 import {
   MetallicPlayerPositionsComponent,
   PlayerPositionDisplay,
@@ -66,6 +72,8 @@ interface OutcomeSummary {
     MetallicStatsComponent,
     MetallicBottomNavComponent,
     MetallicPlayerPositionsComponent,
+    MetallicButtonComponent,
+    MetallicPositionFieldPickerComponent,
   ],
 })
 export class PlayerProfilePage implements OnDestroy {
@@ -86,7 +94,7 @@ export class PlayerProfilePage implements OnDestroy {
   private readonly destroy$ = new Subject<void>();
   private readonly leave$ = new Subject<void>();
   private readonly autoRefreshMs = 45000;
-  private readonly isDemoMode: boolean;
+  readonly isDemoMode: boolean;
   private autoRefreshSub: Subscription | null = null;
   private inviteSearchTimer?: number;
 
@@ -135,6 +143,15 @@ export class PlayerProfilePage implements OnDestroy {
   passwordChangeMessage: string | null = null;
   passwordChangeError: string | null = null;
   logoutLoading = false;
+  profileEditOpen = false;
+  profileEditLoading = false;
+  profileEditPositionsLoading = false;
+  profileEditError: string | null = null;
+  editName = '';
+  editAlias = '';
+  editPositionIds: string[] = [];
+  editPositionOptions: ReadonlyArray<MetallicPositionFieldOption> = [];
+  private assignedPositions: PlayerAssignedPosition[] = [];
 
   constructor() {
     this.isDemoMode = this.route.snapshot.queryParamMap.get('demo') === '1';
@@ -168,6 +185,117 @@ export class PlayerProfilePage implements OnDestroy {
 
   onNavItemSelected(itemId: string): void {
     void this.navigationService.goToMainBottomSection(itemId);
+  }
+
+  async onOpenProfileEdit(): Promise<void> {
+    if (this.isDemoMode || this.profileEditLoading) {
+      return;
+    }
+    this.profileEditOpen = true;
+    this.profileEditError = null;
+    this.editName = this.displayName === 'Jugador' ? '' : this.displayName;
+    this.editAlias = this.displayAlias === 'Sin alias' ? '' : this.displayAlias;
+    this.editPositionIds = this.assignedPositions
+      .slice()
+      .sort((left, right) => left.prioridad - right.prioridad)
+      .map((position) => String(position.positionId));
+
+    if (this.editPositionOptions.length === 0) {
+      await this.loadEditPositionOptions();
+    }
+  }
+
+  onCancelProfileEdit(): void {
+    if (this.profileEditLoading) {
+      return;
+    }
+    this.profileEditOpen = false;
+    this.profileEditError = null;
+  }
+
+  onEditPositionsSelected(positionIds: string[]): void {
+    this.editPositionIds = [...positionIds];
+    this.profileEditError = null;
+  }
+
+  async onRetryProfilePositions(): Promise<void> {
+    await this.loadEditPositionOptions();
+  }
+
+  canSaveProfile(): boolean {
+    const name = this.editName.trim();
+    const alias = this.editAlias.trim();
+    return (
+      name.length > 0 &&
+      name.length <= 100 &&
+      alias.length > 0 &&
+      alias.length <= 50 &&
+      this.editPositionIds.length === 3 &&
+      new Set(this.editPositionIds).size === 3 &&
+      !this.profileEditLoading &&
+      !this.profileEditPositionsLoading
+    );
+  }
+
+  async onSaveProfile(): Promise<void> {
+    const session = this.authSessionService.currentSession;
+    if (!session || !this.canSaveProfile()) {
+      this.profileEditError = 'Completa nombre, alias y tres posiciones distintas.';
+      return;
+    }
+
+    this.profileEditLoading = true;
+    this.profileEditError = null;
+    const nombre = this.editName.trim();
+    const alias = this.editAlias.trim();
+    try {
+      const updated = await firstValueFrom(
+        this.userApiService.updatePlayerProfile(session.user.atletaUuid, {
+          nombre,
+          alias,
+          positionIds: this.editPositionIds.map(Number),
+        }),
+      );
+      this.displayName = updated.nombre || nombre;
+      this.displayAlias = updated.alias || alias;
+      this.authSessionService.updateCurrentUser({ nombre: this.displayName });
+
+      this.assignedPositions = this.editPositionIds.map((positionId, index) => ({
+        playerUuid: session.user.atletaUuid,
+        positionId: Number(positionId),
+        positionName:
+          this.editPositionOptions.find((option) => option.value === positionId)?.label ?? 'Posicion',
+        prioridad: (index + 1) as 1 | 2 | 3,
+        assignedAt: new Date().toISOString(),
+      }));
+      this.playerPositionStateService.clearForPlayer(session.user.atletaUuid);
+      this.assignedPositions.forEach((position) => this.playerPositionStateService.storePosition(position));
+      this.playerPositions = this.toPositionDisplay(this.assignedPositions);
+      this.profileEditOpen = false;
+      await this.appToastService.success('Perfil actualizado correctamente.');
+    } catch (error) {
+      const apiError = error as Partial<ApiError>;
+      this.profileEditError = apiError?.status === 409
+        ? 'Ese alias ya esta en uso. Elige otro.'
+        : this.errorMapper.toUserMessage(error, 'default');
+    } finally {
+      this.profileEditLoading = false;
+    }
+  }
+
+  private async loadEditPositionOptions(): Promise<void> {
+    this.profileEditPositionsLoading = true;
+    try {
+      const positions = await firstValueFrom(this.userApiService.getPositions());
+      this.editPositionOptions = positions.map((position) => ({
+        label: position.nombre,
+        value: String(position.id),
+      }));
+    } catch (error) {
+      this.profileEditError = this.errorMapper.toUserMessage(error, 'default');
+    } finally {
+      this.profileEditPositionsLoading = false;
+    }
   }
 
   async onLogout(): Promise<void> {
@@ -482,7 +610,7 @@ export class PlayerProfilePage implements OnDestroy {
     teams: TeamSummary[],
     positions: PlayerAssignedPosition[],
   ): void {
-    this.displayName = sessionName || 'Jugador';
+    this.displayName = profile?.nombre || sessionName || 'Jugador';
     this.displayAlias = profile?.alias || overall?.alias || 'Sin alias';
     this.displayEmail = sessionEmail;
 
@@ -539,6 +667,7 @@ export class PlayerProfilePage implements OnDestroy {
     this.outcomeStats = this.buildOutcomeStats(outcomeSummary);
     this.memberTeams = teams;
     this.playerPositions = this.toPositionDisplay(positions);
+    this.assignedPositions = [...positions];
   }
 
   private buildOutcomeStats(summary: OutcomeSummary): Stat[] {

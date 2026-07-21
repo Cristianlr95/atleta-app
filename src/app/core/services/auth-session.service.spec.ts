@@ -50,6 +50,21 @@ describe('AuthSessionService', () => {
     expect(restored.currentSession).toBeNull();
     expect(localStorage.length).toBe(0);
   });
+
+  it('updates and persists the current user without replacing authentication tokens', () => {
+    TestBed.configureTestingModule({
+      providers: [AuthSessionService, provideAppConfigMock()],
+    });
+    const service = TestBed.inject(AuthSessionService);
+    const token = buildJwt({ sub: 'ath-1', exp: futureExp() });
+    service.startSession(buildSession(token));
+
+    const updated = service.updateCurrentUser({ nombre: 'Nombre editado' });
+
+    expect(updated?.user.nombre).toBe('Nombre editado');
+    expect(updated?.tokens.accessToken).toBe(token);
+    expect(service.currentSession?.user.nombre).toBe('Nombre editado');
+  });
 });
 
 function buildSession(accessToken: string): AuthSession {

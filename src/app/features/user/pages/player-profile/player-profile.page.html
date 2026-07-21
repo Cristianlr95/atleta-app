@@ -10,6 +10,13 @@
           <p class="profile-alias">Alias: {{ displayAlias }}</p>
           <p class="profile-email">{{ displayEmail }}</p>
         </div>
+        <app-metallic-button
+          *ngIf="!profileEditOpen && !isDemoMode"
+          type="button"
+          variant="secondary"
+          (click)="onOpenProfileEdit()">
+          Editar perfil
+        </app-metallic-button>
       </div>
 
       <p *ngIf="isLoading" class="profile-message profile-message--info">
@@ -18,6 +25,77 @@
       <p *ngIf="errorMessage" class="profile-message profile-message--warning">
         {{ errorMessage }}
       </p>
+
+      <app-metallic-form-section
+        *ngIf="profileEditOpen"
+        title="Editar perfil"
+        [titleIconAsset]="profileTitleIconAsset"
+        description="Actualiza tu identidad y ordena exactamente tres posiciones por prioridad.">
+        <form class="profile-edit-form" (ngSubmit)="onSaveProfile()">
+          <label class="profile-password-field">
+            <span>Nombre</span>
+            <input
+              type="text"
+              name="editName"
+              maxlength="100"
+              autocomplete="name"
+              [(ngModel)]="editName"
+              [disabled]="profileEditLoading" />
+          </label>
+
+          <label class="profile-password-field">
+            <span>Alias</span>
+            <input
+              type="text"
+              name="editAlias"
+              maxlength="50"
+              autocomplete="nickname"
+              [(ngModel)]="editAlias"
+              [disabled]="profileEditLoading" />
+          </label>
+
+          <div class="profile-edit-positions">
+            <p>Posiciones: {{ editPositionIds.length }}/3</p>
+            <app-metallic-position-field-picker
+              [options]="editPositionOptions"
+              [selectedValues]="editPositionIds"
+              [maxSelections]="3"
+              [disabled]="profileEditLoading || profileEditPositionsLoading"
+              (selectedValuesChange)="onEditPositionsSelected($event)">
+            </app-metallic-position-field-picker>
+            <p *ngIf="profileEditPositionsLoading" class="profile-message profile-message--info">
+              Cargando posiciones...
+            </p>
+          </div>
+
+          <p *ngIf="profileEditError" class="profile-message profile-message--warning">
+            {{ profileEditError }}
+          </p>
+          <app-metallic-button
+            *ngIf="editPositionOptions.length === 0 && !profileEditPositionsLoading"
+            type="button"
+            variant="secondary"
+            (click)="onRetryProfilePositions()">
+            Reintentar posiciones
+          </app-metallic-button>
+
+          <div class="profile-edit-actions">
+            <app-metallic-button
+              type="submit"
+              variant="primary"
+              [disabled]="!canSaveProfile()">
+              {{ profileEditLoading ? 'Guardando...' : 'Guardar cambios' }}
+            </app-metallic-button>
+            <app-metallic-button
+              type="button"
+              variant="secondary"
+              [disabled]="profileEditLoading"
+              (click)="onCancelProfileEdit()">
+              Cancelar
+            </app-metallic-button>
+          </div>
+        </form>
+      </app-metallic-form-section>
 
       <app-metallic-form-section
         title="Seguridad de cuenta"

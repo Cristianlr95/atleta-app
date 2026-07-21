@@ -112,6 +112,18 @@ describe('API contracts smoke', () => {
     service.createPlayerProfile({ atletaUuid, alias: 'Demo10' }).subscribe();
     expectRequest('POST', '/player-profiles').flush({});
 
+    service.updatePlayerProfile(atletaUuid, {
+      nombre: 'Jugador Demo',
+      alias: 'Demo11',
+      positionIds: [1, 2, 3],
+    }).subscribe();
+    const updateProfileRequest = expectRequest('PUT', `/player-profiles/${atletaUuid}`);
+    expect(updateProfileRequest.request.body).toEqual({
+      nombre: 'Jugador Demo',
+      alias: 'Demo11',
+      positionIds: [1, 2, 3],
+    });
+
     service.getPlayerPositions(atletaUuid).subscribe();
     expectRequest('GET', `/player-profiles/${atletaUuid}/positions`).flush([]);
 

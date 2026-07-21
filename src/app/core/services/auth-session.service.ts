@@ -42,6 +42,21 @@ export class AuthSessionService {
     this.sessionSubject.next(null);
   }
 
+  updateCurrentUser(patch: Partial<AuthSession['user']>): AuthSession | null {
+    const current = this.getValidSession();
+    if (!current) {
+      return null;
+    }
+
+    const updated: AuthSession = {
+      ...current,
+      user: { ...current.user, ...patch },
+    };
+    this.persistSession(updated);
+    this.sessionSubject.next(updated);
+    return updated;
+  }
+
   private restoreSession(): AuthSession | null {
     const accessToken = this.tokenStorage.getAccessToken();
     if (!accessToken) {

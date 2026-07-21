@@ -1,6 +1,6 @@
 ﻿import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ActivatedRoute, Router } from '@angular/router';
-import { of } from 'rxjs';
+import { of, throwError } from 'rxjs';
 import { AppToastService } from 'src/app/core/services/app-toast.service';
 import { AuthSessionService } from 'src/app/core/services/auth-session.service';
 import { NavigationService } from 'src/app/core/services/navigation.service';
@@ -18,7 +18,7 @@ import { PlayerProfilePage } from './player-profile.page';
 describe('PlayerProfilePage', () => {
   let component: PlayerProfilePage;
   let fixture: ComponentFixture<PlayerProfilePage>;
-  let authSessionService: { currentSession: unknown };
+  let authSessionService: { currentSession: any; updateCurrentUser: jasmine.Spy };
   let userApiService: jasmine.SpyObj<UserApiService>;
   let appToastService: jasmine.SpyObj<AppToastService>;
   let authService: jasmine.SpyObj<AuthService>;
@@ -27,13 +27,21 @@ describe('PlayerProfilePage', () => {
   beforeEach(async () => {
     authSessionService = {
       currentSession: null,
+      updateCurrentUser: jasmine.createSpy('updateCurrentUser'),
     };
     userApiService = jasmine.createSpyObj<UserApiService>('UserApiService', [
       'getPlayerProfile',
       'changePassword',
+      'getPositions',
+      'updatePlayerProfile',
     ]);
     userApiService.getPlayerProfile.and.returnValue(of({} as PlayerProfile));
     userApiService.changePassword.and.returnValue(of(void 0));
+    userApiService.getPositions.and.returnValue(of([
+      { id: 1, nombre: 'Arquero' },
+      { id: 2, nombre: 'Defensa' },
+      { id: 3, nombre: 'Delantero' },
+    ]));
     appToastService = jasmine.createSpyObj<AppToastService>('AppToastService', ['success', 'error', 'info']);
     appToastService.success.and.resolveTo();
     appToastService.error.and.resolveTo();
@@ -86,6 +94,8 @@ describe('PlayerProfilePage', () => {
           provide: PlayerPositionStateService,
           useValue: {
             getByPlayer: () => [],
+            clearForPlayer: jasmine.createSpy('clearForPlayer'),
+            storePosition: jasmine.createSpy('storePosition'),
           },
         },
         {
@@ -208,7 +218,86 @@ describe('PlayerProfilePage', () => {
     expect(navigationService.goToLoginAfterLogout).toHaveBeenCalledTimes(1);
     expect(component.logoutLoading).toBeFalse();
   });
+
+  it('updates name, alias and three prioritized positions without a new login', async () => {
+    authSessionService.currentSession = {
+      user: { atletaUuid: 'ath-1', nombre: 'Anterior', email: 'demo@atleta.cl' },
+    };
+    userApiService.updatePlayerProfile.and.returnValue(of({
+      atletaUuid: 'ath-1',
+      nombre: 'Nombre editado',
+      alias: 'AliasEditado',
+    }));
+    component.displayName = 'Anterior';
+    component.displayAlias = 'AnteriorAlias';
+    (component as any).assignedPositions = [
+      assignedPosition(1, 1),
+      assignedPosition(2, 2),
+      assignedPosition(3, 3),
+    ];
+
+    await component.onOpenProfileEdit();
+    component.editName = 'Nombre editado';
+    component.editAlias = 'AliasEditado';
+    await component.onSaveProfile();
+
+    expect(userApiService.updatePlayerProfile).toHaveBeenCalledOnceWith('ath-1', {
+      nombre: 'Nombre editado',
+      alias: 'AliasEditado',
+      positionIds: [1, 2, 3],
+    });
+    expect(authSessionService.updateCurrentUser).toHaveBeenCalledOnceWith({ nombre: 'Nombre editado' });
+    expect(component.displayName).toBe('Nombre editado');
+    expect(component.profileEditOpen).toBeFalse();
+  });
+
+  it('shows a specific duplicate alias error and keeps the editor open', async () => {
+    authSessionService.currentSession = {
+      user: { atletaUuid: 'ath-1', nombre: 'Anterior', email: 'demo@atleta.cl' },
+    };
+    userApiService.updatePlayerProfile.and.returnValue(
+      throwError(() => ({ status: 409, message: '' })),
+    );
+    component.profileEditOpen = true;
+    component.editName = 'Nombre editado';
+    component.editAlias = 'AliasOcupado';
+    component.editPositionIds = ['1', '2', '3'];
+
+    await component.onSaveProfile();
+
+    expect(component.profileEditError).toBe('Ese alias ya esta en uso. Elige otro.');
+    expect(component.profileEditOpen).toBeTrue();
+  });
+
+  it('keeps edits available when the network fails', async () => {
+    authSessionService.currentSession = {
+      user: { atletaUuid: 'ath-1', nombre: 'Anterior', email: 'demo@atleta.cl' },
+    };
+    userApiService.updatePlayerProfile.and.returnValue(
+      throwError(() => ({ status: 0, message: '' })),
+    );
+    component.profileEditOpen = true;
+    component.editName = 'Nombre editado';
+    component.editAlias = 'AliasEditado';
+    component.editPositionIds = ['1', '2', '3'];
+
+    await component.onSaveProfile();
+
+    expect(component.profileEditError).toBe('No se pudo conectar al servidor. Intenta nuevamente.');
+    expect(component.editName).toBe('Nombre editado');
+    expect(component.profileEditOpen).toBeTrue();
+  });
 });
+
+function assignedPosition(positionId: number, prioridad: 1 | 2 | 3) {
+  return {
+    playerUuid: 'ath-1',
+    positionId,
+    positionName: `Posicion ${positionId}`,
+    prioridad,
+    assignedAt: '2026-07-21T20:00:00.000Z',
+  };
+}
 
 function buildHistoryItem(
   id: number,
