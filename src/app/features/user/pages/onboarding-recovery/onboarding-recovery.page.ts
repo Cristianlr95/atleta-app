@@ -50,7 +50,7 @@ export class OnboardingRecoveryPage {
     }
     this.logoutLoading = true;
     try {
-      this.authService.logout();
+      await this.authService.logout();
     } finally {
       await this.navigationService.goToLoginAfterLogout();
       this.logoutLoading = false;

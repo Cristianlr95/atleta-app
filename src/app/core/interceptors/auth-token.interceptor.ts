@@ -31,7 +31,12 @@ export class AuthTokenInterceptor implements HttpInterceptor {
   private isPublicEndpoint(url: string): boolean {
     return (
       url.includes(API_ENDPOINTS.auth.login) ||
-      url.includes(API_ENDPOINTS.auth.registerAthlete)
+      url.includes(API_ENDPOINTS.auth.registerAthlete) ||
+      url.includes(API_ENDPOINTS.auth.googleLogin) ||
+      url.includes(API_ENDPOINTS.auth.refresh) ||
+      url.includes(API_ENDPOINTS.auth.logout) ||
+      url.includes(API_ENDPOINTS.auth.passwordResetRequest) ||
+      url.includes(API_ENDPOINTS.auth.passwordResetConfirm)
     );
   }
 }

@@ -309,7 +309,7 @@ export class PlayerProfilePage implements OnDestroy {
     this.clearInviteSearchTimer();
 
     try {
-      this.authService.logout();
+      await this.authService.logout();
     } finally {
       await this.navigationService.goToLoginAfterLogout();
       this.logoutLoading = false;

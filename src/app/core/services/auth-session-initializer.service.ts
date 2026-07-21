@@ -3,11 +3,14 @@ import { firstValueFrom } from 'rxjs';
 import { UserApiService } from '../../features/user/services/user-api.service';
 import { ApiError } from '../models/api-error.model';
 import { AuthSessionService } from './auth-session.service';
+import { SessionRefreshService } from './session-refresh.service';
+import { TokenStorageService } from './token-storage.service';
 
 @Injectable({ providedIn: 'root' })
 export class AuthSessionInitializerService {
   private readonly authSessionService = inject(AuthSessionService);
   private readonly injector = inject(Injector);
+  private readonly tokenStorage = inject(TokenStorageService);
 
   private initPromise: Promise<void> | null = null;
   private initialized = false;
@@ -30,7 +33,15 @@ export class AuthSessionInitializerService {
   }
 
   private async runInit(): Promise<void> {
-    const seededSession = this.authSessionService.getValidSession();
+    let seededSession = this.authSessionService.getValidSession();
+    if (!seededSession && this.tokenStorage.getRefreshToken()) {
+      try {
+        await firstValueFrom(this.injector.get(SessionRefreshService).refreshAccessToken());
+        seededSession = this.authSessionService.getValidSession();
+      } catch {
+        this.authSessionService.clearSession();
+      }
+    }
     if (!seededSession) {
       return;
     }

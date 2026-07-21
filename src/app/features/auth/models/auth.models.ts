@@ -14,6 +14,19 @@ export interface LoginRequest {
   password: string;
 }
 
+export interface RefreshTokenRequest {
+  refreshToken: string;
+}
+
+export interface PasswordResetRequest {
+  email: string;
+}
+
+export interface PasswordResetConfirmRequest {
+  token: string;
+  newPassword: string;
+}
+
 export interface GoogleLoginRequest {
   idToken: string;
 }
