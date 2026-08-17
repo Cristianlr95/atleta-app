@@ -12,19 +12,22 @@
   </div>
 
   <div class="summary-meta">
-    <span class="result-badge" [ngClass]="resultBadge.css">{{ resultBadge.icon }} {{ resultBadge.label }}</span>
+    <span class="result-badge" [ngClass]="resultBadge.css">
+      <img class="atleta-raster-icon" [src]="resultBadge.iconAsset" aria-hidden="true" alt="" />
+      {{ resultBadge.label }}
+    </span>
     <span class="winner-label">{{ winnerLabel }}</span>
   </div>
 
   <div class="summary-events">
     <section>
       <h4>{{ homeName }}</h4>
-      <p *ngFor="let event of homeEvents">{{ event.icon }} {{ event.text }}</p>
+      <p *ngFor="let event of homeEvents"><img class="atleta-raster-icon" [src]="event.iconAsset" aria-hidden="true" alt="" />{{ event.text }}</p>
       <p *ngIf="homeEvents.length === 0" class="empty">Sin eventos cargados</p>
     </section>
     <section>
       <h4>{{ awayName }}</h4>
-      <p *ngFor="let event of awayEvents">{{ event.icon }} {{ event.text }}</p>
+      <p *ngFor="let event of awayEvents"><img class="atleta-raster-icon" [src]="event.iconAsset" aria-hidden="true" alt="" />{{ event.text }}</p>
       <p *ngIf="awayEvents.length === 0" class="empty">Sin eventos cargados</p>
     </section>
   </div>

@@ -12,6 +12,8 @@ import { buildBalancedTeams } from '../../utils/team-balance.util';
   styleUrls: ['./player-select-list.component.scss'],
 })
 export class PlayerSelectListComponent implements OnChanges {
+  readonly ratingStarFilledAsset = 'assets/icons/atleta-raster-v1/ic_rating_star_filled_96.png';
+  readonly ratingStarOutlineAsset = 'assets/icons/atleta-raster-v1/ic_rating_star_outline_96.png';
   @Input() players: Player[] = [];
   @Input() selectedIds: string[] = [];
   @Input() loading = false;
@@ -63,11 +65,11 @@ export class PlayerSelectListComponent implements OnChanges {
     return 'Requiere ajuste';
   }
 
-  get homeStars(): string {
+  get homeStars(): boolean[] {
     return this.buildStars(this.homeAverageOvr);
   }
 
-  get awayStars(): string {
+  get awayStars(): boolean[] {
     return this.buildStars(this.awayAverageOvr);
   }
 
@@ -80,8 +82,8 @@ export class PlayerSelectListComponent implements OnChanges {
     this.awayAverageOvr = balanced.awayAverageOvr;
   }
 
-  private buildStars(avgOvr: number): string {
+  private buildStars(avgOvr: number): boolean[] {
     const stars = Math.round((Math.max(0, Math.min(avgOvr, 100)) / 100) * 5);
-    return `${'★'.repeat(stars)}${'☆'.repeat(5 - stars)}`;
+    return Array.from({ length: 5 }, (_item, index) => index < stars);
   }
 }

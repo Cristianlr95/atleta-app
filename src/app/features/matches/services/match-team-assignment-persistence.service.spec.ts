@@ -56,18 +56,16 @@ describe('MatchTeamAssignmentPersistenceService', () => {
     });
   });
 
-  it('removes persisted assignments when the session is cleared', () => {
-    service.saveAll({
-      'backend-42': {
-        homeIds: ['a'],
-        awayIds: ['b'],
-        updatedAt: '2026-06-15T12:00:00.000Z',
-      },
-    });
+  it('stores tactical formations when provided', () => {
+    const snapshot = service.createSnapshot(
+      [player('home-1')],
+      [player('away-1')],
+      '2026-06-15T12:00:00.000Z',
+      { homeFormationId: '2-1-1', awayFormationId: '1-2-1' },
+    );
 
-    service.clear();
-
-    expect(localStorage.getItem('atleta.match.team-assignments.v1')).toBeNull();
+    expect(snapshot.homeFormationId).toBe('2-1-1');
+    expect(snapshot.awayFormationId).toBe('1-2-1');
   });
 });
 

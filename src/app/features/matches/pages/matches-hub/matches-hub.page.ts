@@ -90,14 +90,14 @@ export class MatchesHubPage implements OnDestroy {
   private readonly leave$ = new Subject<void>();
   private readonly playerOvrCache = new Map<string, number | null>();
 
-  readonly iconBase = 'assets/icons/atleta';
-  readonly titleIconAsset = `${this.iconBase}/ic_nav_matches_24.svg`;
-  readonly upcomingIconAsset = `${this.iconBase}/ic_status_in_assembly_24.svg`;
-  readonly historyIconAsset = `${this.iconBase}/ic_match_calendar_24.svg`;
-  readonly createIconAsset = `${this.iconBase}/ic_match_create_24.svg`;
-  readonly filterIconAsset = `${this.iconBase}/ic_action_filter_24.svg`;
-  readonly openIconAsset = `${this.iconBase}/ic_action_search_24.svg`;
-  readonly editIconAsset = `${this.iconBase}/ic_action_edit_24.svg`;
+  readonly iconBase = 'assets/icons/atleta-raster-v1';
+  readonly titleIconAsset = `${this.iconBase}/ic_nav_matches_96.png`;
+  readonly upcomingIconAsset = `${this.iconBase}/ic_status_in_assembly_96.png`;
+  readonly historyIconAsset = `${this.iconBase}/ic_match_calendar_96.png`;
+  readonly createIconAsset = `${this.iconBase}/ic_match_create_96.png`;
+  readonly filterIconAsset = `${this.iconBase}/ic_action_filter_96.png`;
+  readonly openIconAsset = `${this.iconBase}/ic_action_open_match_96.png`;
+  readonly editIconAsset = `${this.iconBase}/ic_action_edit_96.png`;
 
   selectedTab: MatchesTab = 'upcoming';
   isLoading = false;
@@ -178,22 +178,22 @@ export class MatchesHubPage implements OnDestroy {
 
   getStatusIconAsset(status: UpcomingStatusKey): string {
     if (status === 'CONFIRMED') {
-      return `${this.iconBase}/ic_status_finished_24.svg`;
+      return `${this.iconBase}/ic_status_confirmed_96.png`;
     }
 
     if (status === 'INICIADO') {
-      return `${this.iconBase}/ic_status_in_progress_24.svg`;
+      return `${this.iconBase}/ic_status_in_progress_96.png`;
     }
 
     if (status === 'FINALIZADO') {
-      return `${this.iconBase}/ic_status_finished_24.svg`;
+      return `${this.iconBase}/ic_status_finished_96.png`;
     }
 
     if (status === 'INVALIDO') {
-      return `${this.iconBase}/ic_status_canceled_24.svg`;
+      return `${this.iconBase}/ic_status_canceled_96.png`;
     }
 
-    return `${this.iconBase}/ic_status_pending_24.svg`;
+    return `${this.iconBase}/ic_status_pending_96.png`;
   }
 
   getStatusVisualClass(status: UpcomingStatusKey): string {
@@ -762,17 +762,17 @@ export class MatchesHubPage implements OnDestroy {
       {
         label: 'Victorias',
         value: outcomes.filter((outcome) => outcome === 'GANADO').length,
-        icon: 'trophy-outline',
+        icon: 'win',
       },
       {
         label: 'Empates',
         value: outcomes.filter((outcome) => outcome === 'EMPATADO').length,
-        icon: 'stats-chart-outline',
+        icon: 'draw',
       },
       {
         label: 'Derrotas',
         value: outcomes.filter((outcome) => outcome === 'PERDIDO').length,
-        icon: 'football-outline',
+        icon: 'loss',
       },
     ];
   }

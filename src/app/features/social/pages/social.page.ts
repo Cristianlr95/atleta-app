@@ -50,7 +50,7 @@ export class SocialPage implements OnDestroy {
   private readonly notificationBadgeService = inject(NotificationBadgeService);
   private readonly matchService = inject(MatchService);
 
-  readonly socialIconAsset = 'assets/icons/atleta/ic_match_invite_24.svg';
+  readonly socialIconAsset = 'assets/icons/atleta-raster-v1/ic_social_friends_96.png';
 
   private friendSearchHandle?: number;
   private inviteSearchHandle?: number;

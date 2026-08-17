@@ -38,11 +38,11 @@ export class HomePage {
   private readonly invitationsStore = inject(InvitationsStore);
   private readonly notificationBadgeService = inject(NotificationBadgeService);
 
-  readonly iconBase = 'assets/icons/atleta';
-  readonly titleIconAsset = `${this.iconBase}/ic_nav_home_24.svg`;
-  readonly identityIconAsset = `${this.iconBase}/ic_comp_level_24.svg`;
-  readonly statusIconAsset = `${this.iconBase}/ic_status_ready_24.svg`;
-  readonly activityIconAsset = `${this.iconBase}/ic_comp_stats_24.svg`;
+  readonly iconBase = 'assets/icons/atleta-raster-v1';
+  readonly titleIconAsset = `${this.iconBase}/ic_nav_home_96.png`;
+  readonly identityIconAsset = `${this.iconBase}/ic_comp_overall_96.png`;
+  readonly statusIconAsset = `${this.iconBase}/ic_status_ready_96.png`;
+  readonly activityIconAsset = `${this.iconBase}/ic_comp_stats_96.png`;
 
   isLoading = false;
   nextMatchLabel = 'Sin partido agendado';
@@ -206,21 +206,21 @@ export class HomePage {
 
   getHomeStatusIconAsset(): string {
     if (this.nextMatchStatus === 'FINISHED') {
-      return `${this.iconBase}/ic_status_finished_24.svg`;
+      return `${this.iconBase}/ic_status_finished_96.png`;
     }
     if (this.nextMatchStatus === 'INVALID') {
-      return `${this.iconBase}/ic_status_canceled_24.svg`;
+      return `${this.iconBase}/ic_status_canceled_96.png`;
     }
     if (this.nextMatchStatus === 'LIVE') {
-      return `${this.iconBase}/ic_status_in_progress_24.svg`;
+      return `${this.iconBase}/ic_status_in_progress_96.png`;
     }
     if (this.nextMatchStatus === 'CONFIRMED') {
-      return `${this.iconBase}/ic_status_finished_24.svg`;
+      return `${this.iconBase}/ic_status_finished_96.png`;
     }
     if (this.nextMatchStatus === 'CREATED') {
-      return `${this.iconBase}/ic_status_in_assembly_24.svg`;
+      return `${this.iconBase}/ic_status_in_assembly_96.png`;
     }
-    return `${this.iconBase}/ic_status_pending_24.svg`;
+    return `${this.iconBase}/ic_status_pending_96.png`;
   }
 
   getHomeStatusClass(): string {

@@ -1,6 +1,6 @@
 ﻿<div class="positions-list" *ngIf="positions.length > 0; else emptyState">
   <article class="positions-list__item" *ngFor="let position of positions">
-    <ion-icon [src]="itemIconAsset" aria-hidden="true"></ion-icon>
+    <img class="atleta-raster-icon" [src]="itemIconAsset" aria-hidden="true" alt="" />
     <div>
       <p class="positions-list__name">{{ position.name }}</p>
       <p class="positions-list__priority">{{ position.priorityLabel }}</p>

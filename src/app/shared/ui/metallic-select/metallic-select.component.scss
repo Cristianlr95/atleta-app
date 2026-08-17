@@ -4,13 +4,13 @@
 
 .metallic-select__label {
   display: block;
-  color: #cbd9ee;
   margin-bottom: 6px;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
+  color: #d7dfe1;
   font-family: var(--font-family-display);
-  font-weight: 600;
   font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.055em;
+  text-transform: uppercase;
 }
 
 .metallic-select {
@@ -20,57 +20,49 @@
 .metallic-select__field {
   width: 100%;
   min-height: 46px;
-  padding: 13px 42px 13px 14px;
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.04), transparent),
-    var(--input-background);
-  border: 1px solid rgba(176, 199, 231, 0.3);
-  border-radius: 11px;
-  color: #f0f6ff;
+  padding: 11px 40px 11px 13px;
+  appearance: none;
+  border: 1px solid #29434e;
+  border-radius: 6px;
+  outline: none;
+  background: var(--input-background);
+  color: #eef3f4;
   font-family: var(--font-family-body);
   font-size: 16px;
   font-weight: 600;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
-  outline: none;
-  appearance: none;
   cursor: pointer;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  transition:
+    border-color 150ms ease,
+    box-shadow 150ms ease;
 
   &:hover:not(:disabled) {
-    border-color: rgba(176, 199, 231, 0.5);
+    border-color: #3f606c;
   }
 
   &:focus {
-    border-color: rgba(88, 199, 255, 0.72);
-    box-shadow:
-      inset 0 1px 0 rgba(255, 255, 255, 0.1),
-      0 0 0 3px rgba(88, 199, 255, 0.14),
-      0 0 22px rgba(88, 199, 255, 0.16);
+    border-color: var(--tactical-visit);
+    box-shadow: 0 0 0 3px rgba(0, 215, 245, 0.11);
   }
 
   &:disabled {
-    opacity: 0.55;
     cursor: not-allowed;
+    opacity: 0.52;
   }
 }
 
 .metallic-select::after {
   content: '';
   position: absolute;
-  right: 16px;
   top: 50%;
-  width: 8px;
-  height: 8px;
-  border-right: 2px solid #bfeaff;
-  border-bottom: 2px solid #bfeaff;
+  right: 15px;
+  width: 7px;
+  height: 7px;
   transform: translateY(-70%) rotate(45deg);
+  border-right: 2px solid #b8c6ca;
+  border-bottom: 2px solid #b8c6ca;
   pointer-events: none;
 }
 
 .metallic-select__shine {
-  position: absolute;
-  inset: 0;
-  border-radius: 11px;
-  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.05), transparent);
-  pointer-events: none;
+  display: none;
 }

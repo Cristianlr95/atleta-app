@@ -13,17 +13,17 @@ import { ActivityActionType, ActivityItem, ActivityType } from '../../models/act
   styleUrls: ['./activity-card.component.scss'],
 })
 export class ActivityCardComponent {
-  private readonly iconBase = 'assets/icons/atleta';
+  private readonly iconBase = 'assets/icons/atleta-raster-v1';
 
   @Input({ required: true }) item!: ActivityItem;
   @Output() actionSelected = new EventEmitter<{ activityId: string; action: ActivityActionType }>();
   @Output() openContext = new EventEmitter<ActivityItem>();
 
-  readonly friendIconAsset = `${this.iconBase}/ic_match_invite_24.svg`;
-  readonly teamIconAsset = `${this.iconBase}/ic_match_teams_24.svg`;
-  readonly matchIconAsset = `${this.iconBase}/ic_nav_matches_24.svg`;
-  readonly trophyIconAsset = `${this.iconBase}/ic_comp_trophy_24.svg`;
-  readonly statsIconAsset = `${this.iconBase}/ic_comp_stats_24.svg`;
+  readonly friendIconAsset = `${this.iconBase}/ic_social_friends_96.png`;
+  readonly teamIconAsset = `${this.iconBase}/ic_match_teams_96.png`;
+  readonly matchIconAsset = `${this.iconBase}/ic_nav_matches_96.png`;
+  readonly trophyIconAsset = `${this.iconBase}/ic_comp_trophy_96.png`;
+  readonly statsIconAsset = `${this.iconBase}/ic_comp_stats_96.png`;
 
   get iconAsset(): string {
     if (this.item.type.includes('FRIEND')) {

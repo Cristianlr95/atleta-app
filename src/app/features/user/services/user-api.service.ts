@@ -11,8 +11,9 @@ import {
 import {
   AthleteProfile,
   PlayerProfile,
-  UpdatePlayerProfileRequest,
+  PlayerAchievement,
   TrustLogEntry,
+  UpdatePlayerProfileRequest,
   UpdateTrustScoreRequest,
 } from '../models/user.models';
 
@@ -29,26 +30,37 @@ export class UserApiService extends ApiService {
     );
   }
 
+  deleteAccount(atletaUuid: string, payload: { confirmation: string; currentPassword?: string }) {
+    return this.deleteWithBody<void, { confirmation: string; currentPassword?: string }>(
+      `${API_ENDPOINTS.users.athletes}/${atletaUuid}`,
+      payload,
+    );
+  }
+
   getPlayerProfile(atletaUuid: string) {
     return this.get<PlayerProfile>(`${API_ENDPOINTS.users.playerProfiles}/${atletaUuid}`);
   }
 
   getPublicPlayerProfile(atletaUuid: string) {
-    return this.get<PlayerProfile>(
-      `${API_ENDPOINTS.users.playerProfiles}/${atletaUuid}/public`,
+    return this.get<PlayerProfile>(`${API_ENDPOINTS.users.playerProfiles}/${atletaUuid}/public`);
+  }
+
+  updatePlayerProfile(atletaUuid: string, payload: UpdatePlayerProfileRequest) {
+    return this.put<PlayerProfile, UpdatePlayerProfileRequest>(
+      `${API_ENDPOINTS.users.playerProfiles}/${atletaUuid}`,
+      payload,
+    );
+  }
+
+  getPlayerAchievements(atletaUuid: string) {
+    return this.get<PlayerAchievement[]>(
+      `${API_ENDPOINTS.users.playerProfileAchievements}/${atletaUuid}/achievements`,
     );
   }
 
   createPlayerProfile(payload: CreatePlayerProfileRequest) {
     return this.post<PlayerProfile, CreatePlayerProfileRequest>(
       API_ENDPOINTS.users.playerProfiles,
-      payload,
-    );
-  }
-
-  updatePlayerProfile(atletaUuid: string, payload: UpdatePlayerProfileRequest) {
-    return this.put<PlayerProfile, UpdatePlayerProfileRequest>(
-      `${API_ENDPOINTS.users.playerProfiles}/${atletaUuid}`,
       payload,
     );
   }

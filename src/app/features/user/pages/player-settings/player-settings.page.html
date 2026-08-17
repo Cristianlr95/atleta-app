@@ -1,0 +1,61 @@
+<ion-content class="settings-bg">
+  <div class="settings-container">
+    <app-metallic-card title="Ajustes" [titleIconAsset]="settingsTitleIconAsset">
+      <div class="settings-intro">
+        <div>
+          <p class="settings-kicker">CUENTA</p>
+          <h2>Seguridad y acceso</h2>
+          <p>Gestiona las opciones privadas de tu cuenta, separadas de tu perfil deportivo.</p>
+        </div>
+        <button type="button" class="settings-back" (click)="goBack()">Volver al perfil</button>
+      </div>
+
+      <app-metallic-form-section
+        title="Cambiar contrasena"
+        [titleIconAsset]="securitySectionIconAsset"
+        description="Para proteger tu cuenta, confirma tu clave actual antes de establecer una nueva."
+      >
+        <form class="settings-password-form" (ngSubmit)="onChangePassword()">
+          <label class="settings-password-field">
+            <span>Contrasena actual</span>
+            <input type="password" name="currentPassword" autocomplete="current-password" [(ngModel)]="currentPassword" [disabled]="passwordChangeLoading" />
+          </label>
+          <label class="settings-password-field">
+            <span>Nueva contrasena</span>
+            <input type="password" name="newPassword" autocomplete="new-password" [(ngModel)]="newPassword" [disabled]="passwordChangeLoading" />
+          </label>
+          <label class="settings-password-field">
+            <span>Confirmar nueva contrasena</span>
+            <input type="password" name="confirmNewPassword" autocomplete="new-password" [(ngModel)]="confirmNewPassword" [disabled]="passwordChangeLoading" />
+          </label>
+          <p class="settings-message settings-message--warning" *ngIf="passwordChangeError">{{ passwordChangeError }}</p>
+          <p class="settings-message settings-message--success" *ngIf="passwordChangeMessage">{{ passwordChangeMessage }}</p>
+          <button type="submit" class="settings-submit" [disabled]="passwordChangeLoading">
+            {{ passwordChangeLoading ? 'Actualizando...' : 'Actualizar contrasena' }}
+          </button>
+        </form>
+      </app-metallic-form-section>
+
+      <app-metallic-form-section
+        title="Zona de peligro"
+        [titleIconAsset]="securitySectionIconAsset"
+        description="Eliminar cuenta cierra tu sesión y anonimiza tu identidad. El historial deportivo compartido se conserva para no alterar los resultados de otros jugadores."
+      >
+        <form class="settings-delete-form" (ngSubmit)="onDeleteAccount()">
+          <label class="settings-password-field">
+            <span>Contraseña actual (obligatoria en cuentas locales)</span>
+            <input type="password" name="deleteCurrentPassword" autocomplete="current-password" [(ngModel)]="deleteCurrentPassword" [disabled]="deleteLoading" />
+          </label>
+          <label class="settings-password-field">
+            <span>Escribe ELIMINAR para confirmar</span>
+            <input type="text" name="deleteConfirmation" autocomplete="off" [(ngModel)]="deleteConfirmation" [disabled]="deleteLoading" />
+          </label>
+          <p class="settings-message settings-message--warning" *ngIf="deleteError">{{ deleteError }}</p>
+          <button type="submit" class="settings-delete" [disabled]="deleteLoading">
+            {{ deleteLoading ? 'Eliminando...' : 'Eliminar mi cuenta' }}
+          </button>
+        </form>
+      </app-metallic-form-section>
+    </app-metallic-card>
+  </div>
+</ion-content>

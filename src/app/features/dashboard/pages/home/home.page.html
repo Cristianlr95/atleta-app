@@ -32,7 +32,7 @@
             [ngClass]="getHomeStatusClass()"
             *ngIf="nextMatchStatus !== 'NONE'">
             <span class="home-next-status__icon-wrap">
-              <ion-icon class="home-next-status__icon" [src]="getHomeStatusIconAsset()" aria-hidden="true"></ion-icon>
+              <img class="home-next-status__icon atleta-raster-icon" [src]="getHomeStatusIconAsset()" aria-hidden="true" alt="" />
             </span>
             {{ getHomeStatusLabel() }}
           </span>

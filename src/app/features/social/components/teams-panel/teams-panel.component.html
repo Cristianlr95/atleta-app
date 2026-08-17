@@ -27,8 +27,8 @@
     <article class="teams-item" *ngFor="let invite of pendingInvites">
       <p>{{ invite.requesterAlias }} te invito a {{ invite.teamName || ('Equipo ' + invite.teamId) }}</p>
       <div class="teams-item__actions">
-        <button type="button" (click)="respondInvite.emit({ inviteId: invite.id, accept: true })">Aceptar</button>
-        <button type="button" (click)="respondInvite.emit({ inviteId: invite.id, accept: false })">Rechazar</button>
+        <button type="button" (click)="respondInvite.emit({ inviteId: invite.id, accept: true })"><img class="atleta-raster-icon" src="assets/icons/atleta-raster-v1/ic_action_accept_96.png" aria-hidden="true" alt="" />Aceptar</button>
+        <button type="button" (click)="respondInvite.emit({ inviteId: invite.id, accept: false })"><img class="atleta-raster-icon" src="assets/icons/atleta-raster-v1/ic_action_reject_96.png" aria-hidden="true" alt="" />Rechazar</button>
       </div>
     </article>
   </div>

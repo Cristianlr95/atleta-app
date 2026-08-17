@@ -41,6 +41,9 @@
 }
 
 .match-item button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   justify-self: start;
   border: 1px solid rgba(126, 144, 168, 0.45);
   border-radius: 8px;
@@ -49,6 +52,8 @@
   font-size: 11px;
   padding: 4px 8px;
 }
+
+.match-item button img.atleta-raster-icon { width: 18px; height: 18px; }
 
 .match-item__actions {
   display: flex;

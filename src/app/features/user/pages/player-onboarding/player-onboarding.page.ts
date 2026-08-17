@@ -15,10 +15,6 @@ import { ApiError } from 'src/app/core/models/api-error.model';
 import { AuthSessionService } from 'src/app/core/services/auth-session.service';
 import { NavigationService } from 'src/app/core/services/navigation.service';
 import { UserFeedbackService } from 'src/app/core/services/user-feedback.service';
-import { MetallicButtonComponent } from 'src/app/shared/ui/metallic-button/metallic-button.component';
-import { MetallicCardComponent } from 'src/app/shared/ui/metallic-card/metallic-card.component';
-import { MetallicFormSectionComponent } from 'src/app/shared/ui/metallic-form-section/metallic-form-section.component';
-import { MetallicInputComponent } from 'src/app/shared/ui/metallic-input/metallic-input.component';
 import {
   MetallicPositionFieldOption,
   MetallicPositionFieldPickerComponent,
@@ -36,11 +32,7 @@ import { UserApiService } from '../../services/user-api.service';
     CommonModule,
     ReactiveFormsModule,
     IonicModule,
-    MetallicCardComponent,
-    MetallicFormSectionComponent,
-    MetallicInputComponent,
     MetallicPositionFieldPickerComponent,
-    MetallicButtonComponent,
   ],
 })
 export class PlayerOnboardingPage implements OnDestroy {
@@ -54,13 +46,13 @@ export class PlayerOnboardingPage implements OnDestroy {
   private readonly isDemoMode: boolean;
   private readonly leave$ = new Subject<void>();
 
-  readonly iconBase = 'assets/icons/atleta';
-  readonly titleIconAsset = `${this.iconBase}/ic_nav_profile_24.svg`;
-  readonly profileSectionIconAsset = `${this.iconBase}/ic_action_edit_24.svg`;
-  readonly positionSectionIconAsset = `${this.iconBase}/ic_match_lineup_24.svg`;
+  readonly iconBase = 'assets/icons/atleta-raster-v1';
+  readonly titleIconAsset = `${this.iconBase}/ic_nav_profile_96.png`;
+  readonly saveIconAsset = `${this.iconBase}/ic_action_save_96.png`;
 
   isLoadingPositions = false;
   isSubmitting = false;
+  attemptedSubmit = false;
   submitError: string | null = null;
   selectedPositionIds: string[] = [];
 
@@ -77,6 +69,10 @@ export class PlayerOnboardingPage implements OnDestroy {
       validators: [this.uniquePositionsValidator],
     },
   );
+
+  get completionUnits(): number {
+    return (this.onboardingForm.controls.alias.valid ? 1 : 0) + this.selectedPositionIds.length;
+  }
 
   constructor() {
     this.isDemoMode = this.route.snapshot.queryParamMap.get('demo') === '1';
@@ -107,6 +103,7 @@ export class PlayerOnboardingPage implements OnDestroy {
   }
 
   onFinishSetup(): void {
+    this.attemptedSubmit = true;
     if (this.onboardingForm.invalid) {
       this.onboardingForm.markAllAsTouched();
       return;

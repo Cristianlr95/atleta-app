@@ -1,6 +1,6 @@
 ﻿<ion-content class="mvp-vote-bg">
   <div class="mvp-vote-container">
-    <app-metallic-card title="Jugador del Partido">
+    <app-metallic-card title="Jugador del Partido" [titleIconAsset]="mvpIconAsset">
       <p *ngIf="loading()" class="mvp-vote-message">Cargando votacion MVP...</p>
       <p *ngIf="loadError()" class="mvp-vote-message mvp-vote-message--error">{{ loadError() }}</p>
       <div class="mvp-vote-actions" *ngIf="loadError()">
@@ -16,7 +16,7 @@
           </p>
         </div>
 
-        <app-metallic-form-section title="Candidatos" description="Toca un jugador para votar.">
+        <app-metallic-form-section title="Candidatos" [titleIconAsset]="mvpIconAsset" description="Toca un jugador para votar.">
           <div class="vote-grid" *ngIf="voteCards().length > 0; else noCandidates">
             <app-player-vote-card
               *ngFor="let card of voteCards()"
@@ -35,6 +35,7 @@
         </app-metallic-form-section>
 
         <app-metallic-form-section
+          [titleIconAsset]="timeIconAsset"
           [title]="isOpen() ? 'Progreso de votacion' : 'Resultado de votos'"
           [description]="isOpen() ? 'La tendencia se muestra al cerrar para evitar presion o voto tactico.' : 'Ranking final de votacion.'">
           <div class="mvp-progress-chip" *ngIf="totalEligibleVotes() > 0">{{ votesProgressLabel() }}</div>

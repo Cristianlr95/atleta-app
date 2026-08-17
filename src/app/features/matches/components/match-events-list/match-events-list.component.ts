@@ -21,6 +21,7 @@ export interface MatchCloseEventItem {
   styleUrls: ['./match-events-list.component.scss'],
 })
 export class MatchEventsListComponent {
+  private readonly iconBase = 'assets/icons/atleta-raster-v1';
   @Input() events: MatchCloseEventItem[] = [];
 
   @Output() addEvent = new EventEmitter<void>();
@@ -28,7 +29,9 @@ export class MatchEventsListComponent {
   @Output() removeEvent = new EventEmitter<string>();
 
   iconFor(type: MatchCloseEventType): string {
-    return type === 'GOL' ? '⚽' : '🎯';
+    return type === 'GOL'
+      ? `${this.iconBase}/ic_event_goal_96.png`
+      : `${this.iconBase}/ic_event_assist_96.png`;
   }
 
   titleFor(event: MatchCloseEventItem): string {

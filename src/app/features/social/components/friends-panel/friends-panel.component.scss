@@ -41,6 +41,9 @@
 }
 
 .friends-item__actions button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   border: 1px solid rgba(126, 144, 168, 0.45);
   border-radius: 8px;
   background: rgba(12, 19, 31, 0.72);
@@ -48,3 +51,5 @@
   font-size: 11px;
   padding: 4px 8px;
 }
+
+.friends-item__actions img.atleta-raster-icon { width: 18px; height: 18px; }

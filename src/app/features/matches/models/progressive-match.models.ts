@@ -135,6 +135,8 @@ export interface Match {
   themeId?: string;
   homeKitColor?: string;
   awayKitColor?: string;
+  homeFormationId?: string;
+  awayFormationId?: string;
   homePlayers: Player[];
   awayPlayers: Player[];
   createdAt: string;

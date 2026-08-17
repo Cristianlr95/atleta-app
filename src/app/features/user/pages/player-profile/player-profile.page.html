@@ -10,13 +10,10 @@
           <p class="profile-alias">Alias: {{ displayAlias }}</p>
           <p class="profile-email">{{ displayEmail }}</p>
         </div>
-        <app-metallic-button
-          *ngIf="!profileEditOpen && !isDemoMode"
-          type="button"
-          variant="secondary"
-          (click)="onOpenProfileEdit()">
-          Editar perfil
-        </app-metallic-button>
+        <button type="button" class="profile-settings-link" style="font-size:13px" (click)="openSettings()">
+          <img class="atleta-raster-icon" [src]="settingsIconAsset" alt="" width="19" height="19" />
+          Ajustes
+        </button>
       </div>
 
       <p *ngIf="isLoading" class="profile-message profile-message--info">
@@ -26,152 +23,34 @@
         {{ errorMessage }}
       </p>
 
-      <app-metallic-form-section
-        *ngIf="profileEditOpen"
-        title="Editar perfil"
-        [titleIconAsset]="profileTitleIconAsset"
-        description="Actualiza tu identidad y ordena exactamente tres posiciones por prioridad.">
-        <form class="profile-edit-form" (ngSubmit)="onSaveProfile()">
-          <label class="profile-password-field">
-            <span>Nombre</span>
-            <input
-              type="text"
-              name="editName"
-              maxlength="100"
-              autocomplete="name"
-              [(ngModel)]="editName"
-              [disabled]="profileEditLoading" />
-          </label>
-
-          <label class="profile-password-field">
-            <span>Alias</span>
-            <input
-              type="text"
-              name="editAlias"
-              maxlength="50"
-              autocomplete="nickname"
-              [(ngModel)]="editAlias"
-              [disabled]="profileEditLoading" />
-          </label>
-
-          <div class="profile-edit-positions">
-            <p>Posiciones: {{ editPositionIds.length }}/3</p>
-            <app-metallic-position-field-picker
-              [options]="editPositionOptions"
-              [selectedValues]="editPositionIds"
-              [maxSelections]="3"
-              [disabled]="profileEditLoading || profileEditPositionsLoading"
-              (selectedValuesChange)="onEditPositionsSelected($event)">
-            </app-metallic-position-field-picker>
-            <p *ngIf="profileEditPositionsLoading" class="profile-message profile-message--info">
-              Cargando posiciones...
-            </p>
-          </div>
-
-          <p *ngIf="profileEditError" class="profile-message profile-message--warning">
-            {{ profileEditError }}
-          </p>
-          <app-metallic-button
-            *ngIf="editPositionOptions.length === 0 && !profileEditPositionsLoading"
-            type="button"
-            variant="secondary"
-            (click)="onRetryProfilePositions()">
-            Reintentar posiciones
-          </app-metallic-button>
-
-          <div class="profile-edit-actions">
-            <app-metallic-button
-              type="submit"
-              variant="primary"
-              [disabled]="!canSaveProfile()">
-              {{ profileEditLoading ? 'Guardando...' : 'Guardar cambios' }}
-            </app-metallic-button>
-            <app-metallic-button
-              type="button"
-              variant="secondary"
-              [disabled]="profileEditLoading"
-              (click)="onCancelProfileEdit()">
-              Cancelar
-            </app-metallic-button>
-          </div>
-        </form>
-      </app-metallic-form-section>
+      <section class="profile-showcase" aria-label="Resumen destacado del jugador">
+        <div class="profile-showcase__lead">
+          <p>COMPETICIÓN</p>
+          <strong>{{ overallHybridOvr ?? '--' }} OVR</strong>
+          <span>{{ overallText }}</span>
+        </div>
+        <app-metallic-stats [stats]="summaryStats" [compact]="true"></app-metallic-stats>
+        <div class="profile-showcase__actions">
+          <button type="button" (click)="openMatchHistory()">Ver mis partidos</button>
+          <button type="button" (click)="openMatches()">Próximos partidos</button>
+        </div>
+      </section>
 
       <app-metallic-form-section
-        title="Seguridad de cuenta"
-        [titleIconAsset]="securitySectionIconAsset"
-        description="Cambia tu contrasena local. Si entras con Google, conserva este bloque solo si tambien tienes clave local."
+        title="Trofeos y metas"
+        [titleIconAsset]="achievementsSectionIconAsset"
+        description="Tus medallas activas y el próximo objetivo competitivo."
       >
-        <form class="profile-password-form" (ngSubmit)="onChangePassword()">
-          <label class="profile-password-field">
-            <span>Contrasena actual</span>
-            <input
-              type="password"
-              name="currentPassword"
-              autocomplete="current-password"
-              [(ngModel)]="currentPassword"
-              [disabled]="passwordChangeLoading"
-            />
-          </label>
-
-          <label class="profile-password-field">
-            <span>Nueva contrasena</span>
-            <input
-              type="password"
-              name="newPassword"
-              autocomplete="new-password"
-              [(ngModel)]="newPassword"
-              [disabled]="passwordChangeLoading"
-            />
-          </label>
-
-          <label class="profile-password-field">
-            <span>Confirmar nueva contrasena</span>
-            <input
-              type="password"
-              name="confirmNewPassword"
-              autocomplete="new-password"
-              [(ngModel)]="confirmNewPassword"
-              [disabled]="passwordChangeLoading"
-            />
-          </label>
-
-          <p
-            class="profile-message profile-message--warning"
-            *ngIf="passwordChangeError"
-          >
-            {{ passwordChangeError }}
-          </p>
-          <p
-            class="profile-message profile-message--success"
-            *ngIf="passwordChangeMessage"
-          >
-            {{ passwordChangeMessage }}
-          </p>
-
-          <button
-            type="submit"
-            class="profile-team__btn profile-password-submit"
-            [disabled]="passwordChangeLoading"
-          >
-            {{ passwordChangeLoading ? 'Actualizando...' : 'Actualizar contrasena' }}
-          </button>
-        </form>
-      </app-metallic-form-section>
-
-      <app-metallic-form-section
-        title="Sesion"
-        [titleIconAsset]="securitySectionIconAsset"
-        description="Cierra la sesion en este dispositivo y elimina los datos locales asociados a tu cuenta."
-      >
-        <button
-          type="button"
-          class="profile-logout-button"
-          [disabled]="logoutLoading"
-          (click)="onLogout()"
-        >
-          {{ logoutLoading ? 'Cerrando sesion...' : 'Cerrar sesion' }}
-        </button>
+        <div class="achievement-grid achievement-grid--featured" aria-label="Trofeos competitivos">
+          <article *ngFor="let achievement of achievements" class="achievement-card" [class.achievement-card--locked]="!achievement.unlocked">
+            <img class="achievement-card__icon atleta-raster-icon" [src]="achievementIconAsset(achievement.code)" alt="" />
+            <div class="achievement-card__body">
+              <div class="achievement-card__heading"><h4>{{ achievement.title }}</h4><span>{{ achievementTierLabel(achievement) }}</span></div>
+              <div class="achievement-card__progress"><span [style.width.%]="achievement.progressPercent"></span></div>
+              <small>{{ achievement.currentValue }} / {{ achievement.nextThreshold }} {{ achievement.metricLabel }}</small>
+            </div>
+          </article>
+        </div>
       </app-metallic-form-section>
 
       <app-metallic-form-section
@@ -328,6 +207,36 @@
           [subtitle]="'Clasificación general: ' + overallText"
         >
         </app-metallic-role-hexagon>
+      </app-metallic-form-section>
+
+      <app-metallic-form-section
+        title="Logros competitivos"
+        [titleIconAsset]="achievementsSectionIconAsset"
+        description="Medallas obtenidas en partidos finalizados y metas para tu próxima marca."
+      >
+        <div class="achievement-grid" aria-label="Logros competitivos">
+          <article
+            *ngFor="let achievement of achievements"
+            class="achievement-card"
+            [class.achievement-card--locked]="!achievement.unlocked"
+            [class.achievement-card--bronze]="achievement.tier === 'BRONZE'"
+            [class.achievement-card--silver]="achievement.tier === 'SILVER'"
+            [class.achievement-card--gold]="achievement.tier === 'GOLD'"
+          >
+            <img class="achievement-card__icon atleta-raster-icon" [src]="achievementIconAsset(achievement.code)" alt="" />
+            <div class="achievement-card__body">
+              <div class="achievement-card__heading">
+                <h4>{{ achievement.title }}</h4>
+                <span>{{ achievementTierLabel(achievement) }}</span>
+              </div>
+              <p>{{ achievement.description }}</p>
+              <div class="achievement-card__progress" [attr.aria-label]="achievement.currentValue + ' de ' + achievement.nextThreshold + ' ' + achievement.metricLabel">
+                <span [style.width.%]="achievement.progressPercent"></span>
+              </div>
+              <small>{{ achievement.currentValue }} / {{ achievement.nextThreshold }} {{ achievement.metricLabel }}</small>
+            </div>
+          </article>
+        </div>
       </app-metallic-form-section>
 
       <app-metallic-form-section

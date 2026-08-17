@@ -35,10 +35,10 @@ export class RegisterPage {
   private readonly navigationService = inject(NavigationService);
   private readonly userFeedbackService = inject(UserFeedbackService);
 
-  readonly iconBase = 'assets/icons/atleta';
-  readonly registerTitleIconAsset = `${this.iconBase}/ic_nav_profile_24.svg`;
-  readonly accountSectionIconAsset = `${this.iconBase}/ic_action_edit_24.svg`;
-  readonly securitySectionIconAsset = `${this.iconBase}/ic_action_save_24.svg`;
+  readonly iconBase = 'assets/icons/atleta-raster-v1';
+  readonly registerTitleIconAsset = `${this.iconBase}/ic_nav_profile_96.png`;
+  readonly accountSectionIconAsset = `${this.iconBase}/ic_action_edit_96.png`;
+  readonly securitySectionIconAsset = `${this.iconBase}/ic_auth_security_96.png`;
 
   isSubmitting = false;
   registerError: string | null = null;

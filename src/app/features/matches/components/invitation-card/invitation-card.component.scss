@@ -26,6 +26,9 @@
 }
 
 .invitation-card__actions button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   border: 1px solid rgba(128, 151, 179, 0.4);
   background: rgba(16, 27, 43, 0.76);
   color: #dce8ff;
@@ -33,4 +36,6 @@
   padding: 8px 10px;
   font-size: 12px;
 }
+
+.invitation-card__actions img.atleta-raster-icon { width: 18px; height: 18px; }
 

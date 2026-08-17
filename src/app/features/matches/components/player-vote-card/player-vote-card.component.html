@@ -5,6 +5,7 @@
     <small>{{ teamLabel }}</small>
   </div>
   <app-metallic-button variant="accent" [disabled]="disabled" (click)="onVote()">
-    {{ selected ? 'Votado ✓' : 'Votar' }}
+    <img class="atleta-raster-icon" *ngIf="selected" [src]="confirmedIconAsset" aria-hidden="true" alt="" />
+    {{ selected ? 'Votado' : 'Votar' }}
   </app-metallic-button>
 </div>

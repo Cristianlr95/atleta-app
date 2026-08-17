@@ -2,9 +2,9 @@
   <div class="team-score">
     <span>{{ homeLabel }}</span>
     <div class="controls">
-      <button type="button" class="score-btn" (click)="decrementHome()">-</button>
+      <button type="button" class="score-btn" [attr.aria-label]="'Restar gol a ' + homeLabel" (click)="decrementHome()"><img class="atleta-raster-icon" [src]="removeIconAsset" aria-hidden="true" alt="" /></button>
       <strong>{{ homeScore }}</strong>
-      <button type="button" class="score-btn" (click)="incrementHome()">+</button>
+      <button type="button" class="score-btn" [attr.aria-label]="'Sumar gol a ' + homeLabel" (click)="incrementHome()"><img class="atleta-raster-icon" [src]="addIconAsset" aria-hidden="true" alt="" /></button>
     </div>
   </div>
 
@@ -13,9 +13,9 @@
   <div class="team-score">
     <span>{{ awayLabel }}</span>
     <div class="controls">
-      <button type="button" class="score-btn" (click)="decrementAway()">-</button>
+      <button type="button" class="score-btn" [attr.aria-label]="'Restar gol a ' + awayLabel" (click)="decrementAway()"><img class="atleta-raster-icon" [src]="removeIconAsset" aria-hidden="true" alt="" /></button>
       <strong>{{ awayScore }}</strong>
-      <button type="button" class="score-btn" (click)="incrementAway()">+</button>
+      <button type="button" class="score-btn" [attr.aria-label]="'Sumar gol a ' + awayLabel" (click)="incrementAway()"><img class="atleta-raster-icon" [src]="addIconAsset" aria-hidden="true" alt="" /></button>
     </div>
   </div>
 </div>

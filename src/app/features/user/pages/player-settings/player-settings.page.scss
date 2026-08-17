@@ -1,0 +1,109 @@
+.settings-bg {
+  --background: var(--atleta-page-bg);
+  background: var(--atleta-page-bg);
+}
+
+.settings-container {
+  min-height: 100%;
+  display: flex;
+  justify-content: center;
+  padding: 20px 14px 40px;
+}
+
+.settings-intro {
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+  margin-bottom: 18px;
+}
+
+.settings-kicker {
+  margin: 0 0 4px;
+  color: var(--tactical-visit);
+  font: 700 12px var(--font-family-display);
+  letter-spacing: .12em;
+}
+
+.settings-intro h2 {
+  margin: 0;
+  color: var(--text-primary);
+  font-family: var(--font-family-display);
+  font-size: 24px;
+  letter-spacing: .04em;
+}
+
+.settings-intro p:not(.settings-kicker) {
+  max-width: 570px;
+  margin: 7px 0 0;
+  color: var(--text-muted);
+  font-family: var(--font-family-body);
+}
+
+.settings-back,
+.settings-submit {
+  min-height: 40px;
+  border: 1px solid rgba(0, 215, 245, .5);
+  border-radius: 9px;
+  background: rgba(7, 30, 39, .72);
+  color: var(--text-primary);
+  font: 700 13px var(--font-family-display);
+  letter-spacing: .04em;
+  padding: 8px 13px;
+}
+
+.settings-back { align-self: flex-start; white-space: nowrap; }
+
+.settings-submit {
+  justify-self: start;
+  border-color: rgba(215, 255, 0, .7);
+  background: rgba(76, 99, 5, .44);
+}
+
+.settings-password-form { display: grid; gap: 12px; }
+.settings-delete-form { display: grid; gap: 12px; }
+
+.settings-password-field {
+  display: grid;
+  gap: 5px;
+  color: var(--text-primary);
+  font: 700 14px var(--font-family-body);
+}
+
+.settings-password-field input {
+  width: 100%;
+  min-width: 0;
+  height: 42px;
+  border: 1px solid rgba(126, 144, 168, .48);
+  border-radius: 9px;
+  outline: none;
+  background: rgba(7, 12, 20, .68);
+  color: #edf4ff;
+  font: 16px var(--font-family-body);
+  padding: 0 11px;
+}
+
+.settings-password-field input:focus {
+  border-color: var(--tactical-visit);
+  box-shadow: 0 0 0 2px rgba(0, 215, 245, .16);
+}
+
+.settings-message { margin: 0; font: 700 15px var(--font-family-body); }
+.settings-message--warning { color: #ffd98a; }
+.settings-message--success { color: #a7f3c3; }
+
+.settings-delete {
+  justify-self: start;
+  min-height: 40px;
+  border: 1px solid rgba(255, 90, 118, .75);
+  border-radius: 9px;
+  background: rgba(98, 12, 28, .56);
+  color: #ffeef1;
+  font: 700 13px var(--font-family-display);
+  letter-spacing: .04em;
+  padding: 8px 13px;
+}
+
+@media (max-width: 520px) {
+  .settings-intro { flex-direction: column; }
+  .settings-back { align-self: stretch; }
+}

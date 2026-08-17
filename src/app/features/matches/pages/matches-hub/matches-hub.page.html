@@ -7,7 +7,7 @@
           role="tab"
           [class.matches-tabs__item--active]="selectedTab === 'upcoming'"
           (click)="onTabChange('upcoming')">
-          <ion-icon [src]="upcomingIconAsset" aria-hidden="true"></ion-icon>
+          <img class="atleta-raster-icon" [src]="upcomingIconAsset" aria-hidden="true" alt="" />
           <span>Próximos</span>
         </button>
         <button
@@ -15,7 +15,7 @@
           role="tab"
           [class.matches-tabs__item--active]="selectedTab === 'history'"
           (click)="onTabChange('history')">
-          <ion-icon [src]="historyIconAsset" aria-hidden="true"></ion-icon>
+          <img class="atleta-raster-icon" [src]="historyIconAsset" aria-hidden="true" alt="" />
           <span>Historial</span>
         </button>
         <button
@@ -23,7 +23,7 @@
           role="tab"
           [class.matches-tabs__item--active]="selectedTab === 'create'"
           (click)="onTabChange('create')">
-          <ion-icon [src]="createIconAsset" aria-hidden="true"></ion-icon>
+          <img class="atleta-raster-icon" [src]="createIconAsset" aria-hidden="true" alt="" />
           <span>Crear</span>
         </button>
       </div>
@@ -71,7 +71,7 @@
             <div class="matches-item__top">
               <strong>{{ match.title }}</strong>
               <span [ngClass]="getStatusVisualClass(match.statusKey)">
-                <ion-icon [src]="getStatusIconAsset(match.statusKey)" aria-hidden="true"></ion-icon>
+                <img class="atleta-raster-icon" [src]="getStatusIconAsset(match.statusKey)" aria-hidden="true" alt="" />
                 {{ match.statusLabel }}
               </span>
             </div>
@@ -80,7 +80,7 @@
             <p>Equipo: {{ match.teamLabel }}</p>
             <p *ngIf="match.levelLabel">{{ match.levelLabel }}</p>
             <button type="button" class="matches-item__cta" (click)="onOpenMatch(match.id)">
-              <ion-icon [src]="openIconAsset" aria-hidden="true"></ion-icon>
+              <img class="atleta-raster-icon" [src]="openIconAsset" aria-hidden="true" alt="" />
               <span>Ver estado</span>
             </button>
           </article>
@@ -130,7 +130,7 @@
           </label>
 
           <button type="button" class="matches-filters__clear" (click)="resetHistoryFilters()">
-            <ion-icon [src]="filterIconAsset" aria-hidden="true"></ion-icon>
+            <img class="atleta-raster-icon" [src]="filterIconAsset" aria-hidden="true" alt="" />
             <span>Limpiar</span>
           </button>
         </div>
@@ -146,7 +146,7 @@
         <div class="matches-panel">
           <p>Crea un partido nuevo y envía invitaciones al equipo.</p>
           <button type="button" class="matches-panel__cta" (click)="onGoToCreate()">
-            <ion-icon [src]="editIconAsset" aria-hidden="true"></ion-icon>
+            <img class="atleta-raster-icon" [src]="editIconAsset" aria-hidden="true" alt="" />
             <span>Crear ahora</span>
           </button>
         </div>

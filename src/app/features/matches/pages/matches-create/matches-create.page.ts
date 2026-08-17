@@ -56,12 +56,12 @@ export class MatchesCreatePage {
   readonly step = signal(1);
   readonly totalSteps = 4;
 
-  readonly iconBase = 'assets/icons/atleta';
-  readonly titleIconAsset = `${this.iconBase}/ic_match_create_24.svg`;
-  readonly typeIconAsset = `${this.iconBase}/ic_match_format_24.svg`;
-  readonly scheduleIconAsset = `${this.iconBase}/ic_match_calendar_24.svg`;
-  readonly playersIconAsset = `${this.iconBase}/ic_match_invite_24.svg`;
-  readonly confirmIconAsset = `${this.iconBase}/ic_action_accept_24.svg`;
+  readonly iconBase = 'assets/icons/atleta-raster-v1';
+  readonly titleIconAsset = `${this.iconBase}/ic_match_create_96.png`;
+  readonly typeIconAsset = `${this.iconBase}/ic_match_format_96.png`;
+  readonly scheduleIconAsset = `${this.iconBase}/ic_match_calendar_96.png`;
+  readonly playersIconAsset = `${this.iconBase}/ic_match_invite_96.png`;
+  readonly confirmIconAsset = `${this.iconBase}/ic_action_accept_96.png`;
 
   readonly teams = signal<TeamSummary[]>([]);
   readonly loadingTeams = signal(false);

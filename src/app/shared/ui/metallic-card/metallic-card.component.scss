@@ -1,134 +1,74 @@
 .metallic-card {
   position: relative;
-  isolation: isolate;
   width: 100%;
-  background:
-    linear-gradient(145deg, rgba(255, 255, 255, 0.08), transparent 28%),
-    linear-gradient(160deg, rgba(30, 42, 64, 0.94), rgba(9, 15, 28, 0.96) 62%, rgba(16, 25, 41, 0.94));
-  border: 1px solid var(--line-soft);
-  border-radius: 14px;
   overflow: hidden;
-  transition: transform 0.22s ease, border-color 0.22s ease, box-shadow 0.22s ease;
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.12),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.5),
-    var(--shadow-deep);
-
-  &::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    z-index: 0;
-    pointer-events: none;
-    background:
-      radial-gradient(circle at 18% 0%, rgba(88, 199, 255, 0.14), transparent 30%),
-      radial-gradient(circle at 86% 14%, rgba(128, 231, 178, 0.1), transparent 28%);
-    opacity: 0.9;
-  }
-
-  &:hover {
-    transform: translateY(-2px);
-    border-color: rgba(205, 221, 245, 0.5);
-    box-shadow:
-      inset 0 1px 0 rgba(255, 255, 255, 0.14),
-      inset 0 -1px 0 rgba(0, 0, 0, 0.52),
-      0 22px 56px rgba(0, 0, 0, 0.54),
-      0 0 34px rgba(88, 199, 255, 0.08);
-  }
+  border: 1px solid var(--tactical-line);
+  border-radius: 7px;
+  background: var(--tactical-surface);
+  box-shadow: 0 18px 38px rgba(0, 0, 0, 0.38);
 
   &__shine-top,
-  &__shine-bottom {
-    position: absolute;
-    left: 0;
-    right: 0;
-    pointer-events: none;
-  }
-
-  &__shine-top {
-    top: 0;
-    height: 1px;
-    background: linear-gradient(to right, transparent, rgba(88, 199, 255, 0.72), rgba(215, 226, 242, 0.85), transparent);
-    opacity: 0.85;
-  }
-
-  &__shine-bottom {
-    bottom: 0;
-    height: 2px;
-    background: linear-gradient(to right, transparent, rgba(128, 231, 178, 0.48), rgba(88, 199, 255, 0.42), transparent);
-    opacity: 0.58;
-  }
-
+  &__shine-bottom,
   &__glow {
-    position: absolute;
-    inset: 0;
-    z-index: 1;
-    background:
-      linear-gradient(to bottom, rgba(255,255,255,0.07), transparent 46%),
-      linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.04), transparent);
-    pointer-events: none;
+    display: none;
   }
 
   &__content {
     position: relative;
-    z-index: 2;
   }
 
   &__header {
-    padding: 1rem 1.25rem;
-    border-bottom: 1px solid rgba(176, 199, 231, 0.18);
-    background:
-      linear-gradient(90deg, rgba(88, 199, 255, 0.1), transparent 45%),
-      rgba(7, 12, 23, 0.38);
+    padding: 17px 20px;
+    border-bottom: 1px solid var(--tactical-line);
+    background: #041016;
   }
 
   &__title-row {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 11px;
   }
 
   &__title {
-    color: var(--foreground);
-    font-size: 1.1rem;
-    font-weight: 600;
     margin: 0;
-    letter-spacing: 0.05em;
-    text-shadow: 0 0 18px rgba(88, 199, 255, 0.18);
+    color: #f3f5f5;
+    font-family: var(--font-family-display);
+    font-size: clamp(20px, 2vw, 27px);
+    font-weight: 700;
+    line-height: 1;
+    letter-spacing: 0.045em;
+    text-transform: uppercase;
   }
 
   &__title-icon {
-    color: #e6f5ff;
-    font-size: 18px;
-    filter: drop-shadow(0 0 6px rgba(88, 199, 255, 0.35));
+    width: 24px;
+    height: 24px;
+    color: #dbe4e6;
   }
 
   &__body {
-    padding: 1.25rem;
-    color: #c9d8ec;
+    padding: 18px;
+    color: #b6c2c6;
   }
 }
 
 .metallic-card__body--spaced {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 14px;
 }
 
 @media (max-width: 520px) {
   .metallic-card {
-    border-radius: 12px;
-
-    &:hover {
-      transform: none;
-    }
+    border-radius: 5px;
 
     &__header,
     &__body {
-      padding: 1rem;
+      padding: 14px;
     }
 
     &__title {
-      font-size: 1rem;
+      font-size: 21px;
     }
   }
 }

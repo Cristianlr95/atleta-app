@@ -251,7 +251,7 @@ ion-toast::part(container) {
 }
 
 /* Icon system: stronger, game-like definition across the app */
-ion-icon {
+img.atleta-raster-icon {
   --ionicon-stroke-width: 42px;
   color: var(--atleta-icon-color);
   transition: transform 180ms ease, filter 180ms ease, opacity 180ms ease;
@@ -299,7 +299,7 @@ ion-icon {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  ion-icon,
+  img.atleta-raster-icon,
   .atleta-game-icon {
     transition: none;
   }

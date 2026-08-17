@@ -1,6 +1,6 @@
 .stats-bg {
-  --background: none;
-  background:
+  --background: var(--atleta-page-bg);
+  background: var(--atleta-page-bg),
     radial-gradient(circle at 18% 8%, rgba(49, 111, 193, 0.26), transparent 28%),
     radial-gradient(circle at 88% 16%, rgba(220, 174, 80, 0.18), transparent 24%),
     linear-gradient(180deg, #0c1626 0%, #060b14 55%, #04070f 100%);
@@ -17,7 +17,7 @@
 .stats-kicker {
   margin: 0 0 8px;
   color: #d7b96d;
-  font-family: "Orbitron", sans-serif;
+  font-family: var(--font-family-display);
   font-size: 11px;
   letter-spacing: 0.18em;
   text-transform: uppercase;
@@ -71,7 +71,7 @@
 
 .stats-insight span {
   color: #d7b96d;
-  font-family: "Orbitron", sans-serif;
+  font-family: var(--font-family-display);
   font-size: 11px;
   letter-spacing: 0.12em;
   text-transform: uppercase;

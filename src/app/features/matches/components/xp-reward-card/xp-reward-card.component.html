@@ -5,7 +5,10 @@
       <span>+{{ reward.xp }} XP {{ reward.position }}</span>
     </header>
     <p *ngIf="reward.currentOvr !== undefined && reward.currentOvr !== null">OVR actual: {{ reward.currentOvr | number: '1.0-2' }}</p>
-    <p *ngIf="reward.toLevel > reward.fromLevel">⬆ Nivel {{ reward.fromLevel }} → Nivel {{ reward.toLevel }}</p>
+    <p class="xp-level-up" *ngIf="reward.toLevel > reward.fromLevel">
+      <img class="atleta-raster-icon" [src]="levelUpIconAsset" aria-hidden="true" alt="" />
+      Nivel {{ reward.fromLevel }} a nivel {{ reward.toLevel }}
+    </p>
     <div class="xp-bar">
       <div class="xp-fill" [style.width.%]="reward.progressPercent"></div>
     </div>

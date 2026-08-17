@@ -36,6 +36,8 @@ import { MvpVoteStore } from '../../stores/mvp-vote.store';
   styleUrls: ['./match-mvp-vote.page.scss'],
 })
 export class MatchMvpVotePage implements OnDestroy {
+  readonly mvpIconAsset = 'assets/icons/atleta-raster-v1/ic_comp_mvp_96.png';
+  readonly timeIconAsset = 'assets/icons/atleta-raster-v1/ic_match_time_96.png';
   private readonly route = inject(ActivatedRoute);
   private readonly mvpVoteStore = inject(MvpVoteStore);
   private readonly appToastService = inject(AppToastService);

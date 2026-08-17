@@ -41,15 +41,15 @@
 
   <div class="metallic-role-hexagon__summary">
     <button type="button" class="metallic-role-hexagon__chip" (click)="showSummaryInfo('overall')">
-      <ion-icon [src]="starIconAsset"></ion-icon>
+      <img class="atleta-raster-icon" [src]="overallIconAsset" alt="" />
       <span>Nivel General: {{ displayOverall }}</span>
     </button>
     <button type="button" class="metallic-role-hexagon__chip" (click)="showSummaryInfo('bestRole')">
-      <ion-icon [src]="medalIconAsset"></ion-icon>
+      <img class="atleta-raster-icon" [src]="bestRoleIconAsset" alt="" />
       <span>Rol Destacado: {{ roleLabel(displayBestRole.role) }} ({{ displayBestRole.rating }})</span>
     </button>
     <button type="button" class="metallic-role-hexagon__chip" (click)="showSummaryInfo('versatility')">
-      <ion-icon [src]="trophyIconAsset"></ion-icon>
+      <img class="atleta-raster-icon" [src]="versatilityIconAsset" alt="" />
       <span>Indice de Versatilidad: {{ displayVersatility }}%</span>
     </button>
   </div>

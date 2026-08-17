@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { IonicModule } from '@ionic/angular';
 import { SocialRequestItem } from '../../models/social.models';
 
 export interface SocialConfirmedMatchView {
@@ -11,7 +12,7 @@ export interface SocialConfirmedMatchView {
 @Component({
   selector: 'app-match-invitations-panel',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, IonicModule],
   templateUrl: './match-invitations-panel.component.html',
   styleUrls: ['./match-invitations-panel.component.scss'],
 })

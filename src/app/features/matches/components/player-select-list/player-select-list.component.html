@@ -32,14 +32,18 @@
     <section class="team-preview__column">
       <h4>Local</h4>
       <p class="team-preview__level">Nivel estimado: {{ homeAverageOvr }}</p>
-      <p class="team-preview__stars">{{ homeStars }}</p>
+      <p class="team-preview__stars" [attr.aria-label]="'Valoración local ' + homeAverageOvr + ' de 100'">
+        <img class="atleta-raster-icon" *ngFor="let filled of homeStars" [src]="filled ? ratingStarFilledAsset : ratingStarOutlineAsset" aria-hidden="true" alt="" />
+      </p>
       <p *ngFor="let player of balancedHome">OVR {{ player.ovr ?? 65 }} | {{ player.name }}</p>
     </section>
 
     <section class="team-preview__column">
       <h4>Rival</h4>
       <p class="team-preview__level">Nivel estimado rival: {{ awayAverageOvr }}</p>
-      <p class="team-preview__stars">{{ awayStars }}</p>
+      <p class="team-preview__stars" [attr.aria-label]="'Valoración rival ' + awayAverageOvr + ' de 100'">
+        <img class="atleta-raster-icon" *ngFor="let filled of awayStars" [src]="filled ? ratingStarFilledAsset : ratingStarOutlineAsset" aria-hidden="true" alt="" />
+      </p>
       <p *ngFor="let player of balancedAway">OVR {{ player.ovr ?? 65 }} | {{ player.name }}</p>
     </section>
   </div>

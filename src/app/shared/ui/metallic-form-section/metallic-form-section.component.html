@@ -1,7 +1,7 @@
 ﻿<section class="metallic-form-section">
   <header class="metallic-form-section__header" *ngIf="title || description">
     <div class="metallic-form-section__title-row" *ngIf="title">
-      <ion-icon *ngIf="titleIconAsset" [src]="titleIconAsset" class="metallic-form-section__title-icon atleta-game-icon atleta-game-icon--sm"></ion-icon>
+      <img *ngIf="titleIconAsset" [src]="titleIconAsset" class="metallic-form-section__title-icon atleta-game-icon atleta-game-icon--sm atleta-raster-icon" alt="" />
       <h4 class="metallic-form-section__title">{{ title }}</h4>
     </div>
     <p

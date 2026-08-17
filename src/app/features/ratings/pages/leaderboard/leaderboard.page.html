@@ -47,7 +47,7 @@
             class="leaderboard-roles__item"
             [class.leaderboard-roles__item--active]="selectedRole === option.role"
             (click)="onSelectRole(option.role)">
-            <ion-icon [src]="option.iconAsset" aria-hidden="true"></ion-icon>
+            <img class="atleta-raster-icon" [src]="option.iconAsset" aria-hidden="true" alt="" />
             <span>{{ option.label }}</span>
           </button>
         </div>

@@ -8,11 +8,10 @@
     [class.metallic-bottom-nav__item--active]="item.active"
     [class.metallic-bottom-nav__item--cta]="item.variant === 'cta'"
     (click)="onSelect(item.id)">
-    <ion-icon
+    <img
       [src]="resolveIconAsset(item)"
-      class="atleta-game-icon atleta-game-icon--nav"
-      aria-hidden="true">
-    </ion-icon>
+      class="atleta-game-icon atleta-game-icon--nav atleta-raster-icon"
+      aria-hidden="true" alt="" />
     <span
       class="metallic-bottom-nav__badge"
       *ngIf="(item.badgeCount ?? 0) > 0"

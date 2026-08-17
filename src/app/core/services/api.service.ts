@@ -62,6 +62,16 @@ export abstract class ApiService {
       .pipe(catchError((error) => throwError(() => this.normalizeError(error))));
   }
 
+  protected deleteWithBody<TResponse, TPayload>(
+    path: string,
+    payload: TPayload,
+    options?: ApiRequestOptions,
+  ): Observable<TResponse> {
+    return this.http
+      .delete<TResponse>(this.url(path), { ...this.httpOptions(options), body: payload })
+      .pipe(catchError((error) => throwError(() => this.normalizeError(error))));
+  }
+
   protected url(path: string): string {
     if (!path.startsWith('/')) {
       throw new Error(`API path must start with '/'. Received: ${path}`);
