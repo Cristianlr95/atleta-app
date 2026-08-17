@@ -16,6 +16,31 @@
   display: flex;
   justify-content: space-between;
   gap: 14px;
+  align-items: flex-start;
+}
+
+.profile-edit-form {
+  display: grid;
+  gap: 14px;
+}
+
+.profile-edit-positions {
+  display: grid;
+  gap: 8px;
+}
+
+.profile-edit-positions > p:first-child {
+  margin: 0;
+  color: #dce8fa;
+  font-family: "Rajdhani", sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.profile-edit-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
 }
 
 .profile-identity {
@@ -103,6 +128,28 @@
   color: #a7f3c3;
 }
 
+
+.profile-logout-button {
+  min-height: 42px;
+  border: 1px solid rgba(235, 116, 116, 0.72);
+  border-radius: 9px;
+  background: rgba(72, 20, 27, 0.58);
+  color: #ffdada;
+  font-family: "Rajdhani", sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  padding: 9px 16px;
+}
+
+.profile-logout-button:focus-visible {
+  outline: 2px solid #9fc0f6;
+  outline-offset: 3px;
+}
+
+.profile-logout-button:disabled {
+  cursor: wait;
+  opacity: 0.62;
+}
 
 .profile-teams {
   display: grid;
@@ -431,6 +478,14 @@
 }
 
 @media (max-width: 420px) {
+  .profile-header {
+    flex-direction: column;
+  }
+
+  .profile-edit-actions {
+    grid-template-columns: 1fr;
+  }
+
   .profile-name {
     font-size: 20px;
   }

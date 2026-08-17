@@ -82,10 +82,10 @@ describe('LoginPage', () => {
     expect(component.authError).toBe('Google auth no esta configurado.');
   });
 
-  it('explains the available password flow instead of doing nothing', () => {
+  it('opens the password recovery flow', () => {
     component.onForgotPassword();
 
-    expect(component.authError).toContain('Perfil > Seguridad de cuenta');
+    expect(router.navigate).toHaveBeenCalledWith(['/password-reset'], undefined);
   });
 });
 

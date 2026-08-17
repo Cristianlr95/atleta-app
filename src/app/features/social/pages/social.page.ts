@@ -160,11 +160,11 @@ export class SocialPage implements OnDestroy {
       return;
     }
     if (item.target.teamId) {
-      void this.navigationService.safeNavigate(['/sessions/create']);
+      void this.navigationService.safeNavigate(['/teams', String(item.target.teamId)]);
       return;
     }
     if (item.target.userId) {
-      void this.navigationService.safeNavigate(['/player/profile']);
+      void this.navigationService.safeNavigate(['/players', item.target.userId]);
     }
   }
 
@@ -186,12 +186,12 @@ export class SocialPage implements OnDestroy {
     }, 320);
   }
 
-  onOpenProfile(_playerUuid: string): void {
-    void this.navigationService.safeNavigate(['/player/profile']);
+  onOpenProfile(playerUuid: string): void {
+    void this.navigationService.safeNavigate(['/players', playerUuid]);
   }
 
-  onOpenTeam(_teamId: number): void {
-    void this.navigationService.safeNavigate(['/sessions/create']);
+  onOpenTeam(teamId: number): void {
+    void this.navigationService.safeNavigate(['/teams', String(teamId)]);
   }
 
   onOpenMatch(matchId: number): void {

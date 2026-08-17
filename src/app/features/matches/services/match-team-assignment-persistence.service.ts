@@ -34,6 +34,14 @@ export class MatchTeamAssignmentPersistenceService {
     }
   }
 
+  clear(): void {
+    try {
+      localStorage.removeItem(MatchTeamAssignmentPersistenceService.STORAGE_KEY);
+    } catch {
+      // Browser storage can be unavailable in private mode or tests.
+    }
+  }
+
   createSnapshot(
     homePlayers: Player[],
     awayPlayers: Player[],

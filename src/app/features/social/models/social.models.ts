@@ -84,6 +84,15 @@ export interface CreateMatchInvitesBatchPayload {
   message?: string;
 }
 
+export type MatchInviteDeliveryStatus = 'SENT' | 'ALREADY_SENT' | 'ALREADY_ACCEPTED' | 'FAILED';
+
+export interface MatchInviteDeliveryResult {
+  targetUuid: string;
+  status: MatchInviteDeliveryStatus;
+  invitation?: SocialRequestItem | null;
+  message?: string | null;
+}
+
 export interface RespondRequestPayload {
   actorUuid: string;
   accept: boolean;

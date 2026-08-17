@@ -3,6 +3,7 @@ import { of } from 'rxjs';
 import { AuthSessionService } from 'src/app/core/services/auth-session.service';
 import { NavigationService } from 'src/app/core/services/navigation.service';
 import { MatchHistoryService, MatchHistoryViewItem } from 'src/app/features/matches/services/match-history.service';
+import { MatchType } from 'src/app/features/matches/models/progressive-match.models';
 import { NotificationBadgeService } from 'src/app/features/matches/services/notification-badge.service';
 import { RatingsApiService } from 'src/app/features/ratings/services/ratings-api.service';
 import { StatsPage } from './stats.page';
@@ -145,6 +146,8 @@ function buildHistoryItem(
     id,
     scheduledAtEpoch: new Date(`2026-05-0${id}T20:00:00`).getTime(),
     modality: 'CINCO_VS_CINCO',
+    matchType: MatchType.FRIENDLY,
+    typeLabel: 'Amistoso',
     status: 'FINALIZADO',
     displayStatusKey: 'FINISHED',
     modalityLabel: '5 vs 5',

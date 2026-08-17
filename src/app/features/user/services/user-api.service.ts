@@ -40,6 +40,10 @@ export class UserApiService extends ApiService {
     return this.get<PlayerProfile>(`${API_ENDPOINTS.users.playerProfiles}/${atletaUuid}`);
   }
 
+  getPublicPlayerProfile(atletaUuid: string) {
+    return this.get<PlayerProfile>(`${API_ENDPOINTS.users.playerProfiles}/${atletaUuid}/public`);
+  }
+
   getPlayerAchievements(atletaUuid: string) {
     return this.get<PlayerAchievement[]>(
       `${API_ENDPOINTS.users.playerProfileAchievements}/${atletaUuid}/achievements`,

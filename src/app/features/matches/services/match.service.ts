@@ -7,6 +7,7 @@ import {
   MatchSize,
   MatchDraftInput,
   Invitation,
+  InvitationDeliveryStatus,
   MatchProgressView,
   MatchStatus,
   MatchType,
@@ -14,10 +15,11 @@ import {
   PlayerInvitationStatus,
   Venue,
 } from '../models/progressive-match.models';
+import { toCanonicalMatchType } from '../models/match-type.mapper';
 import { MatchPlayerSummary } from '../models/match.models';
 import { MatchesApiService } from './matches-api.service';
-import { InvitationService } from './invitation.service';
 import { NotificationService } from './notification.service';
+import { InvitationService } from './invitation.service';
 import { InvitationsStore } from '../stores/invitations.store';
 import {
   MatchTeamAssignmentPersistenceService,
@@ -28,8 +30,8 @@ import {
 export class MatchService {
   private readonly authSessionService = inject(AuthSessionService);
   private readonly matchesApiService = inject(MatchesApiService);
-  private readonly invitationService = inject(InvitationService);
   private readonly invitationsStore = inject(InvitationsStore);
+  private readonly invitationService = inject(InvitationService);
   private readonly notificationService = inject(NotificationService);
   private readonly teamAssignmentPersistenceService = inject(MatchTeamAssignmentPersistenceService);
   private readonly matchesStore = signal<Match[]>([]);
@@ -47,6 +49,18 @@ export class MatchService {
       (match) => match.status !== MatchStatus.FINISHED && match.status !== MatchStatus.INVALID,
     ),
   );
+
+  clearSessionState(): void {
+    if (this.statusRecalcTimer) {
+      clearTimeout(this.statusRecalcTimer);
+      this.statusRecalcTimer = undefined;
+    }
+    this.pendingStatusRecalc.clear();
+    this.matchesStore.set([]);
+    this.isSubmittingStore.set(false);
+    this.teamAssignmentsStore.set({});
+    this.teamAssignmentPersistenceService.clear();
+  }
 
   constructor() {
     effect(() => {
@@ -66,8 +80,10 @@ export class MatchService {
     const creatorUuid = session?.user.atletaUuid ?? 'anon';
     const creatorName = session?.user.nombre ?? 'Jugador';
 
+    const draftNonce = this.createDraftNonce();
     const draft: Match = {
-      id: `match-${Date.now()}`,
+      id: `match-${draftNonce}`,
+      creationIdempotencyKey: `match-create-${creatorUuid}-${draftNonce}`,
       creatorUuid,
       creatorName,
       type: input.type,
@@ -111,23 +127,26 @@ export class MatchService {
     this.isSubmittingStore.set(true);
 
     try {
-      const created = await firstValueFrom(
-        this.matchesApiService.createMatch({
-          creadorUuid: session.user.atletaUuid,
-          modalidad: draft.modality,
-          categoriaGenero: draft.genderCategory,
-          fechaHoraProgramada: this.toApiLocalDateTime(draft.scheduledAt),
-          latitud: draft.latitude,
-          longitud: draft.longitude,
-        }).pipe(timeout(10000)),
-      );
-
-      await firstValueFrom(
-        this.matchesApiService.addTeamToMatch({
-          matchId: created.id,
-          teamId: draft.team.id,
-          esLocal: true,
-        }).pipe(timeout(10000)),
+      const idempotencyKey = draft.creationIdempotencyKey ?? `match-create-${session.user.atletaUuid}-${draft.id}`;
+      const result = await firstValueFrom(
+        this.matchesApiService.createMatchOrchestrated(
+          {
+            match: {
+              creadorUuid: session.user.atletaUuid,
+              modalidad: draft.modality,
+              matchType: draft.type,
+              categoriaGenero: draft.genderCategory,
+              fechaHoraProgramada: this.toApiLocalDateTime(draft.scheduledAt),
+              latitud: draft.latitude,
+              longitud: draft.longitude,
+            },
+            teamId: draft.team.id,
+            targetUuids: [...new Set(invitedPlayers.map((item) => item.uuid))]
+              .filter((uuid) => uuid !== session.user.atletaUuid),
+            invitationMessage: `Te invito al partido del ${new Date(draft.scheduledAt).toLocaleString()}.`,
+          },
+          idempotencyKey,
+        ).pipe(timeout(15000)),
       );
 
       const inviteTargets = new Set(invitedPlayers.map((item) => item.uuid));
@@ -135,23 +154,82 @@ export class MatchService {
 
       const updatedDraft: Match = {
         ...draft,
-        backendMatchId: created.id,
+        creationIdempotencyKey: idempotencyKey,
+        backendMatchId: result.match.id,
         invitedCount: inviteTargets.size,
         status: MatchStatus.CREATED,
       };
 
       this.upsertMatch(updatedDraft);
       const optimisticInvites = this.buildOptimisticInvitations(updatedDraft, invitedPlayers);
-      this.invitationsStore.upsertInvitations(optimisticInvites);
+      const serverInvitesByTarget = new Map(result.invitations.map((invite) => [invite.targetUuid, invite]));
+      const committedInvites = optimisticInvites.map((invite) => {
+        const serverInvite = serverInvitesByTarget.get(invite.targetUuid);
+        if (!serverInvite) {
+          return {
+            ...invite,
+            deliveryStatus:
+              invite.targetUuid === session.user.atletaUuid
+                ? InvitationDeliveryStatus.SENT
+                : InvitationDeliveryStatus.FAILED,
+            deliveryMessage:
+              invite.targetUuid === session.user.atletaUuid
+                ? undefined
+                : 'El servidor no confirmo la entrega de esta invitacion.',
+          };
+        }
+        return {
+          ...invite,
+          backendMatchId: result.match.id,
+          backendInviteId: serverInvite.id,
+          status:
+            serverInvite.status === 'ACEPTADA'
+              ? PlayerInvitationStatus.ACCEPTED
+              : serverInvite.status === 'RECHAZADA'
+                ? PlayerInvitationStatus.DECLINED
+                : PlayerInvitationStatus.PENDING,
+          deliveryStatus: InvitationDeliveryStatus.SENT,
+          deliveryMessage: undefined,
+        };
+      });
+      this.invitationsStore.upsertInvitations(committedInvites);
       this.recalculateStatus(updatedDraft.id);
-      // No bloquea el flujo de UI en caso de latencia/atasco del batch.
-      void this.dispatchInvitationsInBackground(updatedDraft, invitedPlayers);
 
       return this.getMatchById(updatedDraft.id);
-    } catch {
-      return null;
     } finally {
       this.isSubmittingStore.set(false);
+    }
+  }
+
+  async retryFailedInvitations(matchId: string): Promise<{ sent: number; failed: number }> {
+    const match = this.getMatchById(matchId);
+    if (!match) {
+      throw new Error('No se encontro el partido para reintentar invitaciones.');
+    }
+
+    const failed = this.invitationsStore
+      .getMatchInvitations(matchId)
+      .filter((item) => item.deliveryStatus === InvitationDeliveryStatus.FAILED);
+    if (failed.length === 0) {
+      return { sent: 0, failed: 0 };
+    }
+
+    const failedIds = failed.map((item) => item.id);
+    this.invitationsStore.setDeliveryStatus(failedIds, InvitationDeliveryStatus.RETRYING);
+    try {
+      const retried = await this.invitationService.retryFailedInvitations(match, failed);
+      this.invitationsStore.upsertInvitations(retried);
+      return {
+        sent: retried.filter((item) => item.deliveryStatus === InvitationDeliveryStatus.SENT).length,
+        failed: retried.filter((item) => item.deliveryStatus === InvitationDeliveryStatus.FAILED).length,
+      };
+    } catch (error) {
+      this.invitationsStore.setDeliveryStatus(
+        failedIds,
+        InvitationDeliveryStatus.FAILED,
+        'No fue posible completar el reintento.',
+      );
+      throw error;
     }
   }
 
@@ -456,7 +534,7 @@ export class MatchService {
       Number.isFinite(latitude) && Number.isFinite(longitude)
         ? `Lat/Lng: ${latitude!.toFixed(6)}, ${longitude!.toFixed(6)}`
         : 'Cancha por definir';
-    const resolvedType = this.resolveMatchType(response, existingMatch);
+    const resolvedType = toCanonicalMatchType(response.matchType, existingMatch?.type);
 
     const hasBackendTeamSides = (response.players ?? []).some(
       (item) => item.teamSide === 'LOCAL' || item.teamSide === 'VISITA',
@@ -623,27 +701,6 @@ export class MatchService {
     return initial;
   }
 
-  private resolveMatchType(
-    response: import('../models/match.models').MatchResponse,
-    existingMatch: Match | undefined,
-  ): MatchType {
-    if (existingMatch?.type) {
-      return existingMatch.type;
-    }
-
-    const teamIds = new Set(
-      (response.matchTeams ?? [])
-        .map((item) => item.team?.id)
-        .filter((id): id is number => typeof id === 'number' && Number.isFinite(id)),
-    );
-
-    if (teamIds.size <= 1) {
-      return MatchType.INTERNAL;
-    }
-
-    return MatchType.POINTS;
-  }
-
   private mapBackendStatus(status: import('../models/match.models').MatchStatus, _scheduledAt?: string): MatchStatus {
     if (status === 'FINALIZADO') {
       return MatchStatus.FINISHED;
@@ -736,36 +793,6 @@ export class MatchService {
     return this.teamAssignmentsStore()[this.teamAssignmentPersistenceService.keyForBackendMatch(backendMatchId)] ?? null;
   }
 
-  private async withTimeout<T>(promise: Promise<T>, timeoutMs: number, fallback: T): Promise<T> {
-    let timer: ReturnType<typeof setTimeout> | undefined;
-    try {
-      return await Promise.race([
-        promise,
-        new Promise<T>((resolve) => {
-          timer = setTimeout(() => resolve(fallback), timeoutMs);
-        }),
-      ]);
-    } finally {
-      if (timer) {
-        clearTimeout(timer);
-      }
-    }
-  }
-
-  private async dispatchInvitationsInBackground(match: Match, invitedPlayers: Player[]): Promise<void> {
-    try {
-      const createdInvitations = await this.withTimeout(
-        this.invitationService.sendInvitations(match, invitedPlayers),
-        12000,
-        this.buildOptimisticInvitations(match, invitedPlayers),
-      );
-      this.invitationsStore.upsertInvitations(createdInvitations);
-      this.recalculateStatus(match.id);
-    } catch {
-      // Si falla el lote, el partido ya fue creado y el usuario puede continuar desde estado/historial.
-    }
-  }
-
   private buildOptimisticInvitations(match: Match, invitedPlayers: Player[]): Invitation[] {
     const session = this.authSessionService.currentSession;
     const creatorUuid = session?.user.atletaUuid ?? match.creatorUuid;
@@ -790,8 +817,17 @@ export class MatchService {
       targetUuid: player.uuid,
       targetName: player.name,
       status: player.uuid === creatorUuid ? PlayerInvitationStatus.ACCEPTED : PlayerInvitationStatus.PENDING,
+      deliveryStatus: InvitationDeliveryStatus.PENDING,
       createdAt: now,
     }));
+  }
+
+  private createDraftNonce(): string {
+    const cryptoApi = globalThis.crypto;
+    if (cryptoApi && typeof cryptoApi.randomUUID === 'function') {
+      return cryptoApi.randomUUID();
+    }
+    return `${Date.now()}-${Math.random().toString(36).slice(2)}`;
   }
 
   private async persistTeamAssignmentsToBackend(match: Match, homePlayers: Player[], awayPlayers: Player[]): Promise<void> {

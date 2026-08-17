@@ -11,6 +11,7 @@ import { RatingsApiService } from '../../features/ratings/services/ratings-api.s
 import { TeamApiService } from '../../features/teams/services/team-api.service';
 import { UserApiService } from '../../features/user/services/user-api.service';
 import { CreateMatchRequest } from '../../features/matches/models/match.models';
+import { MatchType } from '../../features/matches/models/progressive-match.models';
 import { UpdateRatingsRequest } from '../../features/ratings/models/rating.models';
 
 describe('API contracts smoke', () => {
@@ -67,6 +68,18 @@ describe('API contracts smoke', () => {
       alias: 'Demo10',
     }).subscribe();
     expectRequest('POST', '/player-profiles').flush({});
+
+    service.refresh({ refreshToken: 'refresh-1' }).subscribe();
+    expectRequest('POST', '/athletes/auth/refresh').flush({});
+
+    service.logout({ refreshToken: 'refresh-2' }).subscribe();
+    expectRequest('POST', '/athletes/auth/logout').flush({});
+
+    service.requestPasswordReset({ email: 'jugador@atleta.test' }).subscribe();
+    expectRequest('POST', '/athletes/password-reset/request').flush({});
+
+    service.confirmPasswordReset({ token: 'reset-token', newPassword: 'secret-2' }).subscribe();
+    expectRequest('POST', '/athletes/password-reset/confirm').flush({});
   });
 
   it('keeps team endpoints aligned with backend routes', () => {
@@ -83,8 +96,14 @@ describe('API contracts smoke', () => {
     service.getByPlayer(playerUuid).subscribe();
     expectRequest('GET', `/teams/by-player/${playerUuid}`).flush([]);
 
+    service.getById(77).subscribe();
+    expectRequest('GET', '/teams/77').flush({});
+
     service.getActiveMembers(77).subscribe();
     expectRequest('GET', '/teams/77/members/active').flush([]);
+
+    service.getLeaderboard(77).subscribe();
+    expectRequest('GET', '/teams/77/leaderboard').flush([]);
 
     service.deleteTeam(77, creatorUuid).subscribe();
     const deleteRequest = expectRequest('DELETE', '/teams/77');
@@ -99,8 +118,23 @@ describe('API contracts smoke', () => {
     service.getPlayerProfile(atletaUuid).subscribe();
     expectRequest('GET', `/player-profiles/${atletaUuid}`).flush({});
 
+    service.getPublicPlayerProfile(atletaUuid).subscribe();
+    expectRequest('GET', `/player-profiles/${atletaUuid}/public`).flush({});
+
     service.createPlayerProfile({ atletaUuid, alias: 'Demo10' }).subscribe();
     expectRequest('POST', '/player-profiles').flush({});
+
+    service.updatePlayerProfile(atletaUuid, {
+      nombre: 'Jugador Demo',
+      alias: 'Demo11',
+      positionIds: [1, 2, 3],
+    }).subscribe();
+    const updateProfileRequest = expectRequest('PUT', `/player-profiles/${atletaUuid}`);
+    expect(updateProfileRequest.request.body).toEqual({
+      nombre: 'Jugador Demo',
+      alias: 'Demo11',
+      positionIds: [1, 2, 3],
+    });
 
     service.getPlayerPositions(atletaUuid).subscribe();
     expectRequest('GET', `/player-profiles/${atletaUuid}/positions`).flush([]);
@@ -129,12 +163,23 @@ describe('API contracts smoke', () => {
     const createPayload: CreateMatchRequest = {
       creadorUuid: creatorUuid,
       modalidad: 'CINCO_VS_CINCO',
+      matchType: MatchType.FRIENDLY,
       categoriaGenero: 'MIXTO',
       fechaHoraProgramada: '2026-05-07T20:00:00',
     };
 
     service.createMatch(createPayload).subscribe();
     expectRequest('POST', '/matches').flush({});
+
+    service.createMatchOrchestrated({
+      match: createPayload,
+      teamId: 7,
+      targetUuids: [playerUuid],
+    }, 'match-create-contract-123').subscribe();
+    const orchestratedRequest = expectRequest('POST', '/matches/orchestrated');
+    expect(orchestratedRequest.request.headers.get('Idempotency-Key')).toBe('match-create-contract-123');
+    expect(orchestratedRequest.request.body.targetUuids).toEqual([playerUuid]);
+    orchestratedRequest.flush({});
 
     service.getById(42).subscribe();
     expectRequest('GET', '/matches/42').flush({});

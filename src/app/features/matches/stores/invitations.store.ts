@@ -1,7 +1,12 @@
 import { computed, Injectable, inject, signal } from '@angular/core';
 import { AuthSessionService } from 'src/app/core/services/auth-session.service';
 import { ErrorMapperService } from 'src/app/core/services/error-mapper.service';
-import { Invitation, PlayerInvitationStatus } from '../models/progressive-match.models';
+import { SocialRequestItem } from '../../social/models/social.models';
+import {
+  Invitation,
+  InvitationDeliveryStatus,
+  PlayerInvitationStatus,
+} from '../models/progressive-match.models';
 import { InvitationService } from '../services/invitation.service';
 
 @Injectable({ providedIn: 'root' })
@@ -55,11 +60,15 @@ export class InvitationsStore {
             : invite.status === 'RECHAZADA'
               ? PlayerInvitationStatus.DECLINED
               : PlayerInvitationStatus.PENDING,
+        deliveryStatus: InvitationDeliveryStatus.SENT,
         createdAt: invite.createdAt ?? new Date().toISOString(),
         respondedAt: invite.respondedAt,
       }))
       .filter((invite) => !currentUserUuid || invite.targetUuid === currentUserUuid);
-      this.invitationStore.set(mapped);
+      const outgoing = this.invitationStore().filter(
+        (invitation) => !!currentUserUuid && invitation.targetUuid !== currentUserUuid,
+      );
+      this.invitationStore.set([...mapped, ...outgoing]);
       return true;
     } catch (error) {
       this.errorStore.set(this.errorMapper.toUserMessage(error, 'invitations'));
@@ -148,6 +157,61 @@ export class InvitationsStore {
     this.invitationStore.set([...invitations, ...preserved]);
   }
 
+  hydrateMatchInvitations(
+    localMatchId: string,
+    backendMatchId: number,
+    invites: SocialRequestItem[],
+  ): void {
+    if (invites.length === 0) {
+      return;
+    }
+
+    const current = this.invitationStore().filter((item) => item.matchId === localMatchId);
+    const currentByTarget = new Map(current.map((item) => [item.targetUuid, item]));
+    const serverTargets = new Set(invites.map((item) => item.targetUuid));
+    const hydrated: Invitation[] = invites.map((invite) => {
+      const previous = currentByTarget.get(invite.targetUuid);
+      return {
+        id: previous?.id ?? `api-${invite.id}`,
+        matchId: localMatchId,
+        backendMatchId,
+        backendInviteId: invite.id,
+        targetUuid: invite.targetUuid,
+        targetName: previous?.targetName || invite.targetAlias || 'Jugador',
+        status:
+          invite.status === 'ACEPTADA'
+            ? PlayerInvitationStatus.ACCEPTED
+            : invite.status === 'RECHAZADA'
+              ? PlayerInvitationStatus.DECLINED
+              : PlayerInvitationStatus.PENDING,
+        deliveryStatus: InvitationDeliveryStatus.SENT,
+        createdAt: invite.createdAt ?? previous?.createdAt ?? new Date().toISOString(),
+        respondedAt: invite.respondedAt,
+      };
+    });
+    const unresolved = current.filter(
+      (item) =>
+        !serverTargets.has(item.targetUuid) &&
+        (item.deliveryStatus === InvitationDeliveryStatus.FAILED ||
+          item.deliveryStatus === InvitationDeliveryStatus.RETRYING),
+    );
+    const otherMatches = this.invitationStore().filter((item) => item.matchId !== localMatchId);
+    this.invitationStore.set([...hydrated, ...unresolved, ...otherMatches]);
+  }
+
+  setDeliveryStatus(
+    invitationIds: string[],
+    deliveryStatus: InvitationDeliveryStatus,
+    deliveryMessage?: string,
+  ): void {
+    const ids = new Set(invitationIds);
+    this.invitationStore.update((items) =>
+      items.map((item) =>
+        ids.has(item.id) ? { ...item, deliveryStatus, deliveryMessage } : item,
+      ),
+    );
+  }
+
   replaceMatchInvitesByBackendMatch(
     backendMatchId: number,
     updates: Array<{ backendInviteId: number; status: PlayerInvitationStatus }>,
@@ -177,5 +241,11 @@ export class InvitationsStore {
         };
       }),
     );
+  }
+
+  clear(): void {
+    this.invitationStore.set([]);
+    this.loadingStore.set(false);
+    this.errorStore.set(null);
   }
 }

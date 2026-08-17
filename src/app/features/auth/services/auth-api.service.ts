@@ -8,6 +8,9 @@ import {
   CreatePlayerProfileRequest,
   GoogleLoginRequest,
   LoginRequest,
+  PasswordResetConfirmRequest,
+  PasswordResetRequest,
+  RefreshTokenRequest,
   RegisterAthleteRequest,
 } from '../models/auth.models';
 
@@ -35,5 +38,21 @@ export class AuthApiService extends ApiService {
       API_ENDPOINTS.auth.createPlayerProfile,
       payload,
     );
+  }
+
+  refresh(payload: RefreshTokenRequest): Observable<AuthApiResponse> {
+    return this.post<AuthApiResponse, RefreshTokenRequest>(API_ENDPOINTS.auth.refresh, payload);
+  }
+
+  logout(payload: RefreshTokenRequest): Observable<void> {
+    return this.post<void, RefreshTokenRequest>(API_ENDPOINTS.auth.logout, payload);
+  }
+
+  requestPasswordReset(payload: PasswordResetRequest): Observable<void> {
+    return this.post<void, PasswordResetRequest>(API_ENDPOINTS.auth.passwordResetRequest, payload);
+  }
+
+  confirmPasswordReset(payload: PasswordResetConfirmRequest): Observable<void> {
+    return this.post<void, PasswordResetConfirmRequest>(API_ENDPOINTS.auth.passwordResetConfirm, payload);
   }
 }

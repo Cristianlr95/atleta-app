@@ -5,6 +5,7 @@ import {
   CreateFriendRequestPayload,
   CreateMatchInvitePayload,
   CreateMatchInvitesBatchPayload,
+  MatchInviteDeliveryResult,
   CreateTeamInvitePayload,
   PushTokenRecord,
   RegisterPushTokenPayload,
@@ -69,6 +70,13 @@ export class SocialApiService extends ApiService {
     );
   }
 
+  createMatchInvitesBatchDetailed(payload: CreateMatchInvitesBatchPayload) {
+    return this.post<MatchInviteDeliveryResult[], CreateMatchInvitesBatchPayload>(
+      API_ENDPOINTS.social.matchInvitesBatchDetailed,
+      payload,
+    );
+  }
+
   respondMatchInvite(inviteId: number, payload: RespondRequestPayload) {
     return this.put<SocialRequestItem, RespondRequestPayload>(
       `${API_ENDPOINTS.social.matchInvites}/${inviteId}/decision`,
@@ -98,6 +106,10 @@ export class SocialApiService extends ApiService {
 
   registerPushToken(payload: RegisterPushTokenPayload) {
     return this.post<PushTokenRecord, RegisterPushTokenPayload>(API_ENDPOINTS.social.pushTokens, payload);
+  }
+
+  revokePushToken(deviceId: string) {
+    return this.delete<void>(API_ENDPOINTS.social.pushTokens, { params: { deviceId } });
   }
 
   searchPlayers(query: string) {

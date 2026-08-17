@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
-import { Observable, forkJoin, of } from 'rxjs';
-import { map, switchMap } from 'rxjs/operators';
+import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { TeamApiService } from 'src/app/features/teams/services/team-api.service';
 import { LeaderboardEntry, RoleType } from '../models/rating.models';
 import { RatingsApiService } from './ratings-api.service';
@@ -31,36 +31,16 @@ export class LeaderboardService {
   }
 
   getTeamOverallLeaderboard(teamId: number): Observable<LeaderboardViewEntry[]> {
-    return this.teamApiService.getActiveMembers(teamId).pipe(
-      switchMap((members) => {
-        if (members.length === 0) {
-          return of([] as LeaderboardViewEntry[]);
-        }
-        return forkJoin(
-          members.map((member) =>
-            this.ratingsApiService.getOverall(member.playerUuid).pipe(
-              map((overall) => ({
-                playerProfileId: member.playerUuid,
-                alias: member.alias || overall.alias || member.playerUuid,
-                score: overall.hybridOVR,
-                matchesPlayed: overall.totalMatchesPlayed ?? 0,
-              })),
-            ),
-          ),
-        ).pipe(
-          map((rows) =>
-            this.toView(
-              rows.map((item) => ({
-                playerProfileId: item.playerProfileId,
-                alias: item.alias,
-                score: item.score,
-                matchesPlayed: item.matchesPlayed,
-              })),
-              'OVR',
-            ),
-          ),
-        );
-      }),
+    return this.teamApiService.getLeaderboard(teamId).pipe(
+      map((entries) => entries.map((entry) => ({
+        rank: entry.rank,
+        playerProfileId: entry.playerProfileId,
+        alias: entry.alias,
+        scoreText: entry.rated && entry.score !== null
+          ? `${entry.score.toFixed(1)} OVR`
+          : 'Sin rating',
+        metaText: entry.rated ? `${entry.matchesPlayed} partidos` : 'Aun sin partidos puntuados',
+      }))),
     );
   }
 

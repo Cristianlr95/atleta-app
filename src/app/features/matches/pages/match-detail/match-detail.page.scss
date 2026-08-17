@@ -76,6 +76,23 @@
   gap: 8px;
 }
 
+.match-detail-delivery-summary {
+  margin: 0 0 10px;
+  color: #c7dcf3;
+  font-size: 13px;
+}
+
+.match-detail-delivery-failures {
+  margin: 0 0 12px;
+  padding-left: 20px;
+  color: #ffd0d0;
+  font-size: 12px;
+}
+
+.match-detail-delivery-failures li + li {
+  margin-top: 5px;
+}
+
 .match-detail-events-form {
   display: grid;
   gap: 10px;

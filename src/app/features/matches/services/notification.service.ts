@@ -199,6 +199,10 @@ export class NotificationService {
     );
   }
 
+  clear(): void {
+    this.inAppQueue.set([]);
+  }
+
   private async initializeAdapters(): Promise<void> {
     for (const adapter of this.adapters) {
       if (!adapter.isAvailable()) {

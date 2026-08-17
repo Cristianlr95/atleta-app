@@ -784,7 +784,7 @@ export class MatchesHubPage implements OnDestroy {
       modalityKey: item.modality,
       statusKey: item.status,
       outcomeKey: item.outcome ?? 'NONE',
-      modalityLabel: item.modalityLabel,
+      modalityLabel: `${item.typeLabel} · ${item.modalityLabel}`,
       dateLabel: item.dateLabel,
       statusLabel: item.statusLabel,
       outcomeLabel: this.outcomeLabel(item.outcome),

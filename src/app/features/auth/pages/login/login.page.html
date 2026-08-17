@@ -26,6 +26,7 @@
         </app-metallic-button>
 
         <p *ngIf="authError" class="login-error">{{ authError }}</p>
+        <p *ngIf="authNotice" class="login-notice">{{ authNotice }}</p>
 
         <button type="button" class="login-link" [disabled]="isSubmitting" (click)="onForgotPassword()">
           ¿Olvidaste tu contraseña?

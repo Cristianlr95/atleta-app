@@ -1,5 +1,6 @@
 import { Injectable, OnDestroy, inject, signal } from '@angular/core';
 import { APP_CONFIG } from 'src/app/core/config/app-config.token';
+import { AuthSessionService } from 'src/app/core/services/auth-session.service';
 import { MatchStatus } from '../models/progressive-match.models';
 import { MatchService } from './match.service';
 import { MatchStore } from '../stores/match.store';
@@ -16,12 +17,14 @@ export class MatchLiveService implements OnDestroy {
   private readonly appConfig = inject(APP_CONFIG);
   private readonly matchService = inject(MatchService);
   private readonly matchStore = inject(MatchStore);
+  private readonly authSessionService = inject(AuthSessionService);
   private readonly liveStateStore = signal<Record<string, MatchLiveState>>({});
   private readonly livePulseStore = signal<Record<string, number>>({});
   private readonly timers = new Map<string, number>();
   private readonly errorCount = new Map<string, number>();
   private readonly inFlight = new Set<string>();
-  private readonly eventSources = new Map<string, EventSource>();
+  private readonly sseControllers = new Map<string, AbortController>();
+  private readonly reconnectTimers = new Map<string, number>();
   private readonly watched = new Set<string>();
   private readonly lastKnownStatusByMatch = new Map<string, MatchStatus>();
   private readonly visibilityHandler = () => this.onVisibilityChange();
@@ -62,6 +65,7 @@ export class MatchLiveService implements OnDestroy {
     this.watched.delete(matchId);
     this.lastKnownStatusByMatch.delete(matchId);
     this.closeEventSource(matchId);
+    this.clearReconnectTimer(matchId);
     this.liveStateStore.update((state) => {
       const clone = { ...state };
       delete clone[matchId];
@@ -94,7 +98,7 @@ export class MatchLiveService implements OnDestroy {
       return;
     }
 
-    const connected = await this.tryEventSource(matchId);
+    const connected = await this.tryAuthenticatedSse(matchId);
     if (connected) {
       return;
     }
@@ -126,12 +130,12 @@ export class MatchLiveService implements OnDestroy {
     try {
       await this.runSync(matchId);
       this.errorCount.set(matchId, 0);
-      this.setState(matchId, true, this.eventSources.has(matchId) ? 'sse' : 'polling');
+      this.setState(matchId, true, this.sseControllers.has(matchId) ? 'sse' : 'polling');
       this.bumpPulse(matchId);
     } catch {
       const nextErrors = (this.errorCount.get(matchId) ?? 0) + 1;
       this.errorCount.set(matchId, nextErrors);
-      this.setState(matchId, false, this.eventSources.has(matchId) ? 'sse' : 'polling');
+      this.setState(matchId, false, this.sseControllers.has(matchId) ? 'sse' : 'polling');
     }
 
     const match = this.matchService.getMatchById(matchId);
@@ -140,70 +144,79 @@ export class MatchLiveService implements OnDestroy {
       return;
     }
 
-    if (!this.eventSources.has(matchId)) {
+    if (!this.sseControllers.has(matchId)) {
       this.scheduleNext(matchId, this.resolveDelay(matchId));
     }
   }
 
-  private async tryEventSource(matchId: string): Promise<boolean> {
-    if (typeof EventSource === 'undefined') {
-      return false;
-    }
-
+  private async tryAuthenticatedSse(matchId: string): Promise<boolean> {
+    if (typeof fetch === 'undefined' || typeof AbortController === 'undefined') return false;
     const backendMatchId = this.matchService.getMatchById(matchId)?.backendMatchId;
-    if (!backendMatchId) {
+    const token = this.authSessionService.currentSession?.tokens.accessToken;
+    if (!backendMatchId || !token) return false;
+
+    const controller = new AbortController();
+    const url = `${this.appConfig.apiBaseUrl}/matches/${backendMatchId}/live`;
+    try {
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: { Accept: 'text/event-stream', Authorization: `Bearer ${token}` },
+        cache: 'no-store',
+        signal: controller.signal,
+      });
+      if (!response.ok || !response.body || !this.watched.has(matchId)) {
+        controller.abort();
+        return false;
+      }
+      this.closeEventSource(matchId);
+      this.sseControllers.set(matchId, controller);
+      this.clearTimer(matchId);
+      this.clearReconnectTimer(matchId);
+      this.errorCount.set(matchId, 0);
+      this.setState(matchId, true, 'sse');
+      void this.consumeSse(matchId, response.body, controller);
+      return true;
+    } catch {
+      controller.abort();
       return false;
     }
+  }
 
-    return new Promise((resolve) => {
-      const url = `${this.appConfig.apiBaseUrl}/matches/${backendMatchId}/live`;
-      const source = new EventSource(url);
-      let settled = false;
-
-      const timeout = window.setTimeout(() => {
-        if (!settled) {
-          settled = true;
-          source.close();
-          resolve(false);
+  private async consumeSse(
+    matchId: string,
+    stream: ReadableStream<Uint8Array>,
+    controller: AbortController,
+  ): Promise<void> {
+    const reader = stream.getReader();
+    const decoder = new TextDecoder();
+    let buffer = '';
+    try {
+      while (this.watched.has(matchId) && !controller.signal.aborted) {
+        const { value, done } = await reader.read();
+        if (done) break;
+        buffer += decoder.decode(value, { stream: true }).replace(/\r\n/g, '\n');
+        let boundary = buffer.indexOf('\n\n');
+        while (boundary >= 0) {
+          const block = buffer.slice(0, boundary);
+          buffer = buffer.slice(boundary + 2);
+          const eventName = block.split('\n').find((line) => line.startsWith('event:'))?.slice(6).trim();
+          if (eventName === 'match-invite-created' || eventName === 'match-invite-updated') {
+            await this.handleRealtimeMessage(matchId);
+          }
+          boundary = buffer.indexOf('\n\n');
         }
-      }, 2500);
-
-      source.onopen = () => {
-        if (!this.watched.has(matchId)) {
-          source.close();
-          return;
-        }
-        window.clearTimeout(timeout);
-        settled = true;
-        this.closeEventSource(matchId);
-        this.eventSources.set(matchId, source);
-        this.clearTimer(matchId);
-        this.setState(matchId, true, 'sse');
-        resolve(true);
-      };
-
-      source.addEventListener('match-invite-created', () => {
-        void this.handleRealtimeMessage(matchId);
-      });
-      source.addEventListener('match-invite-updated', () => {
-        void this.handleRealtimeMessage(matchId);
-      });
-
-      source.onerror = () => {
-        source.close();
-        this.eventSources.delete(matchId);
-
-        if (!settled) {
-          window.clearTimeout(timeout);
-          settled = true;
-          resolve(false);
-          return;
-        }
-
+      }
+    } catch {
+      // La desconexion se refleja abajo y activa recuperacion observable.
+    } finally {
+      reader.releaseLock();
+      if (this.sseControllers.get(matchId) === controller) this.sseControllers.delete(matchId);
+      if (this.watched.has(matchId) && !controller.signal.aborted) {
         this.setState(matchId, false, 'sse');
         this.startPolling(matchId);
-      };
-    });
+        this.scheduleReconnect(matchId);
+      }
+    }
   }
 
   private async handleRealtimeMessage(matchId: string): Promise<void> {
@@ -213,10 +226,10 @@ export class MatchLiveService implements OnDestroy {
 
     try {
       await this.runSync(matchId);
-      this.setState(matchId, true, this.eventSources.has(matchId) ? 'sse' : 'polling');
+      this.setState(matchId, true, this.sseControllers.has(matchId) ? 'sse' : 'polling');
       this.bumpPulse(matchId);
     } catch {
-      this.setState(matchId, false, this.eventSources.has(matchId) ? 'sse' : 'polling');
+      this.setState(matchId, false, this.sseControllers.has(matchId) ? 'sse' : 'polling');
     }
   }
 
@@ -230,11 +243,28 @@ export class MatchLiveService implements OnDestroy {
   }
 
   private closeEventSource(matchId: string): void {
-    const source = this.eventSources.get(matchId);
-    if (source) {
-      source.close();
-      this.eventSources.delete(matchId);
+    const controller = this.sseControllers.get(matchId);
+    if (controller) {
+      controller.abort();
+      this.sseControllers.delete(matchId);
     }
+  }
+
+  private scheduleReconnect(matchId: string): void {
+    this.clearReconnectTimer(matchId);
+    const errors = (this.errorCount.get(matchId) ?? 0) + 1;
+    this.errorCount.set(matchId, errors);
+    const delay = Math.min(1000 * Math.pow(2, errors - 1), 20000);
+    this.reconnectTimers.set(matchId, window.setTimeout(() => {
+      this.reconnectTimers.delete(matchId);
+      if (this.watched.has(matchId)) void this.establishChannel(matchId);
+    }, delay));
+  }
+
+  private clearReconnectTimer(matchId: string): void {
+    const timer = this.reconnectTimers.get(matchId);
+    if (timer) window.clearTimeout(timer);
+    this.reconnectTimers.delete(matchId);
   }
 
   private clearTimer(matchId: string): void {

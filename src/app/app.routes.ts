@@ -19,6 +19,11 @@ export const routes: Routes = [
       import('./features/auth/pages/register/register.page').then((m) => m.RegisterPage),
   },
   {
+    path: 'password-reset',
+    loadComponent: () =>
+      import('./features/auth/pages/password-reset/password-reset.page').then((m) => m.PasswordResetPage),
+  },
+  {
     path: 'home',
     canActivate: [authGuard, onboardingCompletedGuard],
     loadComponent: () =>
@@ -33,11 +38,35 @@ export const routes: Routes = [
       ),
   },
   {
+    path: 'players/:uuid',
+    canActivate: [authGuard, onboardingCompletedGuard],
+    loadComponent: () =>
+      import('./features/user/pages/public-player-detail/public-player-detail.page').then(
+        (m) => m.PublicPlayerDetailPage,
+      ),
+  },
+  {
+    path: 'teams/:id',
+    canActivate: [authGuard, onboardingCompletedGuard],
+    loadComponent: () =>
+      import('./features/teams/pages/team-detail/team-detail.page').then(
+        (m) => m.TeamDetailPage,
+      ),
+  },
+  {
     path: 'player/onboarding',
     canActivate: [authGuard, onboardingPendingGuard],
     loadComponent: () =>
       import('./features/user/pages/player-onboarding/player-onboarding.page').then(
         (m) => m.PlayerOnboardingPage,
+      ),
+  },
+  {
+    path: 'player/onboarding-status',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./features/user/pages/onboarding-recovery/onboarding-recovery.page').then(
+        (m) => m.OnboardingRecoveryPage,
       ),
   },
   {
@@ -150,5 +179,10 @@ export const routes: Routes = [
       import('./features/social/pages/social.page').then(
         (m) => m.SocialPage,
       ),
+  },
+  {
+    path: '**',
+    loadComponent: () =>
+      import('./features/not-found/not-found.page').then((m) => m.NotFoundPage),
   },
 ];

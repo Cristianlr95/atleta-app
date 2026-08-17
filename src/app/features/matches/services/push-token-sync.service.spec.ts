@@ -10,7 +10,7 @@ describe('PushTokenSyncService', () => {
 
   beforeEach(() => {
     localStorage.clear();
-    socialApiService = jasmine.createSpyObj<SocialApiService>('SocialApiService', ['registerPushToken']);
+    socialApiService = jasmine.createSpyObj<SocialApiService>('SocialApiService', ['registerPushToken', 'revokePushToken']);
 
     TestBed.configureTestingModule({
       providers: [
@@ -33,6 +33,14 @@ describe('PushTokenSyncService', () => {
     });
 
     service = TestBed.inject(PushTokenSyncService);
+    socialApiService.revokePushToken.and.returnValue(of(void 0));
+  });
+
+  it('revokes the device token before clearing local session state', () => {
+    localStorage.setItem('atleta_push_device_id:ath-1', 'device-1');
+    service.clearForUser('ath-1');
+
+    expect(socialApiService.revokePushToken).toHaveBeenCalledOnceWith('device-1');
   });
 
   afterEach(() => {
@@ -87,5 +95,25 @@ describe('PushTokenSyncService', () => {
 
     expect(service.syncError()).toBeTrue();
     expect(service.lastSyncedToken()).toBeNull();
+  });
+
+  it('removes user-scoped push data when the session is cleared', async () => {
+    socialApiService.registerPushToken.and.returnValue(
+      of({
+        id: 1,
+        playerUuid: 'ath-1',
+        platform: 'web',
+        active: true,
+      }),
+    );
+    await service.registerToken('push-token-123');
+
+    service.clearForUser('ath-1');
+
+    expect(localStorage.getItem('atleta_push_token:ath-1')).toBeNull();
+    expect(localStorage.getItem('atleta_push_token_synced:ath-1')).toBeNull();
+    expect(localStorage.getItem('atleta_push_device_id:ath-1')).toBeNull();
+    expect(service.lastSyncedToken()).toBeNull();
+    expect(service.syncError()).toBeFalse();
   });
 });

@@ -50,6 +50,43 @@ describe('AuthSessionService', () => {
     expect(restored.currentSession).toBeNull();
     expect(localStorage.length).toBe(0);
   });
+
+  it('updates and persists the current user without replacing authentication tokens', () => {
+    TestBed.configureTestingModule({
+      providers: [AuthSessionService, provideAppConfigMock()],
+    });
+    const service = TestBed.inject(AuthSessionService);
+    const token = buildJwt({ sub: 'ath-1', exp: futureExp() });
+    service.startSession(buildSession(token));
+
+    const updated = service.updateCurrentUser({ nombre: 'Nombre editado' });
+
+    expect(updated?.user.nombre).toBe('Nombre editado');
+    expect(updated?.tokens.accessToken).toBe(token);
+    expect(service.currentSession?.user.nombre).toBe('Nombre editado');
+  });
+
+  it('keeps an expired session recoverable when a refresh token exists', () => {
+    TestBed.configureTestingModule({ providers: [AuthSessionService, provideAppConfigMock()] });
+    const service = TestBed.inject(AuthSessionService);
+    const expired = buildSession(buildJwt({ sub: 'ath-2', exp: pastExp() }));
+    expired.tokens.refreshToken = 'refresh-token';
+    service.startSession(expired);
+
+    expect(service.currentSession).toBeNull();
+    expect(localStorage.length).toBeGreaterThan(0);
+  });
+
+  it('replaces rotated tokens while preserving the authenticated user', () => {
+    TestBed.configureTestingModule({ providers: [AuthSessionService, provideAppConfigMock()] });
+    const service = TestBed.inject(AuthSessionService);
+    service.startSession(buildSession(buildJwt({ sub: 'ath-1', exp: futureExp() })));
+
+    const updated = service.replaceTokens(buildJwt({ sub: 'ath-1', exp: futureExp() }), 'refresh-2');
+
+    expect(updated?.user.atletaUuid).toBe('ath-1');
+    expect(updated?.tokens.refreshToken).toBe('refresh-2');
+  });
 });
 
 function buildSession(accessToken: string): AuthSession {
