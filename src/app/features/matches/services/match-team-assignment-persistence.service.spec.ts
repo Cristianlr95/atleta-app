@@ -55,6 +55,18 @@ describe('MatchTeamAssignmentPersistenceService', () => {
       updatedAt: '2026-06-15T12:00:00.000Z',
     });
   });
+
+  it('stores tactical formations when provided', () => {
+    const snapshot = service.createSnapshot(
+      [player('home-1')],
+      [player('away-1')],
+      '2026-06-15T12:00:00.000Z',
+      { homeFormationId: '2-1-1', awayFormationId: '1-2-1' },
+    );
+
+    expect(snapshot.homeFormationId).toBe('2-1-1');
+    expect(snapshot.awayFormationId).toBe('1-2-1');
+  });
 });
 
 function player(uuid: string): Player {

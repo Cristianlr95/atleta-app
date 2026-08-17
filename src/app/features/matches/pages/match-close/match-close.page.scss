@@ -1,5 +1,5 @@
 .match-close-bg {
-  --background: radial-gradient(circle at top, rgba(24, 36, 62, 0.45), rgba(8, 12, 24, 0.97));
+  --background: var(--atleta-page-bg);
   --atleta-icon-color: #f6f3ff;
   --atleta-icon-glow-main: rgba(199, 170, 255, 0.7);
   --atleta-icon-glow-deep: rgba(94, 61, 160, 0.56);
@@ -185,6 +185,23 @@
 .mini-btn:disabled {
   opacity: 0.45;
   cursor: not-allowed;
+}
+
+.mini-btn img.atleta-raster-icon {
+  width: 16px;
+  height: 16px;
+}
+
+.table-head span:last-child {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+
+.table-head img.atleta-raster-icon {
+  width: 16px;
+  height: 16px;
 }
 
 .cta-row,

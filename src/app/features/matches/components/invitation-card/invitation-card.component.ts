@@ -1,12 +1,13 @@
 ﻿import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { IonicModule } from '@ionic/angular';
 import { Invitation, Match } from '../../models/progressive-match.models';
 import { MatchStatusBadgeComponent } from '../match-status-badge/match-status-badge.component';
 
 @Component({
   selector: 'app-invitation-card',
   standalone: true,
-  imports: [CommonModule, MatchStatusBadgeComponent],
+  imports: [CommonModule, IonicModule, MatchStatusBadgeComponent],
   templateUrl: './invitation-card.component.html',
   styleUrls: ['./invitation-card.component.scss'],
 })

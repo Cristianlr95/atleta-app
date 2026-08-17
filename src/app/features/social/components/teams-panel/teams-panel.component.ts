@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { IonicModule } from '@ionic/angular';
 import { TeamSummary } from 'src/app/features/teams/models/team.models';
 import { MetallicInputComponent } from 'src/app/shared/ui/metallic-input/metallic-input.component';
 import { MetallicSelectComponent, MetallicSelectOption } from 'src/app/shared/ui/metallic-select/metallic-select.component';
@@ -9,7 +10,7 @@ import { SocialPlayerLookupItem, SocialRequestItem } from '../../models/social.m
 @Component({
   selector: 'app-teams-panel',
   standalone: true,
-  imports: [CommonModule, FormsModule, MetallicInputComponent, MetallicSelectComponent],
+  imports: [CommonModule, FormsModule, IonicModule, MetallicInputComponent, MetallicSelectComponent],
   templateUrl: './teams-panel.component.html',
   styleUrls: ['./teams-panel.component.scss'],
 })

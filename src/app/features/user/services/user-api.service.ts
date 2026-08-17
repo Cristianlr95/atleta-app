@@ -11,6 +11,7 @@ import {
 import {
   AthleteProfile,
   PlayerProfile,
+  PlayerAchievement,
   TrustLogEntry,
   UpdateTrustScoreRequest,
 } from '../models/user.models';
@@ -30,6 +31,12 @@ export class UserApiService extends ApiService {
 
   getPlayerProfile(atletaUuid: string) {
     return this.get<PlayerProfile>(`${API_ENDPOINTS.users.playerProfiles}/${atletaUuid}`);
+  }
+
+  getPlayerAchievements(atletaUuid: string) {
+    return this.get<PlayerAchievement[]>(
+      `${API_ENDPOINTS.users.playerProfileAchievements}/${atletaUuid}/achievements`,
+    );
   }
 
   createPlayerProfile(payload: CreatePlayerProfileRequest) {

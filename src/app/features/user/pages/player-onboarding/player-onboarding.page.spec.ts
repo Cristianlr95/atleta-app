@@ -77,4 +77,13 @@ describe('PlayerOnboardingPage', () => {
   it('should not ask for genero during onboarding', () => {
     expect(component.onboardingForm.contains('genero')).toBeFalse();
   });
+
+  it('should reveal validation guidance only after an invalid submit attempt', () => {
+    expect(component.attemptedSubmit).toBeFalse();
+
+    component.onFinishSetup();
+
+    expect(component.attemptedSubmit).toBeTrue();
+    expect(onboardingService.completeOnboarding).not.toHaveBeenCalled();
+  });
 });

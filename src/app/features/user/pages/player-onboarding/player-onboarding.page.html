@@ -1,76 +1,146 @@
-﻿<ion-content class="onboarding-bg">
+<ion-content class="onboarding-bg">
   <div class="onboarding-container">
-    <app-metallic-card title="Configura tu jugador" [titleIconAsset]="titleIconAsset">
-      <form class="onboarding-form" [formGroup]="onboardingForm" (ngSubmit)="onFinishSetup()">
-        <app-metallic-form-section
-          title="Perfil"
-          [titleIconAsset]="profileSectionIconAsset"
-          description="Define tu alias visible para la comunidad. El genero se define al crear tu atleta.">
-          <app-metallic-input
-            formControlName="alias"
-            label="Alias"
-            type="text"
-            placeholder="Ej: El10">
-          </app-metallic-input>
-        </app-metallic-form-section>
+    <form
+      class="onboarding-shell"
+      [formGroup]="onboardingForm"
+      (ngSubmit)="onFinishSetup()"
+      aria-labelledby="onboarding-title">
+      <header class="onboarding-header">
+        <div class="onboarding-header__title">
+          <span class="onboarding-header__icon" aria-hidden="true">
+            <img [src]="titleIconAsset" alt="" />
+          </span>
+          <div>
+            <p class="onboarding-kicker">Perfil competitivo</p>
+            <h1 id="onboarding-title">Configura tu jugador</h1>
+          </div>
+        </div>
 
-        <app-metallic-form-section
-          class="onboarding-position-section"
-          title="Posiciones por prioridad"
-          [titleIconAsset]="positionSectionIconAsset"
-          description="Selecciona 3 posiciones distintas en el mismo mapa. El orden define prioridad 1, 2 y 3.">
-          <app-metallic-position-field-picker
-            [options]="positionOptions"
-            [selectedValues]="selectedPositionIds"
-            [maxSelections]="3"
-            [disabled]="isLoadingPositions || isSubmitting"
-            (selectedValuesChange)="onPositionsSelected($event)">
-          </app-metallic-position-field-picker>
+        <div class="onboarding-progress" aria-label="Progreso de configuración">
+          <span>Progreso</span>
+          <strong>{{ completionUnits }}/4</strong>
+          <div class="onboarding-progress__track" aria-hidden="true">
+            <span [style.width.%]="completionUnits * 25"></span>
+          </div>
+        </div>
+      </header>
 
-          <p *ngIf="isLoadingPositions" class="onboarding-info">Cargando posiciones...</p>
+      <div class="onboarding-layout">
+        <aside class="onboarding-sidebar">
+          <section class="setup-panel setup-panel--profile" aria-labelledby="profile-title">
+            <div class="setup-panel__heading">
+              <span class="setup-panel__step">01</span>
+              <div>
+                <p class="onboarding-kicker">Identidad</p>
+                <h2 id="profile-title">Tu nombre en cancha</h2>
+              </div>
+            </div>
 
-          <p
-            *ngIf="onboardingForm.controls.primaryPositionId.touched && onboardingForm.controls.primaryPositionId.invalid"
-            class="onboarding-error">
-            Debes seleccionar la posicion principal.
-          </p>
+            <p class="setup-panel__copy">
+              Usa el alias con el que te reconocerán jugadores y equipos.
+            </p>
 
-          <p
-            *ngIf="onboardingForm.controls.secondaryPositionId.touched && onboardingForm.controls.secondaryPositionId.invalid"
-            class="onboarding-error">
-            Debes seleccionar la posicion secundaria.
-          </p>
+            <label class="tactical-field" for="player-alias">
+              <span>Alias</span>
+              <input
+                id="player-alias"
+                type="text"
+                formControlName="alias"
+                maxlength="30"
+                autocomplete="nickname"
+                placeholder="Ej: El10" />
+              <small>{{ onboardingForm.controls.alias.value.length }}/30</small>
+            </label>
 
-          <p
-            *ngIf="onboardingForm.controls.tertiaryPositionId.touched && onboardingForm.controls.tertiaryPositionId.invalid"
-            class="onboarding-error">
-            Debes seleccionar la posicion terciaria.
-          </p>
+            <p
+              *ngIf="onboardingForm.controls.alias.touched && onboardingForm.controls.alias.invalid"
+              class="onboarding-error">
+              Ingresa un alias de hasta 30 caracteres.
+            </p>
+          </section>
 
-          <p
-            *ngIf="onboardingForm.hasError('duplicatePositions') && onboardingForm.touched"
-            class="onboarding-error">
-            Debes elegir tres posiciones distintas.
-          </p>
-        </app-metallic-form-section>
+          <section class="setup-panel setup-panel--guide" aria-labelledby="priority-guide-title">
+            <div class="setup-panel__heading">
+              <span class="setup-panel__step">02</span>
+              <div>
+                <p class="onboarding-kicker">Preferencias</p>
+                <h2 id="priority-guide-title">Orden de prioridad</h2>
+              </div>
+            </div>
 
-        <p *ngIf="submitError" class="onboarding-error">{{ submitError }}</p>
-        <app-metallic-button
-          *ngIf="submitError && !isSubmitting"
-          type="button"
-          variant="secondary"
-          (click)="onRetryLoadPositions()">
-          Reintentar carga
-        </app-metallic-button>
+            <ol class="priority-guide">
+              <li [class.priority-guide__item--complete]="selectedPositionIds.length > 0">
+                <span>1</span>
+                <div><strong>Principal</strong><small>Tu rol más habitual</small></div>
+              </li>
+              <li [class.priority-guide__item--complete]="selectedPositionIds.length > 1">
+                <span>2</span>
+                <div><strong>Secundaria</strong><small>Primera alternativa</small></div>
+              </li>
+              <li [class.priority-guide__item--complete]="selectedPositionIds.length > 2">
+                <span>3</span>
+                <div><strong>Terciaria</strong><small>Rol de respaldo</small></div>
+              </li>
+            </ol>
+          </section>
+        </aside>
 
-        <app-metallic-button
+        <main class="onboarding-main">
+          <section class="positions-panel" aria-labelledby="positions-title">
+            <div class="positions-panel__heading">
+              <div>
+                <p class="onboarding-kicker">Mapa táctico</p>
+                <h2 id="positions-title">Elige tus posiciones</h2>
+              </div>
+              <p>
+                Toca o haz clic en tres posiciones. El orden en que las eliges define su prioridad.
+              </p>
+            </div>
+
+            <div class="positions-panel__body">
+              <app-metallic-position-field-picker
+                [options]="positionOptions"
+                [selectedValues]="selectedPositionIds"
+                [maxSelections]="3"
+                [disabled]="isLoadingPositions || isSubmitting"
+                (selectedValuesChange)="onPositionsSelected($event)">
+              </app-metallic-position-field-picker>
+
+              <p *ngIf="isLoadingPositions" class="onboarding-info" role="status">
+                Cargando posiciones...
+              </p>
+
+              <p
+                *ngIf="attemptedSubmit && onboardingForm.controls.tertiaryPositionId.invalid"
+                class="onboarding-error"
+                role="alert">
+                Selecciona tres posiciones para completar tu perfil.
+              </p>
+            </div>
+          </section>
+        </main>
+      </div>
+
+      <div *ngIf="submitError" class="onboarding-feedback" role="alert">
+        <span>{{ submitError }}</span>
+        <button *ngIf="!isSubmitting" type="button" (click)="onRetryLoadPositions()">
+          Reintentar
+        </button>
+      </div>
+
+      <footer class="onboarding-footer">
+        <p>
+          <strong>{{ selectedPositionIds.length }}/3 posiciones</strong>
+          <span>Podrás cambiar estas preferencias más adelante.</span>
+        </p>
+        <button
           class="onboarding-submit"
           type="submit"
-          variant="primary"
           [disabled]="onboardingForm.invalid || isSubmitting || isLoadingPositions">
-          {{ isSubmitting ? 'Guardando...' : 'Finalizar configuracion' }}
-        </app-metallic-button>
-      </form>
-    </app-metallic-card>
+          <img [src]="saveIconAsset" alt="" aria-hidden="true" />
+          {{ isSubmitting ? 'Guardando...' : 'Guardar perfil' }}
+        </button>
+      </footer>
+    </form>
   </div>
 </ion-content>

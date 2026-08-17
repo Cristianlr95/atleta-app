@@ -37,9 +37,9 @@ export class CreateSessionPage {
   private readonly notificationBadgeService = inject(NotificationBadgeService);
 
   playMode: PlayMode = 'none';
-  readonly iconBase = 'assets/icons/atleta';
-  readonly sessionTitleIconAsset = `${this.iconBase}/ic_match_create_24.svg`;
-  readonly createTeamIconAsset = `${this.iconBase}/ic_match_teams_24.svg`;
+  readonly iconBase = 'assets/icons/atleta-raster-v1';
+  readonly sessionTitleIconAsset = `${this.iconBase}/ic_match_play_96.png`;
+  readonly createTeamIconAsset = `${this.iconBase}/ic_match_teams_96.png`;
 
   get bottomNavItems(): ReadonlyArray<MetallicBottomNavItem> {
     return buildMainBottomNav('matches', this.notificationBadgeService.totalPending());

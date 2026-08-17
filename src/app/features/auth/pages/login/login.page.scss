@@ -1,16 +1,6 @@
 .login-bg {
-  --background: none;
-
-  background: 
-    linear-gradient(
-      rgba(10, 12, 20, 0.75),
-      rgba(10, 12, 20, 0.85)
-    ),
-    url("/assets/backgrounds/stadium.png");
-
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
+  --background: var(--atleta-page-bg);
+  background: var(--atleta-page-bg);
 }
 .login-container {
   min-height: 100%;
@@ -59,7 +49,7 @@
   gap: 12px;
   color: #9aa5b8;
   text-transform: lowercase;
-  font-family: 'Orbitron', sans-serif;
+  font-family: var(--font-family-display);
   font-size: 12px;
   letter-spacing: 0.08em;
 
@@ -86,7 +76,7 @@
   border: 0;
   background: transparent;
   color: #e8eef5;
-  font-family: 'Orbitron', sans-serif;
+  font-family: var(--font-family-display);
   font-size: 13px;
   font-weight: 700;
   text-transform: uppercase;

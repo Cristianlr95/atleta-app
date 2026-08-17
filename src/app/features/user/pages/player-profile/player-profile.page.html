@@ -238,6 +238,36 @@
       </app-metallic-form-section>
 
       <app-metallic-form-section
+        title="Logros competitivos"
+        [titleIconAsset]="achievementsSectionIconAsset"
+        description="Medallas obtenidas en partidos finalizados y metas para tu próxima marca."
+      >
+        <div class="achievement-grid" aria-label="Logros competitivos">
+          <article
+            *ngFor="let achievement of achievements"
+            class="achievement-card"
+            [class.achievement-card--locked]="!achievement.unlocked"
+            [class.achievement-card--bronze]="achievement.tier === 'BRONZE'"
+            [class.achievement-card--silver]="achievement.tier === 'SILVER'"
+            [class.achievement-card--gold]="achievement.tier === 'GOLD'"
+          >
+            <img class="achievement-card__icon atleta-raster-icon" [src]="achievementIconAsset(achievement.code)" alt="" />
+            <div class="achievement-card__body">
+              <div class="achievement-card__heading">
+                <h4>{{ achievement.title }}</h4>
+                <span>{{ achievementTierLabel(achievement) }}</span>
+              </div>
+              <p>{{ achievement.description }}</p>
+              <div class="achievement-card__progress" [attr.aria-label]="achievement.currentValue + ' de ' + achievement.nextThreshold + ' ' + achievement.metricLabel">
+                <span [style.width.%]="achievement.progressPercent"></span>
+              </div>
+              <small>{{ achievement.currentValue }} / {{ achievement.nextThreshold }} {{ achievement.metricLabel }}</small>
+            </div>
+          </article>
+        </div>
+      </app-metallic-form-section>
+
+      <app-metallic-form-section
         title="Resumen competitivo"
         [titleIconAsset]="overviewSectionIconAsset"
         descriptionSize="small"

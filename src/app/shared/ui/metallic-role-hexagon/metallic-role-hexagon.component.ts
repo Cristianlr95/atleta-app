@@ -1,7 +1,6 @@
 ﻿import { CommonModule } from '@angular/common';
 import { Component, Input, inject } from '@angular/core';
 import { AlertController } from '@ionic/angular';
-import { IonIcon } from '@ionic/angular/standalone';
 
 export type HexagonRole = 'ATAQUE' | 'MEDIOCAMPO' | 'CARRILERO' | 'DEFENSA' | 'ARQUERO' | 'DT';
 
@@ -22,7 +21,7 @@ interface RolePoint {
 @Component({
   selector: 'app-metallic-role-hexagon',
   standalone: true,
-  imports: [CommonModule, IonIcon],
+  imports: [CommonModule],
   templateUrl: './metallic-role-hexagon.component.html',
   styleUrls: ['./metallic-role-hexagon.component.scss'],
 })
@@ -38,10 +37,10 @@ export class MetallicRoleHexagonComponent {
     'DT',
   ];
 
-  private readonly iconBase = 'assets/icons/atleta';
-  readonly trophyIconAsset = `${this.iconBase}/ic_comp_trophy_24.svg`;
-  readonly medalIconAsset = `${this.iconBase}/ic_comp_level_24.svg`;
-  readonly starIconAsset = `${this.iconBase}/ic_comp_stats_24.svg`;
+  private readonly iconBase = 'assets/icons/atleta-raster-v1';
+  readonly overallIconAsset = `${this.iconBase}/ic_comp_overall_96.png`;
+  readonly bestRoleIconAsset = `${this.iconBase}/ic_comp_best_role_96.png`;
+  readonly versatilityIconAsset = `${this.iconBase}/ic_comp_versatility_96.png`;
 
   @Input() title = 'Hexagono de habilidades';
   @Input() subtitle = 'Perfil por rol (0-100)';

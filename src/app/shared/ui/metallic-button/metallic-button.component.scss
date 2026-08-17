@@ -1,17 +1,21 @@
 .metallic-btn {
   position: relative;
   min-height: 44px;
-  padding: 0.72rem 1.2rem;
-  border: 1px solid;
-  border-radius: 10px;
-  font-family: var(--font-family-display);
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  cursor: pointer;
-  transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease, filter 0.18s ease;
+  padding: 0.65rem 1.2rem;
   overflow: hidden;
-  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.32);
+  border: 1px solid;
+  border-radius: 6px;
+  font-family: var(--font-family-display);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition:
+    transform 150ms ease,
+    border-color 150ms ease,
+    box-shadow 150ms ease,
+    filter 150ms ease;
 
   &:hover:not(:disabled) {
     transform: translateY(-1px);
@@ -19,52 +23,51 @@
   }
 
   &:active:not(:disabled) {
-    transform: translateY(1px) scale(0.99);
+    transform: translateY(1px);
+  }
+
+  &:focus-visible {
+    outline: 2px solid #fff;
+    outline-offset: 3px;
   }
 
   &:disabled {
-    opacity: 0.52;
     cursor: not-allowed;
-    transform: none;
+    opacity: 0.38;
+    filter: saturate(0.35);
   }
 
   &__content {
     position: relative;
-    z-index: 10;
+    z-index: 1;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 0.5rem;
+    gap: 8px;
   }
 
   &__shine {
-    position: absolute;
-    inset: 0;
-    background:
-      linear-gradient(to bottom, rgba(255,255,255,0.24) 0%, transparent 48%, rgba(0,0,0,0.18) 100%),
-      linear-gradient(110deg, transparent 0%, rgba(255, 255, 255, 0.14) 42%, transparent 58%);
-    pointer-events: none;
+    display: none;
   }
 
   &--primary {
-    background: var(--metallic-gradient);
-    border-color: rgba(232, 241, 255, 0.82);
-    color: #07101f;
-    box-shadow: 0 12px 28px rgba(88, 199, 255, 0.18), 0 0 0 1px rgba(255,255,255,0.16) inset;
+    border-color: var(--tactical-local);
+    background: var(--tactical-local);
+    color: #071014;
+    box-shadow: 0 0 18px rgba(215, 255, 0, 0.12);
   }
 
   &--secondary {
-    background: linear-gradient(135deg, rgba(43, 56, 78, 0.96), rgba(105, 126, 158, 0.92));
-    border-color: rgba(169, 190, 220, 0.48);
-    color: #eef6ff;
-    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.34), 0 0 18px rgba(88, 199, 255, 0.08);
+    border-color: #31505c;
+    background: #0a1a22;
+    color: #e7edef;
   }
 
   &--accent {
-    background: linear-gradient(135deg, #52c993 0%, #a8f0c8 52%, #58c7ff 100%);
-    border-color: rgba(195, 255, 226, 0.68);
-    color: #06150f;
-    box-shadow: 0 12px 28px rgba(128, 231, 178, 0.2), 0 0 0 1px rgba(255,255,255,0.16) inset;
+    border-color: var(--tactical-visit);
+    background: var(--tactical-visit);
+    color: #031015;
+    box-shadow: 0 0 18px rgba(0, 215, 245, 0.12);
   }
 }
 
@@ -72,17 +75,11 @@
   .metallic-btn {
     width: 100%;
     padding-inline: 0.9rem;
-    letter-spacing: 0.04em;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .metallic-btn {
     transition: none;
-
-    &:hover:not(:disabled),
-    &:active:not(:disabled) {
-      transform: none;
-    }
   }
 }

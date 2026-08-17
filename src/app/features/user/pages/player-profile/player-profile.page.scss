@@ -1,17 +1,7 @@
 .profile-bg {
-  --background: none;
-  --atleta-icon-color: #edf1ff;
-  --atleta-icon-glow-main: rgba(183, 174, 255, 0.68);
-  --atleta-icon-glow-deep: rgba(84, 69, 161, 0.52);
-  --atleta-icon-nav-main: rgba(196, 186, 255, 0.76);
-  --atleta-icon-nav-deep: rgba(70, 58, 142, 0.58);
-  background:
-    linear-gradient(rgba(10, 12, 20, 0.78), rgba(10, 12, 20, 0.9)),
-    url("/assets/backgrounds/stadium.png");
-
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
+  --background: var(--atleta-page-bg);
+  --atleta-icon-color: var(--tactical-visit);
+  background: var(--atleta-page-bg);
 }
 
 .profile-container {
@@ -36,8 +26,8 @@
 
 .profile-name {
   margin: 0;
-  color: #e8eef5;
-  font-family: "Orbitron", sans-serif;
+  color: var(--text-primary);
+  font-family: var(--font-family-display);
   font-size: 22px;
   letter-spacing: 0.04em;
   line-height: 1.1;
@@ -46,8 +36,8 @@
 .profile-alias,
 .profile-email {
   margin: 0;
-  color: #c7d2e6;
-  font-family: "Rajdhani", sans-serif;
+  color: var(--text-muted);
+  font-family: var(--font-family-body);
   font-size: 16px;
   line-height: 1.2;
 }
@@ -286,7 +276,98 @@
   padding: 0 10px;
 }
 
+.achievement-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.achievement-card {
+  display: flex;
+  gap: 10px;
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid rgba(0, 215, 245, 0.34);
+  border-radius: 10px;
+  background: linear-gradient(145deg, rgba(8, 29, 37, 0.94), rgba(4, 16, 22, 0.9));
+}
+
+.achievement-card--locked {
+  border-color: rgba(121, 147, 154, 0.35);
+  opacity: 0.72;
+}
+
+.achievement-card--bronze { border-color: rgba(205, 132, 71, 0.72); }
+.achievement-card--silver { border-color: rgba(190, 219, 225, 0.78); }
+.achievement-card--gold { border-color: rgba(215, 255, 0, 0.86); }
+
+.achievement-card__icon {
+  width: 40px;
+  height: 40px;
+  margin-top: 2px;
+}
+
+.achievement-card__body { min-width: 0; flex: 1; }
+
+.achievement-card__heading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.achievement-card h4,
+.achievement-card p,
+.achievement-card small { margin: 0; }
+
+.achievement-card h4 {
+  color: #e7f5f7;
+  font-family: var(--font-family-display);
+  font-size: 13px;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+
+.achievement-card__heading span {
+  color: var(--tactical-local);
+  font-family: var(--font-family-display);
+  font-size: 10px;
+  white-space: nowrap;
+}
+
+.achievement-card p {
+  margin-top: 3px;
+  color: var(--text-muted);
+  font-family: var(--font-family-body);
+  font-size: 12px;
+  line-height: 1.15;
+}
+
+.achievement-card__progress {
+  height: 5px;
+  margin-top: 9px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #102831;
+}
+
+.achievement-card__progress span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--tactical-visit), var(--tactical-local));
+}
+
+.achievement-card small {
+  display: block;
+  margin-top: 4px;
+  color: #b8d5da;
+  font-family: var(--font-family-display);
+  font-size: 11px;
+}
+
 @media (max-width: 520px) {
+  .achievement-grid { grid-template-columns: 1fr; }
   .profile-team__head {
     grid-template-columns: 1fr;
     align-items: start;

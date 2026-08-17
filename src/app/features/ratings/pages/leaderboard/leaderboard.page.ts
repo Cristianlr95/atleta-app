@@ -50,18 +50,18 @@ export class LeaderboardPage implements OnDestroy {
   private readonly navigationService = inject(NavigationService);
   private readonly notificationBadgeService = inject(NotificationBadgeService);
 
-  readonly iconBase = 'assets/icons/atleta';
-  readonly titleIconAsset = `${this.iconBase}/ic_nav_ranking_24.svg`;
-  readonly overallSectionIconAsset = `${this.iconBase}/ic_comp_trophy_24.svg`;
-  readonly roleSectionIconAsset = `${this.iconBase}/ic_comp_stats_24.svg`;
+  readonly iconBase = 'assets/icons/atleta-raster-v1';
+  readonly titleIconAsset = `${this.iconBase}/ic_nav_ranking_96.png`;
+  readonly overallSectionIconAsset = `${this.iconBase}/ic_comp_trophy_96.png`;
+  readonly roleSectionIconAsset = `${this.iconBase}/ic_comp_stats_96.png`;
 
   readonly roleOptions: ReadonlyArray<{ role: RoleType; label: string; iconAsset: string }> = [
-    { role: 'ATAQUE', label: 'Ataque', iconAsset: `${this.iconBase}/ic_comp_streak_24.svg` },
-    { role: 'MEDIOCAMPO', label: 'Mediocampo', iconAsset: `${this.iconBase}/ic_comp_stats_24.svg` },
-    { role: 'CARRILERO', label: 'Carrilero', iconAsset: `${this.iconBase}/ic_match_lineup_24.svg` },
-    { role: 'DEFENSA', label: 'Defensa', iconAsset: `${this.iconBase}/ic_match_rules_24.svg` },
-    { role: 'ARQUERO', label: 'Arquero', iconAsset: `${this.iconBase}/ic_status_ready_24.svg` },
-    { role: 'DT', label: 'DT', iconAsset: `${this.iconBase}/ic_comp_trophy_24.svg` },
+    { role: 'ATAQUE', label: 'Ataque', iconAsset: `${this.iconBase}/ic_role_attack_96.png` },
+    { role: 'MEDIOCAMPO', label: 'Mediocampo', iconAsset: `${this.iconBase}/ic_role_midfield_96.png` },
+    { role: 'CARRILERO', label: 'Carrilero', iconAsset: `${this.iconBase}/ic_role_wingback_96.png` },
+    { role: 'DEFENSA', label: 'Defensa', iconAsset: `${this.iconBase}/ic_role_defense_96.png` },
+    { role: 'ARQUERO', label: 'Arquero', iconAsset: `${this.iconBase}/ic_role_goalkeeper_96.png` },
+    { role: 'DT', label: 'DT', iconAsset: `${this.iconBase}/ic_role_coach_96.png` },
   ];
 
   get bottomNavItems(): ReadonlyArray<MetallicBottomNavItem> {

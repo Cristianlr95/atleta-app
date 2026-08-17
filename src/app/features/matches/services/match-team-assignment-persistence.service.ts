@@ -4,6 +4,8 @@ import { Match, Player } from '../models/progressive-match.models';
 export interface TeamAssignmentSnapshot {
   homeIds: string[];
   awayIds: string[];
+  homeFormationId?: string;
+  awayFormationId?: string;
   updatedAt: string;
 }
 
@@ -32,10 +34,17 @@ export class MatchTeamAssignmentPersistenceService {
     }
   }
 
-  createSnapshot(homePlayers: Player[], awayPlayers: Player[], now = new Date().toISOString()): TeamAssignmentSnapshot {
+  createSnapshot(
+    homePlayers: Player[],
+    awayPlayers: Player[],
+    now = new Date().toISOString(),
+    formations?: { homeFormationId?: string; awayFormationId?: string },
+  ): TeamAssignmentSnapshot {
     return {
       homeIds: homePlayers.map((player) => player.uuid),
       awayIds: awayPlayers.map((player) => player.uuid),
+      ...(formations?.homeFormationId ? { homeFormationId: formations.homeFormationId } : {}),
+      ...(formations?.awayFormationId ? { awayFormationId: formations.awayFormationId } : {}),
       updatedAt: now,
     };
   }

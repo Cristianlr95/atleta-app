@@ -1,13 +1,14 @@
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { IonicModule } from '@ionic/angular';
 import { MetallicInputComponent } from 'src/app/shared/ui/metallic-input/metallic-input.component';
 import { SocialPlayerLookupItem, SocialRequestItem } from '../../models/social.models';
 
 @Component({
   selector: 'app-friends-panel',
   standalone: true,
-  imports: [CommonModule, FormsModule, MetallicInputComponent],
+  imports: [CommonModule, FormsModule, IonicModule, MetallicInputComponent],
   templateUrl: './friends-panel.component.html',
   styleUrls: ['./friends-panel.component.scss'],
 })

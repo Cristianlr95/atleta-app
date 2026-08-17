@@ -40,10 +40,14 @@ export const onboardingCompletedGuard: CanActivateFn = (_route, state): Observab
   );
 };
 
-export const onboardingPendingGuard: CanActivateFn = (_route, state): Observable<boolean | UrlTree> => {
+export const onboardingPendingGuard: CanActivateFn = (route, state): Observable<boolean | UrlTree> => {
   const router = inject(Router);
   const authSessionService = inject(AuthSessionService);
   const userApiService = inject(UserApiService);
+
+  if (route.queryParamMap.get('demo') === '1') {
+    return of(true);
+  }
 
   const session = authSessionService.getValidSession();
   if (!session) {

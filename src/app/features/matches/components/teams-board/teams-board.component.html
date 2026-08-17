@@ -1,61 +1,143 @@
-<section class="teams-board" [class.teams-board--disabled]="!enabled">
-  <div class="teams-board__actions" *ngIf="enabled">
-    <app-metallic-button type="button" variant="accent" [disabled]="!enabled" (click)="balanceTeams()">
-      Equilibrar equipos
-    </app-metallic-button>
-    <app-metallic-button type="button" variant="secondary" [disabled]="!enabled" (click)="setMode('MANUAL')">
-      Editar manual
-    </app-metallic-button>
-    <app-metallic-button type="button" variant="accent" [disabled]="!hasUnsavedChanges" (click)="saveTeams()">
-      Guardar cambios
-    </app-metallic-button>
-    <app-metallic-button type="button" variant="secondary" [disabled]="!hasUnsavedChanges" (click)="discardChanges()">
-      Descartar
-    </app-metallic-button>
+<section class="lineup" [class.lineup--read-only]="!enabled" aria-labelledby="lineup-title">
+  <header class="lineup__header">
+    <div>
+      <span class="lineup__eyebrow">ALINEACIÓN TÁCTICA</span>
+      <h3 id="lineup-title">Armar equipos</h3>
+      <p>Toca o arrastra un jugador y elige una posición.</p>
+    </div>
+    <button type="button" class="lineup__balance-button" [disabled]="!enabled" (click)="balanceTeams()">
+      <img src="assets/icons/atleta-raster-v1/ic_comp_overall_96.png" alt="" />
+      Equilibrar
+    </button>
+  </header>
+
+  <div class="lineup__mobile-tabs" role="tablist" aria-label="Equipo visible">
+    <button
+      type="button"
+      role="tab"
+      [attr.aria-selected]="activeMobileSide === 'HOME'"
+      [class.is-active]="activeMobileSide === 'HOME'"
+      (click)="setActiveMobileSide('HOME')">
+      Local · {{ homeAverage }}
+    </button>
+    <button
+      type="button"
+      role="tab"
+      [attr.aria-selected]="activeMobileSide === 'AWAY'"
+      [class.is-active]="activeMobileSide === 'AWAY'"
+      (click)="setActiveMobileSide('AWAY')">
+      Visita · {{ awayAverage }}
+    </button>
   </div>
 
-  <p class="teams-board__hint" *ngIf="enabled && hasUnsavedChanges">
-    Tienes cambios sin guardar. Solo se comparten cuando guardas.
+  <div class="lineup__pitches">
+    <ng-container *ngFor="let side of ['HOME', 'AWAY']">
+      <section
+        class="team-panel"
+        [class.team-panel--home]="side === 'HOME'"
+        [class.team-panel--away]="side === 'AWAY'"
+        [class.team-panel--mobile-hidden]="activeMobileSide !== side">
+        <header class="team-panel__header">
+          <div>
+            <span>{{ side === 'HOME' ? 'LOCAL' : 'VISITA' }}</span>
+            <strong>{{ playersFor($any(side)).length }} jugadores</strong>
+          </div>
+          <label>
+            <span class="sr-only">Formación {{ side === 'HOME' ? 'local' : 'visita' }}</span>
+            <select
+              [disabled]="!enabled"
+              [value]="formationFor($any(side)).id"
+              (change)="changeFormation($any(side), $any($event.target).value)">
+              <option *ngFor="let formation of formations" [value]="formation.id">{{ formation.label }}</option>
+            </select>
+          </label>
+        </header>
+
+        <div class="pitch" [attr.aria-label]="'Cancha ' + (side === 'HOME' ? 'local' : 'visita')">
+          <span class="pitch__halfway" aria-hidden="true"></span>
+          <span class="pitch__circle" aria-hidden="true"></span>
+          <span class="pitch__area pitch__area--top" aria-hidden="true"></span>
+          <span class="pitch__area pitch__area--bottom" aria-hidden="true"></span>
+
+          <div
+            class="pitch-slot"
+            *ngFor="let slot of formationFor($any(side)).slots; let slotIndex = index"
+            [style.left.%]="slot.x"
+            [style.top.%]="slot.y"
+            (dragover)="onDragOver($event)"
+            (drop)="onDrop($any(side), slotIndex, $event)">
+            <button
+              *ngIf="playerAt($any(side), slotIndex) as player; else emptySlot"
+              type="button"
+              class="player-token"
+              [class.is-selected]="isSelected(player)"
+              [attr.draggable]="enabled"
+              [attr.aria-pressed]="isSelected(player)"
+              [attr.aria-label]="player.name + ', ' + slot.role + ', OVR ' + (player.ovr ?? 'sin calificación')"
+              [title]="player.name + ' · ' + slot.role + ' · OVR ' + (player.ovr ?? '—')"
+              (dragstart)="onDragStart(player.uuid, $event)"
+              (click)="selectOrPlace(player.uuid, $any(side), slotIndex)">
+              <span class="player-token__role">{{ slot.role }}</span>
+              <span class="player-token__name">{{ player.name }}</span>
+              <span class="player-token__ovr">OVR {{ player.ovr ?? '—' }}</span>
+            </button>
+            <ng-template #emptySlot>
+              <button
+                type="button"
+                class="empty-slot"
+                [disabled]="!enabled || !selectedPlayerUuid"
+                [attr.aria-label]="slotLabel(slot) + ', disponible'"
+                (click)="placeSelectedInEmptySlot($any(side), slotIndex)">
+                <span>{{ slot.role }}</span>
+              </button>
+            </ng-template>
+          </div>
+        </div>
+
+        <div class="team-panel__bench" *ngIf="benchFor($any(side)).length">
+          <span>DISPONIBLES</span>
+          <div class="team-panel__bench-list">
+            <button
+              type="button"
+              class="bench-player"
+              *ngFor="let player of benchFor($any(side)); let benchIndex = index"
+              [class.is-selected]="isSelected(player)"
+              [attr.aria-pressed]="isSelected(player)"
+              (click)="selectOrPlace(player.uuid, $any(side), formationFor($any(side)).slots.length + benchIndex)">
+              <b>{{ playerRole(player) }}</b>
+              <span>{{ player.name }}</span>
+              <small>OVR {{ player.ovr ?? '—' }}</small>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <aside
+        *ngIf="side === 'HOME'"
+        class="lineup__score"
+        aria-label="Equilibrio estimado de los equipos">
+        <span class="lineup__score-label">Equilibrio</span>
+        <img src="assets/icons/atleta-raster-v1/ic_comp_overall_96.png" alt="" />
+        <strong class="lineup__score-home">{{ homeAverage }}</strong>
+        <b>—</b>
+        <strong class="lineup__score-away">{{ awayAverage }}</strong>
+        <span class="lineup__score-legend lineup__score-legend--home">Asignado</span>
+        <span class="lineup__score-legend lineup__score-legend--available">Disponible</span>
+        <span class="lineup__score-legend lineup__score-legend--swap">Intercambio</span>
+      </aside>
+    </ng-container>
+  </div>
+
+  <p class="lineup__read-only" *ngIf="!enabled">{{ readOnlyMessage }}</p>
+  <p class="lineup__status" aria-live="polite">
+    {{ selectedPlayerUuid ? 'Jugador seleccionado. Elige otra posición para intercambiar.' : (hasUnsavedChanges ? 'Tienes cambios sin guardar.' : 'Alineación sincronizada.') }}
   </p>
 
-  <p class="teams-board__read-only" *ngIf="!enabled">{{ readOnlyMessage }}</p>
-
-  <div class="teams-board__grid">
-    <section class="teams-board__column" (dragover)="onDragOver($event)" (drop)="onDrop('HOME', $event)">
-      <header class="teams-board__column-head">
-        <h4>Local</h4>
-        <span>{{ homePlayers.length }} jugadores</span>
-      </header>
-      <p class="teams-board__color">Color: {{ homeColor }}</p>
-      <p class="teams-board__ovr">Nivel estimado: {{ homeAverage }}</p>
-
-      <article
-        class="teams-board__player"
-        *ngFor="let player of homePlayers; trackBy: trackByPlayer"
-        [attr.draggable]="enabled && mode === 'MANUAL'"
-        (dragstart)="onDragStart(player.uuid, $event)">
-        <span>{{ player.name }}</span>
-        <small>OVR {{ player.ovr || 65 }} | {{ player.position || 'Sin posicion' }}</small>
-      </article>
-    </section>
-
-    <section class="teams-board__column" (dragover)="onDragOver($event)" (drop)="onDrop('AWAY', $event)">
-      <header class="teams-board__column-head">
-        <h4>Visita</h4>
-        <span>{{ awayPlayers.length }} jugadores</span>
-      </header>
-      <p class="teams-board__color">Color: {{ awayColor }}</p>
-      <p class="teams-board__ovr">Nivel estimado: {{ awayAverage }}</p>
-
-      <article
-        class="teams-board__player"
-        *ngFor="let player of awayPlayers; trackBy: trackByPlayer"
-        [attr.draggable]="enabled && mode === 'MANUAL'"
-        (dragstart)="onDragStart(player.uuid, $event)">
-        <span>{{ player.name }}</span>
-        <small>OVR {{ player.ovr || 65 }} | {{ player.position || 'Sin posicion' }}</small>
-      </article>
-    </section>
-  </div>
-
+  <footer class="lineup__footer" *ngIf="enabled">
+    <button type="button" class="lineup__discard" [disabled]="!hasUnsavedChanges" (click)="discardChanges()">Descartar</button>
+    <button type="button" class="lineup__save" [disabled]="!hasUnsavedChanges" (click)="saveTeams()">
+      <img src="assets/icons/atleta-raster-v1/ic_action_save_96.png" alt="" />
+      Guardar equipos
+    </button>
+  </footer>
 </section>

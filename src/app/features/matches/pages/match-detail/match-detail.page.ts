@@ -22,7 +22,7 @@ import {
   ParticipantSegment,
   ParticipantSegmentComponent,
 } from '../../components/participant-segment/participant-segment.component';
-import { TeamsBoardComponent } from '../../components/teams-board/teams-board.component';
+import { TeamsBoardChange, TeamsBoardComponent } from '../../components/teams-board/teams-board.component';
 import { VenueSelectedCardComponent } from '../../components/venue-selected-card/venue-selected-card.component';
 import { DEFAULT_MATCH_THEME_ID, MATCH_THEMES } from '../../models/match-theme.constants';
 import { MatchViewState, toMatchViewState } from '../../models/match-view-state.models';
@@ -71,12 +71,12 @@ export class MatchDetailPage implements OnDestroy {
   private readonly errorMapper = inject(ErrorMapperService);
   private readonly authSessionService = inject(AuthSessionService);
 
-  readonly iconBase = 'assets/icons/atleta';
-  readonly titleIconAsset = `${this.iconBase}/ic_nav_matches_24.svg`;
-  readonly progressIconAsset = `${this.iconBase}/ic_status_in_progress_24.svg`;
-  readonly participantsIconAsset = `${this.iconBase}/ic_match_invite_24.svg`;
-  readonly rankingIconAsset = `${this.iconBase}/ic_comp_stats_24.svg`;
-  readonly actionsIconAsset = `${this.iconBase}/ic_action_edit_24.svg`;
+  readonly iconBase = 'assets/icons/atleta-raster-v1';
+  readonly titleIconAsset = `${this.iconBase}/ic_nav_matches_96.png`;
+  readonly progressIconAsset = `${this.iconBase}/ic_status_in_progress_96.png`;
+  readonly participantsIconAsset = `${this.iconBase}/ic_match_participants_96.png`;
+  readonly rankingIconAsset = `${this.iconBase}/ic_comp_stats_96.png`;
+  readonly actionsIconAsset = `${this.iconBase}/ic_action_edit_96.png`;
 
   readonly themes = MATCH_THEMES;
   readonly selectedParticipantSegment = signal<ParticipantSegment>('CONFIRMED');
@@ -471,7 +471,7 @@ export class MatchDetailPage implements OnDestroy {
     this.selectedParticipantSegment.set(segment);
   }
 
-  async onTeamsChange(payload: { home: Player[]; away: Player[] }): Promise<void> {
+  async onTeamsChange(payload: TeamsBoardChange): Promise<void> {
     if (!this.canEditTeams()) {
       return;
     }
@@ -482,7 +482,10 @@ export class MatchDetailPage implements OnDestroy {
     }
 
     try {
-      await this.matchService.setTeams(match.id, payload.home, payload.away);
+      await this.matchService.setTeams(match.id, payload.home, payload.away, {
+        homeFormationId: payload.homeFormationId,
+        awayFormationId: payload.awayFormationId,
+      });
       this.teamAssignmentError.set(null);
       await this.matchStore.refresh(this.routeMatchId(), true);
     } catch (error) {

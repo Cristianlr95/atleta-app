@@ -10,7 +10,8 @@
 }
 
 .event-icon {
-  font-size: 1.2rem;
+  width: 22px;
+  height: 22px;
   margin-right: 10px;
 }
 
@@ -32,6 +33,11 @@
 }
 
 .events-add {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
   margin-top: 10px;
   border: 1px dashed rgba(126, 157, 210, 0.55);
   border-radius: 12px;
@@ -40,4 +46,9 @@
   font-weight: 700;
   color: #dbe9ff;
   cursor: pointer;
+}
+
+.events-add img.atleta-raster-icon {
+  width: 20px;
+  height: 20px;
 }

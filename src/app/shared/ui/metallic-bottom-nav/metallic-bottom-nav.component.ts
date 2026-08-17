@@ -1,6 +1,5 @@
 ﻿import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { IonIcon } from '@ionic/angular/standalone';
 
 export interface MetallicBottomNavItem {
   id: string;
@@ -15,12 +14,12 @@ export interface MetallicBottomNavItem {
 @Component({
   selector: 'app-metallic-bottom-nav',
   standalone: true,
-  imports: [CommonModule, IonIcon],
+  imports: [CommonModule],
   templateUrl: './metallic-bottom-nav.component.html',
   styleUrls: ['./metallic-bottom-nav.component.scss'],
 })
 export class MetallicBottomNavComponent {
-  private readonly defaultIconAsset = 'assets/icons/atleta/ic_nav_matches_24.svg';
+  private readonly defaultIconAsset = 'assets/icons/atleta-raster-v1/ic_nav_matches_96.png';
   @Input() items: ReadonlyArray<MetallicBottomNavItem> = [];
   @Output() itemSelected = new EventEmitter<string>();
   private lastTapAt = 0;

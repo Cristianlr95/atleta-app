@@ -1,5 +1,40 @@
 # Guia de Iconografia - ATLETA
 
+## Sistema vigente: Acero en Movimiento
+
+La iconografia propia de Atleta traduce el futbol a una interfaz competitiva, metalica y oscura. La referencia visual no es la ilustracion multicolor: la personalidad vive en la geometria, el movimiento diagonal y las metaforas futboleras especificas.
+
+- Reticula: `24x24`, zona segura de `2px`.
+- Trazo principal: `1.8px`; secundario: `1.4px`.
+- Terminaciones y uniones redondeadas.
+- Dos niveles maximos: trazo principal y masa `currentColor` al `16-22%`.
+- Firma visual: impulso hacia arriba-derecha y una muesca diagonal corta en elementos moviles.
+- Sin texto, emoji, colores fijos ni gradientes dentro del SVG.
+- El escudo se reserva para seguridad, defensa e identidad competitiva.
+- Todo icono interactivo debe tener nombre accesible; los decorativos usan `aria-hidden="true"`.
+
+### Principio semantico
+
+Un concepto tiene un icono canonico. Trofeo significa logro o podio; estadisticas significa analisis agregado; racha significa tendencia; lupa significa buscar; calendario significa fecha; reloj significa hora o cuenta regresiva.
+
+### Familias futboleras incorporadas
+
+- Roles: ataque, mediocampo, carrilero, defensa, arquero y DT.
+- Rendimiento: OVR, mejor rol, versatilidad, efectividad, contribucion G+A, medalla y subida de nivel.
+- Resultados: victoria, empate y derrota, siempre acompanados por texto.
+- Partido: participantes, jugar, gol, asistencia y tiempo.
+- Social y acciones: amistad, abrir partido, seguridad, sumar, restar, aceptar y rechazar.
+- Valoracion: estrella llena y estrella vacia propias.
+
+### Activos reservados
+
+Los siguientes recursos siguen disponibles, pero no deben usarse como sustitutos genericos:
+
+- `ic_action_search_24.svg`: solo busqueda.
+- `ic_action_save_24.svg`: solo guardar.
+- `ic_comp_level_24.svg`: solo nivel simple cuando no exista una metafora mas precisa.
+- `ic_match_rules_24.svg`: solo reglas o reglamento.
+
 ## 1) Direccion visual
 - Estilo: `Futurista deportivo metalico` (sci-fi stadium UI).
 - Contexto: interfaz oscura, alto contraste, sensacion competitiva/premium.
@@ -84,4 +119,3 @@ Nota: Mantener fondo oscuro; evitar iconos oscuros sobre oscuro.
   --icon-disabled: rgba(198, 231, 255, 0.45);
 }
 ```
-

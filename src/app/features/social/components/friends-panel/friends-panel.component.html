@@ -5,8 +5,8 @@
     <article class="friends-item" *ngFor="let item of pendingRequests">
       <p>{{ item.requesterAlias }} te envio una solicitud</p>
       <div class="friends-item__actions">
-        <button type="button" (click)="respondRequest.emit({ requestId: item.id, accept: true })">Aceptar</button>
-        <button type="button" (click)="respondRequest.emit({ requestId: item.id, accept: false })">Rechazar</button>
+        <button type="button" (click)="respondRequest.emit({ requestId: item.id, accept: true })"><img class="atleta-raster-icon" src="assets/icons/atleta-raster-v1/ic_action_accept_96.png" aria-hidden="true" alt="" />Aceptar</button>
+        <button type="button" (click)="respondRequest.emit({ requestId: item.id, accept: false })"><img class="atleta-raster-icon" src="assets/icons/atleta-raster-v1/ic_action_reject_96.png" aria-hidden="true" alt="" />Rechazar</button>
       </div>
     </article>
   </div>

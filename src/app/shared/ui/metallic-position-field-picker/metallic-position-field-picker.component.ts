@@ -1,6 +1,5 @@
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { IonIcon } from '@ionic/angular/standalone';
 
 export interface MetallicPositionFieldOption {
   label: string;
@@ -30,7 +29,7 @@ interface FieldPositionNode extends MetallicPositionFieldOption {
 @Component({
   selector: 'app-metallic-position-field-picker',
   standalone: true,
-  imports: [CommonModule, IonIcon],
+  imports: [CommonModule],
   templateUrl: './metallic-position-field-picker.component.html',
   styleUrls: ['./metallic-position-field-picker.component.scss'],
 })
@@ -44,8 +43,8 @@ export class MetallicPositionFieldPickerComponent {
   @Output() selectedValueChange = new EventEmitter<string>();
   @Output() selectedValuesChange = new EventEmitter<string[]>();
 
-  readonly selectedIconAsset = 'assets/icons/atleta/ic_status_confirmed_24.svg';
-  readonly defaultIconAsset = 'assets/icons/atleta/ic_comp_level_24.svg';
+  readonly selectedIconAsset = 'assets/icons/atleta-raster-v1/ic_status_confirmed_96.png';
+  readonly defaultIconAsset = 'assets/icons/atleta-raster-v1/ic_position_unselected_96.png';
 
   get nodes(): FieldPositionNode[] {
     const usedByRole = new Map<FieldRole, number>();
@@ -53,7 +52,7 @@ export class MetallicPositionFieldPickerComponent {
     return this.options.map((option) => {
       const role = this.resolveRole(option.label);
       const used = usedByRole.get(role) ?? 0;
-      const point = this.pickPoint(role, used);
+      const point = this.pickPoint(role, used, option.label);
       usedByRole.set(role, used + 1);
 
       return {
@@ -100,8 +99,22 @@ export class MetallicPositionFieldPickerComponent {
   }
 
   get selectedLabels(): string[] {
-    const selected = new Set(this.effectiveSelectedValues);
-    return this.nodes.filter((node) => selected.has(node.value)).map((node) => node.label);
+    return this.effectiveSelectedValues
+      .map((value) => this.nodes.find((node) => node.value === value)?.label)
+      .filter((label): label is string => Boolean(label));
+  }
+
+  selectedLabelAt(index: number): string {
+    return this.selectedLabels[index] ?? '';
+  }
+
+  priorityLabel(priority: number): string {
+    return ['Principal', 'Secundaria', 'Terciaria'][priority - 1] ?? `Prioridad ${priority}`;
+  }
+
+  positionAriaLabel(node: FieldPositionNode): string {
+    const order = this.selectedOrder(node.value);
+    return order ? `${node.label}, prioridad ${order}` : `${node.label}, disponible`;
   }
 
   onSelect(value: string): void {
@@ -186,7 +199,21 @@ export class MetallicPositionFieldPickerComponent {
     return 'UNKNOWN';
   }
 
-  private pickPoint(role: FieldRole, index: number): FieldPoint {
+  private pickPoint(role: FieldRole, index: number, label: string): FieldPoint {
+    if (role === 'WINGER') {
+      const normalizedLabel = this.normalize(label);
+
+      // La cancha se ve desde la perspectiva táctica habitual: la derecha
+      // del jugador queda a la derecha visual del campo, y viceversa.
+      if (normalizedLabel.includes('derech')) {
+        return { x: 78, y: 48 };
+      }
+
+      if (normalizedLabel.includes('izquierd')) {
+        return { x: 22, y: 48 };
+      }
+    }
+
     const points: Record<FieldRole, FieldPoint[]> = {
       GOALKEEPER: [{ x: 50, y: 91 }],
       DEFENDER: [

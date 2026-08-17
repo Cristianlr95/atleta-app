@@ -1,6 +1,6 @@
 ﻿<div class="leaderboard">
   <header class="leaderboard__header">
-    <ion-icon [src]="podiumIconAsset" aria-hidden="true"></ion-icon>
+    <img class="atleta-raster-icon" [src]="podiumIconAsset" aria-hidden="true" alt="" />
     <h3>{{ title }}</h3>
   </header>
 
@@ -13,7 +13,7 @@
       [class.leaderboard__podium-item--third]="row.rank === 3"
       [class.leaderboard__podium-item--current]="isCurrent(row)"
     >
-      <ion-icon [src]="row.rank === 1 ? trophyIconAsset : medalIconAsset" aria-hidden="true"></ion-icon>
+      <img class="atleta-raster-icon" [src]="row.rank === 1 ? trophyIconAsset : medalIconAsset" aria-hidden="true" alt="" />
       <p class="leaderboard__alias">#{{ row.rank }} {{ row.alias }}</p>
       <p class="leaderboard__score">{{ row.scoreText }}</p>
     </article>

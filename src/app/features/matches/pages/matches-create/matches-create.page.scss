@@ -1,6 +1,6 @@
 ﻿.matches-create-bg {
-  --background: none;
-  background:
+  --background: var(--atleta-page-bg);
+  background: var(--atleta-page-bg),
     linear-gradient(rgba(10, 12, 20, 0.78), rgba(10, 12, 20, 0.9)),
     url('/assets/backgrounds/stadium.png');
   background-size: cover;

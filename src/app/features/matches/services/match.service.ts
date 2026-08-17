@@ -235,14 +235,19 @@ export class MatchService {
     }));
   }
 
-  async setTeams(matchId: string, homePlayers: Player[], awayPlayers: Player[]): Promise<void> {
+  async setTeams(
+    matchId: string,
+    homePlayers: Player[],
+    awayPlayers: Player[],
+    formations?: { homeFormationId?: string; awayFormationId?: string },
+  ): Promise<void> {
     const match = this.getMatchById(matchId);
     if (!match) {
       return;
     }
     this.validateTeamGenderBalance(match, homePlayers, awayPlayers);
 
-    const updated = { ...match, homePlayers, awayPlayers };
+    const updated = { ...match, homePlayers, awayPlayers, ...formations };
     this.upsertMatch(updated);
     this.persistTeamAssignment(updated, homePlayers, awayPlayers);
     await this.persistTeamAssignmentsToBackend(updated, homePlayers, awayPlayers);
@@ -538,6 +543,15 @@ export class MatchService {
         const homeIds = new Set(homePlayers.map((player) => player.uuid));
         const awayIds = new Set(awayPlayers.map((player) => player.uuid));
 
+        const persistedHomeOrder = new Map(persisted.homeIds.map((id, index) => [id, index]));
+        const persistedAwayOrder = new Map(persisted.awayIds.map((id, index) => [id, index]));
+        homePlayers = [...homePlayers].sort(
+          (a, b) => (persistedHomeOrder.get(a.uuid) ?? Number.MAX_SAFE_INTEGER) - (persistedHomeOrder.get(b.uuid) ?? Number.MAX_SAFE_INTEGER),
+        );
+        awayPlayers = [...awayPlayers].sort(
+          (a, b) => (persistedAwayOrder.get(a.uuid) ?? Number.MAX_SAFE_INTEGER) - (persistedAwayOrder.get(b.uuid) ?? Number.MAX_SAFE_INTEGER),
+        );
+
         const missingHome = persistedHome
           .filter((player) => !homeIds.has(player.uuid) && !awayIds.has(player.uuid))
           .map((player) => ({ ...player, teamId: localTeam?.id ?? player.teamId }));
@@ -589,6 +603,8 @@ export class MatchService {
             : 10,
       homeKitColor: 'Azul',
       awayKitColor: 'Rojo',
+      homeFormationId: persisted?.homeFormationId,
+      awayFormationId: persisted?.awayFormationId,
       homePlayers,
       awayPlayers,
       createdAt: new Date().toISOString(),
@@ -709,7 +725,10 @@ export class MatchService {
 
     this.teamAssignmentsStore.update((state) => ({
       ...state,
-      [key]: this.teamAssignmentPersistenceService.createSnapshot(homePlayers, awayPlayers),
+      [key]: this.teamAssignmentPersistenceService.createSnapshot(homePlayers, awayPlayers, new Date().toISOString(), {
+        homeFormationId: match.homeFormationId,
+        awayFormationId: match.awayFormationId,
+      }),
     }));
   }
 

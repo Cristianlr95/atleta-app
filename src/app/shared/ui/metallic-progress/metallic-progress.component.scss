@@ -1,86 +1,58 @@
 .metallic-progress-wrapper {
   width: 100%;
-  margin: 16px 0;
+  margin: 12px 0;
 }
 
 .metallic-progress {
   position: relative;
-  height: 22px;
-  background: rgba(7, 13, 24, 0.88);
-  border: 1px solid rgba(176, 199, 231, 0.3);
-  border-radius: 999px;
+  height: 7px;
   overflow: hidden;
-  box-shadow:
-    inset 0 2px 8px rgba(0, 0, 0, 0.5),
-    0 0 0 1px rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--tactical-line);
+  border-radius: 2px;
+  background: #0b1b22;
 
   &__info {
     display: flex;
-    justify-content: space-between;
     align-items: center;
+    justify-content: space-between;
     gap: 12px;
-    margin-bottom: 8px;
+    margin-bottom: 7px;
+  }
+
+  &__label,
+  &__value {
+    font-family: var(--font-family-display);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
   }
 
   &__label {
-    color: #cbd9ee;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    font-family: var(--font-family-body);
-    font-weight: 700;
-    font-size: 0.875rem;
+    color: #9aabb0;
   }
 
   &__value {
-    color: #e5f2ff;
-    font-family: var(--font-family-display);
-    font-weight: 700;
-    font-size: 0.875rem;
+    color: var(--tactical-local);
   }
 
   &__fill {
     position: absolute;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    background: linear-gradient(90deg, #58c7ff 0%, #80e7b2 62%, #ffd46b 100%);
-    transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: 0 0 18px rgba(88, 199, 255, 0.36);
+    inset: 0 auto 0 0;
+    background: var(--tactical-local);
+    box-shadow: 0 0 12px rgba(215, 255, 0, 0.25);
+    transition: width 300ms ease;
   }
 
-  &__shine {
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(to bottom, rgba(255,255,255,0.28), transparent, rgba(0,0,0,0.16));
-  }
-
-  &__glow {
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(to right, transparent, rgba(255,255,255,0.36), transparent);
-    animation: shimmer 2s infinite;
-  }
-
+  &__shine,
+  &__glow,
   &__grid {
-    position: absolute;
-    inset: 0;
-    background: repeating-linear-gradient(
-      90deg,
-      rgba(255, 255, 255, 0.12) 0,
-      rgba(255, 255, 255, 0.12) 1px,
-      transparent 1px,
-      transparent 20px
-    );
-    pointer-events: none;
+    display: none;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .metallic-progress__fill {
     transition: none;
-  }
-
-  .metallic-progress__glow {
-    animation: none;
   }
 }

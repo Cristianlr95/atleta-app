@@ -64,10 +64,10 @@ export class MatchClosePage {
   private readonly appToast = inject(AppToastService);
   private readonly authSessionService = inject(AuthSessionService);
 
-  readonly iconBase = 'assets/icons/atleta';
-  readonly titleIconAsset = `${this.iconBase}/ic_status_finished_24.svg`;
-  readonly adjustIconAsset = `${this.iconBase}/ic_action_edit_24.svg`;
-  readonly rewardIconAsset = `${this.iconBase}/ic_comp_xp_24.svg`;
+  readonly iconBase = 'assets/icons/atleta-raster-v1';
+  readonly titleIconAsset = `${this.iconBase}/ic_status_finished_96.png`;
+  readonly adjustIconAsset = `${this.iconBase}/ic_action_edit_96.png`;
+  readonly rewardIconAsset = `${this.iconBase}/ic_comp_xp_96.png`;
 
   readonly step = signal<1 | 2 | 3>(1);
   readonly loading = signal(false);
@@ -120,13 +120,13 @@ export class MatchClosePage {
       .map((player) => {
         const goals = this.getCount(this.goalCounts(), player.userId);
         return {
-          icon: goals > 0 ? '⚽' : '🎯',
+          iconAsset: `${this.iconBase}/ic_event_goal_96.png`,
           text: `${player.name}${goals > 0 ? ` (${goals} gol${goals > 1 ? 'es' : ''})` : ''}`,
           goals,
         };
       })
       .filter((item) => item.goals > 0)
-      .map((item) => ({ icon: item.icon, text: item.text })),
+      .map((item) => ({ iconAsset: item.iconAsset, text: item.text })),
   );
 
   readonly awayEvents = computed<TeamEventSummary[]>(() =>
@@ -135,13 +135,13 @@ export class MatchClosePage {
       .map((player) => {
         const goals = this.getCount(this.goalCounts(), player.userId);
         return {
-          icon: goals > 0 ? '⚽' : '🎯',
+          iconAsset: `${this.iconBase}/ic_event_goal_96.png`,
           text: `${player.name}${goals > 0 ? ` (${goals} gol${goals > 1 ? 'es' : ''})` : ''}`,
           goals,
         };
       })
       .filter((item) => item.goals > 0)
-      .map((item) => ({ icon: item.icon, text: item.text })),
+      .map((item) => ({ iconAsset: item.iconAsset, text: item.text })),
   );
 
   readonly xpRewards = computed<XpRewardItem[]>(() =>

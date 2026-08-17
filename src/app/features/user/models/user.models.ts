@@ -29,3 +29,17 @@ export interface TrustLogEntry {
   motivo: string;
   createdAt?: string;
 }
+
+export type AchievementTier = 'BRONZE' | 'SILVER' | 'GOLD' | null;
+
+export interface PlayerAchievement {
+  code: 'TOP_SCORER' | 'TOP_ASSIST' | 'MATCH_VETERAN' | 'MATCH_CREATOR' | 'MATCH_WINNER';
+  title: string;
+  description: string;
+  metricLabel: string;
+  currentValue: number;
+  nextThreshold: number;
+  progressPercent: number;
+  tier: AchievementTier;
+  unlocked: boolean;
+}

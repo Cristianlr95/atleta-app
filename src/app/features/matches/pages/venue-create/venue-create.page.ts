@@ -33,7 +33,7 @@ export class VenueCreatePage {
   private readonly route = inject(ActivatedRoute);
   private readonly enterLoadGuard = new PageLoadGuard();
 
-  readonly titleIconAsset = 'assets/icons/atleta/ic_match_location_24.svg';
+  readonly titleIconAsset = 'assets/icons/atleta-raster-v1/ic_match_location_96.png';
 
   readonly fields = signal<SavedFieldLocation[]>([]);
   readonly loading = signal(false);

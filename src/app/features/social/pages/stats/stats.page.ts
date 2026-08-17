@@ -57,10 +57,10 @@ export class StatsPage implements OnDestroy {
   private readonly notificationBadgeService = inject(NotificationBadgeService);
   private readonly destroy$ = new Subject<void>();
 
-  readonly titleIconAsset = 'assets/icons/atleta/ic_comp_stats_24.svg';
-  readonly summaryIconAsset = 'assets/icons/atleta/ic_comp_trophy_24.svg';
-  readonly rolesIconAsset = 'assets/icons/atleta/ic_match_lineup_24.svg';
-  readonly trendIconAsset = 'assets/icons/atleta/ic_comp_streak_24.svg';
+  readonly titleIconAsset = 'assets/icons/atleta-raster-v1/ic_comp_stats_96.png';
+  readonly summaryIconAsset = 'assets/icons/atleta-raster-v1/ic_comp_overall_96.png';
+  readonly rolesIconAsset = 'assets/icons/atleta-raster-v1/ic_match_lineup_96.png';
+  readonly trendIconAsset = 'assets/icons/atleta-raster-v1/ic_comp_streak_96.png';
 
   isLoading = false;
   errorMessage: string | null = null;
@@ -143,26 +143,26 @@ export class StatsPage implements OnDestroy {
       {
         label: 'OVR actual',
         value: overall ? overall.hybridOVR.toFixed(1) : '--',
-        icon: 'trophy-outline',
+        icon: 'overall',
         description: 'Promedio competitivo actual del jugador.',
       },
       {
         label: 'Rol destacado',
         value: bestRole ? `${this.roleLabel(bestRole.role)} ${bestRole.rating.toFixed(1)}` : '--',
-        icon: 'star-outline',
+        icon: 'best-role',
         valueClass: 'metallic-stat__value--small',
         description: 'Rol donde hoy tienes tu mejor rendimiento registrado.',
       },
       {
         label: 'Efectividad',
         value: countable.length > 0 ? `${winRate}%` : '--',
-        icon: 'stats-chart-outline',
+        icon: 'effectiveness',
         description: 'Porcentaje de victorias sobre partidos finalizados con resultado.',
       },
       {
         label: 'G+A',
         value: goals + assists,
-        icon: 'football-outline',
+        icon: 'goal-contribution',
         description: 'Goles mas asistencias registrados en tu historial.',
       },
     ];
@@ -272,10 +272,10 @@ export class StatsPage implements OnDestroy {
 
   private emptySummaryStats(): Stat[] {
     return [
-      { label: 'OVR actual', value: '--', icon: 'trophy-outline' },
-      { label: 'Rol destacado', value: '--', icon: 'star-outline' },
-      { label: 'Efectividad', value: '--', icon: 'stats-chart-outline' },
-      { label: 'G+A', value: '--', icon: 'football-outline' },
+      { label: 'OVR actual', value: '--', icon: 'overall' },
+      { label: 'Rol destacado', value: '--', icon: 'best-role' },
+      { label: 'Efectividad', value: '--', icon: 'effectiveness' },
+      { label: 'G+A', value: '--', icon: 'goal-contribution' },
     ];
   }
 

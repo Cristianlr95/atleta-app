@@ -1,196 +1,103 @@
 .metallic-bottom-nav {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(108px, 1fr));
-  gap: 10px;
+  gap: 7px;
   width: 100%;
 }
 
 .metallic-bottom-nav__item {
   position: relative;
-  border: 1px solid rgba(176, 199, 231, 0.24);
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.06), transparent),
-    linear-gradient(145deg, rgba(26, 38, 58, 0.92), rgba(8, 14, 26, 0.94));
-  color: #d9e7fb;
-  border-radius: 12px;
-  min-width: 0;
-  min-height: 50px;
   display: flex;
+  min-width: 0;
+  min-height: 48px;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: 7px;
+  border: 1px solid var(--tactical-line);
+  border-radius: 6px;
+  background: #07151c;
+  color: #9eafb5;
   font-family: var(--font-family-display);
   font-size: 12px;
-  letter-spacing: 0.05em;
+  font-weight: 700;
+  letter-spacing: 0.045em;
   text-transform: uppercase;
-  transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease, color 180ms ease;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  transition:
+    border-color 150ms ease,
+    background 150ms ease,
+    color 150ms ease;
 
-  ion-icon {
-    font-size: 18px;
-    padding: 5px;
-    border-radius: 9px;
-    border: 1px solid rgba(130, 156, 194, 0.35);
-    background: linear-gradient(to bottom right, rgba(31, 42, 64, 0.86), rgba(15, 22, 38, 0.92));
-    box-shadow:
-      inset 0 1px 0 rgba(231, 241, 255, 0.12),
-      0 0 0 1px rgba(71, 101, 145, 0.18);
-    transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
+  img.atleta-raster-icon {
+    width: 20px;
+    height: 20px;
   }
 
   span {
     min-width: 0;
-    max-width: 100%;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
   }
 
-  &:active {
-    transform: translateY(1px);
+  &:focus-visible {
+    outline: 2px solid #fff;
+    outline-offset: 2px;
   }
 }
 
 .metallic-bottom-nav__badge {
   position: absolute;
-  top: 4px;
-  right: 6px;
-  min-width: 16px;
-  height: 16px;
-  padding: 0 4px;
-  border-radius: 999px;
+  top: 3px;
+  right: 5px;
   display: grid;
+  min-width: 17px;
+  height: 17px;
   place-items: center;
+  padding: 0 4px;
+  border-radius: 9px;
   background: var(--atleta-red);
   color: #fff;
   font-size: 10px;
-  line-height: 1;
   font-weight: 700;
-  border: 1px solid rgba(255, 255, 255, 0.5);
 }
 
 .metallic-bottom-nav__item--active {
-  border-color: rgba(88, 199, 255, 0.68);
-  color: #f0f9ff;
-  box-shadow:
-    0 0 0 1px rgba(88, 199, 255, 0.24) inset,
-    0 10px 20px rgba(8, 12, 20, 0.34),
-    0 0 22px rgba(88, 199, 255, 0.12);
-  animation: nav-active-glow 300ms ease-out;
-
-  ion-icon {
-    transform: translateY(-1px) scale(1.06);
-    border-color: rgba(134, 207, 255, 0.66);
-    box-shadow:
-      inset 0 1px 0 rgba(235, 246, 255, 0.2),
-      0 0 0 1px rgba(89, 146, 210, 0.28),
-      0 0 12px rgba(84, 171, 255, 0.38);
-  }
+  border-color: var(--tactical-visit);
+  background: rgba(0, 215, 245, 0.08);
+  color: var(--tactical-visit);
+  box-shadow: inset 0 -2px 0 var(--tactical-visit);
 }
 
 .metallic-bottom-nav__item--cta {
-  position: relative;
-  overflow: hidden;
-  border-color: rgba(195, 255, 226, 0.76);
-  background: linear-gradient(135deg, #4bc48c, #a4f0c6 48%, #58c7ff);
-  color: #06150f;
-  font-weight: 800;
-  min-height: 54px;
-  box-shadow:
-    0 0 0 1px rgba(255, 255, 255, 0.24) inset,
-    0 12px 24px rgba(9, 12, 18, 0.38),
-    0 0 20px rgba(128, 231, 178, 0.16);
-
-  &::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    left: -36%;
-    width: 28%;
-    background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.48), transparent);
-    transform: skewX(-18deg);
-    animation: nav-cta-shine 2.4s ease-in-out infinite;
-  }
-
-  ion-icon {
-    font-size: 20px;
-    border-color: rgba(225, 236, 255, 0.62);
-    background: linear-gradient(to bottom right, rgba(17, 70, 52, 0.6), rgba(8, 33, 45, 0.62));
-  }
-}
-
-@keyframes nav-active-glow {
-  from {
-    box-shadow: 0 0 0 0 rgba(88, 199, 255, 0.38);
-    transform: translateY(1px) scale(0.99);
-  }
-
-  to {
-    box-shadow:
-      0 0 0 1px rgba(88, 199, 255, 0.24) inset,
-      0 10px 20px rgba(8, 12, 20, 0.34),
-      0 0 22px rgba(88, 199, 255, 0.12);
-    transform: translateY(0) scale(1);
-  }
-}
-
-@keyframes nav-cta-shine {
-  0%,
-  82% {
-    transform: translateX(0) skewX(-18deg);
-    opacity: 0;
-  }
-
-  88% {
-    opacity: 0.9;
-  }
-
-  100% {
-    transform: translateX(340%) skewX(-18deg);
-    opacity: 0;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .metallic-bottom-nav__item,
-  .metallic-bottom-nav__item ion-icon,
-  .metallic-bottom-nav__item--active {
-    transition: none;
-    animation: none;
-  }
-
-  .metallic-bottom-nav__item--cta::after {
-    animation: none;
-  }
+  border-color: var(--tactical-local);
+  background: var(--tactical-local);
+  color: #071014;
+  font-weight: 700;
 }
 
 @media (max-width: 430px) {
   .metallic-bottom-nav {
-    gap: 6px;
     grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 4px;
   }
 
   .metallic-bottom-nav__item {
-    min-height: 50px;
-    gap: 0;
+    min-height: 48px;
     padding-inline: 0;
-  }
 
-  .metallic-bottom-nav__item span {
-    display: none;
-  }
+    span {
+      display: none;
+    }
 
-  .metallic-bottom-nav__item--cta {
-    min-height: 50px;
-    padding-inline: 0;
+    img.atleta-raster-icon {
+      width: 22px;
+      height: 22px;
+    }
   }
+}
 
-  .metallic-bottom-nav__item--cta ion-icon {
-    font-size: 19px;
-  }
-
-  .metallic-bottom-nav__item ion-icon {
-    font-size: 20px;
+@media (prefers-reduced-motion: reduce) {
+  .metallic-bottom-nav__item {
+    transition: none;
   }
 }

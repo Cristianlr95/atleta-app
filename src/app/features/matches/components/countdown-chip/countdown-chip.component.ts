@@ -1,14 +1,16 @@
 import { CommonModule } from '@angular/common';
 import { Component, Input, OnDestroy, OnInit, signal } from '@angular/core';
+import { IonicModule } from '@ionic/angular';
 
 @Component({
   selector: 'app-countdown-chip',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, IonicModule],
   templateUrl: './countdown-chip.component.html',
   styleUrls: ['./countdown-chip.component.scss'],
 })
 export class CountdownChipComponent implements OnInit, OnDestroy {
+  readonly timeIconAsset = 'assets/icons/atleta-raster-v1/ic_match_time_96.png';
   @Input() scheduledAt = '';
 
   readonly label = signal('Sin fecha');

@@ -1,12 +1,11 @@
 import { Component, Input, booleanAttribute, forwardRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR, FormsModule } from '@angular/forms';
-import { IonIcon } from '@ionic/angular/standalone';
 
 @Component({
   selector: 'app-metallic-input',
   standalone: true,
-  imports: [CommonModule, FormsModule, IonIcon],
+  imports: [CommonModule, FormsModule],
   templateUrl: './metallic-input.component.html',
   styleUrls: ['./metallic-input.component.scss'],
   providers: [
@@ -27,9 +26,9 @@ export class MetallicInputComponent implements ControlValueAccessor {
 
   value: string = '';
   isPasswordVisible: boolean = false;
-  private readonly iconBase = 'assets/icons/atleta';
-  private readonly eyeIconAsset = `${this.iconBase}/ic_action_view_24.svg`;
-  private readonly eyeOffIconAsset = `${this.iconBase}/ic_action_hide_24.svg`;
+  private readonly iconBase = 'assets/icons/atleta-raster-v1';
+  private readonly eyeIconAsset = `${this.iconBase}/ic_action_view_96.png`;
+  private readonly eyeOffIconAsset = `${this.iconBase}/ic_action_hide_96.png`;
 
   onChange = (value: string) => {};
   onTouched = () => {};

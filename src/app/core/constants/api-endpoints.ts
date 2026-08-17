@@ -20,6 +20,7 @@
   users: {
     athletes: '/athletes',
     playerProfiles: '/player-profiles',
+    playerProfileAchievements: '/player-profiles',
     playerProfilePositions: '/player-profiles/positions',
     playerProfileTrustScore: '/player-profiles/trust-score',
     positions: '/positions',
