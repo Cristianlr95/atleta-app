@@ -79,6 +79,26 @@
   height: 19px;
 }
 
+.profile-showcase {
+  display: grid;
+  grid-template-columns: minmax(132px, .55fr) minmax(0, 1.45fr) auto;
+  align-items: stretch;
+  gap: 12px;
+  margin: 18px 0;
+  padding: 14px;
+  border: 1px solid rgba(0, 215, 245, .3);
+  border-radius: 12px;
+  background: linear-gradient(120deg, rgba(0, 215, 245, .08), rgba(215, 255, 0, .04));
+}
+
+.profile-showcase__lead { display: grid; align-content: center; gap: 3px; }
+.profile-showcase__lead p { margin: 0; color: var(--tactical-visit); font: 700 11px var(--font-family-display); letter-spacing: .12em; }
+.profile-showcase__lead strong { color: var(--tactical-local); font: 700 31px var(--font-family-display); }
+.profile-showcase__lead span { color: var(--text-muted); font-family: var(--font-family-body); }
+.profile-showcase__actions { display: grid; align-content: center; gap: 8px; }
+.profile-showcase__actions button { min-height: 38px; border: 1px solid rgba(215,255,0,.55); border-radius: 8px; background: rgba(59, 77, 5, .46); color: var(--text-primary); font: 700 12px var(--font-family-display); padding: 7px 10px; white-space: nowrap; }
+.profile-showcase__actions button + button { border-color: rgba(0,215,245,.45); background: rgba(7,30,39,.7); }
+
 .profile-message--success {
   color: #a7f3c3;
 }
@@ -352,6 +372,8 @@
 }
 
 @media (max-width: 520px) {
+  .profile-showcase { grid-template-columns: 1fr; }
+  .profile-showcase__actions { grid-template-columns: 1fr 1fr; }
   .achievement-grid { grid-template-columns: 1fr; }
   .profile-team__head {
     grid-template-columns: 1fr;

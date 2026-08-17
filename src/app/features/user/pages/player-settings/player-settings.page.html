@@ -35,6 +35,27 @@
           </button>
         </form>
       </app-metallic-form-section>
+
+      <app-metallic-form-section
+        title="Zona de peligro"
+        [titleIconAsset]="securitySectionIconAsset"
+        description="Eliminar cuenta cierra tu sesión y anonimiza tu identidad. El historial deportivo compartido se conserva para no alterar los resultados de otros jugadores."
+      >
+        <form class="settings-delete-form" (ngSubmit)="onDeleteAccount()">
+          <label class="settings-password-field">
+            <span>Contraseña actual (obligatoria en cuentas locales)</span>
+            <input type="password" name="deleteCurrentPassword" autocomplete="current-password" [(ngModel)]="deleteCurrentPassword" [disabled]="deleteLoading" />
+          </label>
+          <label class="settings-password-field">
+            <span>Escribe ELIMINAR para confirmar</span>
+            <input type="text" name="deleteConfirmation" autocomplete="off" [(ngModel)]="deleteConfirmation" [disabled]="deleteLoading" />
+          </label>
+          <p class="settings-message settings-message--warning" *ngIf="deleteError">{{ deleteError }}</p>
+          <button type="submit" class="settings-delete" [disabled]="deleteLoading">
+            {{ deleteLoading ? 'Eliminando...' : 'Eliminar mi cuenta' }}
+          </button>
+        </form>
+      </app-metallic-form-section>
     </app-metallic-card>
   </div>
 </ion-content>

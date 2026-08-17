@@ -167,6 +167,14 @@ export class PlayerProfilePage implements OnDestroy {
     void this.navigationService.safeNavigate(['/player/settings']);
   }
 
+  openMatchHistory(): void {
+    void this.navigationService.safeNavigate(['/matches/history']);
+  }
+
+  openMatches(): void {
+    void this.navigationService.safeNavigate(['/matches']);
+  }
+
   isTeamCreator(team: TeamSummary): boolean {
     const currentUser = this.authSessionService.currentSession?.user.atletaUuid;
     if (!currentUser) {

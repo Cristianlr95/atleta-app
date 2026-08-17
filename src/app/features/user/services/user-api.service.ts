@@ -29,6 +29,13 @@ export class UserApiService extends ApiService {
     );
   }
 
+  deleteAccount(atletaUuid: string, payload: { confirmation: string; currentPassword?: string }) {
+    return this.deleteWithBody<void, { confirmation: string; currentPassword?: string }>(
+      `${API_ENDPOINTS.users.athletes}/${atletaUuid}`,
+      payload,
+    );
+  }
+
   getPlayerProfile(atletaUuid: string) {
     return this.get<PlayerProfile>(`${API_ENDPOINTS.users.playerProfiles}/${atletaUuid}`);
   }

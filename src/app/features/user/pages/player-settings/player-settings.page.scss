@@ -60,6 +60,7 @@
 }
 
 .settings-password-form { display: grid; gap: 12px; }
+.settings-delete-form { display: grid; gap: 12px; }
 
 .settings-password-field {
   display: grid;
@@ -89,6 +90,18 @@
 .settings-message { margin: 0; font: 700 15px var(--font-family-body); }
 .settings-message--warning { color: #ffd98a; }
 .settings-message--success { color: #a7f3c3; }
+
+.settings-delete {
+  justify-self: start;
+  min-height: 40px;
+  border: 1px solid rgba(255, 90, 118, .75);
+  border-radius: 9px;
+  background: rgba(98, 12, 28, .56);
+  color: #ffeef1;
+  font: 700 13px var(--font-family-display);
+  letter-spacing: .04em;
+  padding: 8px 13px;
+}
 
 @media (max-width: 520px) {
   .settings-intro { flex-direction: column; }

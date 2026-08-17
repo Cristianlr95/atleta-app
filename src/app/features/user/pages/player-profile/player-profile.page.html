@@ -23,6 +23,36 @@
         {{ errorMessage }}
       </p>
 
+      <section class="profile-showcase" aria-label="Resumen destacado del jugador">
+        <div class="profile-showcase__lead">
+          <p>COMPETICIÓN</p>
+          <strong>{{ overallHybridOvr ?? '--' }} OVR</strong>
+          <span>{{ overallText }}</span>
+        </div>
+        <app-metallic-stats [stats]="summaryStats" [compact]="true"></app-metallic-stats>
+        <div class="profile-showcase__actions">
+          <button type="button" (click)="openMatchHistory()">Ver mis partidos</button>
+          <button type="button" (click)="openMatches()">Próximos partidos</button>
+        </div>
+      </section>
+
+      <app-metallic-form-section
+        title="Trofeos y metas"
+        [titleIconAsset]="achievementsSectionIconAsset"
+        description="Tus medallas activas y el próximo objetivo competitivo."
+      >
+        <div class="achievement-grid achievement-grid--featured" aria-label="Trofeos competitivos">
+          <article *ngFor="let achievement of achievements" class="achievement-card" [class.achievement-card--locked]="!achievement.unlocked">
+            <img class="achievement-card__icon atleta-raster-icon" [src]="achievementIconAsset(achievement.code)" alt="" />
+            <div class="achievement-card__body">
+              <div class="achievement-card__heading"><h4>{{ achievement.title }}</h4><span>{{ achievementTierLabel(achievement) }}</span></div>
+              <div class="achievement-card__progress"><span [style.width.%]="achievement.progressPercent"></span></div>
+              <small>{{ achievement.currentValue }} / {{ achievement.nextThreshold }} {{ achievement.metricLabel }}</small>
+            </div>
+          </article>
+        </div>
+      </app-metallic-form-section>
+
       <app-metallic-form-section
         title="Mis equipos"
         [titleIconAsset]="teamsSectionIconAsset"

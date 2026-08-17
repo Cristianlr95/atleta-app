@@ -35,6 +35,10 @@ export class PlayerSettingsPage {
   passwordChangeLoading = false;
   passwordChangeMessage: string | null = null;
   passwordChangeError: string | null = null;
+  deleteConfirmation = '';
+  deleteCurrentPassword = '';
+  deleteLoading = false;
+  deleteError: string | null = null;
 
   goBack(): void {
     void this.navigationService.goBackOrProfile();
@@ -87,6 +91,37 @@ export class PlayerSettingsPage {
       this.passwordChangeError = this.errorMapper.toUserMessage(error, 'default');
     } finally {
       this.passwordChangeLoading = false;
+    }
+  }
+
+  async onDeleteAccount(): Promise<void> {
+    if (this.deleteLoading) {
+      return;
+    }
+    const atletaUuid = this.authSessionService.currentSession?.user?.atletaUuid;
+    this.deleteError = null;
+    if (!atletaUuid) {
+      this.deleteError = 'No se encontro una sesion valida.';
+      return;
+    }
+    if (this.deleteConfirmation !== 'ELIMINAR') {
+      this.deleteError = 'Escribe ELIMINAR para confirmar esta acción.';
+      return;
+    }
+
+    this.deleteLoading = true;
+    try {
+      await firstValueFrom(this.userApiService.deleteAccount(atletaUuid, {
+        confirmation: this.deleteConfirmation,
+        currentPassword: this.deleteCurrentPassword || undefined,
+      }));
+      this.authSessionService.clearSession();
+      await this.appToastService.success('Tu cuenta fue eliminada.');
+      await this.navigationService.safeNavigate(['/login']);
+    } catch (error) {
+      this.deleteError = this.errorMapper.toUserMessage(error, 'default');
+    } finally {
+      this.deleteLoading = false;
     }
   }
 }
