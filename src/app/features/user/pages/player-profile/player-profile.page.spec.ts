@@ -145,43 +145,6 @@ describe('PlayerProfilePage', () => {
     expect(played).toBe(totalOutcomes);
   });
 
-  it('changes password for the authenticated athlete and clears sensitive fields', async () => {
-    authSessionService.currentSession = {
-      user: {
-        atletaUuid: 'ath-1',
-      },
-    };
-    component.currentPassword = 'old-pass-123';
-    component.newPassword = 'new-pass-123';
-    component.confirmNewPassword = 'new-pass-123';
-
-    await component.onChangePassword();
-
-    expect(userApiService.changePassword).toHaveBeenCalledOnceWith('ath-1', {
-      currentPassword: 'old-pass-123',
-      newPassword: 'new-pass-123',
-    });
-    expect(component.currentPassword).toBe('');
-    expect(component.newPassword).toBe('');
-    expect(component.confirmNewPassword).toBe('');
-    expect(component.passwordChangeMessage).toBe('Contrasena actualizada correctamente.');
-  });
-
-  it('validates password confirmation before calling the API', async () => {
-    authSessionService.currentSession = {
-      user: {
-        atletaUuid: 'ath-1',
-      },
-    };
-    component.currentPassword = 'old-pass-123';
-    component.newPassword = 'new-pass-123';
-    component.confirmNewPassword = 'different-pass';
-
-    await component.onChangePassword();
-
-    expect(userApiService.changePassword).not.toHaveBeenCalled();
-    expect(component.passwordChangeError).toBe('La confirmacion no coincide con la nueva contrasena.');
-  });
 });
 
 function buildHistoryItem(

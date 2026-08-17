@@ -58,6 +58,14 @@ export const routes: Routes = [
       ),
   },
   {
+    path: 'player/settings',
+    canActivate: [authGuard, onboardingCompletedGuard],
+    loadComponent: () =>
+      import('./features/user/pages/player-settings/player-settings.page').then(
+        (m) => m.PlayerSettingsPage,
+      ),
+  },
+  {
     path: 'matches',
     canActivate: [authGuard, onboardingCompletedGuard],
     loadComponent: () =>

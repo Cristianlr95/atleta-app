@@ -95,7 +95,7 @@ export class PlayerProfilePage implements OnDestroy {
   readonly outcomesSectionIconAsset = `${this.iconBase}/ic_comp_streak_96.png`;
   readonly positionsSectionIconAsset = `${this.iconBase}/ic_match_lineup_96.png`;
   readonly teamsSectionIconAsset = `${this.iconBase}/ic_match_teams_96.png`;
-  readonly securitySectionIconAsset = `${this.iconBase}/ic_auth_security_96.png`;
+  readonly settingsIconAsset = `${this.iconBase}/ic_auth_security_96.png`;
   readonly achievementsSectionIconAsset = `${this.iconBase}/ic_comp_medal_96.png`;
 
   get bottomNavItems(): ReadonlyArray<MetallicBottomNavItem> {
@@ -128,12 +128,6 @@ export class PlayerProfilePage implements OnDestroy {
   teamMembers: TeamMemberView[] = [];
   teamMembersLoading = false;
   teamMembersError: string | null = null;
-  currentPassword = '';
-  newPassword = '';
-  confirmNewPassword = '';
-  passwordChangeLoading = false;
-  passwordChangeMessage: string | null = null;
-  passwordChangeError: string | null = null;
 
   constructor() {
     this.isDemoMode = this.route.snapshot.queryParamMap.get('demo') === '1';
@@ -169,58 +163,8 @@ export class PlayerProfilePage implements OnDestroy {
     void this.navigationService.goToMainBottomSection(itemId);
   }
 
-  async onChangePassword(): Promise<void> {
-    if (this.passwordChangeLoading) {
-      return;
-    }
-
-    const atletaUuid = this.authSessionService.currentSession?.user?.atletaUuid;
-    this.passwordChangeMessage = null;
-    this.passwordChangeError = null;
-
-    if (!atletaUuid) {
-      this.passwordChangeError = 'No se encontro una sesion valida.';
-      return;
-    }
-
-    if (this.currentPassword.length < 8 || this.newPassword.length < 8) {
-      this.passwordChangeError = 'La contrasena actual y la nueva deben tener al menos 8 caracteres.';
-      return;
-    }
-
-    if (this.newPassword.length > 100) {
-      this.passwordChangeError = 'La nueva contrasena no puede superar 100 caracteres.';
-      return;
-    }
-
-    if (this.newPassword !== this.confirmNewPassword) {
-      this.passwordChangeError = 'La confirmacion no coincide con la nueva contrasena.';
-      return;
-    }
-
-    if (this.currentPassword === this.newPassword) {
-      this.passwordChangeError = 'La nueva contrasena debe ser distinta a la actual.';
-      return;
-    }
-
-    this.passwordChangeLoading = true;
-    try {
-      await firstValueFrom(
-        this.userApiService.changePassword(atletaUuid, {
-          currentPassword: this.currentPassword,
-          newPassword: this.newPassword,
-        }),
-      );
-      this.currentPassword = '';
-      this.newPassword = '';
-      this.confirmNewPassword = '';
-      this.passwordChangeMessage = 'Contrasena actualizada correctamente.';
-      await this.appToastService.success('Contrasena actualizada correctamente.');
-    } catch (error) {
-      this.passwordChangeError = this.errorMapper.toUserMessage(error, 'default');
-    } finally {
-      this.passwordChangeLoading = false;
-    }
+  openSettings(): void {
+    void this.navigationService.safeNavigate(['/player/settings']);
   }
 
   isTeamCreator(team: TeamSummary): boolean {

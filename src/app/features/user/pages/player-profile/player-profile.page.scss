@@ -58,46 +58,31 @@
   color: #9fc0f6;
 }
 
+.profile-settings-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  align-self: flex-start;
+  min-height: 38px;
+  padding: 7px 11px;
+  border: 1px solid rgba(0, 215, 245, 0.46);
+  border-radius: 9px;
+  background: rgba(7, 30, 39, 0.72);
+  color: var(--text-primary);
+  font-family: var(--font-family-display);
+  font-size: 13px;
+  letter-spacing: 0.04em;
+}
+
+.profile-settings-link .atleta-raster-icon {
+  width: 19px;
+  height: 19px;
+}
+
 .profile-message--success {
   color: #a7f3c3;
 }
 
-.profile-password-form {
-  display: grid;
-  gap: 10px;
-}
-
-.profile-password-field {
-  display: grid;
-  gap: 5px;
-  color: #dce8fa;
-  font-family: "Rajdhani", sans-serif;
-  font-size: 13px;
-  font-weight: 700;
-}
-
-.profile-password-field input {
-  width: 100%;
-  min-width: 0;
-  height: 38px;
-  border-radius: 8px;
-  border: 1px solid rgba(126, 144, 168, 0.4);
-  background: rgba(7, 12, 20, 0.68);
-  color: #edf4ff;
-  font-family: "Rajdhani", sans-serif;
-  font-size: 15px;
-  outline: none;
-  padding: 0 10px;
-}
-
-.profile-password-field input:focus {
-  border-color: rgba(159, 192, 246, 0.82);
-  box-shadow: 0 0 0 2px rgba(86, 139, 229, 0.18);
-}
-
-.profile-password-submit {
-  justify-self: start;
-}
 
 .profile-teams {
   display: grid;
