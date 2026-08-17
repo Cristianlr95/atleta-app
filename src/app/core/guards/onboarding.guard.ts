@@ -45,7 +45,7 @@ export const onboardingPendingGuard: CanActivateFn = (route, state): Observable<
   const authSessionService = inject(AuthSessionService);
   const userApiService = inject(UserApiService);
 
-  if (route.queryParamMap.get('demo') === '1') {
+  if (route.queryParamMap?.get('demo') === '1') {
     return of(true);
   }
 

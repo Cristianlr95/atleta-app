@@ -13,6 +13,7 @@ import {
   PlayerProfile,
   PlayerAchievement,
   TrustLogEntry,
+  UpdatePlayerProfileRequest,
   UpdateTrustScoreRequest,
 } from '../models/user.models';
 
@@ -42,6 +43,13 @@ export class UserApiService extends ApiService {
 
   getPublicPlayerProfile(atletaUuid: string) {
     return this.get<PlayerProfile>(`${API_ENDPOINTS.users.playerProfiles}/${atletaUuid}/public`);
+  }
+
+  updatePlayerProfile(atletaUuid: string, payload: UpdatePlayerProfileRequest) {
+    return this.put<PlayerProfile, UpdatePlayerProfileRequest>(
+      `${API_ENDPOINTS.users.playerProfiles}/${atletaUuid}`,
+      payload,
+    );
   }
 
   getPlayerAchievements(atletaUuid: string) {
