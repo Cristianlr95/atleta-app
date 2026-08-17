@@ -33,7 +33,6 @@
   margin: 0;
   color: #dce8fa;
   font-family: "Rajdhani", sans-serif;
-  font-size: 13px;
   font-weight: 700;
 }
 
@@ -87,8 +86,6 @@
   display: inline-flex;
   align-items: center;
   gap: 7px;
-  align-self: flex-start;
-  min-height: 38px;
   padding: 7px 11px;
   border: 1px solid rgba(0, 215, 245, 0.46);
   border-radius: 9px;
@@ -96,12 +93,6 @@
   color: var(--text-primary);
   font-family: var(--font-family-display);
   font-size: 13px;
-  letter-spacing: 0.04em;
-}
-
-.profile-settings-link .atleta-raster-icon {
-  width: 19px;
-  height: 19px;
 }
 
 .profile-showcase {
