@@ -37,7 +37,9 @@ export function buildUnifiedMatchParticipants(
     const resolvedStatus =
       apiDetail?.status === PlayerInvitationStatus.ACCEPTED || inviteStatus === PlayerInvitationStatus.ACCEPTED
         ? PlayerInvitationStatus.ACCEPTED
-        : inviteStatus === PlayerInvitationStatus.DECLINED
+        : inviteStatus === PlayerInvitationStatus.WAITLIST
+          ? PlayerInvitationStatus.WAITLIST
+          : inviteStatus === PlayerInvitationStatus.DECLINED
           ? PlayerInvitationStatus.DECLINED
           : apiDetail?.status ?? PlayerInvitationStatus.PENDING;
 
@@ -70,6 +72,9 @@ export function buildUnifiedMatchParticipants(
 function mapInviteStatus(status: SocialRequestItem['status']): PlayerInvitationStatus {
   if (status === 'ACEPTADA') {
     return PlayerInvitationStatus.ACCEPTED;
+  }
+  if (status === 'LISTA_ESPERA') {
+    return PlayerInvitationStatus.WAITLIST;
   }
   if (status === 'RECHAZADA') {
     return PlayerInvitationStatus.DECLINED;

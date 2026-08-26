@@ -263,6 +263,9 @@ function humanizeStatus(status: SocialRequestItem['status']): string {
   if (status === 'ACEPTADA') {
     return 'Aceptada';
   }
+  if (status === 'LISTA_ESPERA') {
+    return 'Lista de espera';
+  }
   if (status === 'RECHAZADA') {
     return 'Rechazada';
   }

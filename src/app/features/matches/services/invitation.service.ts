@@ -122,6 +122,8 @@ export class InvitationService {
       status:
         response?.status === 'ACEPTADA'
           ? PlayerInvitationStatus.ACCEPTED
+          : response?.status === 'LISTA_ESPERA'
+            ? PlayerInvitationStatus.WAITLIST
           : response?.status === 'RECHAZADA'
             ? PlayerInvitationStatus.DECLINED
             : PlayerInvitationStatus.PENDING,
@@ -161,13 +163,13 @@ export class InvitationService {
     );
   }
 
-  async respondInviteByBackendId(backendInviteId: number, accept: boolean): Promise<boolean> {
+  async respondInviteByBackendId(backendInviteId: number, accept: boolean): Promise<SocialRequestItem | null> {
     const session = this.authSessionService.currentSession;
     if (!session) {
-      return false;
+      return null;
     }
 
-    await firstValueFrom(
+    return firstValueFrom(
       this.socialApiService.respondMatchInvite(backendInviteId, {
         actorUuid: session.user.atletaUuid,
         accept,
@@ -176,7 +178,6 @@ export class InvitationService {
         catchError((error) => this.handleHttpError(error)),
       ),
     );
-    return true;
   }
 
   private handleHttpError(error: unknown) {

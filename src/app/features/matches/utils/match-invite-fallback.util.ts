@@ -32,6 +32,9 @@ function toSocialStatus(status: PlayerInvitationStatus): SocialRequestItem['stat
   if (status === PlayerInvitationStatus.ACCEPTED) {
     return 'ACEPTADA';
   }
+  if (status === PlayerInvitationStatus.WAITLIST) {
+    return 'LISTA_ESPERA';
+  }
   if (status === PlayerInvitationStatus.DECLINED) {
     return 'RECHAZADA';
   }

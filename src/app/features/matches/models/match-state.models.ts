@@ -15,6 +15,7 @@ export interface MatchState {
   participants: MatchParticipant[];
   confirmedParticipants: MatchParticipant[];
   pendingParticipants: MatchParticipant[];
+  waitlistedParticipants: MatchParticipant[];
   declinedParticipants: MatchParticipant[];
   confirmedPlayers: Player[];
   progress: MatchProgressView;
@@ -45,7 +46,7 @@ export function resolveLifecycleState(
     return MatchLifecycleState.FINISHED;
   }
 
-  if (totalInvited > 0 && acceptedCount === totalInvited && pendingCount === 0) {
+  if (status === MatchStatus.CONFIRMED || (totalInvited > 0 && acceptedCount === totalInvited && pendingCount === 0)) {
     return MatchLifecycleState.CREATED_CONFIRMED;
   }
 

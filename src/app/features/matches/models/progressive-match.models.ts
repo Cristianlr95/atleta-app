@@ -28,6 +28,7 @@ export enum MatchGenderCategory {
 export enum PlayerInvitationStatus {
   INVITED = 'INVITED',
   ACCEPTED = 'ACCEPTED',
+  WAITLIST = 'WAITLIST',
   DECLINED = 'DECLINED',
   PENDING = 'PENDING',
 }

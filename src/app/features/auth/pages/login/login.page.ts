@@ -37,7 +37,6 @@ export class LoginPage {
   private readonly userFeedbackService = inject(UserFeedbackService);
 
   readonly iconBase = 'assets/icons/atleta-raster-v1';
-  readonly loginTitleIconAsset = `${this.iconBase}/ic_nav_profile_96.png`;
   readonly googleIconAsset = `${this.iconBase}/ic_brand_google_96.png`;
   isSubmitting = false;
   authError: string | null = null;

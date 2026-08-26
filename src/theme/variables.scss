@@ -6,21 +6,21 @@
   --font-family-display: "Rajdhani", sans-serif;
   --font-family-body: "Rajdhani", sans-serif;
 
-  // Colores principales - Estilo Winning Eleven 10
-  --background: #02090d;
-  --foreground: #f0f4f5;
-  --card: #06141b;
-  --card-foreground: #f0f4f5;
-  --popover: #07171f;
-  --popover-foreground: #f0f4f5;
+  // Superficies grafito: contraste óptimo para la identidad azul/cian/lima.
+  --background: #151a23;
+  --foreground: #f2f6fa;
+  --card: #1e2632;
+  --card-foreground: #f2f6fa;
+  --popover: #202a37;
+  --popover-foreground: #f2f6fa;
 
   // Colores plateados metálicos
   --primary: #d7ff00;
   --primary-foreground: #071014;
-  --secondary: #10222b;
+  --secondary: #283443;
   --secondary-foreground: #f0f4f5;
-  --muted: #102129;
-  --muted-foreground: #81949b;
+  --muted: #28313e;
+  --muted-foreground: #aebac8;
   --accent: #00d7f5;
   --accent-foreground: #031015;
   --atleta-blue: #00d7f5;
@@ -39,25 +39,26 @@
   // Otros
   --destructive: #ef476f;
   --destructive-foreground: #ffffff;
-  --border: #17313b;
-  --input-background: #071219;
+  --border: #3b4a5e;
+  --input-background: #18212c;
   --radius: 0.375rem;
   --atleta-page-bg:
-    radial-gradient(circle at 50% -20%, rgba(0, 215, 245, 0.07), transparent 34%),
-    linear-gradient(180deg, #031016 0%, #02090d 58%, #010609 100%);
+    radial-gradient(circle at 50% -20%, rgba(0, 215, 245, 0.11), transparent 34%),
+    radial-gradient(circle at 12% 80%, rgba(215, 255, 0, 0.045), transparent 28%),
+    linear-gradient(180deg, #252e3a 0%, #151a23 56%, #10151d 100%);
   --atleta-stadium-overlay:
     linear-gradient(
       180deg,
-      rgba(2, 9, 13, 0.92) 0%,
-      rgba(2, 9, 13, 0.96) 60%,
-      rgba(1, 6, 9, 0.98) 100%
+      rgba(21, 26, 35, 0.88) 0%,
+      rgba(21, 26, 35, 0.94) 60%,
+      rgba(16, 21, 29, 0.97) 100%
     ),
     radial-gradient(circle at 50% 0%, rgba(0, 215, 245, 0.08), transparent 44%);
-  --surface-1: #06141b;
-  --surface-2: #041017;
-  --surface-3: #091a22;
-  --line-soft: #17313b;
-  --line-strong: #31515d;
+  --surface-1: #1e2632;
+  --surface-2: #161e28;
+  --surface-3: #293544;
+  --line-soft: #3b4a5e;
+  --line-strong: #566980;
   --glow-blue: rgba(0, 215, 245, 0.22);
   --glow-green: rgba(215, 255, 0, 0.18);
   --shadow-deep: 0 16px 36px rgba(0, 0, 0, 0.42);

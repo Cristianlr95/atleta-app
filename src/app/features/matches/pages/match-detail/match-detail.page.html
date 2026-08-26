@@ -82,6 +82,7 @@
           [selected]="selectedParticipantSegment()"
           [confirmedCount]="confirmedParticipants().length"
           [pendingCount]="pendingParticipants().length"
+          [waitlistCount]="waitlistedParticipants().length"
           [declinedCount]="declinedParticipants().length"
           (selectedChange)="onSegmentChange($event)">
         </app-participant-segment>

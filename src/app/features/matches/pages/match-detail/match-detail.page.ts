@@ -120,6 +120,7 @@ export class MatchDetailPage implements OnDestroy {
 
   readonly confirmedParticipants = computed(() => this.state()?.confirmedParticipants ?? []);
   readonly pendingParticipants = computed(() => this.state()?.pendingParticipants ?? []);
+  readonly waitlistedParticipants = computed(() => this.state()?.waitlistedParticipants ?? []);
   readonly declinedParticipants = computed(() => this.state()?.declinedParticipants ?? []);
   readonly participants = computed(() => this.state()?.participants ?? []);
   readonly confirmedPlayers = computed(() => this.state()?.confirmedPlayers ?? []);
@@ -130,6 +131,9 @@ export class MatchDetailPage implements OnDestroy {
     }
     if (this.selectedParticipantSegment() === 'DECLINED') {
       return this.declinedParticipants();
+    }
+    if (this.selectedParticipantSegment() === 'WAITLIST') {
+      return this.waitlistedParticipants();
     }
     return this.confirmedParticipants();
   });
@@ -667,7 +671,13 @@ export class MatchDetailPage implements OnDestroy {
       }
 
       await this.notificationBadgeService.refresh();
-      await this.appToastService.success(accept ? 'Invitacion aceptada.' : 'Invitacion rechazada.');
+      await this.appToastService.success(
+        !accept
+          ? 'Invitacion rechazada.'
+          : updated.status === PlayerInvitationStatus.WAITLIST
+            ? 'El cupo ya esta completo. Quedaste en lista de espera.'
+            : 'Invitacion aceptada.',
+      );
     } catch (error) {
       await this.appToastService.error(this.errorMapper.toUserMessage(error, 'invitations'));
       if (this.routeMatchId()) {

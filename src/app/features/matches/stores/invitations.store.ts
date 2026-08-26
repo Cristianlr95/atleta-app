@@ -57,6 +57,8 @@ export class InvitationsStore {
         status:
           invite.status === 'ACEPTADA'
             ? PlayerInvitationStatus.ACCEPTED
+            : invite.status === 'LISTA_ESPERA'
+              ? PlayerInvitationStatus.WAITLIST
             : invite.status === 'RECHAZADA'
               ? PlayerInvitationStatus.DECLINED
               : PlayerInvitationStatus.PENDING,
@@ -97,8 +99,21 @@ export class InvitationsStore {
     );
 
     try {
-      await this.invitationApi.respondInviteByBackendId(current.backendInviteId, accept);
-      return optimistic;
+      const response = await this.invitationApi.respondInviteByBackendId(current.backendInviteId, accept);
+      if (!response) {
+        throw new Error('No se pudo actualizar la invitacion.');
+      }
+      const resolved: Invitation = {
+        ...optimistic,
+        status: response.status === 'LISTA_ESPERA'
+          ? PlayerInvitationStatus.WAITLIST
+          : response.status === 'ACEPTADA'
+            ? PlayerInvitationStatus.ACCEPTED
+            : PlayerInvitationStatus.DECLINED,
+        respondedAt: response.respondedAt ?? optimistic.respondedAt,
+      };
+      this.invitationStore.update((items) => items.map((item) => item.id === invitationId ? resolved : item));
+      return resolved;
     } catch (error) {
       this.invitationStore.update((items) =>
         items.map((item) =>
@@ -181,6 +196,8 @@ export class InvitationsStore {
         status:
           invite.status === 'ACEPTADA'
             ? PlayerInvitationStatus.ACCEPTED
+            : invite.status === 'LISTA_ESPERA'
+              ? PlayerInvitationStatus.WAITLIST
             : invite.status === 'RECHAZADA'
               ? PlayerInvitationStatus.DECLINED
               : PlayerInvitationStatus.PENDING,

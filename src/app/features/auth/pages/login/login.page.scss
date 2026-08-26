@@ -5,9 +5,44 @@
 .login-container {
   min-height: 100%;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 24px 16px;
+  gap: 10px;
+  padding: 22px 16px 28px;
+
+  app-metallic-card {
+    width: min(100%, 460px);
+  }
+}
+
+.login-brand {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+
+  img {
+    display: block;
+    width: 106px;
+    height: 106px;
+    border-radius: 27px;
+    box-shadow:
+      0 12px 24px rgba(0, 0, 0, 0.34),
+      0 0 26px rgba(0, 215, 245, 0.22),
+      0 0 18px rgba(215, 255, 0, 0.1);
+  }
+
+  span {
+    color: #f2f6fa;
+    font-family: var(--font-family-display);
+    font-size: 17px;
+    font-weight: 700;
+    letter-spacing: 0.22em;
+    line-height: 1;
+    text-indent: 0.22em;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+  }
 }
 
 .login-form {
@@ -111,5 +146,36 @@
   font-family: 'Rajdhani', sans-serif;
   font-size: 14px;
   font-weight: 600;
+}
+
+.login-google {
+  display: block;
+  width: 100%;
+}
+
+.login-google__icon {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+}
+
+@media (max-width: 480px) {
+  .login-container {
+    justify-content: flex-start;
+    gap: 8px;
+    padding-top: 18px;
+  }
+
+  .login-brand {
+    img {
+      width: 90px;
+      height: 90px;
+      border-radius: 23px;
+    }
+
+    span {
+      font-size: 15px;
+    }
+  }
 }
 

@@ -185,6 +185,8 @@ export class MatchService {
           status:
             serverInvite.status === 'ACEPTADA'
               ? PlayerInvitationStatus.ACCEPTED
+              : serverInvite.status === 'LISTA_ESPERA'
+                ? PlayerInvitationStatus.WAITLIST
               : serverInvite.status === 'RECHAZADA'
                 ? PlayerInvitationStatus.DECLINED
                 : PlayerInvitationStatus.PENDING,
@@ -720,13 +722,16 @@ export class MatchService {
     }
 
     const scheduled = new Date(match.scheduledAt).getTime();
-    const allConfirmed = totalInvited > 0 && accepted === totalInvited && pending === 0;
+    // Las invitaciones adicionales pueden terminar en lista de espera. El
+    // partido queda confirmado al completar los cupos de la modalidad, aunque
+    // aún existan respuestas pendientes para reemplazos.
+    const rosterComplete = accepted >= match.minRequired;
 
-    if (Number.isFinite(scheduled) && scheduled <= Date.now() && allConfirmed) {
+    if (Number.isFinite(scheduled) && scheduled <= Date.now() && rosterComplete) {
       return MatchStatus.LIVE;
     }
 
-    if (allConfirmed) {
+    if (rosterComplete) {
       return MatchStatus.CONFIRMED;
     }
 

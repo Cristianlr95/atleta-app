@@ -133,8 +133,8 @@ export class ActivityService {
     await firstValueFrom(this.socialApiService.createMatchInvite(payload));
   }
 
-  async respondMatchInvite(inviteId: number, payload: RespondRequestPayload): Promise<void> {
-    await firstValueFrom(this.socialApiService.respondMatchInvite(inviteId, payload));
+  async respondMatchInvite(inviteId: number, payload: RespondRequestPayload): Promise<SocialRequestItem> {
+    return firstValueFrom(this.socialApiService.respondMatchInvite(inviteId, payload));
   }
 
   async searchPlayers(query: string): Promise<SocialPlayerLookupItem[]> {

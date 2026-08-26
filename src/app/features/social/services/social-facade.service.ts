@@ -194,8 +194,14 @@ export class SocialFacadeService {
     }
 
     try {
-      await this.activityService.respondMatchInvite(inviteId, { actorUuid: this.playerUuid, accept });
-      this.successMessageStore.set(accept ? 'Invitacion aceptada.' : 'Invitacion rechazada.');
+      const response = await this.activityService.respondMatchInvite(inviteId, { actorUuid: this.playerUuid, accept });
+      this.successMessageStore.set(
+        !accept
+          ? 'Invitacion rechazada.'
+          : response.status === 'LISTA_ESPERA'
+            ? 'El cupo esta completo. Quedaste en lista de espera.'
+            : 'Invitacion aceptada.',
+      );
     } catch (error) {
       this.errorMessageStore.set(this.errorMapper.toUserMessage(error, 'social'));
     } finally {

@@ -207,12 +207,12 @@ export class MatchStore extends ResourceStore<MatchState> {
     const hydratedFromApi = matchResponse
       ? {
           ...refreshedMatch,
-          status: mapBackendMatchStatus(matchResponse.estado, accepted, pending, totalInvited),
+          status: mapBackendMatchStatus(matchResponse.estado, accepted, pending, totalInvited, refreshedMatch.minRequired),
           startedAt: matchResponse.startedAt ?? refreshedMatch.startedAt,
           finalizedAt: matchResponse.finalizedAt ?? refreshedMatch.finalizedAt,
           closePending:
             !!matchResponse.closePending ||
-            isClosePendingFallback(matchResponse.estado, matchResponse.fechaHoraProgramada, accepted, pending, totalInvited),
+            isClosePendingFallback(matchResponse.estado, matchResponse.fechaHoraProgramada, accepted, pending, totalInvited, Date.now(), refreshedMatch.minRequired),
         }
       : refreshedMatch;
     const lifecycleState = resolveLifecycleState(hydratedFromApi.status, accepted, pending, totalInvited);
@@ -236,6 +236,7 @@ export class MatchStore extends ResourceStore<MatchState> {
       pendingParticipants: participants.filter(
         (item) => item.status === PlayerInvitationStatus.PENDING || item.status === PlayerInvitationStatus.INVITED,
       ),
+      waitlistedParticipants: participants.filter((item) => item.status === PlayerInvitationStatus.WAITLIST),
       declinedParticipants: participants.filter((item) => item.status === PlayerInvitationStatus.DECLINED),
       confirmedPlayers,
       progress,
@@ -267,6 +268,7 @@ export class MatchStore extends ResourceStore<MatchState> {
       participants,
       confirmedParticipants: accepted,
       pendingParticipants: pending,
+      waitlistedParticipants: participants.filter((item) => item.status === PlayerInvitationStatus.WAITLIST),
       declinedParticipants: declined,
       confirmedPlayers,
       progress,

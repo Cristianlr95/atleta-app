@@ -1,4 +1,4 @@
-export type SocialRequestStatus = 'PENDIENTE' | 'ACEPTADA' | 'RECHAZADA' | 'CANCELADA';
+export type SocialRequestStatus = 'PENDIENTE' | 'ACEPTADA' | 'LISTA_ESPERA' | 'RECHAZADA' | 'CANCELADA';
 export type SocialNotificationType =
   | 'SOLICITUD_AMISTAD'
   | 'RESPUESTA_AMISTAD'

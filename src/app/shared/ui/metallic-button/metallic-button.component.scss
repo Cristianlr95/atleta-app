@@ -69,6 +69,10 @@
     color: #031015;
     box-shadow: 0 0 18px rgba(0, 215, 245, 0.12);
   }
+
+  &--full {
+    width: 100%;
+  }
 }
 
 @media (max-width: 420px) {

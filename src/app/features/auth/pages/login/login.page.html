@@ -1,6 +1,10 @@
 ﻿<ion-content class="login-bg">
   <div class="login-container">
-    <app-metallic-card title="Iniciar sesión" [titleIconAsset]="loginTitleIconAsset">
+    <div class="login-brand" aria-label="Atleta">
+      <img src="/assets/brand/atleta-app-icon-v1.png" alt="Logo Atleta" />
+      <span>ATLETA</span>
+    </div>
+    <app-metallic-card title="Iniciar sesión">
       <form class="login-form" [formGroup]="loginForm" (ngSubmit)="onLogin()">
         <app-metallic-input
           formControlName="email"
@@ -37,11 +41,13 @@
         </div>
 
         <app-metallic-button
+          class="login-google"
           type="button"
           variant="secondary"
+          [fullWidth]="true"
           [disabled]="isSubmitting"
           (click)="onContinueWithGoogle()">
-          <img class="atleta-raster-icon" [src]="googleIconAsset" aria-hidden="true" alt="" />
+          <img class="login-google__icon" [src]="googleIconAsset" aria-hidden="true" alt="" />
           Continuar con Google
         </app-metallic-button>
 

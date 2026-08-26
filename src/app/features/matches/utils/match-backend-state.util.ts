@@ -6,6 +6,7 @@ export function mapBackendMatchStatus(
   accepted: number,
   pending: number,
   totalInvited: number,
+  requiredPlayers = totalInvited,
 ): MatchStatus {
   if (status === 'FINALIZADO') {
     return MatchStatus.FINISHED;
@@ -17,7 +18,7 @@ export function mapBackendMatchStatus(
     return MatchStatus.LIVE;
   }
 
-  const allConfirmed = totalInvited > 0 && accepted === totalInvited && pending === 0;
+  const allConfirmed = accepted >= requiredPlayers;
 
   if (allConfirmed) {
     return MatchStatus.CONFIRMED;
@@ -35,6 +36,7 @@ export function isClosePendingFallback(
   pending: number,
   totalInvited: number,
   nowMs = Date.now(),
+  requiredPlayers = totalInvited,
 ): boolean {
   if (status === 'FINALIZADO' || status === 'INVALIDO') {
     return false;
@@ -46,6 +48,6 @@ export function isClosePendingFallback(
   }
 
   const oneHourAfterKickoff = scheduledAtMs + 60 * 60 * 1000;
-  const allConfirmed = totalInvited > 0 && accepted === totalInvited && pending === 0;
+  const allConfirmed = accepted >= requiredPlayers;
   return allConfirmed && nowMs >= oneHourAfterKickoff;
 }
