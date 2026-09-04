@@ -250,6 +250,29 @@ ion-toast::part(container) {
   backdrop-filter: blur(16px);
 }
 
+ion-toast.atleta-notification-toast {
+  --width: min(430px, calc(100vw - 24px));
+  --max-width: 430px;
+  --offset-bottom: calc(72px + env(safe-area-inset-bottom));
+  --background: rgba(12, 24, 34, 0.97);
+  --color: #e8f4ff;
+  --button-color: #c7ff00;
+}
+
+ion-toast.atleta-notification-toast::part(container) {
+  border: 1px solid rgba(0, 207, 232, 0.4);
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.46), 0 0 16px rgba(0, 207, 232, 0.1);
+}
+
+ion-toast.atleta-notification-toast::part(header) {
+  color: #ffffff;
+  font-weight: 800;
+}
+
+ion-toast.atleta-notification-toast::part(message) {
+  color: #b9cddd;
+}
+
 /* Icon system: stronger, game-like definition across the app */
 img.atleta-raster-icon {
   --ionicon-stroke-width: 42px;

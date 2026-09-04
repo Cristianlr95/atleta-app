@@ -15,8 +15,8 @@
     <span
       class="metallic-bottom-nav__badge"
       *ngIf="(item.badgeCount ?? 0) > 0"
-      [attr.aria-label]="item.badgeCount + ' pendientes'">
-      {{ item.badgeCount }}
+      [attr.aria-label]="badgeAriaLabel(item)">
+      {{ formatBadgeCount(item.badgeCount) }}
     </span>
     <span>{{ item.label }}</span>
   </button>

@@ -18,3 +18,13 @@ export function loadSmokeUsers(): SmokeUsers | null {
     userB: { email: userBEmail, password: userBPassword },
   };
 }
+
+export function loadFinalizedMatchId(): number | null {
+  const raw = process.env.E2E_FINALIZED_MATCH_ID;
+  if (!raw) {
+    return null;
+  }
+
+  const matchId = Number(raw);
+  return Number.isInteger(matchId) && matchId > 0 ? matchId : null;
+}

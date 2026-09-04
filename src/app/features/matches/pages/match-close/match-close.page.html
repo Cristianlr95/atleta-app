@@ -13,7 +13,13 @@
         <app-metallic-button variant="secondary" (click)="onRetry()">Reintentar</app-metallic-button>
       </div>
 
-      <ng-container *ngIf="!loading() && !error() && !closedSuccess()">
+      <section *ngIf="!loading() && !error() && closeBlockedReason()" class="close-blocked" role="alert">
+        <h3>Este partido no puede cerrarse</h3>
+        <p>{{ closeBlockedReason() }}</p>
+        <app-metallic-button variant="secondary" (click)="onBackStep()">Volver a partidos</app-metallic-button>
+      </section>
+
+      <ng-container *ngIf="!loading() && !error() && !closedSuccess() && !closeBlockedReason()">
         <section *ngIf="step() === 1" class="panel">
           <h3>Ajustes rapidos</h3>
           <p class="helper-copy">Ajusta marcador global y distribuye goles en la lista completa de jugadores.</p>

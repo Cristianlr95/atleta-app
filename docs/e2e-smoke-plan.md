@@ -57,10 +57,12 @@ If credentials are missing, smoke specs are marked as skipped.
 4. Confirm status transitions and participants list updates.
 
 ## Smoke 6: MVP vote post-cierre
+
+Prerequisito adicional: `E2E_FINALIZED_MATCH_ID` debe identificar un partido ya finalizado en el que `E2E_USER_B` sea participante confirmado. El smoke no intenta iniciar encuentros incompletos.
 1. Seed match via API and accept at least one invitation.
 2. Transition match `CREADO -> INICIADO -> FINALIZADO`.
 3. Open `/matches/:id/mvp-vote` with confirmed participant.
-4. Submit MVP vote and verify "Tu voto actual".
+4. Enviar el voto y verificar el estado visual `Votado` en Jugador del Partido.
 5. Validate API returns `myVote` for current user.
 
 ## Pass criteria

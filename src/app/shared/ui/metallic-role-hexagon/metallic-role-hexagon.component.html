@@ -39,7 +39,7 @@
     </svg>
   </div>
 
-  <div class="metallic-role-hexagon__summary">
+  <div *ngIf="showSummary" class="metallic-role-hexagon__summary">
     <button type="button" class="metallic-role-hexagon__chip" (click)="showSummaryInfo('overall')">
       <img class="atleta-raster-icon" [src]="overallIconAsset" alt="" />
       <span>Nivel General: {{ displayOverall }}</span>
@@ -54,7 +54,7 @@
     </button>
   </div>
 
-  <p class="metallic-role-hexagon__classification" [ngClass]="classificationClassName">
+  <p *ngIf="showClassification" class="metallic-role-hexagon__classification" [ngClass]="classificationClassName">
     Nivel competitivo: {{ overallClassification }}
   </p>
 </div>

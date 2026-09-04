@@ -6,15 +6,17 @@ import { IonicModule } from '@ionic/angular';
 import { Subject } from 'rxjs';
 import { finalize, takeUntil } from 'rxjs/operators';
 import { NavigationService } from 'src/app/core/services/navigation.service';
+import { buildMainBottomNav } from 'src/app/shared/navigation/main-bottom-nav';
+import { MetallicBottomNavComponent, MetallicBottomNavItem } from 'src/app/shared/ui/metallic-bottom-nav/metallic-bottom-nav.component';
 import { MetallicCardComponent } from 'src/app/shared/ui/metallic-card/metallic-card.component';
-import { PageNavComponent } from 'src/app/shared/ui/page-nav/page-nav.component';
+import { NotificationBadgeService } from 'src/app/features/matches/services/notification-badge.service';
 import { PlayerProfile } from '../../models/user.models';
 import { UserApiService } from '../../services/user-api.service';
 
 @Component({
   selector: 'app-public-player-detail-page',
   standalone: true,
-  imports: [CommonModule, IonicModule, MetallicCardComponent, PageNavComponent],
+  imports: [CommonModule, IonicModule, MetallicCardComponent, MetallicBottomNavComponent],
   templateUrl: './public-player-detail.page.html',
   styleUrls: ['./public-player-detail.page.scss'],
 })
@@ -22,6 +24,7 @@ export class PublicPlayerDetailPage implements OnDestroy {
   private readonly route = inject(ActivatedRoute);
   private readonly userApiService = inject(UserApiService);
   private readonly navigationService = inject(NavigationService);
+  private readonly notificationBadgeService = inject(NotificationBadgeService);
   private readonly destroy$ = new Subject<void>();
 
   readonly titleIconAsset = 'assets/icons/atleta/ic_nav_profile_24.svg';
@@ -45,6 +48,14 @@ export class PublicPlayerDetailPage implements OnDestroy {
 
   onBackToSocial(): void {
     void this.navigationService.safeNavigate(['/social']);
+  }
+
+  onBack(): void { void this.navigationService.goBackOrProfile(); }
+
+  onNavItemSelected(itemId: string): void { void this.navigationService.goToMainBottomSection(itemId); }
+
+  get bottomNavItems(): ReadonlyArray<MetallicBottomNavItem> {
+    return buildMainBottomNav('home', this.notificationBadgeService.totalPending());
   }
 
   genderLabel(gender: PlayerProfile['genero']): string {

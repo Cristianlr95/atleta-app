@@ -99,7 +99,7 @@ describe('PlayerProfilePage', () => {
     expect(component).toBeTruthy();
   });
 
-  it('keeps Partidos Jugados aligned with victories, draws and losses', () => {
+  it('keeps the competition summary aligned with victories, draws and losses', () => {
     const history: MatchHistoryViewItem[] = [
       buildHistoryItem(1, 'GANADO'),
       buildHistoryItem(2, 'EMPATADO'),
@@ -139,8 +139,8 @@ describe('PlayerProfilePage', () => {
       [],
     );
 
-    const played = Number(component.summaryStats.find((stat) => stat.label === 'Partidos Jugados')?.value);
-    const totalOutcomes = component.outcomeStats.reduce((sum, stat) => sum + Number(stat.value), 0);
+    const played = component.competition.matches;
+    const totalOutcomes = component.competition.wins + component.competition.draws + component.competition.losses;
 
     expect(played).toBe(3);
     expect(played).toBe(totalOutcomes);

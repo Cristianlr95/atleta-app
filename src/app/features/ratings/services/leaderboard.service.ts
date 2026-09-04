@@ -11,6 +11,8 @@ export interface LeaderboardViewEntry {
   alias: string;
   scoreText: string;
   metaText?: string;
+  roleText?: string;
+  matchesPlayed?: number;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -40,6 +42,7 @@ export class LeaderboardService {
           ? `${entry.score.toFixed(1)} OVR`
           : 'Sin rating',
         metaText: entry.rated ? `${entry.matchesPlayed} partidos` : 'Aun sin partidos puntuados',
+        matchesPlayed: entry.matchesPlayed,
       }))),
     );
   }
@@ -53,6 +56,19 @@ export class LeaderboardService {
         alias: entry.alias || entry.name || `Jugador ${index + 1}`,
         scoreText: `${entry.score.toFixed(1)} ${label}`,
         metaText: entry.matchesPlayed !== undefined ? `${entry.matchesPlayed} partidos` : undefined,
+        roleText: entry.roleType ? this.roleLabel(entry.roleType) : undefined,
+        matchesPlayed: entry.matchesPlayed,
       }));
+  }
+
+  private roleLabel(role: RoleType): string {
+    return {
+      ATAQUE: 'Ataque',
+      MEDIOCAMPO: 'Mediocampo',
+      CARRILERO: 'Carrilero',
+      DEFENSA: 'Defensa',
+      ARQUERO: 'Arquero',
+      DT: 'Dirección técnica',
+    }[role];
   }
 }

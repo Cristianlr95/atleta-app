@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnDestroy, computed, effect, inject, signal } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+import { firstValueFrom } from 'rxjs';
 import { IonicModule } from '@ionic/angular';
 import { AppToastService } from 'src/app/core/services/app-toast.service';
 import { AuthSessionService } from 'src/app/core/services/auth-session.service';
@@ -26,7 +27,7 @@ import { TeamsBoardChange, TeamsBoardComponent } from '../../components/teams-bo
 import { VenueSelectedCardComponent } from '../../components/venue-selected-card/venue-selected-card.component';
 import { DEFAULT_MATCH_THEME_ID, MATCH_THEMES } from '../../models/match-theme.constants';
 import { MatchViewState, toMatchViewState } from '../../models/match-view-state.models';
-import { MatchState, lifecycleToUserLabel } from '../../models/match-state.models';
+import { MatchLifecycleState, MatchState, lifecycleToUserLabel } from '../../models/match-state.models';
 import {
   InvitationDeliveryStatus,
   MatchStatus,
@@ -34,6 +35,7 @@ import {
   PlayerInvitationStatus,
 } from '../../models/progressive-match.models';
 import { MatchLiveService } from '../../services/match-live.service';
+import { MatchesApiService } from '../../services/matches-api.service';
 import { MatchService } from '../../services/match.service';
 import { NotificationService } from '../../services/notification.service';
 import { NotificationBadgeService } from '../../services/notification-badge.service';
@@ -68,6 +70,7 @@ export class MatchDetailPage implements OnDestroy {
   private readonly matchStore = inject(MatchStore);
   private readonly matchService = inject(MatchService);
   private readonly matchLiveService = inject(MatchLiveService);
+  private readonly matchesApiService = inject(MatchesApiService);
   private readonly notificationService = inject(NotificationService);
   private readonly notificationBadgeService = inject(NotificationBadgeService);
   private readonly invitationsStore = inject(InvitationsStore);
@@ -90,6 +93,8 @@ export class MatchDetailPage implements OnDestroy {
   readonly teamAssignmentError = signal<string | null>(null);
   readonly inviteActionLoading = signal(false);
   readonly inviteRetryLoading = signal(false);
+  readonly startMatchLoading = signal(false);
+  readonly flowSteps = ['Convocar', 'Listo', 'En juego', 'Cerrar', 'Resultados'];
 
   private readonly routeMatchId = signal('');
   private readonly localMatchId = signal('');
@@ -188,9 +193,16 @@ export class MatchDetailPage implements OnDestroy {
       return true;
     }
 
-    const scheduledAt = new Date(match.scheduledAt).getTime();
-    return Number.isFinite(scheduledAt) && scheduledAt <= Date.now();
+    return false;
   });
+
+  readonly canStartMatch = computed(
+    () => this.isCreator()
+      && this.match()?.status === MatchStatus.CONFIRMED
+      && !this.hasMatchStarted()
+      && this.assignedHomePlayers().length > 0
+      && this.assignedAwayPlayers().length > 0,
+  );
 
   readonly canEditTeams = computed(
     () => this.isCreator() && this.confirmedParticipants().length >= 2 && !this.hasMatchStarted(),
@@ -352,6 +364,27 @@ export class MatchDetailPage implements OnDestroy {
 
     const inviteStatus = this.currentUserInvitation()?.status;
     return inviteStatus === PlayerInvitationStatus.PENDING || inviteStatus === PlayerInvitationStatus.INVITED;
+  });
+  readonly canWithdrawFromMatch = computed(() => {
+    if (this.isCreator() || this.isFinalized() || this.hasMatchStarted()) {
+      return false;
+    }
+    const status = this.currentUserInvitation()?.status;
+    return status === PlayerInvitationStatus.ACCEPTED || status === PlayerInvitationStatus.WAITLIST;
+  });
+  readonly flowStepIndex = computed(() => {
+    switch (this.state()?.lifecycleState) {
+      case MatchLifecycleState.CREATED_CONFIRMED:
+        return 1;
+      case MatchLifecycleState.LIVE:
+        return 2;
+      case MatchLifecycleState.CLOSE_PENDING:
+        return 3;
+      case MatchLifecycleState.FINISHED:
+        return 4;
+      default:
+        return 0;
+    }
   });
 
   readonly selectedTheme = computed(() => {
@@ -584,12 +617,34 @@ export class MatchDetailPage implements OnDestroy {
     await this.respondFromMatchState(false);
   }
 
+  async onWithdrawFromMatch(): Promise<void> {
+    await this.respondFromMatchState(false);
+  }
+
   async onFinishMatch(): Promise<void> {
     const routeMatchId = this.routeMatchId();
     if (!routeMatchId) {
       return;
     }
     void this.navigationService.safeNavigate(['/matches', routeMatchId, 'close']);
+  }
+
+  async onStartMatch(): Promise<void> {
+    const backendMatchId = this.match()?.backendMatchId;
+    if (!backendMatchId || !this.canStartMatch() || this.startMatchLoading()) {
+      return;
+    }
+
+    this.startMatchLoading.set(true);
+    try {
+      await firstValueFrom(this.matchesApiService.updateMatchStatus(backendMatchId, 'INICIADO'));
+      await this.matchStore.refresh(this.routeMatchId(), true);
+      await this.appToastService.success('Partido iniciado. Los equipos quedaron bloqueados.');
+    } catch (error) {
+      await this.appToastService.error(this.errorMapper.toUserMessage(error, 'matches'));
+    } finally {
+      this.startMatchLoading.set(false);
+    }
   }
 
   private async autoPersistBalancedTeams(matchId: string, confirmedPlayers: Player[]): Promise<void> {
@@ -633,7 +688,8 @@ export class MatchDetailPage implements OnDestroy {
   }
 
   private async respondFromMatchState(accept: boolean): Promise<void> {
-    if (!this.canRespondInvitationInMatch() || this.inviteActionLoading()) {
+    const canAct = this.canRespondInvitationInMatch() || (!accept && this.canWithdrawFromMatch());
+    if (!canAct || this.inviteActionLoading()) {
       return;
     }
 
@@ -671,9 +727,10 @@ export class MatchDetailPage implements OnDestroy {
       }
 
       await this.notificationBadgeService.refresh();
+      const wasConfirmed = invitation?.status === PlayerInvitationStatus.ACCEPTED;
       await this.appToastService.success(
         !accept
-          ? 'Invitacion rechazada.'
+          ? wasConfirmed ? 'Cupo liberado. El primer jugador en espera sera promovido.' : 'Invitacion rechazada.'
           : updated.status === PlayerInvitationStatus.WAITLIST
             ? 'El cupo ya esta completo. Quedaste en lista de espera.'
             : 'Invitacion aceptada.',

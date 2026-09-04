@@ -99,11 +99,25 @@ describe('API contracts smoke', () => {
     service.getById(77).subscribe();
     expectRequest('GET', '/teams/77').flush({});
 
-    service.getActiveMembers(77).subscribe();
-    expectRequest('GET', '/teams/77/members/active').flush([]);
+    let activeMemberOvr: number | null | undefined;
+    service.getActiveMembers(77).subscribe((members) => {
+      activeMemberOvr = members[0]?.ovr;
+    });
+    expectRequest('GET', '/teams/77/members/active').flush([{
+      playerUuid,
+      alias: 'Demo10',
+      rol: 'JUGADOR',
+      primaryPositionId: 9,
+      primaryPositionName: 'Delantero',
+      ovr: 82.5,
+    }]);
+    expect(activeMemberOvr).toBe(82.5);
 
     service.getLeaderboard(77).subscribe();
     expectRequest('GET', '/teams/77/leaderboard').flush([]);
+
+    service.getExternalRecord(77).subscribe();
+    expectRequest('GET', '/teams/77/external-record').flush({});
 
     service.deleteTeam(77, creatorUuid).subscribe();
     const deleteRequest = expectRequest('DELETE', '/teams/77');

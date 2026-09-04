@@ -4,6 +4,7 @@ import { ApiService } from 'src/app/core/services/api.service';
 import {
   CreateTeamRequest,
   TeamActiveMember,
+  TeamExternalRecord,
   TeamLeaderboardEntry,
   TeamSummary,
 } from '../models/team.models';
@@ -38,6 +39,10 @@ export class TeamApiService extends ApiService {
 
   getLeaderboard(teamId: number) {
     return this.get<TeamLeaderboardEntry[]>(`${API_ENDPOINTS.teams.base}/${teamId}/leaderboard`);
+  }
+
+  getExternalRecord(teamId: number) {
+    return this.get<TeamExternalRecord>(`${API_ENDPOINTS.teams.base}/${teamId}/external-record`);
   }
 
   deleteTeam(teamId: number, actorUuid: string) {

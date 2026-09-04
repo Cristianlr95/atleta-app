@@ -404,12 +404,19 @@ export class MatchService {
     }
 
     const invitations = this.invitationsStore.getMatchInvitations(matchId);
-    const accepted = invitations.filter((item) => item.status === PlayerInvitationStatus.ACCEPTED).length;
+    const acceptedInvitations = invitations.filter((item) => item.status === PlayerInvitationStatus.ACCEPTED);
+    // El creador ocupa y confirma un cupo por definicion. No suele existir como
+    // invitacion, pero datos heredados pueden incluirlo: se cuenta exactamente una vez.
+    const creatorAlreadyIncluded = acceptedInvitations.some((item) => item.targetUuid === match.creatorUuid);
+    const accepted = acceptedInvitations.length + (match.creatorUuid && !creatorAlreadyIncluded ? 1 : 0);
     const pending = invitations.filter(
       (item) => item.status === PlayerInvitationStatus.PENDING || item.status === PlayerInvitationStatus.INVITED,
     ).length;
-    const nextInvitedCount = Math.max(match.invitedCount, invitations.length);
-    const nextStatus = this.resolveLifecycleStatus(match, accepted, pending, invitations.length);
+    const effectiveRosterSize = invitations.length + (
+      match.creatorUuid && !invitations.some((item) => item.targetUuid === match.creatorUuid) ? 1 : 0
+    );
+    const nextInvitedCount = Math.max(match.invitedCount, effectiveRosterSize);
+    const nextStatus = this.resolveLifecycleStatus(match, accepted, pending, effectiveRosterSize);
 
     const changed = match.status !== nextStatus;
     if (!changed && nextInvitedCount === match.invitedCount) {

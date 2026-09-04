@@ -35,6 +35,7 @@ export interface TeamActiveMember {
   rol: 'JUGADOR' | 'CAPITAN' | 'DT';
   primaryPositionId: number | null;
   primaryPositionName: string | null;
+  ovr?: number | null;
 }
 
 export interface TeamLeaderboardEntry {
@@ -44,4 +45,14 @@ export interface TeamLeaderboardEntry {
   score: number | null;
   matchesPlayed: number;
   rated: boolean;
+}
+
+export interface TeamExternalRecord {
+  teamId: number;
+  teamName: string;
+  matchesPlayed: number;
+  wins: number;
+  draws: number;
+  losses: number;
+  points: number;
 }

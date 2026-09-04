@@ -1,7 +1,14 @@
 ﻿<ion-content class="matches-hub-bg">
   <div class="matches-hub-container">
     <app-metallic-card title="Partidos" [titleIconAsset]="titleIconAsset">
-      <div class="matches-tabs" role="tablist" aria-label="Secciones de partidos">
+      <div class="matches-hub-topline">
+        <p>Tu agenda, convocatorias e historial competitivo.</p>
+        <button type="button" class="matches-create-quick" (click)="onGoToCreate()">
+          <img class="atleta-raster-icon" [src]="createIconAsset" aria-hidden="true" alt="" /> Crear partido
+        </button>
+      </div>
+
+      <div class="matches-tabs" role="tablist" aria-label="Vista de partidos">
         <button
           type="button"
           role="tab"
@@ -18,21 +25,13 @@
           <img class="atleta-raster-icon" [src]="historyIconAsset" aria-hidden="true" alt="" />
           <span>Historial</span>
         </button>
-        <button
-          type="button"
-          role="tab"
-          [class.matches-tabs__item--active]="selectedTab === 'create'"
-          (click)="onTabChange('create')">
-          <img class="atleta-raster-icon" [src]="createIconAsset" aria-hidden="true" alt="" />
-          <span>Crear</span>
-        </button>
       </div>
 
-      <app-metallic-form-section
-        *ngIf="selectedTab === 'upcoming'"
-        title="Agenda competitiva"
-        [titleIconAsset]="upcomingIconAsset"
-        description="Estado, cupos y confirmaciones de tus próximos partidos.">
+      <section *ngIf="selectedTab === 'upcoming'" class="matches-view">
+        <header class="matches-view__heading">
+          <div><span>Mi agenda</span><p>Partidos activos, próximos y tus respuestas pendientes.</p></div>
+          <strong>{{ upcomingMatches.length }} activos</strong>
+        </header>
         <div class="matches-invites" *ngIf="pendingInvitationGroups().length > 0">
           <div class="matches-invites__header">
             <strong>Partidos con pendientes: {{ pendingInvitationGroups().length }}</strong>
@@ -66,7 +65,7 @@
           Aun no tienes partidos confirmados. Responde desde el estado del partido para que aparezcan aqui.
         </p>
 
-        <div class="matches-list">
+        <div class="matches-list" *ngIf="upcomingMatches.length > 0">
           <article class="matches-item" *ngFor="let match of upcomingMatches">
             <div class="matches-item__top">
               <strong>{{ match.title }}</strong>
@@ -85,13 +84,13 @@
             </button>
           </article>
         </div>
-      </app-metallic-form-section>
+      </section>
 
-      <app-metallic-form-section
-        *ngIf="selectedTab === 'history'"
-        title="Historial"
-        [titleIconAsset]="historyIconAsset"
-        description="Partidos finalizados con filtros por resultado, modalidad y estado.">
+      <section *ngIf="selectedTab === 'history'" class="matches-view">
+        <header class="matches-view__heading">
+          <div><span>Partidos disputados</span><p>Resultados y rendimiento de tus encuentros finalizados.</p></div>
+          <strong>{{ matchHistoryItems.length }} registros</strong>
+        </header>
         <p *ngIf="isLoading" class="matches-state">Cargando historial...</p>
         <div class="matches-panel matches-panel--outcomes">
           <app-metallic-stats [stats]="outcomeStats"></app-metallic-stats>
@@ -136,21 +135,7 @@
         </div>
 
         <app-metallic-competition-history [items]="matchHistoryItems"></app-metallic-competition-history>
-      </app-metallic-form-section>
-
-      <app-metallic-form-section
-        *ngIf="selectedTab === 'create'"
-        title="Crear Partido"
-        [titleIconAsset]="createIconAsset"
-        description="Arma convocatoria, reglas y vestimenta en un solo flujo.">
-        <div class="matches-panel">
-          <p>Crea un partido nuevo y envía invitaciones al equipo.</p>
-          <button type="button" class="matches-panel__cta" (click)="onGoToCreate()">
-            <img class="atleta-raster-icon" [src]="editIconAsset" aria-hidden="true" alt="" />
-            <span>Crear ahora</span>
-          </button>
-        </div>
-      </app-metallic-form-section>
+      </section>
 
       <div class="matches-retry-wrap" *ngIf="errorMessage">
         <button type="button" class="matches-panel__cta" (click)="onRetryLoad()">Reintentar carga</button>

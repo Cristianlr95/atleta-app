@@ -1,6 +1,6 @@
 <ion-content class="team-bg">
   <main class="team-container">
-    <app-page-nav></app-page-nav>
+    <button type="button" class="team-back" (click)="onBack()">‹ Volver</button>
     <app-metallic-card title="Detalle de equipo" [titleIconAsset]="titleIconAsset">
       <p class="team-status" *ngIf="isLoading">Cargando equipo...</p>
       <section class="team-error" *ngIf="errorMessage">
@@ -16,11 +16,25 @@
         <dl class="team-stats" *ngIf="selectedTeam.stats as stats">
           <div><dt>PJ</dt><dd>{{ stats.partidosJugados }}</dd></div><div><dt>PG</dt><dd>{{ stats.partidosGanados }}</dd></div><div><dt>Pts</dt><dd>{{ stats.puntos }}</dd></div><div><dt>DG</dt><dd>{{ stats.diferenciagoles }}</dd></div>
         </dl>
-        <section class="team-members"><h2>Plantel activo</h2>
-          <button class="team-member" type="button" *ngFor="let member of members" (click)="onOpenPlayer(member.playerUuid)"><span><strong>{{ member.alias }}</strong><small>{{ member.primaryPositionName || 'Sin posicion' }}</small></span><em>{{ member.rol }}</em></button>
+        <section class="team-members"><div class="team-members__heading"><h2>Plantel activo</h2><span>{{ members.length }} jugadores</span></div>
+          <div class="team-roster-head" aria-hidden="true"><span>Jugador</span><span>Posición</span><span>OVR</span><span>Rol</span></div>
+          <button class="team-member" type="button" *ngFor="let member of members" (click)="onOpenPlayer(member.playerUuid)">
+            <span class="team-member__player">
+              <img *ngIf="member.pictureUrl" [src]="member.pictureUrl" [alt]="member.alias">
+              <i *ngIf="!member.pictureUrl" aria-hidden="true">{{ member.alias.charAt(0) }}</i>
+              <strong>{{ member.alias }}</strong>
+            </span>
+            <small>{{ member.primaryPositionName || 'Sin posición' }}</small>
+            <b>{{ member.ovr ?? '—' }}</b>
+            <em>{{ member.rol }}</em>
+          </button>
           <p class="team-status" *ngIf="members.length === 0">No hay integrantes activos.</p>
         </section>
       </article>
     </app-metallic-card>
   </main>
 </ion-content>
+
+<ion-footer class="team-footer" translucent>
+  <ion-toolbar><app-metallic-bottom-nav [items]="bottomNavItems" (itemSelected)="onNavItemSelected($event)"></app-metallic-bottom-nav></ion-toolbar>
+</ion-footer>

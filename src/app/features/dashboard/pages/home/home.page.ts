@@ -8,13 +8,14 @@ import { MatchHistoryViewItem, MatchHistoryService } from 'src/app/features/matc
 import { NotificationBadgeService } from 'src/app/features/matches/services/notification-badge.service';
 import { InvitationsStore } from 'src/app/features/matches/stores/invitations.store';
 import { RatingsApiService } from 'src/app/features/ratings/services/ratings-api.service';
+import { TeamSummary } from 'src/app/features/teams/models/team.models';
+import { TeamApiService } from 'src/app/features/teams/services/team-api.service';
 import { buildMainBottomNav } from 'src/app/shared/navigation/main-bottom-nav';
 import {
   MetallicBottomNavComponent,
   MetallicBottomNavItem,
 } from 'src/app/shared/ui/metallic-bottom-nav/metallic-bottom-nav.component';
 import { MetallicCardComponent } from 'src/app/shared/ui/metallic-card/metallic-card.component';
-import { MetallicFormSectionComponent } from 'src/app/shared/ui/metallic-form-section/metallic-form-section.component';
 import { buildHomeActivity, HomeActivityItem } from '../../utils/home-activity.util';
 
 @Component({
@@ -26,7 +27,6 @@ import { buildHomeActivity, HomeActivityItem } from '../../utils/home-activity.u
     CommonModule,
     IonicModule,
     MetallicCardComponent,
-    MetallicFormSectionComponent,
     MetallicBottomNavComponent,
   ],
 })
@@ -37,12 +37,11 @@ export class HomePage {
   private readonly matchHistoryService = inject(MatchHistoryService);
   private readonly invitationsStore = inject(InvitationsStore);
   private readonly notificationBadgeService = inject(NotificationBadgeService);
+  private readonly teamApiService = inject(TeamApiService);
 
   readonly iconBase = 'assets/icons/atleta-raster-v1';
   readonly titleIconAsset = `${this.iconBase}/ic_nav_home_96.png`;
-  readonly identityIconAsset = `${this.iconBase}/ic_comp_overall_96.png`;
-  readonly statusIconAsset = `${this.iconBase}/ic_status_ready_96.png`;
-  readonly activityIconAsset = `${this.iconBase}/ic_comp_stats_96.png`;
+  readonly teamIconAsset = `${this.iconBase}/ic_team_96.png`;
 
   isLoading = false;
   nextMatchLabel = 'Sin partido agendado';
@@ -59,6 +58,7 @@ export class HomePage {
   xpToNextLevel = 100;
 
   activities: HomeActivityItem[] = [];
+  currentTeam: TeamSummary | null = null;
 
   get bottomNavItems(): ReadonlyArray<MetallicBottomNavItem> {
     return buildMainBottomNav('home', this.notificationBadgeService.totalPending());
@@ -80,6 +80,18 @@ export class HomePage {
     void this.navigationService.goToMainBottomSection(itemId);
   }
 
+  onOpenTeam(): void {
+    if (this.currentTeam) {
+      void this.navigationService.safeNavigate(['/teams', String(this.currentTeam.id)]);
+      return;
+    }
+    void this.navigationService.safeNavigate(['/matches/create']);
+  }
+
+  onOpenMatches(): void {
+    void this.navigationService.safeNavigate(['/matches']);
+  }
+
   private loadHomeData(): void {
     const session = this.authSessionService.currentSession;
     if (!session) {
@@ -92,15 +104,17 @@ export class HomePage {
     forkJoin({
       overall: this.ratingsApiService.getOverall(session.user.atletaUuid).pipe(catchError(() => of(null))),
       history: this.matchHistoryService.getPlayerHistory(session.user.atletaUuid).pipe(catchError(() => of([]))),
+      teams: this.teamApiService.getByPlayer(session.user.atletaUuid).pipe(catchError(() => of([] as TeamSummary[]))),
     })
       .pipe(finalize(() => (this.isLoading = false)))
-      .subscribe(async ({ overall, history }) => {
+      .subscribe(async ({ overall, history, teams }) => {
         await this.invitationsStore.loadPendingInvitations();
         void this.notificationBadgeService.refresh();
 
         this.pendingInvitations.set(this.invitationsStore.pendingInvitations().length);
         this.applyProgress(overall?.hybridOVR ?? 50);
         this.applyHistoryContext(history);
+        this.currentTeam = teams[0] ?? null;
       });
   }
 
@@ -204,57 +218,4 @@ export class HomePage {
     return 'Bronce IV';
   }
 
-  getHomeStatusIconAsset(): string {
-    if (this.nextMatchStatus === 'FINISHED') {
-      return `${this.iconBase}/ic_status_finished_96.png`;
-    }
-    if (this.nextMatchStatus === 'INVALID') {
-      return `${this.iconBase}/ic_status_canceled_96.png`;
-    }
-    if (this.nextMatchStatus === 'LIVE') {
-      return `${this.iconBase}/ic_status_in_progress_96.png`;
-    }
-    if (this.nextMatchStatus === 'CONFIRMED') {
-      return `${this.iconBase}/ic_status_finished_96.png`;
-    }
-    if (this.nextMatchStatus === 'CREATED') {
-      return `${this.iconBase}/ic_status_in_assembly_96.png`;
-    }
-    return `${this.iconBase}/ic_status_pending_96.png`;
-  }
-
-  getHomeStatusClass(): string {
-    if (this.nextMatchStatus === 'FINISHED' || this.nextMatchStatus === 'CONFIRMED') {
-      return 'home-next-status--success';
-    }
-    if (this.nextMatchStatus === 'INVALID') {
-      return 'home-next-status--danger';
-    }
-    if (this.nextMatchStatus === 'LIVE') {
-      return 'home-next-status--warning';
-    }
-    if (this.nextMatchStatus === 'CREATED') {
-      return 'home-next-status--neutral';
-    }
-    return 'home-next-status--empty';
-  }
-
-  getHomeStatusLabel(): string {
-    if (this.nextMatchStatus === 'CREATED') {
-      return 'En armado';
-    }
-    if (this.nextMatchStatus === 'CONFIRMED') {
-      return 'Confirmado';
-    }
-    if (this.nextMatchStatus === 'LIVE') {
-      return 'En juego';
-    }
-    if (this.nextMatchStatus === 'FINISHED') {
-      return 'Finalizado';
-    }
-    if (this.nextMatchStatus === 'INVALID') {
-      return 'Invalido';
-    }
-    return 'Sin estado';
-  }
 }

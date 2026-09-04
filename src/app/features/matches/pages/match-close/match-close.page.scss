@@ -49,6 +49,31 @@
   margin-top: 10px;
 }
 
+.close-blocked {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px;
+  border: 1px solid rgba(255, 195, 104, 0.42);
+  border-radius: 12px;
+  background: rgba(45, 31, 12, 0.54);
+}
+
+.close-blocked h3,
+.close-blocked p {
+  margin: 0;
+}
+
+.close-blocked h3 {
+  color: #ffe0ae;
+  font-size: 1rem;
+}
+
+.close-blocked p {
+  color: #e8d5b0;
+  font-size: 0.84rem;
+}
+
 .panel {
   display: flex;
   flex-direction: column;

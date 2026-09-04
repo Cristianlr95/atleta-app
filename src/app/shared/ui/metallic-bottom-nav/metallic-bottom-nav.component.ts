@@ -35,6 +35,20 @@ export class MetallicBottomNavComponent {
     return this.defaultIconAsset;
   }
 
+  formatBadgeCount(count: number | undefined): string {
+    const normalized = Math.max(0, Math.floor(count ?? 0));
+    return normalized > 9 ? '9+' : String(normalized);
+  }
+
+  badgeAriaLabel(item: MetallicBottomNavItem): string {
+    const count = Math.max(0, Math.floor(item.badgeCount ?? 0));
+    if (item.id === 'matches') {
+      return `${count} invitaciones pendientes de respuesta`;
+    }
+
+    return `${count} notificaciones pendientes`;
+  }
+
   onSelect(itemId: string): void {
     const item = this.items.find((entry) => entry.id === itemId);
     if (item?.active) {

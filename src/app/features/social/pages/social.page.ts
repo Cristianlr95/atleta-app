@@ -80,8 +80,7 @@ export class SocialPage implements OnDestroy {
   );
 
   get bottomNavItems(): ReadonlyArray<MetallicBottomNavItem> {
-    const badgeCount = this.notificationBadgeService.totalPending() + this.facade.unreadCount();
-    return buildMainBottomNav('matches', badgeCount);
+    return buildMainBottomNav('matches', this.notificationBadgeService.totalPending());
   }
 
   ionViewWillEnter(): void {

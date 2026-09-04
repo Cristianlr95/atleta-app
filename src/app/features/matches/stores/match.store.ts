@@ -215,7 +215,13 @@ export class MatchStore extends ResourceStore<MatchState> {
             isClosePendingFallback(matchResponse.estado, matchResponse.fechaHoraProgramada, accepted, pending, totalInvited, Date.now(), refreshedMatch.minRequired),
         }
       : refreshedMatch;
-    const lifecycleState = resolveLifecycleState(hydratedFromApi.status, accepted, pending, totalInvited);
+    const lifecycleState = resolveLifecycleState(
+      hydratedFromApi.status,
+      accepted,
+      pending,
+      totalInvited,
+      !!hydratedFromApi.closePending,
+    );
     const progress = buildMatchProgress(
       hydratedFromApi.status,
       accepted,
@@ -254,7 +260,13 @@ export class MatchStore extends ResourceStore<MatchState> {
     const totalInvited = participants.length;
     this.matchService.recalculateStatusFromCounts(current.localMatchId, accepted.length, pending.length, totalInvited);
     const refreshedMatch = this.matchService.getMatchById(current.localMatchId) ?? current.match;
-    const lifecycleState = resolveLifecycleState(refreshedMatch.status, accepted.length, pending.length, totalInvited);
+    const lifecycleState = resolveLifecycleState(
+      refreshedMatch.status,
+      accepted.length,
+      pending.length,
+      totalInvited,
+      !!refreshedMatch.closePending,
+    );
     const progress = buildMatchProgress(
       refreshedMatch.status,
       accepted.length,

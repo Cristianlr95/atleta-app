@@ -61,6 +61,8 @@ export class InvitationsStore {
               ? PlayerInvitationStatus.WAITLIST
             : invite.status === 'RECHAZADA'
               ? PlayerInvitationStatus.DECLINED
+              : invite.status === 'CANCELADA'
+                ? PlayerInvitationStatus.DECLINED
               : PlayerInvitationStatus.PENDING,
         deliveryStatus: InvitationDeliveryStatus.SENT,
         createdAt: invite.createdAt ?? new Date().toISOString(),
@@ -200,6 +202,8 @@ export class InvitationsStore {
               ? PlayerInvitationStatus.WAITLIST
             : invite.status === 'RECHAZADA'
               ? PlayerInvitationStatus.DECLINED
+              : invite.status === 'CANCELADA'
+                ? PlayerInvitationStatus.DECLINED
               : PlayerInvitationStatus.PENDING,
         deliveryStatus: InvitationDeliveryStatus.SENT,
         createdAt: invite.createdAt ?? previous?.createdAt ?? new Date().toISOString(),

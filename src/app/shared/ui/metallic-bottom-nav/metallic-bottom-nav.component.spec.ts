@@ -58,6 +58,18 @@ describe('MetallicBottomNavComponent', () => {
     const badge: HTMLElement | null = fixture.nativeElement.querySelector('.metallic-bottom-nav__badge');
 
     expect(badge?.textContent?.trim()).toBe('3');
-    expect(badge?.getAttribute('aria-label')).toBe('3 pendientes');
+    expect(badge?.getAttribute('aria-label')).toBe('3 invitaciones pendientes de respuesta');
+  });
+
+  it('keeps large badge counts compact', () => {
+    component.items = [
+      { id: 'matches', label: 'Partidos', icon: '', badgeCount: 13 },
+    ];
+    fixture.detectChanges();
+
+    const badge: HTMLElement | null = fixture.nativeElement.querySelector('.metallic-bottom-nav__badge');
+
+    expect(badge?.textContent?.trim()).toBe('9+');
+    expect(badge?.getAttribute('aria-label')).toBe('13 invitaciones pendientes de respuesta');
   });
 });

@@ -29,8 +29,8 @@ describe('LeaderboardService', () => {
     ]));
 
     service.getTeamOverallLeaderboard(77).subscribe((rows) => expect(rows).toEqual([
-      { rank: 1, playerProfileId: 'alpha', alias: 'Alpha', scoreText: '82.5 OVR', metaText: '9 partidos' },
-      { rank: 2, playerProfileId: 'beta', alias: 'Beta', scoreText: 'Sin rating', metaText: 'Aun sin partidos puntuados' },
+      { rank: 1, playerProfileId: 'alpha', alias: 'Alpha', scoreText: '82.5 OVR', metaText: '9 partidos', matchesPlayed: 9 },
+      { rank: 2, playerProfileId: 'beta', alias: 'Beta', scoreText: 'Sin rating', metaText: 'Aun sin partidos puntuados', matchesPlayed: 0 },
     ]));
 
     expect(teamApiService.getLeaderboard).toHaveBeenCalledOnceWith(77);

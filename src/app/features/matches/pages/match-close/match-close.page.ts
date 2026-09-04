@@ -73,6 +73,7 @@ export class MatchClosePage {
   readonly loading = signal(false);
   readonly saving = signal(false);
   readonly error = signal<string | null>(null);
+  readonly closeBlockedReason = signal<string | null>(null);
   readonly closedSuccess = signal(false);
 
   readonly routeMatchId = signal('');
@@ -188,6 +189,9 @@ export class MatchClosePage {
   );
 
   readonly canContinue = computed(() => {
+    if (this.closeBlockedReason()) {
+      return false;
+    }
     if (this.step() === 1) {
       return this.players().length > 0 && this.scoreboardMatchesAssignedGoals();
     }
@@ -234,7 +238,7 @@ export class MatchClosePage {
   }
 
   onNextStep(): void {
-    if (!this.canContinue() || this.step() === 3) {
+    if (this.closeBlockedReason() || !this.canContinue() || this.step() === 3) {
       return;
     }
     const nextStep = (this.step() + 1) as 1 | 2 | 3;
@@ -319,7 +323,7 @@ export class MatchClosePage {
   }
 
   async onConfirmClose(): Promise<void> {
-    if (this.saving() || !this.isCreator()) {
+    if (this.saving() || !this.isCreator() || this.closeBlockedReason()) {
       return;
     }
 
@@ -372,8 +376,12 @@ export class MatchClosePage {
     const latest = await firstValueFrom(this.matchesApiService.getById(backendMatchId));
     const status = latest.estado as BackendMatchStatus;
 
-    if (status === 'INICIADO' || status === 'FINALIZADO') {
+    if (status === 'INICIADO') {
       return;
+    }
+
+    if (status === 'FINALIZADO') {
+      throw new Error('El partido ya fue finalizado.');
     }
 
     if (status === 'INVALIDO') {
@@ -396,6 +404,9 @@ export class MatchClosePage {
     this.routeMatchId.set(routeMatchId);
     this.loading.set(true);
     this.error.set(null);
+    this.closeBlockedReason.set(null);
+    this.closedSuccess.set(false);
+    this.step.set(1);
 
     try {
       const state = await this.matchStore.refresh(routeMatchId, true);
@@ -415,6 +426,10 @@ export class MatchClosePage {
       }
 
       this.matchResponse.set(response);
+      this.closeBlockedReason.set(this.getCloseBlockedReason(response));
+      if (this.closeBlockedReason()) {
+        return;
+      }
       const localTeam = response.matchTeams?.find((t) => t.esLocal);
       const awayTeam = response.matchTeams?.find((t) => !t.esLocal);
       const baseTeamName = localTeam?.team?.nombre ?? awayTeam?.team?.nombre ?? state.match.team.name ?? 'Club';
@@ -561,6 +576,10 @@ export class MatchClosePage {
   }
 
   private async loadClosePreview(): Promise<void> {
+    if (this.closeBlockedReason()) {
+      this.closePreview.set(null);
+      return;
+    }
     const backendMatchId = this.matchResponse()?.id;
     if (!backendMatchId) {
       return;
@@ -583,6 +602,16 @@ export class MatchClosePage {
     } catch {
       this.closePreview.set(null);
     }
+  }
+
+  private getCloseBlockedReason(response: MatchResponse): string | null {
+    if (response.estado === 'INVALIDO') {
+      return response.validationReason || 'Este partido fue invalidado y no puede cerrarse.';
+    }
+    if (response.estado === 'FINALIZADO') {
+      return 'Este partido ya fue finalizado. No se pueden modificar sus resultados.';
+    }
+    return null;
   }
 }
 

@@ -12,7 +12,6 @@ test.describe('Smoke 02 - Crear partido wizard', () => {
     await page.goto('/matches/create');
 
     await page.getByRole('button', { name: 'Enfrentamiento Interno' }).click();
-    await page.getByRole('button', { name: 'Continuar' }).click();
 
     const teamSelect = page.locator('app-metallic-select').filter({ hasText: 'Equipo' }).locator('select');
     if ((await teamSelect.count()) > 0) {
@@ -37,14 +36,17 @@ test.describe('Smoke 02 - Crear partido wizard', () => {
     await expect(firstVenue).toBeVisible();
     await firstVenue.click();
 
+    // Paso 1 concentra formato, agenda, equipo y cancha.
     await page.getByRole('button', { name: 'Continuar' }).click();
 
+    // Paso 2 concentra vestimenta y convocatoria con sobrecupo permitido.
     const selectAllButton = page.getByRole('button', { name: 'Seleccionar todos' });
     await expect(selectAllButton).toBeVisible();
     await selectAllButton.click();
 
     await page.getByRole('button', { name: 'Continuar' }).click();
 
+    // Paso 3 confirma el resumen y ejecuta la creación orquestada.
     const sendButton = page.getByRole('button', { name: 'Enviar invitaciones' });
     await expect(sendButton).toBeVisible();
     await sendButton.click();

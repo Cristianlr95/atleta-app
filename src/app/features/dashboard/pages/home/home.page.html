@@ -1,62 +1,45 @@
 ﻿<ion-content class="home-bg">
   <div class="home-container">
     <app-metallic-card title="Inicio competitivo" [titleIconAsset]="titleIconAsset">
-      <app-metallic-form-section title="Identidad" [titleIconAsset]="identityIconAsset" description="Tu progreso competitivo en tiempo real.">
+      <section class="home-overview">
         <div class="home-identity">
           <div class="home-avatar">{{ playerName.charAt(0) }}</div>
           <div class="home-identity__meta">
             <p class="home-name">{{ playerName }}</p>
             <p class="home-subtitle">Nivel {{ playerLevel }} · {{ divisionLabel }}</p>
-            <p class="home-streak">Racha de participación: {{ streakValue }}</p>
+            <p class="home-streak">{{ streakValue }} partidos consecutivos</p>
           </div>
         </div>
+        <button type="button" class="home-team" (click)="onOpenTeam()">
+          <img class="atleta-raster-icon" [src]="teamIconAsset" aria-hidden="true" alt="" />
+          <span class="home-team__copy"><small>Mi equipo</small><strong>{{ currentTeam?.nombre ?? 'Sin equipo' }}</strong></span>
+          <span class="home-team__arrow" aria-hidden="true">›</span>
+        </button>
+      </section>
 
-        <div class="home-xp">
-          <div class="home-xp__labels">
-            <span>XP total: {{ totalXp }}</span>
-            <span>{{ xpProgressPercent }}%</span>
-          </div>
-          <div class="home-xp__track">
-            <div class="home-xp__fill" [style.width.%]="xpProgressPercent"></div>
-          </div>
-          <p class="home-hint">{{ xpHint }}</p>
-        </div>
-      </app-metallic-form-section>
+      <section class="home-priority" [class.home-priority--empty]="nextMatchStatus === 'NONE'">
+        <div class="home-priority__label">Próximo en cancha</div>
+        <div><p class="home-status-card__title">{{ nextMatchLabel }}</p><p class="home-status-card__detail">{{ nextMatchDetail }}</p></div>
+        <button type="button" class="home-priority__cta" (click)="onOpenMatches()">Ver partidos</button>
+      </section>
 
-      <app-metallic-form-section title="Estado actual" [titleIconAsset]="statusIconAsset" description="Urgencia y próximos objetivos.">
-        <div class="home-status-card">
-          <p class="home-status-card__title">{{ nextMatchLabel }}</p>
-          <p class="home-status-card__detail">{{ nextMatchDetail }}</p>
-          <span
-            class="home-next-status"
-            [ngClass]="getHomeStatusClass()"
-            *ngIf="nextMatchStatus !== 'NONE'">
-            <span class="home-next-status__icon-wrap">
-              <img class="home-next-status__icon atleta-raster-icon" [src]="getHomeStatusIconAsset()" aria-hidden="true" alt="" />
-            </span>
-            {{ getHomeStatusLabel() }}
-          </span>
-        </div>
-        <div class="home-status-grid">
-          <article class="home-status-pill">
-            <span class="home-status-pill__label">Partidos por responder</span>
-            <strong>{{ pendingInvitations() }}</strong>
-          </article>
-          <article class="home-status-pill">
-            <span class="home-status-pill__label">Objetivo inmediato</span>
-            <strong>Subir de nivel</strong>
-          </article>
-        </div>
-      </app-metallic-form-section>
+      <section class="home-metrics" aria-label="Resumen de rendimiento">
+        <div class="home-metric"><span>OVR</span><strong>{{ playerLevel * 5 }}</strong></div>
+        <div class="home-metric"><span>Invitaciones</span><strong>{{ pendingInvitations() }}</strong></div>
+        <div class="home-metric"><span>XP total</span><strong>{{ totalXp }}</strong></div>
+      </section>
 
-      <app-metallic-form-section title="Actividad reciente" [titleIconAsset]="activityIconAsset" description="Feed corto estilo social competitivo.">
+      <section class="home-progress">
+        <div class="home-progress__heading"><span>Progreso de nivel</span><strong>{{ xpProgressPercent }}%</strong></div>
+        <div class="home-xp__track"><div class="home-xp__fill" [style.width.%]="xpProgressPercent"></div></div>
+        <p class="home-hint">{{ xpHint }}</p>
+      </section>
+
+      <section class="home-activity">
+        <div class="home-activity__heading"><span>Actividad reciente</span><button type="button" (click)="onOpenMatches()">Ver historial</button></div>
         <p *ngIf="isLoading" class="home-loading">Actualizando actividad...</p>
-        <div class="home-feed">
-          <article class="home-feed__item" *ngFor="let item of activities" [attr.data-variant]="item.variant">
-            {{ item.text }}
-          </article>
-        </div>
-      </app-metallic-form-section>
+        <div class="home-feed"><article class="home-feed__item" *ngFor="let item of activities" [attr.data-variant]="item.variant">{{ item.text }}</article></div>
+      </section>
     </app-metallic-card>
   </div>
 </ion-content>

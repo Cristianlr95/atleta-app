@@ -7,6 +7,8 @@ export interface LeaderboardDisplayRow {
   alias: string;
   scoreText: string;
   metaText?: string;
+  roleText?: string;
+  matchesPlayed?: number;
 }
 
 @Component({
@@ -22,20 +24,17 @@ export class MetallicLeaderboardComponent {
   @Input() title = 'Ranking';
   @Input() rows: ReadonlyArray<LeaderboardDisplayRow> = [];
   @Input() currentPlayerId: string | null = null;
+  @Input() showRole = false;
 
   readonly podiumIconAsset = `${this.iconBase}/ic_nav_ranking_96.png`;
   readonly medalIconAsset = `${this.iconBase}/ic_comp_medal_96.png`;
   readonly trophyIconAsset = `${this.iconBase}/ic_comp_trophy_96.png`;
 
-  get topRows(): LeaderboardDisplayRow[] {
-    return this.rows.slice(0, 3);
-  }
-
-  get remainingRows(): LeaderboardDisplayRow[] {
-    return this.rows.slice(3);
-  }
-
   isCurrent(row: LeaderboardDisplayRow): boolean {
     return !!this.currentPlayerId && !!row.playerProfileId && row.playerProfileId === this.currentPlayerId;
+  }
+
+  isPodium(row: LeaderboardDisplayRow): boolean {
+    return row.rank >= 1 && row.rank <= 3;
   }
 }

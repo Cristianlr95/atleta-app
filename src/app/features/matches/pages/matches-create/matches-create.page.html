@@ -1,20 +1,23 @@
 <ion-content class="matches-create-bg">
   <div class="matches-create-container">
-    <app-page-nav></app-page-nav>
+    <button type="button" class="wizard-back" (click)="onBack()">‹ Partidos</button>
     <app-metallic-card title="Crear Partido" [titleIconAsset]="titleIconAsset">
-      <p class="wizard-head">Paso {{ step() }}/{{ totalSteps }}</p>
-      <app-metallic-progress [value]="step()" [max]="totalSteps" label="Progreso" [showValue]="true"></app-metallic-progress>
-
-      <div class="wizard-actions">
-        <app-metallic-button type="button" variant="secondary" [disabled]="step() === 1" (click)="onPrevious()">Anterior</app-metallic-button>
-        <app-metallic-button type="button" variant="secondary" [disabled]="!canContinue() || step() === totalSteps" (click)="onContinue()">Continuar</app-metallic-button>
+      <header class="wizard-intro">
+        <div><span>Configuración del encuentro</span><p>Paso {{ step() }} de {{ totalSteps }} · {{ stepLabels[step() - 1] }}</p></div>
+        <strong>{{ step() }}/{{ totalSteps }}</strong>
+      </header>
+      <div class="wizard-steps" aria-label="Progreso de creación">
+        <span *ngFor="let label of stepLabels; let index = index" [class.wizard-steps__item--active]="step() === index + 1" [class.wizard-steps__item--complete]="step() > index + 1"><i>{{ index + 1 }}</i><b>{{ label }}</b></span>
       </div>
 
-      <app-metallic-form-section *ngIf="step() === 1" title="Tipo de partido" [titleIconAsset]="typeIconAsset" description="Selecciona una modalidad.">
-        <app-match-type-selector [selectedType]="selectedMatchType()" (selectedTypeChange)="selectedMatchType.set($event)"></app-match-type-selector>
-      </app-metallic-form-section>
+      <div class="wizard-actions">
+        <button type="button" class="wizard-action wizard-action--secondary" [disabled]="step() === 1" (click)="onPrevious()">Anterior</button>
+        <button type="button" class="wizard-action" [disabled]="!canContinue() || step() === totalSteps" (click)="onContinue()">Continuar</button>
+      </div>
 
-      <app-metallic-form-section *ngIf="step() === 2" title="Fecha, hora y lugar" [titleIconAsset]="scheduleIconAsset" description="Programa el partido.">
+      <app-metallic-form-section *ngIf="step() === 1" title="Configurar partido" [titleIconAsset]="typeIconAsset" description="Define formato, agenda y lugar antes de convocar.">
+        <app-match-type-selector [selectedType]="selectedMatchType()" (selectedTypeChange)="selectedMatchType.set($event)"></app-match-type-selector>
+        <div class="wizard-section-divider"><span>Agenda y cancha</span></div>
         <p *ngIf="loadTeamsError()" class="kit-help">{{ loadTeamsError() }}</p>
         <app-metallic-button *ngIf="loadTeamsError()" type="button" variant="secondary" (click)="onRetryLoadTeams()">
           Reintentar equipos
@@ -27,7 +30,7 @@
         </app-match-schedule-form>
       </app-metallic-form-section>
 
-      <app-metallic-form-section *ngIf="step() === 3" title="Invitar jugadores" [titleIconAsset]="playersIconAsset" description="Define invitados del equipo.">
+      <app-metallic-form-section *ngIf="step() === 2" title="Convocar jugadores" [titleIconAsset]="playersIconAsset" description="Puedes invitar más personas que cupos: confirman por orden de aceptación.">
         <div class="kit-grid">
           <app-metallic-select
             label="Vestimenta local"
@@ -57,7 +60,7 @@
         </app-metallic-button>
       </app-metallic-form-section>
 
-      <app-metallic-form-section *ngIf="step() === 4" title="Confirmar y enviar" [titleIconAsset]="confirmIconAsset" description="Revisa y envía invitaciones.">
+      <app-metallic-form-section *ngIf="step() === 3" title="Confirmar y enviar" [titleIconAsset]="confirmIconAsset" description="Revisa la convocatoria antes de enviarla.">
         <div class="summary">
           <p><strong>Tipo:</strong> {{ matchTypeLabel }}</p>
           <p><strong>Modalidad:</strong> {{ modalityLabel }}</p>
@@ -79,3 +82,7 @@
     </app-metallic-card>
   </div>
 </ion-content>
+
+<ion-footer class="matches-create-footer" translucent>
+  <ion-toolbar><app-metallic-bottom-nav [items]="bottomNavItems" (itemSelected)="onNavItemSelected($event)"></app-metallic-bottom-nav></ion-toolbar>
+</ion-footer>

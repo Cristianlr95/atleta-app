@@ -1,44 +1,32 @@
 <ion-content class="leaderboard-bg">
   <div class="leaderboard-container">
     <app-metallic-card title="Ranking competitivo" [titleIconAsset]="titleIconAsset">
-      <app-metallic-form-section
-        title="Ranking"
-        [titleIconAsset]="overallSectionIconAsset"
-        description="Compara el rendimiento global y el de tu equipo.">
+      <section class="ranking-workspace">
+        <header class="ranking-workspace__header">
+          <div>
+            <p class="ranking-workspace__eyebrow">Clasificación</p>
+            <p class="ranking-workspace__description">Compara el rendimiento global y el de tu equipo.</p>
+          </div>
+          <span class="ranking-workspace__demo" *ngIf="usesDevelopmentDemo">Datos de prueba</span>
+        </header>
 
-        <div class="leaderboard-scope" role="tablist" aria-label="Alcance del ranking">
-          <button
-            type="button"
-            class="leaderboard-scope__item"
-            [class.leaderboard-scope__item--active]="selectedScope === 'PLATFORM'"
-            (click)="onScopeChange('PLATFORM')">
-            Plataforma
-          </button>
-          <button
-            type="button"
-            class="leaderboard-scope__item"
-            [class.leaderboard-scope__item--active]="selectedScope === 'TEAM'"
-            (click)="onScopeChange('TEAM')">
-            Mi equipo
-          </button>
-        </div>
+        <section class="ranking-toolbar" aria-label="Filtros del ranking">
+          <label class="ranking-toolbar__control">
+            <span>Mostrar</span>
+            <select [ngModel]="selectedScope" (ngModelChange)="onScopeChange($any($event))">
+              <option value="PLATFORM">Todos los jugadores</option>
+              <option value="TEAM">Mi equipo</option>
+            </select>
+          </label>
 
-        <div class="leaderboard-mode" *ngIf="selectedScope === 'PLATFORM'" role="tablist" aria-label="Modo de ranking plataforma">
-          <button
-            type="button"
-            class="leaderboard-mode__item"
-            [class.leaderboard-mode__item--active]="selectedMode === 'OVERALL'"
-            (click)="onModeChange('OVERALL')">
-            OVR global
-          </button>
-          <button
-            type="button"
-            class="leaderboard-mode__item"
-            [class.leaderboard-mode__item--active]="selectedMode === 'ROLE'"
-            (click)="onModeChange('ROLE')">
-            Por posicion
-          </button>
-        </div>
+          <label class="ranking-toolbar__control" *ngIf="selectedScope === 'PLATFORM'">
+            <span>Clasificar por</span>
+            <select [ngModel]="selectedMode" (ngModelChange)="onModeChange($any($event))">
+              <option value="OVERALL">OVR global</option>
+              <option value="ROLE">Posición</option>
+            </select>
+          </label>
+        </section>
 
         <div class="leaderboard-roles" *ngIf="selectedScope === 'PLATFORM' && selectedMode === 'ROLE'" role="tablist" aria-label="Filtro de posiciones">
           <button
@@ -61,7 +49,39 @@
           </app-metallic-select>
         </div>
 
+        <section class="team-record" *ngIf="selectedScope === 'TEAM'">
+          <div class="team-record__heading">
+            <span>Récord contra otros equipos</span>
+            <span *ngIf="isLoadingTeamRecord">Actualizando…</span>
+          </div>
+          <p class="team-record__hint">No considera entrenamientos internos.</p>
+          <div class="team-record__stats" *ngIf="teamRecord">
+            <span><strong>{{ teamRecord.matchesPlayed }}</strong>PJ</span>
+            <span><strong>{{ teamRecord.wins }}</strong>PG</span>
+            <span><strong>{{ teamRecord.draws }}</strong>PE</span>
+            <span><strong>{{ teamRecord.losses }}</strong>PP</span>
+            <span><strong>{{ teamRecord.points }}</strong>PTS</span>
+          </div>
+          <p class="leaderboard-message leaderboard-message--error" *ngIf="teamRecordError">{{ teamRecordError }}</p>
+        </section>
+
         <p class="leaderboard-current" *ngIf="currentUserPositionText">{{ currentUserPositionText }}</p>
+
+        <div class="leaderboard-tools" aria-label="Filtros adicionales de la tabla">
+          <label class="leaderboard-search">
+            <span>Buscar</span>
+            <input type="search" [(ngModel)]="searchTerm" placeholder="Jugador o posición" aria-label="Buscar jugador o posición" />
+          </label>
+          <label class="leaderboard-sort">
+            <span>Ordenar tabla por</span>
+            <select [(ngModel)]="selectedSort">
+              <option value="RANK">Clasificación</option>
+              <option value="OVR">OVR</option>
+              <option value="MATCHES">Partidos</option>
+              <option value="NAME">Nombre</option>
+            </select>
+          </label>
+        </div>
 
         <p *ngIf="modeLoading" class="leaderboard-message">Actualizando ranking...</p>
         <p *ngIf="modeError" class="leaderboard-message leaderboard-message--error">{{ modeError }}</p>
@@ -69,10 +89,11 @@
 
         <app-metallic-leaderboard
           [title]="modeTitle"
-          [rows]="modeRows"
+          [rows]="filteredRows"
+          [showRole]="selectedScope === 'PLATFORM'"
           [currentPlayerId]="currentUserId">
         </app-metallic-leaderboard>
-      </app-metallic-form-section>
+      </section>
     </app-metallic-card>
   </div>
 </ion-content>

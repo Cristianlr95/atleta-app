@@ -11,3 +11,8 @@ dt { color: #9fb3d1; font: 700 12px "Rajdhani", sans-serif; text-transform: uppe
 ol { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; } li { display: flex; justify-content: space-between; gap: 12px; color: #e6eefb; font: 700 14px "Rajdhani", sans-serif; } li span { color: #aebfda; }
 .detail-error { text-align: center; color: #dce7f8; font-family: "Rajdhani", sans-serif; } .detail-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
 button { border: 1px solid rgba(215,185,109,.46); border-radius: 999px; background: rgba(215,185,109,.15); color: #f5e8c4; padding: 8px 14px; font-weight: 800; }
+
+.detail-container { padding-bottom: 96px; }
+.detail-back { align-self:flex-start; margin:0 0 10px; padding:5px 0; border:0; background:transparent; color:var(--tactical-visit); font-family:var(--font-family-display); font-size:12px; text-transform:uppercase; cursor:pointer; }
+.detail-avatar--photo { object-fit:cover; }
+.detail-footer ion-toolbar { --background:rgba(2,9,13,.96); --border-color:var(--tactical-line); padding:6px 8px calc(env(safe-area-inset-bottom) + 8px); }

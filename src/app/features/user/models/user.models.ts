@@ -4,6 +4,7 @@ export interface PlayerProfile {
   atletaUuid: string;
   alias?: string;
   nombre?: string;
+  pictureUrl?: string;
   genero?: 'MASCULINO' | 'FEMENINO' | 'OTRO';
   trustScore?: number;
   createdAt?: string;

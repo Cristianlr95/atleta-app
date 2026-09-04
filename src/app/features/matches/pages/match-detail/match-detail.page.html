@@ -12,6 +12,15 @@
         No se encontro informacion para este partido.
       </p>
 
+      <nav *ngIf="match()" class="match-flow" aria-label="Estado del encuentro">
+        <span
+          *ngFor="let flowStep of flowSteps; let index = index"
+          [class.match-flow__step--active]="flowStepIndex() === index"
+          [class.match-flow__step--complete]="flowStepIndex() > index">
+          <i>{{ index + 1 }}</i><b>{{ flowStep }}</b>
+        </span>
+      </nav>
+
       <app-metallic-form-section title="Header partido" [titleIconAsset]="titleIconAsset" description="Estado, cuenta regresiva y cancha.">
         <app-match-header-card
           *ngIf="match()"
@@ -19,6 +28,16 @@
           [theme]="selectedTheme()">
         </app-match-header-card>
       </app-metallic-form-section>
+
+      <section *ngIf="canWithdrawFromMatch()" class="match-inline-action">
+        <div>
+          <strong>{{ currentUserInvitation()?.status === 'WAITLIST' ? 'Estas en lista de espera' : 'Tu cupo esta confirmado' }}</strong>
+          <p>Si ya no puedes asistir, libera el cupo para el siguiente jugador.</p>
+        </div>
+        <app-metallic-button type="button" variant="secondary" [disabled]="inviteActionLoading()" (click)="onWithdrawFromMatch()">
+          Liberar cupo
+        </app-metallic-button>
+      </section>
 
       <app-metallic-form-section
         *ngIf="canRespondInvitationInMatch()"
@@ -120,10 +139,10 @@
         <app-venue-selected-card [venue]="selectedVenue()"></app-venue-selected-card>
       </app-metallic-form-section>
 
-      <app-metallic-form-section title="Impacto competitivo" [titleIconAsset]="rankingIconAsset" description="Preparado para ranking y estadisticas.">
+      <app-metallic-form-section title="Impacto competitivo" [titleIconAsset]="rankingIconAsset" description="Estadisticas que se consolidan al cerrar.">
         <div class="match-detail-impact">
-          <p>Este partido afectara el ranking.</p>
-          <p>Proximamente: MVP, estadisticas y puntos competitivos.</p>
+          <p>{{ match()?.type === 'INTERNAL' ? 'Entrenamiento interno: suma actividad personal, pero no altera el record competitivo del equipo.' : 'Encuentro contra otro equipo: el resultado puede actualizar record y ranking competitivo.' }}</p>
+          <p>Goles, asistencias, XP y OVR se procesan una sola vez al confirmar el cierre.</p>
         </div>
       </app-metallic-form-section>
 
@@ -156,6 +175,14 @@
           {{ closeMatchMessage() }}
         </p>
         <div class="match-detail-actions">
+          <app-metallic-button
+            *ngIf="!hasMatchStarted() && !isFinalized()"
+            type="button"
+            variant="accent"
+            [disabled]="!canStartMatch() || startMatchLoading()"
+            (click)="onStartMatch()">
+            {{ startMatchLoading() ? 'Iniciando...' : 'Iniciar partido' }}
+          </app-metallic-button>
           <app-metallic-button type="button" variant="accent" [disabled]="!canCloseMatch()" (click)="onFinishMatch()">
             Cierre del Partido
           </app-metallic-button>

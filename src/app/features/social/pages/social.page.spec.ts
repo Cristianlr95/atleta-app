@@ -139,13 +139,13 @@ describe('SocialPage', () => {
     ]);
   });
 
-  it('keeps main bottom nav social badge aligned with pending and unread counts', () => {
+  it('shows only actionable match invitations in the matches badge', () => {
     notificationBadgeService.totalPending.set(2);
     facade.unreadCount.set(3);
 
     const matchesItem = component.bottomNavItems.find((item) => item.id === 'matches');
 
-    expect(matchesItem?.badgeCount).toBe(5);
+    expect(matchesItem?.badgeCount).toBe(2);
   });
 
   it('routes bottom nav actions through NavigationService', () => {

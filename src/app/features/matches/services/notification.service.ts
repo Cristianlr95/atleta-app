@@ -27,6 +27,14 @@ class InAppNotificationAdapter implements NotificationAdapter {
   }
 
   async send(title: string, message: string): Promise<void> {
+    const current = this.queue();
+    const duplicate = current.find(
+      (notification) => !notification.read && notification.title === title && notification.message === message,
+    );
+    if (duplicate) {
+      return;
+    }
+
     const item: InAppNotification = {
       id: `notif-${Date.now()}-${Math.random().toString(16).slice(2)}`,
       title,
@@ -35,7 +43,8 @@ class InAppNotificationAdapter implements NotificationAdapter {
       read: false,
     };
 
-    this.queue.update((notifications) => [item, ...notifications]);
+    // Conserva una bandeja breve: estos avisos son feedback de contexto, no un historial.
+    this.queue.update((notifications) => [item, ...notifications].slice(0, 4));
   }
 }
 
@@ -47,13 +56,8 @@ class WebNotificationAdapter implements NotificationAdapter {
   }
 
   async initialize(): Promise<void> {
-    if (!this.isAvailable()) {
-      return;
-    }
-
-    if (window.Notification.permission === 'default') {
-      await window.Notification.requestPermission();
-    }
+    // Los permisos del navegador deben solicitarse desde una accion explicita del usuario.
+    // Inicializar la aplicacion nunca debe abrir un prompt inesperado.
   }
 
   async send(title: string, message: string): Promise<void> {

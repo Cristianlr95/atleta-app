@@ -27,4 +27,15 @@ describe('resolveLifecycleState', () => {
     const state = resolveLifecycleState(MatchStatus.FINISHED, 10, 0, 10);
     expect(state).toBe(MatchLifecycleState.FINISHED);
   });
+
+  it('distinguishes live play from pending close', () => {
+    expect(resolveLifecycleState(MatchStatus.LIVE, 10, 0, 10)).toBe(MatchLifecycleState.LIVE);
+    expect(resolveLifecycleState(MatchStatus.LIVE, 10, 0, 10, true)).toBe(
+      MatchLifecycleState.CLOSE_PENDING,
+    );
+  });
+
+  it('maps invalid matches as cancelled flow', () => {
+    expect(resolveLifecycleState(MatchStatus.INVALID, 0, 0, 0)).toBe(MatchLifecycleState.INVALID);
+  });
 });

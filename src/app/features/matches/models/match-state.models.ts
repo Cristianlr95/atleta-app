@@ -4,7 +4,10 @@ export enum MatchLifecycleState {
   CREATED_WITHOUT_CONFIRMATIONS = 'CREATED_WITHOUT_CONFIRMATIONS',
   CREATED_WITH_PARTIAL_CONFIRMATIONS = 'CREATED_WITH_PARTIAL_CONFIRMATIONS',
   CREATED_CONFIRMED = 'CREATED_CONFIRMED',
+  LIVE = 'LIVE',
+  CLOSE_PENDING = 'CLOSE_PENDING',
   FINISHED = 'FINISHED',
+  INVALID = 'INVALID',
 }
 
 export interface MatchState {
@@ -24,6 +27,12 @@ export interface MatchState {
 }
 
 export function lifecycleToUserLabel(state: MatchLifecycleState): string {
+  if (state === MatchLifecycleState.LIVE) {
+    return 'Partido en juego';
+  }
+  if (state === MatchLifecycleState.CLOSE_PENDING) {
+    return 'Cierre pendiente';
+  }
   if (state === MatchLifecycleState.CREATED_WITH_PARTIAL_CONFIRMATIONS) {
     return 'Armandose el partido';
   }
@@ -33,6 +42,9 @@ export function lifecycleToUserLabel(state: MatchLifecycleState): string {
   if (state === MatchLifecycleState.FINISHED) {
     return 'Finalizado';
   }
+  if (state === MatchLifecycleState.INVALID) {
+    return 'Partido cancelado';
+  }
   return 'Invitaciones enviadas';
 }
 
@@ -41,9 +53,18 @@ export function resolveLifecycleState(
   acceptedCount: number,
   pendingCount: number,
   totalInvited: number,
+  closePending = false,
 ): MatchLifecycleState {
   if (status === MatchStatus.FINISHED) {
     return MatchLifecycleState.FINISHED;
+  }
+
+  if (status === MatchStatus.INVALID) {
+    return MatchLifecycleState.INVALID;
+  }
+
+  if (status === MatchStatus.LIVE) {
+    return closePending ? MatchLifecycleState.CLOSE_PENDING : MatchLifecycleState.LIVE;
   }
 
   if (status === MatchStatus.CONFIRMED || (totalInvited > 0 && acceptedCount === totalInvited && pendingCount === 0)) {

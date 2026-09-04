@@ -52,6 +52,15 @@ export class UserApiService extends ApiService {
     );
   }
 
+  uploadPlayerPicture(atletaUuid: string, file: File) {
+    const body = new FormData();
+    body.append('file', file, file.name);
+    return this.post<PlayerProfile, FormData>(
+      `${API_ENDPOINTS.users.playerProfiles}/${atletaUuid}/picture`,
+      body,
+    );
+  }
+
   getPlayerAchievements(atletaUuid: string) {
     return this.get<PlayerAchievement[]>(
       `${API_ENDPOINTS.users.playerProfileAchievements}/${atletaUuid}/achievements`,

@@ -108,7 +108,7 @@ export class MatchesApiService extends ApiService {
       params['actorUuid'] = actorUuid;
     }
 
-    return this.put<void, null>(`${API_ENDPOINTS.matches.base}/${matchId}/status`, null, {
+    return this.put<MatchResponse, null>(`${API_ENDPOINTS.matches.base}/${matchId}/status`, null, {
       params,
     });
   }

@@ -1,6 +1,6 @@
 <ion-content class="detail-bg">
   <main class="detail-container">
-    <app-page-nav></app-page-nav>
+    <button type="button" class="detail-back" (click)="onBack()">‹ Volver al equipo</button>
 
     <app-metallic-card title="Perfil de jugador" [titleIconAsset]="titleIconAsset">
       <p class="detail-status" *ngIf="isLoading">Cargando perfil...</p>
@@ -15,7 +15,8 @@
       </section>
 
       <article class="detail-profile" *ngIf="profile as player">
-        <div class="detail-avatar" aria-hidden="true">{{ (player.alias || 'A').charAt(0) }}</div>
+        <img *ngIf="player.pictureUrl" class="detail-avatar detail-avatar--photo" [src]="player.pictureUrl" [alt]="player.alias || 'Jugador'">
+        <div *ngIf="!player.pictureUrl" class="detail-avatar" aria-hidden="true">{{ (player.alias || 'A').charAt(0) }}</div>
         <p class="detail-kicker">Jugador Atleta</p>
         <h1>{{ player.alias || 'Jugador sin alias' }}</h1>
         <dl class="detail-facts">
@@ -37,3 +38,7 @@
     </app-metallic-card>
   </main>
 </ion-content>
+
+<ion-footer class="detail-footer" translucent>
+  <ion-toolbar><app-metallic-bottom-nav [items]="bottomNavItems" (itemSelected)="onNavItemSelected($event)"></app-metallic-bottom-nav></ion-toolbar>
+</ion-footer>

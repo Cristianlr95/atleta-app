@@ -17,7 +17,6 @@ import {
   CompetitionHistoryDisplayItem,
   MetallicCompetitionHistoryComponent,
 } from 'src/app/shared/ui/metallic-competition-history/metallic-competition-history.component';
-import { MetallicFormSectionComponent } from 'src/app/shared/ui/metallic-form-section/metallic-form-section.component';
 import { MetallicStatsComponent, Stat } from 'src/app/shared/ui/metallic-stats/metallic-stats.component';
 import { MatchHistoryViewItem, MatchHistoryService } from '../../services/match-history.service';
 import { PlayerMatchHistoryItem } from '../../models/match.models';
@@ -71,7 +70,6 @@ interface PendingMatchSummary {
     FormsModule,
     IonicModule,
     MetallicCardComponent,
-    MetallicFormSectionComponent,
     MetallicBottomNavComponent,
     MetallicStatsComponent,
     MetallicCompetitionHistoryComponent,
@@ -97,7 +95,6 @@ export class MatchesHubPage implements OnDestroy {
   readonly createIconAsset = `${this.iconBase}/ic_match_create_96.png`;
   readonly filterIconAsset = `${this.iconBase}/ic_action_filter_96.png`;
   readonly openIconAsset = `${this.iconBase}/ic_action_open_match_96.png`;
-  readonly editIconAsset = `${this.iconBase}/ic_action_edit_96.png`;
 
   selectedTab: MatchesTab = 'upcoming';
   isLoading = false;

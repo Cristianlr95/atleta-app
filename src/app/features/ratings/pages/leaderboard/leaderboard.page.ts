@@ -5,9 +5,10 @@ import { IonicModule } from '@ionic/angular';
 import { Subject } from 'rxjs';
 import { finalize, takeUntil } from 'rxjs/operators';
 import { AuthSessionService } from 'src/app/core/services/auth-session.service';
+import { APP_CONFIG } from 'src/app/core/config/app-config.token';
 import { NavigationService } from 'src/app/core/services/navigation.service';
 import { NotificationBadgeService } from 'src/app/features/matches/services/notification-badge.service';
-import { TeamSummary } from 'src/app/features/teams/models/team.models';
+import { TeamExternalRecord, TeamSummary } from 'src/app/features/teams/models/team.models';
 import { TeamApiService } from 'src/app/features/teams/services/team-api.service';
 import { buildMainBottomNav } from 'src/app/shared/navigation/main-bottom-nav';
 import {
@@ -15,7 +16,6 @@ import {
   MetallicBottomNavItem,
 } from 'src/app/shared/ui/metallic-bottom-nav/metallic-bottom-nav.component';
 import { MetallicCardComponent } from 'src/app/shared/ui/metallic-card/metallic-card.component';
-import { MetallicFormSectionComponent } from 'src/app/shared/ui/metallic-form-section/metallic-form-section.component';
 import {
   LeaderboardDisplayRow,
   MetallicLeaderboardComponent,
@@ -23,9 +23,16 @@ import {
 import { MetallicSelectComponent, MetallicSelectOption } from 'src/app/shared/ui/metallic-select/metallic-select.component';
 import { RoleType } from '../../models/rating.models';
 import { LeaderboardService } from '../../services/leaderboard.service';
+import {
+  RANKING_DEMO_RECORD,
+  RANKING_DEMO_ROWS,
+  RANKING_DEMO_TEAM,
+  RANKING_DEMO_TEAM_ID,
+} from './leaderboard-demo.data';
 
 type RankingScope = 'PLATFORM' | 'TEAM';
 type RankingMode = 'OVERALL' | 'ROLE';
+type RankingSort = 'RANK' | 'OVR' | 'MATCHES' | 'NAME';
 
 @Component({
   selector: 'app-leaderboard-page',
@@ -37,7 +44,6 @@ type RankingMode = 'OVERALL' | 'ROLE';
     FormsModule,
     IonicModule,
     MetallicCardComponent,
-    MetallicFormSectionComponent,
     MetallicLeaderboardComponent,
     MetallicBottomNavComponent,
     MetallicSelectComponent,
@@ -49,6 +55,7 @@ export class LeaderboardPage implements OnDestroy {
   private readonly authSessionService = inject(AuthSessionService);
   private readonly navigationService = inject(NavigationService);
   private readonly notificationBadgeService = inject(NotificationBadgeService);
+  private readonly appConfig = inject(APP_CONFIG);
 
   readonly iconBase = 'assets/icons/atleta-raster-v1';
   readonly titleIconAsset = `${this.iconBase}/ic_nav_ranking_96.png`;
@@ -78,11 +85,13 @@ export class LeaderboardPage implements OnDestroy {
   isLoadingByRole = false;
   isLoadingTeams = false;
   isLoadingTeamRows = false;
+  isLoadingTeamRecord = false;
 
   overallError: string | null = null;
   roleError: string | null = null;
   teamsError: string | null = null;
   teamRowsError: string | null = null;
+  teamRecordError: string | null = null;
 
   overallRows: LeaderboardDisplayRow[] = [];
   byRoleRows: LeaderboardDisplayRow[] = [];
@@ -91,6 +100,10 @@ export class LeaderboardPage implements OnDestroy {
   teams: TeamSummary[] = [];
   selectedTeamId: number | null = null;
   currentUserPositionText: string | null = null;
+  teamRecord: TeamExternalRecord | null = null;
+  searchTerm = '';
+  selectedSort: RankingSort = 'RANK';
+  isDemoData = false;
 
   get currentUserId(): string | null {
     return this.authSessionService.currentSession?.user.atletaUuid ?? null;
@@ -112,6 +125,29 @@ export class LeaderboardPage implements OnDestroy {
       return `Ranking ${selected?.label ?? this.selectedRole}`;
     }
     return 'Ranking OVR Global';
+  }
+
+  get usesDevelopmentDemo(): boolean {
+    return this.appConfig.environmentName === 'development' && this.isDemoData;
+  }
+
+  get filteredRows(): LeaderboardDisplayRow[] {
+    const query = this.searchTerm.trim().toLocaleLowerCase();
+    const rows = query
+      ? this.modeRows.filter((row) => `${row.alias} ${row.roleText ?? ''}`.toLocaleLowerCase().includes(query))
+      : [...this.modeRows];
+    return rows.sort((left, right) => {
+      switch (this.selectedSort) {
+        case 'NAME':
+          return left.alias.localeCompare(right.alias, 'es');
+        case 'OVR':
+          return this.ovrValue(right) - this.ovrValue(left);
+        case 'MATCHES':
+          return (right.matchesPlayed ?? 0) - (left.matchesPlayed ?? 0);
+        default:
+          return left.rank - right.rank;
+      }
+    });
   }
 
   get modeLoading(): boolean {
@@ -167,6 +203,7 @@ export class LeaderboardPage implements OnDestroy {
     this.selectedScope = scope;
     if (scope === 'TEAM' && this.selectedTeamId) {
       this.loadTeamLeaderboard(this.selectedTeamId);
+      this.loadTeamExternalRecord(this.selectedTeamId);
       return;
     }
     this.refreshCurrentUserPosition();
@@ -185,9 +222,11 @@ export class LeaderboardPage implements OnDestroy {
     this.selectedTeamId = Number.isFinite(next) ? next : null;
     if (this.selectedTeamId) {
       this.loadTeamLeaderboard(this.selectedTeamId);
+      this.loadTeamExternalRecord(this.selectedTeamId);
       return;
     }
     this.teamRows = [];
+    this.teamRecord = null;
     this.refreshCurrentUserPosition();
   }
 
@@ -199,6 +238,7 @@ export class LeaderboardPage implements OnDestroy {
     if (this.selectedScope === 'TEAM') {
       if (this.selectedTeamId) {
         this.loadTeamLeaderboard(this.selectedTeamId);
+        this.loadTeamExternalRecord(this.selectedTeamId);
       } else {
         this.loadTeams();
       }
@@ -222,10 +262,19 @@ export class LeaderboardPage implements OnDestroy {
       )
       .subscribe({
         next: (rows) => {
-          this.overallRows = rows;
+          this.overallRows = rows.length === 0 && this.canUseDevelopmentDemo()
+            ? [...RANKING_DEMO_ROWS]
+            : rows;
+          this.isDemoData = this.overallRows === RANKING_DEMO_ROWS || (rows.length === 0 && this.canUseDevelopmentDemo());
           this.refreshCurrentUserPosition();
         },
         error: () => {
+          if (this.canUseDevelopmentDemo()) {
+            this.overallRows = [...RANKING_DEMO_ROWS];
+            this.isDemoData = true;
+            this.refreshCurrentUserPosition();
+            return;
+          }
           this.overallError = 'No se pudo cargar el ranking general.';
         },
       });
@@ -242,10 +291,19 @@ export class LeaderboardPage implements OnDestroy {
       )
       .subscribe({
         next: (rows) => {
-          this.byRoleRows = rows;
+          this.byRoleRows = rows.length === 0 && this.canUseDevelopmentDemo()
+            ? RANKING_DEMO_ROWS.filter((row) => this.roleForLabel(row.roleText) === this.selectedRole)
+            : rows;
+          this.isDemoData = this.isDemoData || (rows.length === 0 && this.canUseDevelopmentDemo());
           this.refreshCurrentUserPosition();
         },
         error: () => {
+          if (this.canUseDevelopmentDemo()) {
+            this.byRoleRows = RANKING_DEMO_ROWS.filter((row) => this.roleForLabel(row.roleText) === this.selectedRole);
+            this.isDemoData = true;
+            this.refreshCurrentUserPosition();
+            return;
+          }
           this.roleError = 'No se pudo cargar el ranking por posicion.';
         },
       });
@@ -268,22 +326,37 @@ export class LeaderboardPage implements OnDestroy {
       )
       .subscribe({
         next: (teams) => {
-          this.teams = teams ?? [];
+          const resolvedTeams = teams ?? [];
+          this.teams = resolvedTeams.length === 0 && this.canUseDevelopmentDemo()
+            ? [RANKING_DEMO_TEAM]
+            : resolvedTeams;
+          this.isDemoData = this.isDemoData || (resolvedTeams.length === 0 && this.canUseDevelopmentDemo());
           if (!this.selectedTeamId || !this.teams.some((item) => item.id === this.selectedTeamId)) {
             this.selectedTeamId = this.teams[0]?.id ?? null;
           }
           if (this.selectedTeamId) {
             this.loadTeamLeaderboard(this.selectedTeamId);
+            this.loadTeamExternalRecord(this.selectedTeamId);
             return;
           }
           this.teamRows = [];
+          this.teamRecord = null;
           this.refreshCurrentUserPosition();
         },
         error: () => {
+          if (this.canUseDevelopmentDemo()) {
+            this.teams = [RANKING_DEMO_TEAM];
+            this.selectedTeamId = RANKING_DEMO_TEAM_ID;
+            this.teamRows = [...RANKING_DEMO_ROWS];
+            this.teamRecord = RANKING_DEMO_RECORD;
+            this.isDemoData = true;
+            return;
+          }
           this.teamsError = 'No se pudieron cargar tus equipos.';
           this.teams = [];
           this.selectedTeamId = null;
           this.teamRows = [];
+          this.teamRecord = null;
           this.refreshCurrentUserPosition();
         },
       });
@@ -300,15 +373,73 @@ export class LeaderboardPage implements OnDestroy {
       )
       .subscribe({
         next: (rows) => {
-          this.teamRows = rows;
+          this.teamRows = rows.length === 0 && this.canUseDevelopmentDemo()
+            ? [...RANKING_DEMO_ROWS]
+            : rows;
+          this.isDemoData = this.isDemoData || (rows.length === 0 && this.canUseDevelopmentDemo());
           this.refreshCurrentUserPosition();
         },
         error: () => {
+          if (this.canUseDevelopmentDemo()) {
+            this.teamRows = [...RANKING_DEMO_ROWS];
+            this.isDemoData = true;
+            this.refreshCurrentUserPosition();
+            return;
+          }
           this.teamRowsError = 'No se pudo cargar el ranking del equipo.';
           this.teamRows = [];
           this.refreshCurrentUserPosition();
         },
       });
+  }
+
+  private loadTeamExternalRecord(teamId: number): void {
+    this.isLoadingTeamRecord = true;
+    this.teamRecordError = null;
+    this.teamApiService
+      .getExternalRecord(teamId)
+      .pipe(
+        takeUntil(this.leave$),
+        finalize(() => (this.isLoadingTeamRecord = false)),
+      )
+      .subscribe({
+        next: (record) => {
+          this.teamRecord = record.matchesPlayed === 0 && this.canUseDevelopmentDemo()
+            ? RANKING_DEMO_RECORD
+            : record;
+          this.isDemoData = this.isDemoData || (record.matchesPlayed === 0 && this.canUseDevelopmentDemo());
+        },
+        error: () => {
+          if (this.canUseDevelopmentDemo()) {
+            this.teamRecord = RANKING_DEMO_RECORD;
+            this.isDemoData = true;
+            return;
+          }
+          this.teamRecordError = 'No se pudo cargar el récord competitivo del equipo.';
+          this.teamRecord = null;
+        },
+      });
+  }
+
+  private ovrValue(row: LeaderboardDisplayRow): number {
+    const score = Number.parseFloat(row.scoreText);
+    return Number.isFinite(score) ? score : -1;
+  }
+
+  private canUseDevelopmentDemo(): boolean {
+    return this.appConfig.environmentName === 'development';
+  }
+
+  private roleForLabel(label: string | undefined): RoleType | null {
+    const roles: Record<string, RoleType> = {
+      Ataque: 'ATAQUE',
+      Mediocampo: 'MEDIOCAMPO',
+      Carrilero: 'CARRILERO',
+      Defensa: 'DEFENSA',
+      Arquero: 'ARQUERO',
+      'Dirección técnica': 'DT',
+    };
+    return roles[label ?? ''] ?? null;
   }
 
   private refreshCurrentUserPosition(): void {
