@@ -258,6 +258,40 @@
   font-size: 0.9rem;
 }
 
+.ai-summary {
+  display: grid;
+  gap: 8px;
+  padding: 12px;
+  border-top: 1px solid rgba(0, 214, 232, 0.28);
+}
+
+.ai-summary h4,
+.ai-summary p,
+.ai-summary ul {
+  margin: 0;
+}
+
+.ai-summary h4 {
+  color: #f4f8fb;
+  font-size: 1rem;
+}
+
+.ai-summary ul {
+  display: grid;
+  gap: 4px;
+  padding-left: 18px;
+  color: #b9ced4;
+  font-size: 0.8rem;
+}
+
+.eyebrow {
+  color: #00d6e8;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
 .match-close-footer ion-toolbar {
   --background: rgba(6, 10, 20, 0.92);
   --border-color: transparent;

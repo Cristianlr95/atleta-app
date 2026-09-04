@@ -16,6 +16,7 @@
     byPlayerOrCreator: '/matches/by-player-or-creator',
     join: '/matches/join',
     events: '/matches/events',
+    aiSummary: '/matches',
   },
   ratings: {
     base: '/ratings',

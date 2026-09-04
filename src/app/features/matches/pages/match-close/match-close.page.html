@@ -127,6 +127,16 @@
       <section *ngIf="closedSuccess()" class="success">
         <h3>Partido Finalizado</h3>
         <p>Experiencia aplicada correctamente.</p>
+        <section *ngIf="aiSummary() as summary" class="ai-summary" aria-live="polite">
+          <span class="eyebrow">Resumen del partido</span>
+          <h4>{{ summary.title }}</h4>
+          <p>{{ summary.summary }}</p>
+          <ul>
+            <li *ngFor="let highlight of summary.highlights">{{ highlight }}</li>
+          </ul>
+          <p class="helper-copy">{{ summary.mvpComment }}</p>
+        </section>
+        <p *ngIf="aiSummaryUnavailable()" class="helper-copy">El partido quedó cerrado correctamente. El resumen estará disponible más tarde.</p>
         <app-metallic-button variant="accent" (click)="onOpenMvp()">Ir a Votacion MVP</app-metallic-button>
       </section>
     </app-metallic-card>

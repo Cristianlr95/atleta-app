@@ -13,6 +13,7 @@ import {
   MatchPlayerSummary,
   MatchClosePreviewRequest,
   MatchClosePreviewResponse,
+  MatchAiSummaryResponse,
   MatchResponse,
   RegisterMatchEventRequest,
   RemoveMatchPlayerRequest,
@@ -135,6 +136,13 @@ export class MatchesApiService extends ApiService {
     return this.post<MatchClosePreviewResponse, MatchClosePreviewRequest>(
       `${API_ENDPOINTS.matches.base}/${matchId}/close/preview`,
       payload,
+    );
+  }
+
+  generateAiSummary(matchId: number) {
+    return this.post<MatchAiSummaryResponse, null>(
+      `${API_ENDPOINTS.matches.aiSummary}/${matchId}/ai-summary`,
+      null,
     );
   }
 }

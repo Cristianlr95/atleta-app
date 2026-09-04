@@ -22,6 +22,7 @@ import {
   MatchClosePreviewResponse,
   MatchResponse,
   MatchPlayerSummary,
+  MatchAiSummaryResponse,
   MatchStatus as BackendMatchStatus,
 } from '../../models/match.models';
 import { MatchService } from '../../services/match.service';
@@ -75,6 +76,8 @@ export class MatchClosePage {
   readonly error = signal<string | null>(null);
   readonly closeBlockedReason = signal<string | null>(null);
   readonly closedSuccess = signal(false);
+  readonly aiSummary = signal<MatchAiSummaryResponse | null>(null);
+  readonly aiSummaryUnavailable = signal(false);
 
   readonly routeMatchId = signal('');
   readonly localMatchId = signal('');
@@ -335,9 +338,10 @@ export class MatchClosePage {
     this.saving.set(true);
     try {
       const backendMatchId = this.matchResponse()?.id;
-      if (backendMatchId) {
-        await this.ensureMatchStartedForClose(backendMatchId);
+      if (!backendMatchId) {
+        throw new Error('No se pudo resolver el partido en backend.');
       }
+      await this.ensureMatchStartedForClose(backendMatchId);
 
       for (const player of this.players()) {
         const goalDelta = this.getCount(this.goalCounts(), player.userId) - this.getCount(this.baselineGoalCounts(), player.userId);
@@ -359,6 +363,7 @@ export class MatchClosePage {
       await this.matchService.finishMatch(localMatchId);
       await this.matchStore.refresh(this.routeMatchId(), true);
       this.closedSuccess.set(true);
+      await this.loadAiSummary(backendMatchId);
       await this.appToast.success('Partido finalizado y recompensas aplicadas.');
     } catch (error) {
       await this.appToast.error(this.errorMapper.toUserMessage(error, 'matches'));
@@ -406,6 +411,8 @@ export class MatchClosePage {
     this.error.set(null);
     this.closeBlockedReason.set(null);
     this.closedSuccess.set(false);
+    this.aiSummary.set(null);
+    this.aiSummaryUnavailable.set(false);
     this.step.set(1);
 
     try {
@@ -612,6 +619,15 @@ export class MatchClosePage {
       return 'Este partido ya fue finalizado. No se pueden modificar sus resultados.';
     }
     return null;
+  }
+
+  private async loadAiSummary(matchId: number): Promise<void> {
+    try {
+      this.aiSummary.set(await firstValueFrom(this.matchesApiService.generateAiSummary(matchId)));
+    } catch {
+      // The closing outcome remains valid even when an optional experience is unavailable.
+      this.aiSummaryUnavailable.set(true);
+    }
   }
 }
 

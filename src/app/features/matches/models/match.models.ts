@@ -198,5 +198,15 @@ export interface MatchClosePreviewResponse {
   players: MatchClosePreviewPlayer[];
 }
 
+export interface MatchAiSummaryResponse {
+  matchId: number;
+  promptVersion: string;
+  source: string;
+  title: string;
+  summary: string;
+  highlights: string[];
+  mvpComment: string;
+}
+
 
 
