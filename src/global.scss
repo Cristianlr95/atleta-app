@@ -131,6 +131,9 @@ app-metallic-position-field-picker {
 
 ion-content {
   --color: var(--foreground);
+  // Routed standalone pages place their footer after ion-content in the DOM.
+  // Reserve its height so scrollable content remains reachable.
+  --padding-bottom: calc(env(safe-area-inset-bottom) + 82px);
   font-family: var(--font-family-body);
 }
 
@@ -139,6 +142,12 @@ ion-content::part(background) {
 }
 
 ion-footer {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 1000;
+  pointer-events: auto;
   background: rgba(4, 8, 15, 0.82);
   backdrop-filter: blur(18px);
   border-top: 1px solid rgba(176, 199, 231, 0.18);

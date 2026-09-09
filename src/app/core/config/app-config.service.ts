@@ -4,7 +4,10 @@ import { AppConfig, defaultAppConfig, normalizeAppConfig } from './app-config';
 
 @Injectable({ providedIn: 'root' })
 export class AppConfigService {
-  private config: AppConfig = defaultAppConfig;
+  // Keep this object reference stable. Some providers can be resolved while the
+  // app initializer is loading the runtime configuration; mutating the same
+  // object ensures those providers observe the loaded values.
+  private readonly config: AppConfig = { ...defaultAppConfig };
 
   async load(): Promise<void> {
     const runtimeConfigUrl = new URL(environment.runtimeConfigPath, document.baseURI).toString();
@@ -22,10 +25,10 @@ export class AppConfigService {
       }
 
       const runtimeConfig = (await response.json()) as Partial<AppConfig>;
-      this.config = normalizeAppConfig(runtimeConfig);
+      Object.assign(this.config, normalizeAppConfig(runtimeConfig));
     } catch (error) {
       console.warn('[app-config] Falling back to bundled defaults.', error);
-      this.config = defaultAppConfig;
+      Object.assign(this.config, defaultAppConfig);
     }
   }
 

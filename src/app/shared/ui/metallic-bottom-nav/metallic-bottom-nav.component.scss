@@ -17,11 +17,13 @@
   border-radius: 6px;
   background: #07151c;
   color: #9eafb5;
+  cursor: pointer;
   font-family: var(--font-family-display);
   font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.045em;
   text-transform: uppercase;
+  text-decoration: none;
   transition:
     border-color 150ms ease,
     background 150ms ease,

@@ -2,12 +2,12 @@
   <button
     *ngFor="let item of items"
     type="button"
+    [attr.data-main-nav-route]="routeHref(item.id)"
     class="metallic-bottom-nav__item"
     [attr.aria-label]="item.label"
     [attr.aria-current]="item.active ? 'page' : null"
     [class.metallic-bottom-nav__item--active]="item.active"
-    [class.metallic-bottom-nav__item--cta]="item.variant === 'cta'"
-    (click)="onSelect(item.id)">
+    [class.metallic-bottom-nav__item--cta]="item.variant === 'cta'">
     <img
       [src]="resolveIconAsset(item)"
       class="atleta-game-icon atleta-game-icon--nav atleta-raster-icon"
