@@ -16,11 +16,11 @@
           <div class="player-photo" [class.player-photo--placeholder]="!profilePictureUrl">
             <img *ngIf="profilePictureUrl" [src]="profilePictureUrl" [alt]="'Foto de ' + displayName" />
             <span *ngIf="!profilePictureUrl" aria-hidden="true">{{ displayName.charAt(0) || 'J' }}</span>
-            <button type="button" class="player-photo__edit" [disabled]="isPictureUploading" [attr.aria-label]="isPictureUploading ? 'Subiendo foto' : 'Cambiar foto de perfil'" title="Cambiar foto" (click)="pictureInput.click()">
+            <button *ngIf="uploadsEnabled" type="button" class="player-photo__edit" [disabled]="isPictureUploading" [attr.aria-label]="isPictureUploading ? 'Subiendo foto' : 'Cambiar foto de perfil'" title="Cambiar foto" (click)="pictureInput.click()">
               <img class="atleta-raster-icon" [src]="iconBase + '/ic_action_edit_96.png'" alt="" width="18" height="18" />
             </button>
           </div>
-          <input #pictureInput class="player-photo__input" type="file" accept="image/png,image/jpeg,image/webp" (change)="onPictureSelected($event)" />
+          <input #pictureInput class="player-photo__input" type="file" [disabled]="!uploadsEnabled" accept="image/png,image/jpeg,image/webp" (change)="onPictureSelected($event)" />
           <div class="player-identity"><p class="profile-name">{{ displayName }}</p><p class="profile-alias">{{ displayAlias }}</p></div>
         </div>
 
@@ -31,7 +31,7 @@
             <li *ngIf="playerPositions.length === 0" class="position-priority-list__empty">Sin posiciones definidas</li>
           </ol>
           <button id="ovr-explainer-trigger" type="button" class="ovr-block" aria-label="Ver qué significa OVR">
-            <span>OVR</span><strong>{{ overallHybridOvr ? (overallHybridOvr | number:'1.0-0') : '--' }}</strong>
+            <span>OVR</span><strong>{{ overallHybridOvr !== null ? (overallHybridOvr | number:'1.0-0') : '--' }}</strong>
           </button>
           <ion-popover trigger="ovr-explainer-trigger" side="bottom" alignment="start" show-backdrop="false">
             <ng-template>
@@ -54,9 +54,12 @@
               <p>RESUMEN</p>
               <div><span>ROL DESTACADO</span><strong>{{ roleDisplay(overallBestRole) }}</strong><small *ngIf="overallBestRoleRating">{{ overallBestRoleRating | number:'1.0-0' }}</small></div>
               <div><span>VERSATILIDAD</span><strong>{{ overallVersatilityPercent ?? '--' }}%</strong></div>
-              <div><span>NIVEL GENERAL</span><strong>{{ overallHybridOvr ? (overallHybridOvr | number:'1.0-0') : '--' }}</strong></div>
+              <div><span>NIVEL GENERAL</span><strong>{{ overallHybridOvr !== null ? (overallHybridOvr | number:'1.0-0') : '--' }}</strong></div>
             </aside>
           </div>
+          <dl class="role-stat-values" aria-label="Valores por posición">
+            <div *ngFor="let stat of roleStats"><dt>{{ roleDisplay(stat.role) }}</dt><dd>{{ stat.rating | number:'1.0-0' }}</dd></div>
+          </dl>
         </section>
 
         <section class="player-command-center__competition" aria-label="Competición">

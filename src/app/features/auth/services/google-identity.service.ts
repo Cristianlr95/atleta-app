@@ -37,6 +37,10 @@ export class GoogleIdentityService {
 
   private scriptLoad?: Promise<void>;
 
+  isConfigured(): boolean {
+    return !!this.appConfig.googleClientId?.trim();
+  }
+
   async requestIdToken(): Promise<string> {
     const clientId = this.appConfig.googleClientId;
     if (!clientId) {

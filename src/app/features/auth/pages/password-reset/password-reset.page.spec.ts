@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ActivatedRoute } from '@angular/router';
-import { of } from 'rxjs';
+import { of, throwError } from 'rxjs';
 import { NavigationService } from 'src/app/core/services/navigation.service';
 import { AuthService } from '../../services/auth.service';
 import { PasswordResetPage } from './password-reset.page';
@@ -37,7 +37,17 @@ describe('PasswordResetPage', () => {
     await component.onSubmitRequest();
 
     expect(auth.requestPasswordReset).toHaveBeenCalledOnceWith('demo@atleta.cl');
-    expect(component.message).toContain('Si el correo existe');
+    expect(component.message).toContain('Si hay una cuenta asociada a ese correo');
+    expect(component.message).toContain('spam');
+  });
+
+  it('does not keep an old confirmation when a retry fails', async () => {
+    component.requestForm.setValue({ email: 'demo@atleta.test' });
+    await component.onSubmitRequest();
+    auth.requestPasswordReset.and.returnValue(throwError(() => ({ status: 0 })));
+    await component.onSubmitRequest();
+    expect(component.message).toBeNull();
+    expect(component.error).toContain('No se pudo conectar');
   });
 
   it('prevents mismatched password confirmation', async () => {

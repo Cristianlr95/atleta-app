@@ -32,8 +32,8 @@ export class AuthService {
     );
   }
 
-  register(payload: RegisterAthleteRequest): Observable<AuthenticatedUser> {
-    return this.authApiService.registerAthlete(payload).pipe(map((response) => this.toUser(response)));
+  register(payload: RegisterAthleteRequest, invitationCode?: string): Observable<AuthenticatedUser> {
+    return this.authApiService.registerAthlete(payload, invitationCode).pipe(map((response) => this.toUser(response)));
   }
 
   async logout(): Promise<void> {

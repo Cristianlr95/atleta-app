@@ -41,7 +41,7 @@ export class HomePage {
 
   readonly iconBase = 'assets/icons/atleta-raster-v1';
   readonly titleIconAsset = `${this.iconBase}/ic_nav_home_96.png`;
-  readonly teamIconAsset = `${this.iconBase}/ic_team_96.png`;
+  readonly teamIconAsset = `${this.iconBase}/ic_match_teams_96.png`;
 
   isLoading = false;
   nextMatchLabel = 'Sin partido agendado';
@@ -51,6 +51,7 @@ export class HomePage {
 
   playerName = 'Jugador';
   playerLevel = 1;
+  overallHybridOvr: number | null = null;
   divisionLabel = 'Bronce IV';
   streakValue = 0;
   totalXp = 0;
@@ -108,6 +109,7 @@ export class HomePage {
     })
       .pipe(finalize(() => (this.isLoading = false)))
       .subscribe(async ({ overall, history, teams }) => {
+        this.overallHybridOvr = overall?.hybridOVR ?? null;
         await this.invitationsStore.loadPendingInvitations();
         void this.notificationBadgeService.refresh();
 

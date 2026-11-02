@@ -15,8 +15,8 @@ for (const fileName of envFiles) {
 }
 
 const resolvedEnv = {
-  ...process.env,
   ...loadedEnv,
+  ...process.env,
 };
 
 validateNoSensitiveFrontendEnv(resolvedEnv);
@@ -26,6 +26,7 @@ const runtimeConfig = {
   storagePrefix: resolveStoragePrefix(mode, resolvedEnv.ATLETA_STORAGE_PREFIX),
   environmentName: resolvedEnv.ATLETA_ENV_NAME?.trim() || mode,
   googleClientId: resolveOptionalPublicId(resolvedEnv.ATLETA_GOOGLE_CLIENT_ID),
+  uploadsEnabled: resolveUploadsEnabled(resolvedEnv.ATLETA_UPLOADS_ENABLED),
 };
 
 const outputDir = path.join(rootDir, 'src', 'assets');
@@ -92,6 +93,7 @@ function validateNoSensitiveFrontendEnv(env) {
       'ATLETA_ENV_NAME',
       'ATLETA_APP_ENV',
       'ATLETA_GOOGLE_CLIENT_ID',
+      'ATLETA_UPLOADS_ENABLED',
     ].includes(key),
   );
 
@@ -133,4 +135,12 @@ function resolveStoragePrefix(mode, value) {
 function resolveOptionalPublicId(value) {
   const normalized = value?.trim();
   return normalized || undefined;
+}
+
+function resolveUploadsEnabled(value) {
+  if (value === undefined) return resolvedEnv.ATLETA_ENV_NAME?.trim() !== 'beta';
+  if (!['true', 'false'].includes(value.trim())) {
+    throw new Error('ATLETA_UPLOADS_ENABLED must be true or false.');
+  }
+  return value.trim() === 'true';
 }

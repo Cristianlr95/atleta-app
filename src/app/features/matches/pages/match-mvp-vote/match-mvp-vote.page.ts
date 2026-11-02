@@ -52,7 +52,7 @@ export class MatchMvpVotePage implements OnDestroy {
   readonly votingProcessing = signal<string | null>(null);
 
   readonly resource = computed(() => this.mvpVoteStore.getStateSnapshot(this.routeMatchId()));
-  readonly loading = computed(() => this.resource().loading);
+  readonly loading = computed(() => this.resource().loading && !this.resource().data);
   readonly loadError = computed(() => this.resource().error);
   readonly state = computed(() => this.resource().data);
   readonly candidates = computed(() => this.state()?.candidates ?? []);
@@ -170,8 +170,11 @@ export class MatchMvpVotePage implements OnDestroy {
     }
 
     this.countdownSub = interval(1000)
-      .pipe(startWith(0))
-      .subscribe(() => {
+      .pipe(startWith(-1))
+      .subscribe((tickIndex) => {
+        if (tickIndex >= 0 && (tickIndex + 1) % 5 === 0 && this.isOpen()) {
+          void this.mvpVoteStore.refresh(this.routeMatchId(), true);
+        }
         const ms = new Date(closesAt).getTime() - Date.now();
         if (ms <= 0) {
           this.remainingLabel.set('00:00:00');

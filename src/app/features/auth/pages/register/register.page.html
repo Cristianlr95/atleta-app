@@ -8,39 +8,54 @@
           description="Completa los campos para registrarte en Atleta.">
           <app-metallic-input
             formControlName="nombre"
+            [invalid]="isControlInvalid('nombre')"
+            [describedBy]="(isControlInvalid('nombre')) ? 'register-nombre-error' : null"
             label="Nombre completo"
             type="text"
             placeholder="Juan Perez">
           </app-metallic-input>
-          <p *ngIf="hasControlError('nombre', 'required')" class="register-message register-message--error">
+          <p id="register-nombre-error" role="alert" *ngIf="hasControlError('nombre', 'required')" class="register-message register-message--error">
             El nombre es obligatorio.
           </p>
-          <p *ngIf="hasControlError('nombre', 'maxlength')" class="register-message register-message--error">
+          <p id="register-nombre-error" role="alert" *ngIf="hasControlError('nombre', 'maxlength')" class="register-message register-message--error">
             El nombre no puede superar 100 caracteres.
           </p>
 
           <app-metallic-input
             formControlName="email"
+            [invalid]="isControlInvalid('email')"
+            [describedBy]="(isControlInvalid('email')) ? 'register-email-error' : null"
             label="Email"
             type="email"
             placeholder="tu@email.com">
           </app-metallic-input>
-          <p *ngIf="hasControlError('email', 'required')" class="register-message register-message--error">
+          <p id="register-email-error" role="alert" *ngIf="hasControlError('email', 'required')" class="register-message register-message--error">
             El email es obligatorio.
           </p>
-          <p *ngIf="hasControlError('email', 'email')" class="register-message register-message--error">
+          <p id="register-email-error" role="alert" *ngIf="hasControlError('email', 'email')" class="register-message register-message--error">
             Ingresa un email válido.
           </p>
 
           <app-metallic-select
             formControlName="genero"
+            [invalid]="isControlInvalid('genero')"
+            [describedBy]="(isControlInvalid('genero')) ? 'register-genero-error' : null"
             label="Genero"
             placeholder="Selecciona genero"
             [options]="genderOptions">
           </app-metallic-select>
-          <p *ngIf="hasControlError('genero', 'required')" class="register-message register-message--error">
+          <p id="register-genero-error" role="alert" *ngIf="hasControlError('genero', 'required')" class="register-message register-message--error">
             Debes seleccionar genero.
           </p>
+          <ng-container *ngIf="isBeta">
+            <app-metallic-input formControlName="invitationCode" label="Código de invitación"
+              type="password" [invalid]="isControlInvalid('invitationCode')"
+              [describedBy]="isControlInvalid('invitationCode') ? 'register-invitation-error' : null">
+            </app-metallic-input>
+            <p id="register-invitation-error" role="alert" *ngIf="hasControlError('invitationCode', 'required')" class="register-message register-message--error">
+              Ingresa el código de invitación.
+            </p>
+          </ng-container>
         </app-metallic-form-section>
 
         <app-metallic-form-section
@@ -49,39 +64,43 @@
           description="Tu contraseña debe tener entre 8 y 100 caracteres.">
           <app-metallic-input
             formControlName="password"
+            [invalid]="isControlInvalid('password')"
+            [describedBy]="(isControlInvalid('password')) ? 'register-password-error' : null"
             label="Contraseña"
             type="password"
             placeholder="••••••••"
             allowPasswordToggle>
           </app-metallic-input>
-          <p *ngIf="hasControlError('password', 'required')" class="register-message register-message--error">
+          <p id="register-password-error" role="alert" *ngIf="hasControlError('password', 'required')" class="register-message register-message--error">
             La contraseña es obligatoria.
           </p>
-          <p *ngIf="hasControlError('password', 'minlength')" class="register-message register-message--error">
+          <p id="register-password-error" role="alert" *ngIf="hasControlError('password', 'minlength')" class="register-message register-message--error">
             La contraseña debe tener al menos 8 caracteres.
           </p>
-          <p *ngIf="hasControlError('password', 'maxlength')" class="register-message register-message--error">
+          <p id="register-password-error" role="alert" *ngIf="hasControlError('password', 'maxlength')" class="register-message register-message--error">
             La contraseña no puede superar 100 caracteres.
           </p>
 
           <app-metallic-input
             formControlName="confirmPassword"
+            [invalid]="isControlInvalid('confirmPassword') || hasPasswordMismatch"
+            [describedBy]="(isControlInvalid('confirmPassword') || hasPasswordMismatch) ? 'register-confirmPassword-error' : null"
             label="Confirmar contraseña"
             type="password"
             placeholder="••••••••"
             allowPasswordToggle>
           </app-metallic-input>
-          <p *ngIf="hasControlError('confirmPassword', 'required')" class="register-message register-message--error">
+          <p id="register-confirmPassword-error" role="alert" *ngIf="hasControlError('confirmPassword', 'required')" class="register-message register-message--error">
             Debes confirmar la contraseña.
           </p>
         </app-metallic-form-section>
 
-        <p *ngIf="hasPasswordMismatch" class="register-message register-message--error">
+        <p id="register-confirmPassword-error" role="alert" *ngIf="hasPasswordMismatch" class="register-message register-message--error">
           Las contraseñas no coinciden.
         </p>
 
-        <p *ngIf="registerError" class="register-message register-message--error">{{ registerError }}</p>
-        <p *ngIf="registerSuccess" class="register-message register-message--success">{{ registerSuccess }}</p>
+        <p role="alert" *ngIf="registerError" class="register-message register-message--error">{{ registerError }}</p>
+        <p role="status" *ngIf="registerSuccess" class="register-message register-message--success">{{ registerSuccess }}</p>
 
         <app-metallic-button
           class="register-submit"

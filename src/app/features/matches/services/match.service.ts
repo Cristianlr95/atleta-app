@@ -87,6 +87,7 @@ export class MatchService {
       creatorUuid,
       creatorName,
       type: input.type,
+      rotativeGoalkeeper: input.rotativeGoalkeeper ?? false,
       modality: input.modality,
       genderCategory: input.genderCategory,
       status: MatchStatus.CREATED,
@@ -135,6 +136,7 @@ export class MatchService {
               creadorUuid: session.user.atletaUuid,
               modalidad: draft.modality,
               matchType: draft.type,
+              rotativeGoalkeeper: draft.rotativeGoalkeeper ?? false,
               categoriaGenero: draft.genderCategory,
               fechaHoraProgramada: this.toApiLocalDateTime(draft.scheduledAt),
               latitud: draft.latitude,
@@ -154,6 +156,7 @@ export class MatchService {
 
       const updatedDraft: Match = {
         ...draft,
+        rotativeGoalkeeper: result.match.rotativeGoalkeeper ?? draft.rotativeGoalkeeper ?? false,
         creationIdempotencyKey: idempotencyKey,
         backendMatchId: result.match.id,
         invitedCount: inviteTargets.size,
@@ -425,11 +428,6 @@ export class MatchService {
 
     this.upsertMatch({ ...match, status: nextStatus, invitedCount: nextInvitedCount });
 
-    if (changed && nextStatus === MatchStatus.PARTIAL_CONFIRMATIONS) {
-      const missing = Math.max(match.minRequired - accepted, 0);
-      void this.notificationService.notifyAlmostReady(missing);
-    }
-
     if (changed && nextStatus === MatchStatus.CONFIRMED) {
       void this.notificationService.notifyMatchConfirmed();
     }
@@ -661,6 +659,7 @@ export class MatchService {
       creatorName:
         response.creador?.alias ?? captain?.alias ?? existingMatch?.creatorName ?? session?.user.nombre ?? 'Organizador',
       type: resolvedType,
+      rotativeGoalkeeper: response.rotativeGoalkeeper ?? false,
       modality: response.modalidad as MatchSize,
       genderCategory: (response.categoriaGenero as MatchGenderCategory) ?? MatchGenderCategory.MIXED,
       status: this.mapBackendStatus(response.estado, response.fechaHoraProgramada),

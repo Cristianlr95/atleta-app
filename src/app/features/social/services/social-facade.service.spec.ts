@@ -1,17 +1,26 @@
 import { signal } from '@angular/core';
+import { of } from 'rxjs';
 import { TestBed } from '@angular/core/testing';
 import { AuthSessionService } from 'src/app/core/services/auth-session.service';
 import { ErrorMapperService } from 'src/app/core/services/error-mapper.service';
 import { MatchStore } from 'src/app/features/matches/stores/match.store';
+import { PlayerMatchHistoryItem } from 'src/app/features/matches/models/match.models';
+import { MatchesApiService } from 'src/app/features/matches/services/matches-api.service';
 import { ActivityService } from '../activity/services/activity.service';
 import { SocialFacadeService } from './social-facade.service';
 
 describe('SocialFacadeService', () => {
   let activityService: jasmine.SpyObj<ActivityService>;
   let facade: SocialFacadeService;
+  let matchesApi: jasmine.SpyObj<MatchesApiService>;
+  let matchStore: jasmine.SpyObj<MatchStore>;
 
   beforeEach(() => {
     activityService = buildActivityServiceMock();
+    matchesApi = jasmine.createSpyObj<MatchesApiService>('MatchesApiService', ['getByPlayerOrCreator']);
+    matchesApi.getByPlayerOrCreator.and.returnValue(of([]));
+    matchStore = jasmine.createSpyObj<MatchStore>('MatchStore', ['optimisticPatchByBackendMatchId', 'refreshByBackendMatchId', 'refresh']);
+    matchStore.refresh.and.resolveTo(null);
     TestBed.configureTestingModule({
       providers: [
         SocialFacadeService,
@@ -28,11 +37,9 @@ describe('SocialFacadeService', () => {
         },
         {
           provide: MatchStore,
-          useValue: {
-            optimisticPatchByBackendMatchId: jasmine.createSpy('optimisticPatchByBackendMatchId'),
-            refreshByBackendMatchId: jasmine.createSpy('refreshByBackendMatchId').and.resolveTo(),
-          } as unknown as MatchStore,
+          useValue: matchStore,
         },
+        { provide: MatchesApiService, useValue: matchesApi },
         {
           provide: ErrorMapperService,
           useValue: {
@@ -42,6 +49,29 @@ describe('SocialFacadeService', () => {
       ],
     });
     facade = TestBed.inject(SocialFacadeService);
+  });
+
+  it('shows full and live matches but not partial or finished matches', async () => {
+    const full = { id: 12, estado: 'CREADO', modalidad: 'CINCO_VS_CINCO', fechaHoraProgramada: '2030-01-01T12:00:00', players: Array.from({ length: 10 }, () => ({ confirmado: true })) };
+    const partial = { ...full, id: 13, players: full.players.slice(0, 2) };
+    const live = { ...partial, id: 14, estado: 'INICIADO' };
+    const finished = { ...full, id: 15, estado: 'FINALIZADO' };
+    matchesApi.getByPlayerOrCreator.and.returnValue(of([full, partial, live, finished] as unknown as PlayerMatchHistoryItem[]));
+
+    await facade.initialize();
+
+    expect(matchesApi.getByPlayerOrCreator).toHaveBeenCalledOnceWith('me');
+    expect(facade.confirmedMatches().map(match => match.id)).toEqual([12, 14]);
+    expect(matchStore.refresh).not.toHaveBeenCalled();
+  });
+
+  it('loads a large list of full matches', async () => {
+    const matches = Array.from({ length: 20 }, (_, index) => ({ id: index + 1, estado: 'CREADO', modalidad: 'CINCO_VS_CINCO', fechaHoraProgramada: '2030-01-01T12:00:00', players: Array.from({ length: 10 }, () => ({ confirmado: true })) })) as unknown as PlayerMatchHistoryItem[];
+    matchesApi.getByPlayerOrCreator.and.returnValue(of(matches));
+    await facade.initialize();
+    expect(matchesApi.getByPlayerOrCreator).toHaveBeenCalledTimes(1);
+    expect(facade.confirmedMatches().length).toBe(20);
+    expect(matchStore.refresh).not.toHaveBeenCalled();
   });
 
   it('clears stale friend candidates when search fails', async () => {

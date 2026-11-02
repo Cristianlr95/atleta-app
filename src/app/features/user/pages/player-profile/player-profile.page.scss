@@ -162,10 +162,10 @@
 .stats-layout { display: grid; grid-template-columns: minmax(0, 1fr) minmax(116px, .62fr); align-items: stretch; gap: 10px; }
 .player-command-center__stats app-metallic-role-hexagon { display: block; min-width: 0; }
 .stats-insights { display: grid; align-content: start; gap: 7px; padding-left: 10px; border-left: 1px solid rgba(0, 215, 245, .22); }
-.stats-insights > p { margin: 0 0 2px; color: var(--tactical-visit); font: 700 10px var(--font-family-display); letter-spacing: .1em; }
+.stats-insights > p { margin: 0 0 2px; color: var(--tactical-visit); font: 700 12px var(--font-family-display); letter-spacing: .1em; }
 .stats-insights > div { display: grid; gap: 2px; padding-bottom: 7px; border-bottom: 1px solid rgba(122, 138, 160, .22); }
-.stats-insights span { color: var(--text-muted); font: 700 9px var(--font-family-display); letter-spacing: .07em; }
-.stats-insights strong { color: var(--text-primary); font: 700 14px/1.05 var(--font-family-display); }
+.stats-insights span { color: var(--text-muted); font: 700 12px/1.4 var(--font-family-body); letter-spacing: .03em; }
+.stats-insights strong { color: var(--text-primary); font: 700 16px/1.3 var(--font-family-body); }
 .stats-insights small { color: var(--tactical-local); font: 700 12px var(--font-family-display); }
 .player-command-center__competition { display: grid; align-content: start; gap: 8px; }
 .competition-metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 5px 12px; }
@@ -476,19 +476,24 @@
 }
 
 @media (max-width: 520px) {
-  .player-command-center { grid-template-columns: 112px minmax(0, 1fr); grid-template-areas: "identity roles" "stats stats" "competition competition"; gap: 8px; padding: 4px 0; }
-  .player-command-center__identity { align-content: start; gap: 6px; padding-inline: 3px; }
-  .player-command-center__roles { padding-left: 12px; border-top: 0; border-left: 1px solid rgba(0, 215, 245, .32); }
+  .player-command-center { grid-template-columns: minmax(0, 1fr); grid-template-areas: "identity" "roles" "stats" "competition"; gap: 8px; padding: 4px 0; }
+  .player-command-center__identity { grid-template-columns: 82px minmax(0, 1fr); align-items: center; justify-items: start; text-align: left; gap: 14px; }
+
   .player-photo { width: 82px; height: 98px; }
   .profile-name { font-size: 16px; }
   .profile-alias { font-size: 13px; }
   .player-command-center__roles,
   .player-command-center__stats,
   .player-command-center__competition { border-top: 1px solid rgba(0, 215, 245, .2); border-left: 0; }
-  .player-command-center__roles { border-top: 0; border-left: 1px solid rgba(0, 215, 245, .32); }
+
   .player-command-center__stats { margin-top: 10px; padding-top: 16px; border-top-color: rgba(0, 215, 245, .4); }
-  .stats-layout { grid-template-columns: minmax(0, 1fr) 112px; gap: 7px; }
-  .stats-insights { padding-left: 8px; }
+  .stats-layout { grid-template-columns: minmax(0, 1fr); gap: 14px; }
+  .stats-insights { padding: 0; border-left: 0; }
+  .stats-insights span { font: 14px/1.4 var(--font-family-body); }
+  .stats-insights strong { font-size: 17px; line-height: 1.3; }
+  .position-priority-list { display: flex; flex-wrap: wrap; gap: 10px; }
+  .position-priority-list li { display: flex; align-items: center; gap: 6px; font-size: 15px; line-height: 1.4; }
+  .position-priority-list strong { overflow-wrap: normal; }
   .achievement-grid { grid-template-columns: 1fr; }
   .profile-team__head {
     grid-template-columns: 1fr;
@@ -562,3 +567,8 @@
     font-size: 15px;
   }
 }
+
+.role-stat-values { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px 14px; margin: 0; font: 14px/1.4 var(--font-family-body); }
+.role-stat-values div { display: flex; justify-content: space-between; gap: 6px; }
+.role-stat-values dt { color: var(--text-secondary); }
+.role-stat-values dd { margin: 0; color: var(--tactical-local); font-weight: 700; }

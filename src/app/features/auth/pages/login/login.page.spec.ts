@@ -25,6 +25,7 @@ describe('LoginPage', () => {
     authService.login.and.returnValue(of(buildSession()));
     authService.loginWithGoogleIdToken.and.returnValue(of(buildSession()));
     googleIdentityService.requestIdToken.and.resolveTo('google-id-token');
+    Object.assign(googleIdentityService, { isConfigured: () => true });
     router.navigate.and.resolveTo(true);
 
     await TestBed.configureTestingModule({
@@ -62,6 +63,12 @@ describe('LoginPage', () => {
 
   it('should create', () => {
     expect(component).toBeTruthy();
+  });
+
+  it('hides the Google sign-in option when this environment has no client ID', () => {
+    Object.assign(googleIdentityService, { isConfigured: () => false });
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelector('.login-google')).toBeNull();
   });
 
   it('authenticates with Google credential and navigates home', async () => {

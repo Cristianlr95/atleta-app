@@ -17,8 +17,6 @@
 }
 
 .wizard-back { align-self:flex-start; margin:0 0 10px; padding:5px 0; border:0; background:transparent; color:var(--tactical-visit); font-family:var(--font-family-display); font-size:12px; font-weight:700; text-transform:uppercase; cursor:pointer; }
-.wizard-intro { display:flex; justify-content:space-between; align-items:flex-start; gap:14px; padding-bottom:12px; border-bottom:1px solid rgba(112,159,166,.28); }.wizard-intro span { color:var(--tactical-visit); font-family:var(--font-family-display); font-size:11px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; }.wizard-intro p { margin:3px 0 0; color:var(--text-muted); font-size:13px; }.wizard-intro strong { color:var(--tactical-local); font-family:var(--font-family-display); font-size:20px; }
-.wizard-steps { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); margin:0 0 14px; border-bottom:1px solid rgba(112,159,166,.28); }.wizard-steps span { display:grid; justify-items:center; gap:4px; padding:10px 2px 8px; border-bottom:2px solid transparent; color:var(--text-muted); }.wizard-steps i { display:grid; place-items:center; width:19px; height:19px; border:1px solid currentColor; border-radius:50%; font:700 11px var(--font-family-body); font-style:normal; }.wizard-steps b { font-family:var(--font-family-display); font-size:10px; text-transform:uppercase; }.wizard-steps__item--active { color:var(--tactical-local)!important; border-color:var(--tactical-local)!important; }.wizard-steps__item--complete { color:var(--tactical-visit)!important; }
 
 .wizard-section-divider {
   margin: 18px 0 12px;
@@ -45,7 +43,7 @@
 }
 
 .wizard-actions {
-  margin: 0 0 14px;
+  margin: 16px 0 0;
   display: flex;
   justify-content: flex-end;
   gap: 8px;
@@ -72,5 +70,7 @@
 }
 
 .matches-create-footer ion-toolbar { --background:rgba(2,9,13,.96); --border-color:var(--tactical-line); padding:6px 8px calc(env(safe-area-inset-bottom) + 8px); }
-@media (max-width:420px) { .wizard-steps b { font-size:9px; }.matches-create-container { padding-inline:10px; } }
+@media (max-width:420px) { .matches-create-container { padding-inline:10px; } }
 
+
+.wizard-progress { margin: 0 0 16px; color: var(--tactical-visit); font-size: 16px; font-weight: 700; }

@@ -71,6 +71,7 @@ interface CompetitionSummary extends OutcomeSummary {
 export class PlayerProfilePage implements OnDestroy {
   private readonly authSessionService = inject(AuthSessionService);
   private readonly appConfig = inject(APP_CONFIG);
+  readonly uploadsEnabled = this.appConfig.uploadsEnabled !== false;
   private readonly userApiService = inject(UserApiService);
   private readonly ratingsApiService = inject(RatingsApiService);
   private readonly matchHistoryService = inject(MatchHistoryService);

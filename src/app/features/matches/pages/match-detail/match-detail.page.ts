@@ -234,7 +234,10 @@ export class MatchDetailPage implements OnDestroy {
       return null;
     }
 
-    const kickoffRaw = match.startedAt ?? match.scheduledAt;
+    const kickoffRaw = match.startedAt;
+    if (!kickoffRaw) {
+      return null;
+    }
     const kickoffAt = new Date(kickoffRaw).getTime();
     if (!Number.isFinite(kickoffAt)) {
       return null;
@@ -247,12 +250,8 @@ export class MatchDetailPage implements OnDestroy {
       return false;
     }
 
-    if (this.match()?.closePending) {
-      return true;
-    }
-
     const closeAvailableAt = this.closeAvailableAt();
-    return closeAvailableAt !== null && this.now() >= closeAvailableAt;
+    return closeAvailableAt !== null && this.now() >= closeAvailableAt && this.now() <= closeAvailableAt + 2 * 60 * 60 * 1000;
   });
   readonly closeMatchMessage = computed(() => {
     if (!this.isCreator() || this.isFinalized()) {
@@ -272,6 +271,9 @@ export class MatchDetailPage implements OnDestroy {
       return 'El cierre se habilita 1 hora después del inicio del partido.';
     }
 
+    if (this.now() > closeAvailableAt + 2 * 60 * 60 * 1000) {
+      return 'La ventana de cierre de 3 horas ha vencido.';
+    }
     return `Podrás cerrar el partido desde las ${this.formatCloseTime(closeAvailableAt)}.`;
   });
   readonly canOpenMvpVote = computed(() => {

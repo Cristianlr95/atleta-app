@@ -29,18 +29,19 @@
           {{ isSubmitting ? 'Ingresando...' : 'Iniciar sesión' }}
         </app-metallic-button>
 
-        <p *ngIf="authError" class="login-error">{{ authError }}</p>
-        <p *ngIf="authNotice" class="login-notice">{{ authNotice }}</p>
+        <p role="alert" *ngIf="authError" class="login-error">{{ authError }}</p>
+        <p role="status" *ngIf="authNotice" class="login-notice">{{ authNotice }}</p>
 
         <button type="button" class="login-link" [disabled]="isSubmitting" (click)="onForgotPassword()">
           ¿Olvidaste tu contraseña?
         </button>
 
-        <div class="login-divider" aria-hidden="true">
+        <div *ngIf="googleAvailable" class="login-divider" aria-hidden="true">
           <span>o</span>
         </div>
 
         <app-metallic-button
+          *ngIf="googleAvailable"
           class="login-google"
           type="button"
           variant="secondary"

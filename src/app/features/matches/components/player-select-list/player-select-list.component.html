@@ -15,7 +15,7 @@
       <p>{{ player.name }}</p>
       <span>OVR {{ player.ovr ?? 65 }} | {{ player.position }}</span>
     </div>
-    <ion-checkbox [checked]="isSelected(player.uuid)" (ionChange)="onToggle(player.uuid, !!$event.detail.checked)"></ion-checkbox>
+    <ion-checkbox [attr.aria-label]="'Invitar a ' + player.name" [checked]="isSelected(player.uuid)" (ionChange)="onToggle(player.uuid, !!$event.detail.checked)"></ion-checkbox>
   </label>
 </div>
 

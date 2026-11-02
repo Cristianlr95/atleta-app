@@ -24,7 +24,7 @@
       </section>
 
       <section class="home-metrics" aria-label="Resumen de rendimiento">
-        <div class="home-metric"><span>OVR</span><strong>{{ playerLevel * 5 }}</strong></div>
+        <div class="home-metric"><span>OVR</span><strong>{{ overallHybridOvr !== null ? (overallHybridOvr | number:'1.0-0') : '--' }}</strong></div>
         <div class="home-metric"><span>Invitaciones</span><strong>{{ pendingInvitations() }}</strong></div>
         <div class="home-metric"><span>XP total</span><strong>{{ totalXp }}</strong></div>
       </section>
