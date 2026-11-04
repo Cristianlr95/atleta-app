@@ -4,6 +4,7 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Observable, of } from 'rxjs';
 import { finalize, map, switchMap } from 'rxjs/operators';
 import { ApiError } from 'src/app/core/models/api-error.model';
+import { APP_CONFIG } from 'src/app/core/config/app-config.token';
 import { AuthSessionService } from 'src/app/core/services/auth-session.service';
 import { TeamSummary } from '../../models/team.models';
 import { TeamApiService } from '../../services/team-api.service';
@@ -18,6 +19,7 @@ import { MetallicInputComponent } from 'src/app/shared/ui/metallic-input/metalli
   styleUrls: ['./team-creator.component.scss'],
 })
 export class TeamCreatorComponent {
+  readonly uploadsEnabled = inject(APP_CONFIG).uploadsEnabled !== false;
   private readonly formBuilder = inject(FormBuilder);
   private readonly authSessionService = inject(AuthSessionService);
   private readonly teamApiService = inject(TeamApiService);

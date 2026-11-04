@@ -20,4 +20,11 @@ describe('MetallicInputComponent', () => {
   it('should create', () => {
     expect(component).toBeTruthy();
   });
+
+  it('associates its visible label with the native input', () => {
+    component.label = 'Email';
+    fixture.detectChanges();
+    const input: HTMLInputElement = fixture.nativeElement.querySelector('input');
+    expect(input.labels?.[0]?.textContent?.trim()).toBe('Email');
+  });
 });

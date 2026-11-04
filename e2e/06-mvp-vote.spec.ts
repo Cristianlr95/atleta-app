@@ -2,7 +2,6 @@ import { expect, test } from '@playwright/test';
 import {
   apiLogin,
   getMatchMvp,
-  voteMatchMvp,
 } from './helpers/api-helpers';
 import { loadFinalizedMatchId, loadSmokeUsers } from './helpers/env';
 import { loginWithUi } from './helpers/ui-helpers';
@@ -24,13 +23,15 @@ test.describe('Smoke 06 - MVP vote after match close', () => {
     expect(mvpState.candidates.length).toBeGreaterThan(0);
 
     const votedUserId = mvpState.candidates[0].userId;
-    const voteResult = await voteMatchMvp(invited, finalizedMatchId!, votedUserId);
-    expect(voteResult.myVote).toBe(votedUserId);
+    expect(mvpState.myVote).toBeFalsy();
 
     await loginWithUi(page, users!.userB);
     await page.goto(`/matches/${finalizedMatchId}/mvp-vote`);
 
     await expect(page.getByRole('heading', { name: 'Jugador del Partido' })).toBeVisible();
+    await page.locator('app-player-vote-card').first().getByRole('button', { name: 'Votar' }).click();
     await expect(page.getByRole('button', { name: 'Votado' })).toBeVisible();
+    const voteResult = await getMatchMvp(invited, finalizedMatchId!);
+    expect(voteResult.myVote).toBe(votedUserId);
   });
 });

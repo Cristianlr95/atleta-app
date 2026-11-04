@@ -1,8 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { signal } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { MatchStatus } from 'src/app/features/matches/models/progressive-match.models';
-import { MatchService } from 'src/app/features/matches/services/match.service';
 import { NotificationBadgeService } from 'src/app/features/matches/services/notification-badge.service';
 import { NavigationService } from 'src/app/core/services/navigation.service';
 import { SocialFacadeService, SocialTabId } from '../services/social-facade.service';
@@ -57,27 +55,6 @@ describe('SocialPage', () => {
         {
           provide: NotificationBadgeService,
           useValue: notificationBadgeService,
-        },
-        {
-          provide: MatchService,
-          useValue: {
-            activeMatches: signal([
-              {
-                id: 'local-10',
-                backendMatchId: 10,
-                status: MatchStatus.CONFIRMED,
-                scheduledAt: '2026-05-05T20:00:00',
-                team: { name: 'Rojo' },
-              },
-              {
-                id: 'local-11',
-                backendMatchId: 11,
-                status: MatchStatus.FINISHED,
-                scheduledAt: '2026-05-06T20:00:00',
-                team: { name: 'Azul' },
-              },
-            ]),
-          },
         },
       ],
     }).compileComponents();
@@ -199,6 +176,7 @@ function buildSocialFacadeMock() {
     friendships: signal([]).asReadonly(),
     teamInvites: signal([]).asReadonly(),
     matchInvites: signal([]).asReadonly(),
+    confirmedMatches: signal([{ id: 10, title: 'Rojo confirmado', scheduledAt: '2026-05-05T20:00:00' }]).asReadonly(),
     pendingFriends: signal([]).asReadonly(),
     pendingTeamInvites: signal([]).asReadonly(),
     pendingMatchInvites: signal([]).asReadonly(),

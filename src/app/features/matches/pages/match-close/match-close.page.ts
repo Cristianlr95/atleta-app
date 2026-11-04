@@ -1,4 +1,4 @@
-﻿import { CommonModule } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { Component, computed, effect, inject, signal, viewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { IonicModule } from '@ionic/angular';
@@ -16,19 +16,18 @@ import {
 import { MetallicCardComponent } from 'src/app/shared/ui/metallic-card/metallic-card.component';
 import { MatchSummaryCardComponent, TeamEventSummary } from '../../components/match-summary-card/match-summary-card.component';
 import { ScoreEditorComponent } from '../../components/score-editor/score-editor.component';
-import { MatchState } from '../../models/match-state.models';
 import { XpRewardCardComponent, XpRewardItem } from '../../components/xp-reward-card/xp-reward-card.component';
 import {
   MatchClosePreviewResponse,
   MatchResponse,
   MatchPlayerSummary,
   MatchAiSummaryResponse,
-  MatchStatus as BackendMatchStatus,
 } from '../../models/match.models';
 import { MatchService } from '../../services/match.service';
 import { MatchesApiService } from '../../services/matches-api.service';
 import { NotificationBadgeService } from '../../services/notification-badge.service';
 import { MatchStore } from '../../stores/match.store';
+import { getMatchCloseBlockedReason } from '../../utils/match-close-window.util';
 
 interface ClosePlayerOption {
   userId: string;
@@ -153,9 +152,6 @@ export class MatchClosePage {
       ? this.players().map((player) => {
           const preview = this.closePreview()?.players.find((item) => item.playerUuid === player.userId);
           const totalXp = preview?.estimatedXp ?? 0;
-          const fromLevel = Math.max(1, Math.floor(40 / 10));
-          const toLevel = Math.max(fromLevel, Math.floor((40 + totalXp) / 10));
-          const progress = Math.min(100, ((40 + totalXp) % 10) * 10);
 
           return {
             id: player.userId,
@@ -163,9 +159,6 @@ export class MatchClosePage {
             position: player.position,
             xp: totalXp,
             currentOvr: preview?.currentHybridOvr ?? null,
-            fromLevel,
-            toLevel,
-            progressPercent: progress,
           };
         })
       : this.players().map((player) => {
@@ -174,9 +167,6 @@ export class MatchClosePage {
       const result = this.resultXpFor(player.teamLabel);
       const goalXp = goals * this.goalXpByPosition(player.position);
       const totalXp = base + result + goalXp;
-      const fromLevel = Math.max(1, Math.floor(40 / 10));
-      const toLevel = Math.max(fromLevel, Math.floor((40 + totalXp) / 10));
-      const progress = Math.min(100, ((40 + totalXp) % 10) * 10);
 
       return {
         id: player.userId,
@@ -184,9 +174,6 @@ export class MatchClosePage {
         position: player.position,
         xp: totalXp,
         currentOvr: null,
-        fromLevel,
-        toLevel,
-        progressPercent: progress,
       };
     })),
   );
@@ -341,7 +328,7 @@ export class MatchClosePage {
       if (!backendMatchId) {
         throw new Error('No se pudo resolver el partido en backend.');
       }
-      await this.ensureMatchStartedForClose(backendMatchId);
+      await this.validateMatchForClose(backendMatchId);
 
       for (const player of this.players()) {
         const goalDelta = this.getCount(this.goalCounts(), player.userId) - this.getCount(this.baselineGoalCounts(), player.userId);
@@ -372,28 +359,12 @@ export class MatchClosePage {
     }
   }
 
-  private async ensureMatchStartedForClose(backendMatchId: number): Promise<void> {
-    const actorUuid = this.authSessionService.currentSession?.user?.atletaUuid;
-    if (!actorUuid) {
-      throw new Error('Sesion no disponible para iniciar el partido.');
-    }
-
+  private async validateMatchForClose(backendMatchId: number): Promise<void> {
     const latest = await firstValueFrom(this.matchesApiService.getById(backendMatchId));
-    const status = latest.estado as BackendMatchStatus;
-
-    if (status === 'INICIADO') {
-      return;
+    const reason = getMatchCloseBlockedReason(latest);
+    if (reason) {
+      throw new Error(reason);
     }
-
-    if (status === 'FINALIZADO') {
-      throw new Error('El partido ya fue finalizado.');
-    }
-
-    if (status === 'INVALIDO') {
-      throw new Error('El partido esta marcado como invalido y no puede cerrarse.');
-    }
-
-    await firstValueFrom(this.matchesApiService.updateMatchStatus(backendMatchId, 'INICIADO', actorUuid));
   }
 
   trackByPlayerId(_index: number, item: ClosePlayerOption): string {
@@ -448,7 +419,7 @@ export class MatchClosePage {
         this.awayName.set(`${baseTeamName} Visita`);
       }
 
-      const playerOptions = this.buildPlayers(response.players ?? [], state);
+      const playerOptions = this.buildPlayers(response.players ?? []);
       this.players.set(playerOptions);
 
       const initialGoalCounts = this.buildInitialGoalCounts(response);
@@ -467,73 +438,24 @@ export class MatchClosePage {
     }
   }
 
-  private buildPlayers(players: MatchPlayerSummary[], storeState: MatchState): ClosePlayerOption[] {
-    const localTeamId = this.matchResponse()?.matchTeams?.find((item) => item.esLocal)?.team?.id;
-    const awayTeamId = this.matchResponse()?.matchTeams?.find((item) => !item.esLocal)?.team?.id;
-    const responsePlayersByUuid = new Map(
-      (players ?? [])
-        .filter((item) => !!item.player?.atletaUuid)
-        .map((item) => [item.player!.atletaUuid, item] as const),
-    );
+  private buildPlayers(players: MatchPlayerSummary[]): ClosePlayerOption[] {
+    const teams = this.matchResponse()?.matchTeams ?? [];
     const seen = new Set<string>();
-
-    const fromAssignedTeams = [
-      ...storeState.match.homePlayers
-        .map((player) => {
-          const responsePlayer = responsePlayersByUuid.get(player.uuid);
-          return {
-            userId: player.uuid,
-            name: responsePlayer?.player?.alias ?? player.name ?? 'Jugador',
-            teamId: localTeamId ?? responsePlayer?.team?.id ?? player.teamId,
-            teamLabel: 'LOCAL' as const,
-            position: responsePlayer?.position?.nombre ?? player.position ?? 'Sin posicion',
-          };
-        }),
-      ...storeState.match.awayPlayers
-        .map((player) => {
-          const responsePlayer = responsePlayersByUuid.get(player.uuid);
-          return {
-            userId: player.uuid,
-            name: responsePlayer?.player?.alias ?? player.name ?? 'Jugador',
-            teamId: awayTeamId ?? responsePlayer?.team?.id ?? player.teamId,
-            teamLabel: 'VISITA' as const,
-            position: responsePlayer?.position?.nombre ?? player.position ?? 'Sin posicion',
-          };
-        }),
-    ].filter((item) => {
-      if (seen.has(item.userId)) {
+    return players.filter(player => {
+      const uuid = player.player?.atletaUuid;
+      if (!player.confirmado || !uuid || seen.has(uuid)) {
         return false;
       }
-      seen.add(item.userId);
+      seen.add(uuid);
       return true;
-    });
-
-    if (fromAssignedTeams.length > 0) {
-      return fromAssignedTeams;
-    }
-
-    const fallbackFromParticipants = storeState.confirmedParticipants.map((participant, index) => ({
-      userId: participant.userId,
-      name: participant.name || `Jugador ${index + 1}`,
-      teamId: participant.teamSide === 'AWAY' ? awayTeamId : localTeamId,
-      teamLabel:
-        participant.teamSide === 'AWAY'
-          ? ('VISITA' as const)
-          : ('LOCAL' as const),
-      position: participant.position ?? responsePlayersByUuid.get(participant.userId)?.position?.nombre ?? 'Sin posicion',
+    }).map(player => ({
+      userId: player.player!.atletaUuid,
+      name: player.player!.alias || 'Jugador',
+      teamId: player.team?.id,
+      teamLabel: player.teamSide ?? (teams.find(team => team.team?.id === player.team?.id)?.esLocal === false ? 'VISITA' : 'LOCAL'),
+      position: player.position?.nombre ?? 'Sin posicion',
     }));
-
-    const uniqueFallback = fallbackFromParticipants.filter((item) => {
-      if (seen.has(item.userId)) {
-        return false;
-      }
-      seen.add(item.userId);
-      return true;
-    });
-
-    return uniqueFallback;
   }
-
   private buildInitialGoalCounts(response: MatchResponse): Record<string, number> {
     const counts: Record<string, number> = {};
     for (const event of response.events ?? []) {
@@ -612,13 +534,7 @@ export class MatchClosePage {
   }
 
   private getCloseBlockedReason(response: MatchResponse): string | null {
-    if (response.estado === 'INVALIDO') {
-      return response.validationReason || 'Este partido fue invalidado y no puede cerrarse.';
-    }
-    if (response.estado === 'FINALIZADO') {
-      return 'Este partido ya fue finalizado. No se pueden modificar sus resultados.';
-    }
-    return null;
+    return getMatchCloseBlockedReason(response);
   }
 
   private async loadAiSummary(matchId: number): Promise<void> {

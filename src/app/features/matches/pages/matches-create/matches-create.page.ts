@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, ViewChild, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { IonicModule } from '@ionic/angular';
+import { IonicModule, IonContent } from '@ionic/angular';
 import { Router } from '@angular/router';
 import { AppToastService } from 'src/app/core/services/app-toast.service';
 import { ErrorMapperService } from 'src/app/core/services/error-mapper.service';
@@ -43,6 +43,7 @@ import { firstValueFrom } from 'rxjs';
   styleUrls: ['./matches-create.page.scss'],
 })
 export class MatchesCreatePage {
+  @ViewChild(IonContent) private content?: IonContent;
   private readonly authSessionService = inject(AuthSessionService);
   private readonly teamApiService = inject(TeamApiService);
   readonly matchService = inject(MatchService);
@@ -71,6 +72,11 @@ export class MatchesCreatePage {
   private loadTeamsInFlight: Promise<void> | null = null;
 
   readonly selectedMatchType = signal<MatchType | null>(null);
+  readonly rotativeGoalkeeper = signal(false);
+  readonly goalkeeperOptions: MetallicSelectOption[] = [
+    { label: 'Arquero fijo', value: 'fixed' },
+    { label: 'Arquero rotativo', value: 'rotative' },
+  ];
   readonly schedule = signal<MatchScheduleValue>({
     teamId: null,
     modality: MatchSize.FIVE_VS_FIVE,
@@ -156,6 +162,7 @@ export class MatchesCreatePage {
 
   onPrevious(): void {
     this.step.update((current) => Math.max(1, current - 1));
+    void this.content?.scrollToTop(0);
   }
 
   async onContinue(): Promise<void> {
@@ -171,6 +178,7 @@ export class MatchesCreatePage {
     }
 
     this.step.update((current) => Math.min(this.totalSteps, current + 1));
+    await this.content?.scrollToTop(0);
   }
 
   onScheduleChange(value: MatchScheduleValue): void {
@@ -184,7 +192,8 @@ export class MatchesCreatePage {
   }
 
   onSelectionChange(playerIds: string[]): void {
-    this.selectedPlayerIds.set(playerIds);
+    const creatorUuid = this.authSessionService.currentSession?.user.atletaUuid;
+    this.selectedPlayerIds.set([...new Set(playerIds)].filter((uuid) => uuid !== creatorUuid));
   }
 
   onKitColorChange(team: 'home' | 'away', color: string): void {
@@ -250,6 +259,7 @@ export class MatchesCreatePage {
     const selectedPlayers = this.teamPlayers().filter((player) => this.selectedPlayerIds().includes(player.uuid));
     const draft = this.matchService.createDraft({
       type,
+      rotativeGoalkeeper: this.rotativeGoalkeeper(),
       modality: value.modality,
       genderCategory: value.genderCategory,
       team: { id: team.id, name: team.nombre },
@@ -400,7 +410,8 @@ export class MatchesCreatePage {
     this.loadPlayersError.set(null);
     try {
       const members = await firstValueFrom(this.teamApiService.getActiveMembers(teamId));
-      const players = members.map((member) => ({
+      const creatorUuid = this.authSessionService.currentSession?.user.atletaUuid;
+      const players = members.filter((member) => member.playerUuid !== creatorUuid).map((member) => ({
         uuid: member.playerUuid,
         name: member.alias,
         position: member.primaryPositionName ?? 'Sin posición',

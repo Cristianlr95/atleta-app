@@ -11,16 +11,16 @@
       <p *ngIf="isLoading" class="profile-message profile-message--info">Actualizando estadísticas...</p>
       <p *ngIf="errorMessage" class="profile-message profile-message--warning">{{ errorMessage }}</p>
 
-      <section class="player-command-center" aria-label="Resumen competitivo del jugador">
+      <section *ngIf="!isLoading" class="player-command-center" aria-label="Resumen competitivo del jugador">
         <div class="player-command-center__identity">
           <div class="player-photo" [class.player-photo--placeholder]="!profilePictureUrl">
             <img *ngIf="profilePictureUrl" [src]="profilePictureUrl" [alt]="'Foto de ' + displayName" />
             <span *ngIf="!profilePictureUrl" aria-hidden="true">{{ displayName.charAt(0) || 'J' }}</span>
-            <button type="button" class="player-photo__edit" [disabled]="isPictureUploading" [attr.aria-label]="isPictureUploading ? 'Subiendo foto' : 'Cambiar foto de perfil'" title="Cambiar foto" (click)="pictureInput.click()">
+            <button *ngIf="uploadsEnabled" type="button" class="player-photo__edit" [disabled]="isPictureUploading" [attr.aria-label]="isPictureUploading ? 'Subiendo foto' : 'Cambiar foto de perfil'" title="Cambiar foto" (click)="pictureInput.click()">
               <img class="atleta-raster-icon" [src]="iconBase + '/ic_action_edit_96.png'" alt="" width="18" height="18" />
             </button>
           </div>
-          <input #pictureInput class="player-photo__input" type="file" accept="image/png,image/jpeg,image/webp" (change)="onPictureSelected($event)" />
+          <input #pictureInput class="player-photo__input" type="file" [disabled]="!uploadsEnabled" accept="image/png,image/jpeg,image/webp" (change)="onPictureSelected($event)" />
           <div class="player-identity"><p class="profile-name">{{ displayName }}</p><p class="profile-alias">{{ displayAlias }}</p></div>
         </div>
 
@@ -31,7 +31,7 @@
             <li *ngIf="playerPositions.length === 0" class="position-priority-list__empty">Sin posiciones definidas</li>
           </ol>
           <button id="ovr-explainer-trigger" type="button" class="ovr-block" aria-label="Ver qué significa OVR">
-            <span>OVR</span><strong>{{ overallHybridOvr ? (overallHybridOvr | number:'1.0-0') : '--' }}</strong>
+            <span>OVR</span><strong>{{ overallHybridOvr !== null ? (overallHybridOvr | number:'1.0-0') : '--' }}</strong>
           </button>
           <ion-popover trigger="ovr-explainer-trigger" side="bottom" alignment="start" show-backdrop="false">
             <ng-template>
@@ -48,20 +48,25 @@
 
         <section class="player-command-center__stats" aria-label="Estadísticas por rol">
           <p class="section-kicker">STATS</p>
-          <div class="stats-layout">
+          <p *ngIf="!isLoading && roleStats.length === 0" class="profile-message">No hay estadísticas por posición disponibles.</p>
+          <div class="stats-layout" *ngIf="roleStats.length > 0">
             <app-metallic-role-hexagon [stats]="roleStats" [compact]="true" [showSummary]="false" [showClassification]="false" [overallValue]="overallHybridOvr" [overallClassificationLabel]="overallText" [versatilityValue]="overallVersatilityPercent" [bestRoleOverride]="overallBestRole" [bestRoleRatingOverride]="overallBestRoleRating" [subtitle]="'Perfil por posición'"></app-metallic-role-hexagon>
             <aside class="stats-insights" aria-label="Resumen de habilidades">
               <p>RESUMEN</p>
               <div><span>ROL DESTACADO</span><strong>{{ roleDisplay(overallBestRole) }}</strong><small *ngIf="overallBestRoleRating">{{ overallBestRoleRating | number:'1.0-0' }}</small></div>
               <div><span>VERSATILIDAD</span><strong>{{ overallVersatilityPercent ?? '--' }}%</strong></div>
-              <div><span>NIVEL GENERAL</span><strong>{{ overallHybridOvr ? (overallHybridOvr | number:'1.0-0') : '--' }}</strong></div>
+              <div><span>NIVEL GENERAL</span><strong>{{ overallHybridOvr !== null ? (overallHybridOvr | number:'1.0-0') : '--' }}</strong></div>
             </aside>
           </div>
+          <dl class="role-stat-values" aria-label="Valores por posición">
+            <div *ngFor="let stat of roleStats"><dt>{{ roleDisplay(stat.role) }}</dt><dd>{{ stat.rating | number:'1.0-0' }}</dd></div>
+          </dl>
         </section>
 
         <section class="player-command-center__competition" aria-label="Competición">
           <p class="section-kicker">COMPETICIÓN</p>
-          <div class="competition-metrics">
+          <p *ngIf="historyUnavailable" class="profile-message profile-message--warning" role="status">No se pudieron cargar las estadísticas de competición.</p>
+          <div *ngIf="!historyUnavailable" class="competition-metrics">
             <div><span>PARTIDOS</span><strong>{{ competition.matches }}</strong></div>
             <div><span>GOLES</span><strong>{{ competition.goals }}</strong></div>
             <div><span>ASISTENCIAS</span><strong>{{ competition.assists }}</strong></div>
@@ -71,7 +76,8 @@
         </section>
       </section>
 
-      <app-metallic-form-section title="Trofeos y metas" [titleIconAsset]="achievementsSectionIconAsset" description="Tus medallas activas y el próximo objetivo competitivo.">
+      <app-metallic-form-section *ngIf="!isLoading" title="Trofeos y metas" [titleIconAsset]="achievementsSectionIconAsset" description="Tus medallas activas y el próximo objetivo competitivo.">
+        <p *ngIf="!isLoading && achievements.length === 0" class="profile-message">No hay trofeos disponibles.</p>
         <div class="achievement-grid" aria-label="Trofeos competitivos">
           <article *ngFor="let achievement of achievements" class="achievement-card" [class.achievement-card--locked]="!achievement.unlocked" [class.achievement-card--bronze]="achievement.tier === 'BRONZE'" [class.achievement-card--silver]="achievement.tier === 'SILVER'" [class.achievement-card--gold]="achievement.tier === 'GOLD'">
             <img class="achievement-card__icon atleta-raster-icon" [src]="achievementIconAsset(achievement.code)" alt="" />
@@ -80,18 +86,18 @@
         </div>
       </app-metallic-form-section>
 
-      <app-metallic-form-section title="Gestionar equipos" [titleIconAsset]="teamsSectionIconAsset" description="Consulta integrantes, invitaciones y administración de tus equipos.">
+      <app-metallic-form-section *ngIf="!isLoading" title="Gestionar equipos" [titleIconAsset]="teamsSectionIconAsset" description="Consulta integrantes, invitaciones y administración de tus equipos.">
         <div *ngIf="memberTeams.length > 0; else noTeams" class="profile-teams">
           <div class="profile-team" *ngFor="let team of memberTeams">
             <div class="profile-team__head">
               <img *ngIf="team.logoUrl" class="profile-team__logo" [src]="team.logoUrl" [alt]="'Logo ' + team.nombre" />
               <div class="profile-team__meta"><p class="profile-team__name">{{ team.nombre }}</p><p class="profile-team__detail" *ngIf="team.anioFundacion">Fundado: {{ team.anioFundacion }}</p></div>
-              <div class="profile-team__actions"><button type="button" class="profile-team__btn profile-team__btn--icon" (click)="toggleTeamAccordion(team.id)">{{ isTeamExpanded(team.id) ? 'Ocultar' : 'Ver' }}</button><button type="button" class="profile-team__btn" *ngIf="isTeamCreator(team)" (click)="toggleTeamAccordion(team.id)">+ Gestionar</button><button type="button" class="profile-team__btn profile-team__btn--danger" *ngIf="isTeamCreator(team)" (click)="onDeleteTeam(team)">Eliminar</button></div>
+              <div class="profile-team__actions"><button type="button" class="profile-team__btn profile-team__btn--icon" [attr.aria-expanded]="isTeamExpanded(team.id)" [attr.aria-label]="(isTeamExpanded(team.id) ? 'Ocultar integrantes de ' : 'Ver integrantes de ') + team.nombre" (click)="toggleTeamAccordion(team.id)">{{ isTeamExpanded(team.id) ? 'Ocultar' : 'Ver integrantes' }}</button><button type="button" class="profile-team__btn profile-team__btn--danger" *ngIf="isTeamCreator(team)" (click)="onDeleteTeam(team)">Eliminar</button></div>
             </div>
             <div class="profile-team-invite" *ngIf="isTeamExpanded(team.id)">
               <p class="profile-team-invite__title">Participantes y nivel del equipo</p><p class="profile-message profile-message--info" *ngIf="teamMembersLoading">Cargando miembros...</p><p class="profile-message profile-message--warning" *ngIf="teamMembersError">{{ teamMembersError }}</p>
               <div class="profile-team-members" *ngIf="!teamMembersLoading && teamMembers.length > 0"><div class="profile-team-members__item" *ngFor="let member of teamMembers"><div><p>{{ member.alias }}</p><small *ngIf="member.primaryPositionName">{{ member.primaryPositionName }}</small></div><div class="profile-team-members__right"><span>{{ memberRoleLabel(member.rol) }}</span><span>{{ memberOvrLabel(member.ovr) }}</span></div></div></div>
-              <ng-container *ngIf="isTeamCreator(team)"><p class="profile-team-invite__subtitle">Invitar jugador</p><input type="text" class="profile-team-invite__input" [ngModel]="inviteQuery" (ngModelChange)="onInviteQueryChange($event)" placeholder="Buscar por alias, nombre o email" /><p class="profile-message profile-message--info" *ngIf="inviteLoading">Buscando jugadores...</p><div class="profile-team-invite__list" *ngIf="inviteCandidates.length > 0"><div class="profile-team-invite__item" *ngFor="let player of inviteCandidates"><div class="profile-team-invite__meta"><p>{{ player.alias || player.athleteName || player.atletaUuid }}</p><small *ngIf="player.athleteEmail">{{ player.athleteEmail }}</small></div><button type="button" class="profile-team__btn" [disabled]="inviteSendingUuid === player.atletaUuid" (click)="onSendTeamInvite(player.atletaUuid)">{{ inviteSendingUuid === player.atletaUuid ? 'Enviando...' : 'Invitar' }}</button></div></div></ng-container>
+              <ng-container *ngIf="isTeamCreator(team)"><p class="profile-team-invite__subtitle">Invitar jugador</p><input type="text" aria-label="Buscar jugadores para invitar" class="profile-team-invite__input" [ngModel]="inviteQuery" (ngModelChange)="onInviteQueryChange($event)" placeholder="Buscar por alias, nombre o email" /><p class="profile-message profile-message--info" *ngIf="inviteLoading">Buscando jugadores...</p><div class="profile-team-invite__list" *ngIf="inviteCandidates.length > 0"><div class="profile-team-invite__item" *ngFor="let player of inviteCandidates"><div class="profile-team-invite__meta"><p>{{ player.alias || player.athleteName || player.atletaUuid }}</p><small *ngIf="player.athleteEmail">{{ player.athleteEmail }}</small></div><button type="button" class="profile-team__btn" [disabled]="inviteSendingUuid === player.atletaUuid" (click)="onSendTeamInvite(player.atletaUuid)">{{ inviteSendingUuid === player.atletaUuid ? 'Enviando...' : 'Invitar' }}</button></div></div></ng-container>
             </div>
           </div>
         </div>

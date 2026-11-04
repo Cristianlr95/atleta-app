@@ -27,7 +27,7 @@ export class PublicPlayerDetailPage implements OnDestroy {
   private readonly notificationBadgeService = inject(NotificationBadgeService);
   private readonly destroy$ = new Subject<void>();
 
-  readonly titleIconAsset = 'assets/icons/atleta/ic_nav_profile_24.svg';
+  readonly titleIconAsset = 'assets/icons/atleta-raster-v1/ic_nav_profile_96.png';
   profile: PlayerProfile | null = null;
   isLoading = false;
   errorMessage: string | null = null;

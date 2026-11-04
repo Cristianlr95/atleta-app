@@ -110,6 +110,7 @@ export interface Match {
   creatorUuid: string;
   creatorName: string;
   type: MatchType;
+  rotativeGoalkeeper?: boolean;
   modality: MatchSize;
   genderCategory: MatchGenderCategory;
   status: MatchStatus;
@@ -145,6 +146,7 @@ export interface Match {
 
 export interface MatchDraftInput {
   type: MatchType;
+  rotativeGoalkeeper?: boolean;
   modality: MatchSize;
   genderCategory: MatchGenderCategory;
   team: Team;

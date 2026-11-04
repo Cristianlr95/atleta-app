@@ -2,6 +2,8 @@
 import { Component, Input, forwardRef } from '@angular/core';
 import { ControlValueAccessor, FormsModule, NG_VALUE_ACCESSOR } from '@angular/forms';
 
+let nextSelectId = 0;
+
 export interface MetallicSelectOption {
   label: string;
   value: string;
@@ -22,6 +24,9 @@ export interface MetallicSelectOption {
   ],
 })
 export class MetallicSelectComponent implements ControlValueAccessor {
+  readonly selectId = `metallic-select-${nextSelectId++}`;
+  @Input() invalid = false;
+  @Input() describedBy: string | null = null;
   @Input() label?: string;
   @Input() placeholder = 'Selecciona una opción';
   @Input() options: readonly MetallicSelectOption[] = [];

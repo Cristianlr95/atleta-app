@@ -23,6 +23,13 @@ describe('MetallicBottomNavComponent', () => {
     expect(component).toBeTruthy();
   });
 
+  it('activates a destination through the native button click', () => {
+    let selected = '';
+    component.itemSelected.subscribe((id) => selected = id);
+    fixture.nativeElement.querySelector('button').click();
+    expect(selected).toBe('profile');
+  });
+
   it('marks the active item as the current page', () => {
     component.items = [
       { id: 'home', label: 'Inicio', icon: '', active: true },
@@ -37,7 +44,7 @@ describe('MetallicBottomNavComponent', () => {
     expect(activeButton?.getAttribute('aria-current')).toBe('page');
   });
 
-  it('does not emit when tapping the active item', () => {
+  it('allows the active section to open its root from a detail page', () => {
     spyOn(component.itemSelected, 'emit');
     component.items = [
       { id: 'home', label: 'Inicio', icon: '', active: true },
@@ -46,7 +53,7 @@ describe('MetallicBottomNavComponent', () => {
 
     component.onSelect('home');
 
-    expect(component.itemSelected.emit).not.toHaveBeenCalled();
+    expect(component.itemSelected.emit).toHaveBeenCalledOnceWith('home');
   });
 
   it('renders pending badge with an accessible label', () => {

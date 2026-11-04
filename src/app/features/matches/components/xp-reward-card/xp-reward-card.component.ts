@@ -1,4 +1,4 @@
-﻿import { CommonModule } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { Component, Input } from '@angular/core';
 import { IonicModule } from '@ionic/angular';
 
@@ -8,9 +8,6 @@ export interface XpRewardItem {
   position: string;
   xp: number;
   currentOvr?: number | null;
-  fromLevel: number;
-  toLevel: number;
-  progressPercent: number;
 }
 
 @Component({
@@ -21,7 +18,6 @@ export interface XpRewardItem {
   styleUrls: ['./xp-reward-card.component.scss'],
 })
 export class XpRewardCardComponent {
-  readonly levelUpIconAsset = 'assets/icons/atleta-raster-v1/ic_comp_level_up_96.png';
   @Input() rewards: XpRewardItem[] = [];
 
   trackByRewardId(_index: number, item: XpRewardItem): string {

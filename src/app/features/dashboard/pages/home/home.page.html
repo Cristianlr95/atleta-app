@@ -1,12 +1,16 @@
-﻿<ion-content class="home-bg">
+<ion-content class="home-bg">
   <div class="home-container">
-    <app-metallic-card title="Inicio competitivo" [titleIconAsset]="titleIconAsset">
+    <app-metallic-card>
+      <header class="home-brand">
+        <img src="assets/brand/atleta-app-icon-v1.png" alt="" />
+        <div><span>ATLETA</span><h1>Inicio competitivo</h1></div>
+      </header>
       <section class="home-overview">
         <div class="home-identity">
           <div class="home-avatar">{{ playerName.charAt(0) }}</div>
           <div class="home-identity__meta">
             <p class="home-name">{{ playerName }}</p>
-            <p class="home-subtitle">Nivel {{ playerLevel }} · {{ divisionLabel }}</p>
+            <p class="home-subtitle">Jugador de Atleta</p>
             <p class="home-streak">{{ streakValue }} partidos consecutivos</p>
           </div>
         </div>
@@ -17,26 +21,22 @@
         </button>
       </section>
 
+      <section class="home-metrics" aria-label="Resumen de rendimiento">
+        <div class="home-metric"><span>OVR</span><strong>{{ overallHybridOvr !== null ? (overallHybridOvr | number:'1.0-0') : '--' }}</strong></div>
+        <div class="home-metric"><span>Invitaciones</span><strong>{{ pendingInvitations() }}</strong></div>
+        <div class="home-metric"><span>XP total</span><strong>--</strong></div>
+      </section>
+
       <section class="home-priority" [class.home-priority--empty]="nextMatchStatus === 'NONE'">
-        <div class="home-priority__label">Próximo en cancha</div>
+        <div class="home-priority__label">En cancha</div>
         <div><p class="home-status-card__title">{{ nextMatchLabel }}</p><p class="home-status-card__detail">{{ nextMatchDetail }}</p></div>
         <button type="button" class="home-priority__cta" (click)="onOpenMatches()">Ver partidos</button>
       </section>
 
-      <section class="home-metrics" aria-label="Resumen de rendimiento">
-        <div class="home-metric"><span>OVR</span><strong>{{ playerLevel * 5 }}</strong></div>
-        <div class="home-metric"><span>Invitaciones</span><strong>{{ pendingInvitations() }}</strong></div>
-        <div class="home-metric"><span>XP total</span><strong>{{ totalXp }}</strong></div>
-      </section>
-
-      <section class="home-progress">
-        <div class="home-progress__heading"><span>Progreso de nivel</span><strong>{{ xpProgressPercent }}%</strong></div>
-        <div class="home-xp__track"><div class="home-xp__fill" [style.width.%]="xpProgressPercent"></div></div>
-        <p class="home-hint">{{ xpHint }}</p>
-      </section>
+      <section class="home-progress"><p class="home-hint">XP y nivel no disponibles.</p></section>
 
       <section class="home-activity">
-        <div class="home-activity__heading"><span>Actividad reciente</span><button type="button" (click)="onOpenMatches()">Ver historial</button></div>
+        <div class="home-activity__heading"><span>Actividad reciente</span><button type="button" (click)="onOpenHistory()">Ver historial</button></div>
         <p *ngIf="isLoading" class="home-loading">Actualizando actividad...</p>
         <div class="home-feed"><article class="home-feed__item" *ngFor="let item of activities" [attr.data-variant]="item.variant">{{ item.text }}</article></div>
       </section>

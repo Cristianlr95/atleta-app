@@ -1,5 +1,5 @@
 ﻿import { Injectable, inject } from '@angular/core';
-import { catchError, firstValueFrom, of, timeout } from 'rxjs';
+import { firstValueFrom, timeout } from 'rxjs';
 import { CreateFieldLocationRequest, FieldLocation } from 'src/app/features/fields/models/field-location.models';
 import { FieldLocationsApiService } from 'src/app/features/fields/services/field-locations-api.service';
 import { Venue } from '../models/progressive-match.models';
@@ -30,7 +30,7 @@ export class VenueService {
   }
 
   async getVenueById(id: number): Promise<Venue | null> {
-    const fields = await this.fetchFieldsSafe();
+    const fields = await this.fetchFieldsSafe().catch(() => []);
     const found = fields.find((field) => field.id === id);
     return found ? this.mapFieldToVenue(found) : null;
   }
@@ -40,7 +40,7 @@ export class VenueService {
       return null;
     }
 
-    const fields = await this.fetchFieldsSafe();
+    const fields = await this.fetchFieldsSafe().catch(() => []);
     if (fields.length === 0) {
       return null;
     }
@@ -97,7 +97,6 @@ export class VenueService {
     this.inFlightFields = firstValueFrom(
       this.fieldLocationsApiService.getFieldLocations(undefined, true).pipe(
         timeout(this.requestTimeoutMs),
-        catchError(() => of([] as FieldLocation[])),
       ),
     )
       .then((fields) => {

@@ -1,4 +1,4 @@
-﻿import { CommonModule } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { Component, OnDestroy, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
@@ -71,6 +71,7 @@ interface CompetitionSummary extends OutcomeSummary {
 export class PlayerProfilePage implements OnDestroy {
   private readonly authSessionService = inject(AuthSessionService);
   private readonly appConfig = inject(APP_CONFIG);
+  readonly uploadsEnabled = this.appConfig.uploadsEnabled !== false;
   private readonly userApiService = inject(UserApiService);
   private readonly ratingsApiService = inject(RatingsApiService);
   private readonly matchHistoryService = inject(MatchHistoryService);
@@ -101,6 +102,7 @@ export class PlayerProfilePage implements OnDestroy {
   }
 
   isLoading = false;
+  historyUnavailable = false;
   errorMessage: string | null = null;
 
   displayName = 'Jugador';
@@ -115,8 +117,8 @@ export class PlayerProfilePage implements OnDestroy {
   isPictureUploading = false;
   competition: CompetitionSummary = { matches: 0, goals: 0, assists: 0, wins: 0, draws: 0, losses: 0, total: 0 };
 
-  roleStats: HexagonRoleStat[] = this.demoHexagon();
-  achievements: PlayerAchievement[] = this.demoAchievements();
+  roleStats: HexagonRoleStat[] = [];
+  achievements: PlayerAchievement[] = [];
   playerPositions: PlayerPositionDisplay[] = [];
   memberTeams: TeamSummary[] = [];
   expandedTeamId: number | null = null;
@@ -298,8 +300,9 @@ export class PlayerProfilePage implements OnDestroy {
     const session = this.authSessionService.currentSession;
 
     if (!session) {
-      this.errorMessage = 'Mostrando datos de demostración. Inicia sesión para ver tus estadísticas reales.';
-      this.applyDemo();
+      this.errorMessage = 'Inicia sesión para ver tus estadísticas.';
+      this.roleStats = [];
+      this.achievements = [];
       return;
     }
 
@@ -310,12 +313,13 @@ export class PlayerProfilePage implements OnDestroy {
       this.errorMessage = null;
     }
 
+    this.historyUnavailable = false;
     forkJoin({
       profile: this.userApiService.getPlayerProfile(atletaUuid).pipe(catchError(() => of(null))),
       achievements: this.userApiService.getPlayerAchievements(atletaUuid).pipe(catchError(() => of([] as PlayerAchievement[]))),
       overall: this.ratingsApiService.getOverall(atletaUuid).pipe(catchError(() => of(null))),
       ratings: this.ratingsApiService.getByRole(atletaUuid).pipe(catchError(() => of([]))),
-      history: this.matchHistoryService.getPlayerHistory(atletaUuid).pipe(catchError(() => of([]))),
+      history: this.matchHistoryService.getPlayerHistory(atletaUuid).pipe(catchError(() => { this.historyUnavailable = true; return of([]); })),
       teams: this.teamApiService.getByPlayer(atletaUuid).pipe(catchError(() => of([] as TeamSummary[]))),
       positions: this.userApiService
         .getPlayerPositions(atletaUuid)
@@ -336,7 +340,7 @@ export class PlayerProfilePage implements OnDestroy {
           teams,
           positions,
         );
-        this.achievements = achievements.length > 0 ? achievements : this.demoAchievements();
+        this.achievements = achievements;
         if (this.expandedTeamId && !teams.some((team) => team.id === this.expandedTeamId)) {
           this.expandedTeamId = null;
           this.inviteQuery = '';
@@ -451,7 +455,7 @@ export class PlayerProfilePage implements OnDestroy {
     this.profilePictureUrl = this.resolvePictureUrl(profile?.pictureUrl);
 
     const mappedHexagon = this.mapRoleStats(overall, ratings);
-    this.roleStats = mappedHexagon.length > 0 ? mappedHexagon : this.demoHexagon();
+    this.roleStats = mappedHexagon;
 
     this.overallText = overall?.classification || 'Intermedio';
     this.overallHybridOvr = overall?.hybridOVR ?? null;

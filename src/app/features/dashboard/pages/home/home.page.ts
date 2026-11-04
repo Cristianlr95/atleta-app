@@ -1,4 +1,4 @@
-﻿import { CommonModule } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { Component, inject, signal } from '@angular/core';
 import { IonicModule } from '@ionic/angular';
 import { catchError, finalize, forkJoin, of } from 'rxjs';
@@ -41,7 +41,7 @@ export class HomePage {
 
   readonly iconBase = 'assets/icons/atleta-raster-v1';
   readonly titleIconAsset = `${this.iconBase}/ic_nav_home_96.png`;
-  readonly teamIconAsset = `${this.iconBase}/ic_team_96.png`;
+  readonly teamIconAsset = `${this.iconBase}/ic_match_teams_96.png`;
 
   isLoading = false;
   nextMatchLabel = 'Sin partido agendado';
@@ -50,26 +50,14 @@ export class HomePage {
   pendingInvitations = signal(0);
 
   playerName = 'Jugador';
-  playerLevel = 1;
-  divisionLabel = 'Bronce IV';
+  overallHybridOvr: number | null = null;
   streakValue = 0;
-  totalXp = 0;
-  currentXpProgress = 0;
-  xpToNextLevel = 100;
 
   activities: HomeActivityItem[] = [];
   currentTeam: TeamSummary | null = null;
 
   get bottomNavItems(): ReadonlyArray<MetallicBottomNavItem> {
     return buildMainBottomNav('home', this.notificationBadgeService.totalPending());
-  }
-
-  get xpProgressPercent(): number {
-    return Math.max(0, Math.min(100, this.currentXpProgress));
-  }
-
-  get xpHint(): string {
-    return `Te faltan ${this.xpToNextLevel} XP para subir de nivel.`;
   }
 
   ionViewWillEnter(): void {
@@ -92,6 +80,10 @@ export class HomePage {
     void this.navigationService.safeNavigate(['/matches']);
   }
 
+  onOpenHistory(): void {
+    void this.navigationService.safeNavigate(['/matches/history']);
+  }
+
   private loadHomeData(): void {
     const session = this.authSessionService.currentSession;
     if (!session) {
@@ -108,27 +100,14 @@ export class HomePage {
     })
       .pipe(finalize(() => (this.isLoading = false)))
       .subscribe(async ({ overall, history, teams }) => {
+        this.overallHybridOvr = overall?.hybridOVR ?? null;
         await this.invitationsStore.loadPendingInvitations();
         void this.notificationBadgeService.refresh();
 
         this.pendingInvitations.set(this.invitationsStore.pendingInvitations().length);
-        this.applyProgress(overall?.hybridOVR ?? 50);
         this.applyHistoryContext(history);
         this.currentTeam = teams[0] ?? null;
       });
-  }
-
-  private applyProgress(hybridOvr: number): void {
-    const normalized = Math.max(0, Number.isFinite(hybridOvr) ? hybridOvr : 50);
-    const derivedLevel = Math.max(1, Math.floor(normalized / 5));
-    const currentBlock = (normalized % 5) / 5;
-    const progressPercent = Math.round(currentBlock * 100);
-
-    this.playerLevel = derivedLevel;
-    this.currentXpProgress = progressPercent;
-    this.xpToNextLevel = Math.max(1, 100 - progressPercent);
-    this.totalXp = Math.round(normalized * 120);
-    this.divisionLabel = this.resolveDivision(derivedLevel);
   }
 
   private applyHistoryContext(history: MatchHistoryViewItem[]): void {
@@ -205,17 +184,5 @@ export class HomePage {
     return streak;
   }
 
-  private resolveDivision(level: number): string {
-    if (level >= 18) {
-      return 'Diamante II';
-    }
-    if (level >= 12) {
-      return 'Oro I';
-    }
-    if (level >= 8) {
-      return 'Plata II';
-    }
-    return 'Bronce IV';
-  }
 
 }

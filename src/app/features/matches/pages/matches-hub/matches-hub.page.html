@@ -1,4 +1,4 @@
-﻿<ion-content class="matches-hub-bg">
+<ion-content class="matches-hub-bg">
   <div class="matches-hub-container">
     <app-metallic-card title="Partidos" [titleIconAsset]="titleIconAsset">
       <div class="matches-hub-topline">
@@ -11,7 +11,9 @@
       <div class="matches-tabs" role="tablist" aria-label="Vista de partidos">
         <button
           type="button"
-          role="tab"
+          role="tab" #upcomingTab
+          [attr.aria-selected]="selectedTab === 'upcoming'" [attr.tabindex]="selectedTab === 'upcoming' ? 0 : -1"
+          (keydown.arrowright)="onTabChange('history'); historyTab.focus(); $event.preventDefault()" (keydown.arrowleft)="onTabChange('history'); historyTab.focus(); $event.preventDefault()"
           [class.matches-tabs__item--active]="selectedTab === 'upcoming'"
           (click)="onTabChange('upcoming')">
           <img class="atleta-raster-icon" [src]="upcomingIconAsset" aria-hidden="true" alt="" />
@@ -19,7 +21,9 @@
         </button>
         <button
           type="button"
-          role="tab"
+          role="tab" #historyTab
+          [attr.aria-selected]="selectedTab === 'history'" [attr.tabindex]="selectedTab === 'history' ? 0 : -1"
+          (keydown.arrowright)="onTabChange('upcoming'); upcomingTab.focus(); $event.preventDefault()" (keydown.arrowleft)="onTabChange('upcoming'); upcomingTab.focus(); $event.preventDefault()"
           [class.matches-tabs__item--active]="selectedTab === 'history'"
           (click)="onTabChange('history')">
           <img class="atleta-raster-icon" [src]="historyIconAsset" aria-hidden="true" alt="" />
@@ -58,10 +62,10 @@
 
         <p *ngIf="isLoading" class="matches-state">Cargando agenda...</p>
         <p *ngIf="errorMessage" class="matches-state matches-state--error">{{ errorMessage }}</p>
-        <p *ngIf="!isLoading && upcomingMatches.length === 0 && pendingInvitationGroups().length === 0" class="matches-state">
+        <p *ngIf="!isLoading && !errorMessage && upcomingMatches.length === 0 && pendingInvitationGroups().length === 0" class="matches-state">
           No tienes partidos activos, recientes ni próximos. Crea uno para activar la competencia.
         </p>
-        <p *ngIf="!isLoading && upcomingMatches.length === 0 && pendingInvitationGroups().length > 0" class="matches-state">
+        <p *ngIf="!isLoading && !errorMessage && upcomingMatches.length === 0 && pendingInvitationGroups().length > 0" class="matches-state">
           Aun no tienes partidos confirmados. Responde desde el estado del partido para que aparezcan aqui.
         </p>
 
@@ -92,6 +96,7 @@
           <strong>{{ matchHistoryItems.length }} registros</strong>
         </header>
         <p *ngIf="isLoading" class="matches-state">Cargando historial...</p>
+        <p *ngIf="errorMessage" class="matches-state matches-state--error" role="alert">{{ errorMessage }}</p>
         <div class="matches-panel matches-panel--outcomes">
           <app-metallic-stats [stats]="outcomeStats"></app-metallic-stats>
         </div>
@@ -134,7 +139,7 @@
           </button>
         </div>
 
-        <app-metallic-competition-history [items]="matchHistoryItems"></app-metallic-competition-history>
+        <app-metallic-competition-history *ngIf="!isLoading && !errorMessage" [items]="matchHistoryItems"></app-metallic-competition-history>
       </section>
 
       <div class="matches-retry-wrap" *ngIf="errorMessage">

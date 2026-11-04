@@ -18,7 +18,7 @@
       <p class="venue-create__coords" *ngIf="hasCoordinates()">
         Coordenadas seleccionadas: {{ selectedLat() }} / {{ selectedLng() }}
       </p>
-      <p class="venue-create__error" *ngIf="saveError()">{{ saveError() }}</p>
+      <p role="alert" class="venue-create__error" *ngIf="saveError()">{{ saveError() }}</p>
     </app-metallic-card>
   </div>
 </ion-content>

@@ -10,6 +10,10 @@ export class ErrorMapperService {
     const status = apiError?.status ?? 0;
     const raw = this.extractRawMessage(error, apiError).toLowerCase();
 
+    if (apiError?.code === 'MATCH_TEAM_REQUIRED') {
+      return 'El partido no tiene equipo asociado. Pide al organizador que lo configure.';
+    }
+
     if (context === 'matches') {
       if (apiError?.code === 'MATCH_CREATION_FAILED' && apiError.message.trim()) {
         return apiError.message;

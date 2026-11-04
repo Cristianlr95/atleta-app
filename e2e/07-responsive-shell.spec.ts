@@ -23,7 +23,7 @@ test.describe('Responsive shell and onboarding', () => {
       await expect(page.locator('ion-router-outlet > .ion-page:not(.ion-page-hidden)')).toHaveCount(1);
       await expect(page.getByText('Configura tu jugador', { exact: true })).toBeVisible();
 
-      const card = page.locator('app-metallic-card.onboarding-card');
+      const card = page.getByRole('form', { name: 'Configura tu jugador' });
       const cardBox = await card.boundingBox();
       expect(cardBox).not.toBeNull();
       expect(cardBox!.x).toBeGreaterThanOrEqual(0);
@@ -39,6 +39,16 @@ test.describe('Responsive shell and onboarding', () => {
         expect(box!.x + box!.width).toBeLessThanOrEqual(viewport.width);
       }
       await expect(page.locator('.field-picker__role-card')).toBeVisible();
+      const positions = page.locator('.field-picker__position');
+      await positions.nth(0).click();
+      await positions.nth(1).click();
+      await positions.nth(2).click();
+      await expect(positions.nth(0)).toHaveAttribute('aria-pressed', 'true');
+      await expect(page.getByText('3/3 elegidas')).toBeVisible();
+      await expect(page.getByRole('button', { name: 'Guardar perfil' })).toBeDisabled();
+      await page.getByLabel('Alias').fill('Jugador');
+      await expect(page.getByRole('button', { name: 'Guardar perfil' })).toBeEnabled();
+      await page.screenshot({ path: `docs/flow-captures/onboarding-selected-${viewport.width}.png` });
 
       if (viewport.width === 390 || viewport.width === 1366) {
         await testInfo.attach(`onboarding-${viewport.width}x${viewport.height}`, {
@@ -62,6 +72,12 @@ async function openDemoOnboarding(page: Page): Promise<void> {
     };
     localStorage.setItem('atleta.dev.access-token', 'responsive-test-token');
     localStorage.setItem('atleta.dev.auth-session', JSON.stringify(session));
+  });
+  await page.route('**/api/v1/**', async (route) => {
+    await route.fulfill({ status: 200, contentType: 'application/json', body: '[]' });
+  });
+  await page.route('**/api/v1/athletes/ath-responsive', async (route) => {
+    await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ atletaUuid: 'ath-responsive', email: 'responsive@atleta.local', nombre: 'Responsive' }) });
   });
   await page.route('**/api/v1/player-profiles/ath-responsive', async (route) => {
     await route.fulfill({ status: 404, contentType: 'application/json', body: '{}' });

@@ -434,6 +434,18 @@
     font-size: 9px;
   }
 
+  .field-picker__slots { grid-template-columns: 1fr; }
+  .field-picker__slot {
+    grid-template-columns: auto minmax(0, 1fr);
+    text-align: left;
+    > span { margin: 0; }
+  }
+  .field-picker__slot small,
+  .field-picker__slot strong {
+    overflow: visible;
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
   .field-picker__role-description {
     display: none;
   }

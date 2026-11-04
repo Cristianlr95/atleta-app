@@ -1,5 +1,5 @@
 ﻿import { TestBed } from '@angular/core/testing';
-import { of } from 'rxjs';
+import { of, throwError } from 'rxjs';
 import { FieldLocationsApiService } from 'src/app/features/fields/services/field-locations-api.service';
 import { VenueService } from './venue.service';
 
@@ -41,5 +41,10 @@ describe('VenueService', () => {
     expect(result.length).toBe(1);
     expect(result[0].name).toBe('Cancha Norte');
     expect(result[0].coordinates?.lat).toBe(-36.82);
+  });
+
+  it('reports a failed venue lookup instead of treating it as an empty list', async () => {
+    spyOn(TestBed.inject(FieldLocationsApiService), 'getFieldLocations').and.returnValue(throwError(() => new Error('offline')));
+    await expectAsync(service.getActiveVenues()).toBeRejected();
   });
 });

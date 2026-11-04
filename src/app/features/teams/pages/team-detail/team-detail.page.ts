@@ -36,7 +36,7 @@ export class TeamDetailPage implements OnDestroy {
   private readonly notificationBadgeService = inject(NotificationBadgeService);
   private readonly destroy$ = new Subject<void>();
 
-  readonly titleIconAsset = 'assets/icons/atleta/ic_match_lineup_24.svg';
+  readonly titleIconAsset = 'assets/icons/atleta-raster-v1/ic_match_teams_96.png';
   team: TeamSummary | null = null;
   members: TeamRosterMember[] = [];
   isLoading = false;

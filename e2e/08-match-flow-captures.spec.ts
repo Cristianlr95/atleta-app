@@ -7,6 +7,62 @@ const captureDirectory = join(process.cwd(), 'docs', 'flow-captures');
 test.describe('Flujo visual integral de partidos', () => {
   test.beforeAll(() => mkdirSync(captureDirectory, { recursive: true }));
 
+  test('muestra Inicio sin desbordamiento en movil y escritorio', async ({ page }) => {
+    await installFlowFixture(page);
+    for (const viewport of [{ width: 320, height: 760 }, { width: 390, height: 844 }, { width: 1366, height: 768 }]) {
+      await page.setViewportSize(viewport);
+      await page.goto('/home');
+      await expect(page.getByRole('button', { name: 'Ver historial' })).toBeVisible();
+      await expect(page.getByText('XP y nivel no disponibles.')).toBeVisible();
+      await page.keyboard.press('Tab');
+      await expect(page.getByRole('button', { name: /Mi equipo/i })).toBeFocused();
+      await page.keyboard.press('Tab');
+      await expect(page.getByRole('button', { name: 'Ver partidos' })).toBeFocused();
+      await page.keyboard.press('Tab');
+      await expect(page.getByRole('button', { name: 'Ver historial' })).toBeFocused();
+      const dimensions = await page.evaluate(() => ({ width: document.documentElement.clientWidth, scroll: document.documentElement.scrollWidth }));
+      expect(dimensions.scroll).toBeLessThanOrEqual(dimensions.width);
+      await capture(page, `08-inicio-${viewport.width}.png`);
+    }
+  });
+  test('Inicio muestra OVR y partido finalizado sin estados contradictorios', async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await installFlowFixture(page);
+    await page.route('**/api/v1/ratings/player/ath-flow/overall', route => json(route, { hybridOVR: 63.4 }));
+    await page.route('**/api/v1/matches/by-player-or-creator/ath-flow', route => json(route, [matchResponse('FINALIZADO')]));
+    await page.goto('/home');
+    await expect(page.locator('.home-metric').first()).toContainText('63');
+    await expect(page.locator('.home-priority')).toContainText('Finalizado');
+    await expect(page.locator('.home-priority')).not.toContainText('Próximo');
+    await capture(page, '08-inicio-con-datos-390.png');
+  });
+  test('historial móvil muestra todos los campos y abre el detalle', async ({ page }) => {
+    await page.setViewportSize({ width: 320, height: 760 });
+    await installFlowFixture(page);
+    await page.route('**/api/v1/matches/by-player-or-creator/ath-flow', route => json(route, [matchResponse('FINALIZADO')]));
+    await page.goto('/matches/history');
+    const row = page.locator('.match-history__table tbody tr').first();
+    await expect(row).toBeVisible();
+    await expect(row.locator('td')).toHaveCount(13);
+    for (const cell of await row.locator('td').all()) await expect(cell).toBeVisible();
+    const tableDimensions = await page.locator('.match-history').evaluate(el => ({ width: el.clientWidth, scroll: el.scrollWidth }));
+    expect(tableDimensions.scroll).toBeLessThanOrEqual(tableDimensions.width);
+    await row.screenshot({ path: 'docs/flow-captures/historial-card-320.png' });
+    await row.getByRole('button', { name: 'Ver estado' }).click();
+    await expect(page).toHaveURL(/\/matches\/64$/);
+    await page.setViewportSize({ width: 1366, height: 768 });
+    await page.goto('/matches/history');
+    await expect(page.getByRole('columnheader', { name: 'Equipo' })).toBeVisible();
+    await expect(page.locator('.match-history__table tbody tr').first()).toBeVisible();
+  });
+  test('muestra error y reintento cuando falla la carga de partidos', async ({ page }) => {
+    await installFlowFixture(page);
+    await page.route('**/api/v1/matches/by-player*/ath-flow', route => route.fulfill({ status: 500, contentType: 'application/json', body: '{}' }));
+    await page.goto('/matches/history');
+    await expect(page.getByText('No se pudo cargar la agenda e historial de partidos.')).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Reintentar carga' })).toBeVisible();
+    await expect(page.getByText('Aun no tienes registros de competicion.')).toHaveCount(0);
+  });
   test('documenta configurar, convocar y confirmar en movil', async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
     await installFlowFixture(page);
@@ -27,14 +83,49 @@ test.describe('Flujo visual integral de partidos', () => {
     await page.getByRole('button', { name: 'Continuar' }).click();
     await expect(page.getByText('Paso 3 de 3 · Confirmar')).toBeVisible();
     await expect(page.getByText('Invitados: 10')).toBeVisible();
+    await expect(page.locator('p').filter({ hasText: /^Fecha:/ })).toContainText(/\d{2}\/\d{2}\/\d{4}, \d{2}:\d{2}/);
     await capture(page, '03-confirmar-convocatoria-mobile.png');
   });
 
+  test('la búsqueda de canchas se abre al recibir foco por teclado', async ({ page }) => {
+    await installFlowFixture(page);
+    await page.goto('/matches/create');
+    await page.getByRole('button', { name: 'Enfrentamiento Interno' }).click();
+    const search = page.getByLabel('Buscar cancha');
+    await search.focus();
+    await expect(page.getByRole('button', { name: /Cancha Central/ })).toBeVisible();
+  });
+  test('creación de partido conserva validación y navegación en escritorio', async ({ page }) => {
+    await page.setViewportSize({ width: 1366, height: 768 });
+    await installFlowFixture(page);
+    await page.goto('/matches/create');
+    await expect(page.getByRole('button', { name: 'Continuar' })).toBeDisabled();
+    await page.getByRole('button', { name: 'Enfrentamiento Interno' }).click();
+    await selectFutureSchedule(page);
+    await selectVenue(page);
+    await page.getByRole('button', { name: 'Continuar' }).click();
+    await page.getByRole('button', { name: 'Seleccionar todos' }).click();
+    await page.getByRole('button', { name: 'Continuar' }).click();
+    await expect(page.getByText('Paso 3 de 3 · Confirmar')).toBeVisible();
+    expect((await page.locator('app-matches-create-page app-metallic-card').boundingBox())!.width).toBeGreaterThanOrEqual(600);
+    await expect(page.locator('p').filter({ hasText: /^Fecha:/ })).toContainText(/\d{2}\/\d{2}\/\d{4}, \d{2}:\d{2}/);
+    await expect(page.getByRole('button', { name: 'Enviar invitaciones' })).toBeVisible();
+    await capture(page, '10-confirmacion-desktop.png');
+  });
   test('documenta partido confirmado y cierre conservando navegacion', async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
     const fixture = await installFlowFixture(page);
     await page.goto('/matches/64');
 
+    await page.goto('/matches/history');
+    const historyTab = page.getByRole('tab', { name: 'Historial' });
+    const upcomingTab = page.getByRole('tab', { name: 'Próximos' });
+    await expect(historyTab).toHaveAttribute('aria-selected', 'true');
+    await historyTab.focus();
+    await page.keyboard.press('ArrowLeft');
+    await expect(upcomingTab).toBeFocused();
+    await expect(upcomingTab).toHaveAttribute('aria-selected', 'true');
+    await page.goto('/matches/64');
     await expect(page.getByText('Estado del partido')).toBeVisible();
     await expect(page.getByText(/Confirmados 10/)).toBeVisible();
     await page.waitForTimeout(400);
@@ -47,9 +138,100 @@ test.describe('Flujo visual integral de partidos', () => {
     await expect(page.getByText('Ajustes rapidos')).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Atleta Dev FC' })).toBeVisible();
     await expect(page.locator('app-metallic-bottom-nav')).toBeVisible();
+    const goalButton = page.locator('.players-table').getByRole('button', { name: /Sumar gol a/ }).first();
+    const scoreButton = page.locator('.score-editor').getByRole('button', { name: /Sumar gol a/ }).first();
+    const scoreButtonBox = await scoreButton.boundingBox();
+    expect(scoreButtonBox!.width).toBeGreaterThanOrEqual(44);
+    expect(scoreButtonBox!.height).toBeGreaterThanOrEqual(44);
+    const goalButtonBox = await goalButton.boundingBox();
+    expect(goalButtonBox!.width).toBeGreaterThanOrEqual(44);
+    expect(goalButtonBox!.height).toBeGreaterThanOrEqual(44);
     await capture(page, '05-cierre-partido-mobile.png');
+    await page.getByRole('button', { name: 'Ir al resumen' }).click();
+    await page.getByRole('button', { name: 'Ver recompensas' }).click();
+    await expect(page.getByRole('heading', { name: 'XP estimada' })).toBeVisible();
+    await expect(page.locator('app-xp-reward-card .xp-item').first()).toContainText('XP estimados');
+    await expect(page.locator('app-xp-reward-card .xp-level-up, app-xp-reward-card .xp-bar')).toHaveCount(0);
+    await capture(page, '07-recompensas-mobile.png');
   });
 
+  test('perfil sin datos reales no muestra estadísticas ni trofeos de ejemplo', async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await installFlowFixture(page);
+    await page.goto('/player/profile');
+    await expect(page.getByText('No hay estadísticas por posición disponibles.')).toBeVisible();
+    await expect(page.getByText('No hay trofeos disponibles.')).toBeVisible();
+    await expect(page.locator('.achievement-card')).toHaveCount(0);
+    await expect(page.locator('app-metallic-role-hexagon')).toHaveCount(0);
+  });
+
+  test('perfil permite abrir integrantes de equipo en móvil', async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await installFlowFixture(page);
+    await page.goto('/player/profile');
+    const team = page.getByRole('button', { name: 'Ver integrantes de Atleta Dev FC' });
+    await expect(team).toHaveAttribute('aria-expanded', 'false');
+    await team.click();
+    await expect(page.getByRole('button', { name: 'Ocultar integrantes de Atleta Dev FC' })).toHaveAttribute('aria-expanded', 'true');
+    await expect(page.getByText('Participantes y nivel del equipo')).toBeVisible();
+  });
+  test('perfil indica cuando no puede cargar el historial', async ({ page }) => {
+    await installFlowFixture(page);
+    await page.route('**/api/v1/matches/by-player*/ath-flow', route => route.fulfill({ status: 500, contentType: 'application/json', body: '{}' }));
+    await page.goto('/player/profile');
+    await expect(page.getByText('No se pudieron cargar las estadísticas de competición.')).toBeVisible();
+    await expect(page.locator('.competition-metrics')).toHaveCount(0);
+  });
+  test('social permite recorrer secciones en móvil sin desbordamiento', async ({ page }) => {
+    await page.setViewportSize({ width: 320, height: 760 });
+    await installFlowFixture(page);
+    await page.goto('/social');
+    const sections = page.getByRole('group', { name: 'Secciones sociales' });
+    for (const name of ['Actividad', 'Amigos', 'Equipos', 'Partidos']) {
+      const button = sections.getByRole('button', { name });
+      await button.click();
+      await expect(button).toHaveAttribute('aria-pressed', 'true');
+      expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true);
+    }
+  });
+  test('ranking permite filtrar posiciones en móvil y escritorio', async ({ page }) => {
+    await installFlowFixture(page);
+    for (const width of [320, 1366]) {
+      await page.setViewportSize({ width, height: 844 });
+      await page.goto('/leaderboard');
+      await page.getByLabel('Clasificar por').selectOption('ROLE');
+      const group = page.getByRole('group', { name: 'Filtro de posiciones' });
+      const buttons = group.getByRole('button');
+      await expect(buttons.first()).toBeVisible();
+      await buttons.first().click();
+      await expect(buttons.first()).toHaveAttribute('aria-pressed', 'true');
+      expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true);
+      await capture(page, `09-ranking-${width}.png`);
+    }
+  });
+  test('detalle conserva navegación en estados creado, en juego y finalizado', async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    const fixture = await installFlowFixture(page);
+    for (const status of ['CREADO', 'INICIADO', 'FINALIZADO']) {
+      fixture.setStatus(status);
+      await page.goto('/matches/64');
+      await expect(page.getByText('Estado del partido')).toBeVisible();
+      await expect(page.locator('app-metallic-bottom-nav')).toBeVisible();
+      expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true);
+    }
+  });
+  test('votación cerrada no invita a votar y mantiene candidatos deshabilitados', async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    const fixture = await installFlowFixture(page);
+    fixture.setStatus('FINALIZADO');
+    await page.route('**/api/v1/matches/64/mvp', route => json(route, { ...mvpState(), open: false, winnerAlias: 'Jugador2' }));
+    await page.goto('/matches/64/mvp-vote');
+    await expect(page.getByText('Toca un jugador para votar.')).toHaveCount(0);
+    await expect(page.getByText('La votación está cerrada.')).toBeVisible();
+    const voteButtons = page.locator('app-player-vote-card button');
+    expect(await voteButtons.count()).toBeGreaterThan(0);
+    for (const button of await voteButtons.all()) await expect(button).toBeDisabled();
+  });
   test('documenta votacion MVP responsive en escritorio', async ({ page }) => {
     await page.setViewportSize({ width: 1366, height: 768 });
     const fixture = await installFlowFixture(page);
@@ -103,7 +285,7 @@ async function installFlowFixture(page: Page): Promise<{ setStatus: (status: str
       return;
     }
     if (path.endsWith('/teams/10/members/active')) {
-      await json(route, activeMembers());
+      await json(route, [...activeMembers(), { playerUuid: 'ath-11', alias: 'Jugador11', rol: 'JUGADOR', primaryPositionId: 1, primaryPositionName: 'Delantero', ovr: 72 }]);
       return;
     }
     if (path.endsWith('/fields')) {
@@ -202,7 +384,7 @@ function matchResponse(status: string): Record<string, unknown> {
     categoriaGenero: 'MIXED',
     estado: status,
     fechaHoraProgramada: new Date(Date.now() + 60 * 60 * 1000).toISOString(),
-    startedAt: status === 'CREADO' ? null : new Date(Date.now() - 30 * 60 * 1000).toISOString(),
+    startedAt: status === 'CREADO' ? null : new Date(Date.now() - 90 * 60 * 1000).toISOString(),
     finalizedAt: status === 'FINALIZADO' ? new Date().toISOString() : null,
     latitud: -36.827,
     longitud: -73.05,

@@ -1,13 +1,13 @@
 import { CommonModule } from '@angular/common';
 import { Component, Input } from '@angular/core';
-import { IonLabel } from "@ionic/angular/standalone";
+import { IonicModule } from '@ionic/angular';
 
 @Component({
   selector: 'app-metallic-progress',
   standalone: true,
   templateUrl: './metallic-progress.component.html',
   styleUrls: ['./metallic-progress.component.scss'],
-  imports: [CommonModule, IonLabel]
+  imports: [CommonModule, IonicModule]
 })
 export class MetallicProgressComponent {
   @Input() value: number = 0;

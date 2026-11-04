@@ -103,7 +103,6 @@ export class LeaderboardPage implements OnDestroy {
   teamRecord: TeamExternalRecord | null = null;
   searchTerm = '';
   selectedSort: RankingSort = 'RANK';
-  isDemoData = false;
 
   get currentUserId(): string | null {
     return this.authSessionService.currentSession?.user.atletaUuid ?? null;
@@ -128,7 +127,10 @@ export class LeaderboardPage implements OnDestroy {
   }
 
   get usesDevelopmentDemo(): boolean {
-    return this.appConfig.environmentName === 'development' && this.isDemoData;
+    return this.canUseDevelopmentDemo() && (
+      this.modeRows.some((row) => RANKING_DEMO_ROWS.includes(row)) ||
+      (this.selectedScope === 'TEAM' && this.teamRecord === RANKING_DEMO_RECORD)
+    );
   }
 
   get filteredRows(): LeaderboardDisplayRow[] {
@@ -265,13 +267,11 @@ export class LeaderboardPage implements OnDestroy {
           this.overallRows = rows.length === 0 && this.canUseDevelopmentDemo()
             ? [...RANKING_DEMO_ROWS]
             : rows;
-          this.isDemoData = this.overallRows === RANKING_DEMO_ROWS || (rows.length === 0 && this.canUseDevelopmentDemo());
           this.refreshCurrentUserPosition();
         },
         error: () => {
           if (this.canUseDevelopmentDemo()) {
             this.overallRows = [...RANKING_DEMO_ROWS];
-            this.isDemoData = true;
             this.refreshCurrentUserPosition();
             return;
           }
@@ -294,13 +294,11 @@ export class LeaderboardPage implements OnDestroy {
           this.byRoleRows = rows.length === 0 && this.canUseDevelopmentDemo()
             ? RANKING_DEMO_ROWS.filter((row) => this.roleForLabel(row.roleText) === this.selectedRole)
             : rows;
-          this.isDemoData = this.isDemoData || (rows.length === 0 && this.canUseDevelopmentDemo());
           this.refreshCurrentUserPosition();
         },
         error: () => {
           if (this.canUseDevelopmentDemo()) {
             this.byRoleRows = RANKING_DEMO_ROWS.filter((row) => this.roleForLabel(row.roleText) === this.selectedRole);
-            this.isDemoData = true;
             this.refreshCurrentUserPosition();
             return;
           }
@@ -330,7 +328,6 @@ export class LeaderboardPage implements OnDestroy {
           this.teams = resolvedTeams.length === 0 && this.canUseDevelopmentDemo()
             ? [RANKING_DEMO_TEAM]
             : resolvedTeams;
-          this.isDemoData = this.isDemoData || (resolvedTeams.length === 0 && this.canUseDevelopmentDemo());
           if (!this.selectedTeamId || !this.teams.some((item) => item.id === this.selectedTeamId)) {
             this.selectedTeamId = this.teams[0]?.id ?? null;
           }
@@ -349,7 +346,6 @@ export class LeaderboardPage implements OnDestroy {
             this.selectedTeamId = RANKING_DEMO_TEAM_ID;
             this.teamRows = [...RANKING_DEMO_ROWS];
             this.teamRecord = RANKING_DEMO_RECORD;
-            this.isDemoData = true;
             return;
           }
           this.teamsError = 'No se pudieron cargar tus equipos.';
@@ -376,13 +372,11 @@ export class LeaderboardPage implements OnDestroy {
           this.teamRows = rows.length === 0 && this.canUseDevelopmentDemo()
             ? [...RANKING_DEMO_ROWS]
             : rows;
-          this.isDemoData = this.isDemoData || (rows.length === 0 && this.canUseDevelopmentDemo());
           this.refreshCurrentUserPosition();
         },
         error: () => {
           if (this.canUseDevelopmentDemo()) {
             this.teamRows = [...RANKING_DEMO_ROWS];
-            this.isDemoData = true;
             this.refreshCurrentUserPosition();
             return;
           }
@@ -407,12 +401,10 @@ export class LeaderboardPage implements OnDestroy {
           this.teamRecord = record.matchesPlayed === 0 && this.canUseDevelopmentDemo()
             ? RANKING_DEMO_RECORD
             : record;
-          this.isDemoData = this.isDemoData || (record.matchesPlayed === 0 && this.canUseDevelopmentDemo());
         },
         error: () => {
           if (this.canUseDevelopmentDemo()) {
             this.teamRecord = RANKING_DEMO_RECORD;
-            this.isDemoData = true;
             return;
           }
           this.teamRecordError = 'No se pudo cargar el récord competitivo del equipo.';

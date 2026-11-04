@@ -76,7 +76,7 @@ export class MetallicLocationPickerComponent implements AfterViewInit, OnChanges
       return;
     }
 
-    this.leaflet = await import('leaflet');
+    this.leaflet = (await import('leaflet')).default;
     this.map = this.leaflet.map(this.mapContainer.nativeElement, {
       center: [this.centerLat, this.centerLng],
       zoom: this.zoom,

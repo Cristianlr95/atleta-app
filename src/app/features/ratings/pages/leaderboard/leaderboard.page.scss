@@ -63,6 +63,24 @@
   text-transform: uppercase;
 }
 
+.ranking-demo-notice {
+  margin: 0 0 12px;
+  padding: 10px;
+  border-left: 3px solid var(--tactical-local);
+  color: var(--text-secondary);
+  font: 14px/1.4 var(--font-family-body);
+}
+
+.leaderboard-extra-filters { margin-bottom: 12px; }
+.leaderboard-extra-filters summary {
+  min-height: 44px;
+  padding-block: 10px;
+  color: var(--tactical-visit);
+  cursor: pointer;
+  font-size: 15px;
+}
+.leaderboard-extra-filters summary:focus-visible { outline: 2px solid var(--tactical-visit); }
+
 .ranking-toolbar {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));

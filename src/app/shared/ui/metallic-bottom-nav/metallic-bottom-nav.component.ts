@@ -20,12 +20,6 @@ export interface MetallicBottomNavItem {
 })
 export class MetallicBottomNavComponent {
   private readonly defaultIconAsset = 'assets/icons/atleta-raster-v1/ic_nav_matches_96.png';
-  private readonly mainRoutes: Readonly<Record<string, string>> = {
-    home: '/home',
-    matches: '/matches',
-    ranking: '/leaderboard',
-    profile: '/player/profile',
-  };
   @Input() items: ReadonlyArray<MetallicBottomNavItem> = [];
   @Output() itemSelected = new EventEmitter<string>();
   private lastTapAt = 0;
@@ -55,16 +49,7 @@ export class MetallicBottomNavComponent {
     return `${count} notificaciones pendientes`;
   }
 
-  routeHref(itemId: string): string {
-    return this.mainRoutes[itemId] ?? '#';
-  }
-
   onSelect(itemId: string): void {
-    const item = this.items.find((entry) => entry.id === itemId);
-    if (item?.active) {
-      return;
-    }
-
     const now = Date.now();
     if (now - this.lastTapAt < this.tapCooldownMs) {
       return;

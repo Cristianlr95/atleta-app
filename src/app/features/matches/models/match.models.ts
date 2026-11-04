@@ -19,6 +19,7 @@ export interface CreateMatchRequest {
   creadorUuid: string;
   modalidad: MatchModality;
   matchType: MatchType;
+  rotativeGoalkeeper?: boolean;
   categoriaGenero?: MatchGenderCategory;
   fechaHoraProgramada: string;
   latitud?: number;
@@ -93,6 +94,7 @@ export interface MatchResponse {
   id: number;
   modalidad: MatchModality;
   matchType?: MatchType;
+  rotativeGoalkeeper?: boolean;
   categoriaGenero?: MatchGenderCategory;
   fechaHoraProgramada: string;
   creador?: PlayerSummary;

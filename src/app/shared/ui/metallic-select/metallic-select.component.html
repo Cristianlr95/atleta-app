@@ -1,8 +1,11 @@
 ﻿<div class="metallic-select-wrapper">
-  <label *ngIf="label" class="metallic-select__label">{{ label }}</label>
+  <label *ngIf="label" class="metallic-select__label" [for]="selectId">{{ label }}</label>
 
   <div class="metallic-select">
     <select
+      [id]="selectId"
+      [attr.aria-invalid]="invalid ? 'true' : null"
+      [attr.aria-describedby]="describedBy"
       class="metallic-select__field"
       [disabled]="disabled"
       [value]="value"
