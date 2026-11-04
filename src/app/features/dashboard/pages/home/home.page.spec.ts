@@ -58,7 +58,8 @@ describe('HomePage OVR', () => {
     expect(xp).toContain('XP posición principal');
     expect(xp).toContain('120');
     expect(xp).not.toContain('170');
-    expect(fixture.nativeElement.textContent).toContain('Nivel no disponible');
+    expect(fixture.nativeElement.textContent).toContain('Nivel de posición 2');
+    expect(fixture.nativeElement.querySelector('[role=progressbar]').getAttribute('aria-valuetext')).toBe('20 de 125 XP');
   });
 
   it('no muestra XP inventada si la posición principal no tiene datos válidos', async () => {

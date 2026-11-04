@@ -13,7 +13,7 @@ test.describe('Flujo visual integral de partidos', () => {
       await page.setViewportSize(viewport);
       await page.goto('/home');
       await expect(page.getByRole('button', { name: 'Ver historial' })).toBeVisible();
-      await expect(page.getByText('Nivel no disponible.')).toBeVisible();
+      await expect(page.getByText('Nivel de posición 2')).toBeVisible();
       await expect(page.locator('.home-metric').nth(2)).toContainText('120');
       await page.keyboard.press('Tab');
       await expect(page.getByRole('button', { name: /Mi equipo/i })).toBeFocused();
@@ -78,7 +78,7 @@ test.describe('Flujo visual integral de partidos', () => {
     await page.goto('/home');
     await expect(page.locator('.home-metric').nth(2)).toContainText('XP posición principal');
     await expect(page.locator('.home-metric').nth(2)).toContainText('120');
-    await expect(page.getByText('Nivel no disponible.')).toBeVisible();
+    await expect(page.getByText('Nivel de posición 2')).toBeVisible();
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true);
   });
 

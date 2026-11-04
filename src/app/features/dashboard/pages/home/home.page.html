@@ -35,7 +35,13 @@
         <button type="button" class="home-priority__cta" (click)="onOpenMatches()">Ver partidos</button>
       </section>
 
-      <section class="home-progress"><p class="home-hint">{{ primaryPositionXp === null ? 'XP y nivel no disponibles.' : 'Nivel no disponible.' }}</p></section>
+      <section class="home-progress" aria-label="Progreso de posición principal">
+        <ng-container *ngIf="levelProgress as progress; else noLevel">
+          <div class="home-progress__heading"><span>Nivel de posición {{ progress.level }}</span><strong>{{ progress.currentXp }} / {{ progress.requiredXp }} XP</strong></div>
+          <div class="home-xp__track" role="progressbar" aria-label="Progreso hacia el siguiente nivel de posición" aria-valuemin="0" aria-valuemax="100" [attr.aria-valuenow]="progress.percent" [attr.aria-valuetext]="progress.currentXp + ' de ' + progress.requiredXp + ' XP'"><div class="home-xp__fill" [style.width.%]="progress.percent"></div></div>
+        </ng-container>
+        <ng-template #noLevel><p class="home-hint">XP y nivel no disponibles.</p></ng-template>
+      </section>
 
       <section class="home-activity">
         <div class="home-activity__heading"><span>Actividad reciente</span><button type="button" (click)="onOpenHistory()">Ver historial</button></div>

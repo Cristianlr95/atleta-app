@@ -18,6 +18,7 @@ import {
 } from 'src/app/shared/ui/metallic-bottom-nav/metallic-bottom-nav.component';
 import { MetallicCardComponent } from 'src/app/shared/ui/metallic-card/metallic-card.component';
 import { buildHomeActivity, HomeActivityItem } from '../../utils/home-activity.util';
+import { PositionLevel, positionLevel } from '../../utils/position-level.util';
 
 @Component({
   selector: 'app-home-page',
@@ -56,6 +57,7 @@ export class HomePage {
   playerName = 'Jugador';
   overallHybridOvr: number | null = null;
   primaryPositionXp: number | null = null;
+  levelProgress: PositionLevel | null = null;
   streakValue: number | null = null;
   historyUnavailable = false;
 
@@ -115,7 +117,8 @@ export class HomePage {
       .pipe(finalize(() => (this.isLoading = false)))
       .subscribe(({ profile, overall, history, teams, invitations }) => {
         const xp = profile?.positions?.find((position) => position.prioridad === 1)?.xp;
-        this.primaryPositionXp = typeof xp === 'number' && Number.isSafeInteger(xp) && xp >= 0 ? xp : null;
+        this.primaryPositionXp = typeof xp === 'number' && Number.isSafeInteger(xp) && xp >= 0 && xp <= 2147483647 ? xp : null;
+        this.levelProgress = this.primaryPositionXp === null ? null : positionLevel(this.primaryPositionXp);
         this.overallHybridOvr = overall?.hybridOVR ?? null;
         void this.notificationBadgeService.refresh();
 
