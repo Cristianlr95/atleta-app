@@ -7,16 +7,16 @@
       </header>
       <section class="home-overview">
         <div class="home-identity">
-          <div class="home-avatar">{{ playerName.charAt(0) }}</div>
+          <div class="home-avatar" aria-hidden="true">{{ playerName.charAt(0) }}</div>
           <div class="home-identity__meta">
             <p class="home-name">{{ playerName }}</p>
             <p class="home-subtitle">Jugador de Atleta</p>
-            <p class="home-streak">{{ streakValue }} partidos consecutivos</p>
+            <p class="home-streak" *ngIf="streakValue !== null">{{ streakValue }} partidos consecutivos</p>
           </div>
         </div>
         <button type="button" class="home-team" (click)="onOpenTeam()">
           <img class="atleta-raster-icon" [src]="teamIconAsset" aria-hidden="true" alt="" />
-          <span class="home-team__copy"><small>Mi equipo</small><strong>{{ currentTeam?.nombre ?? 'Sin equipo' }}</strong></span>
+          <span class="home-team__copy"><small>Mi equipo</small><strong>{{ currentTeam?.nombre ?? 'Sin equipo · Crear equipo' }}</strong></span>
           <span class="home-team__arrow" aria-hidden="true">›</span>
         </button>
       </section>
@@ -37,7 +37,8 @@
 
       <section class="home-activity">
         <div class="home-activity__heading"><span>Actividad reciente</span><button type="button" (click)="onOpenHistory()">Ver historial</button></div>
-        <p *ngIf="isLoading" class="home-loading">Actualizando actividad...</p>
+        <p *ngIf="isLoading" class="home-loading" role="status">Actualizando actividad...</p>
+        <div *ngIf="historyUnavailable" role="alert"><p>No se pudo cargar la actividad reciente.</p><button type="button" class="home-retry" (click)="loadHomeData()">Reintentar</button></div>
         <div class="home-feed"><article class="home-feed__item" *ngFor="let item of activities" [attr.data-variant]="item.variant">{{ item.text }}</article></div>
       </section>
     </app-metallic-card>

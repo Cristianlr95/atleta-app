@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { of } from 'rxjs';
+import { of, throwError } from 'rxjs';
 import { AuthSessionService } from 'src/app/core/services/auth-session.service';
 import { NavigationService } from 'src/app/core/services/navigation.service';
 import { MatchHistoryService } from 'src/app/features/matches/services/match-history.service';
@@ -12,16 +12,18 @@ import { HomePage } from './home.page';
 describe('HomePage OVR', () => {
   let fixture: ComponentFixture<HomePage>;
   let rating: number | null;
+  let historyFails: boolean;
 
   beforeEach(async () => {
     rating = 63.4;
+    historyFails = false;
     await TestBed.configureTestingModule({
       imports: [HomePage],
       providers: [
         { provide: AuthSessionService, useValue: { currentSession: { user: { atletaUuid: 'player-1', nombre: 'Ana' } } } },
         { provide: NavigationService, useValue: { safeNavigate: jasmine.createSpy('safeNavigate') } },
         { provide: RatingsApiService, useValue: { getOverall: () => of(rating === null ? null : { hybridOVR: rating }) } },
-        { provide: MatchHistoryService, useValue: { getPlayerHistory: () => of([]) } },
+        { provide: MatchHistoryService, useValue: { getPlayerHistory: () => historyFails ? throwError(() => new Error('offline')) : of([]) } },
         { provide: TeamApiService, useValue: { getByPlayer: () => of([]) } },
         { provide: InvitationsStore, useValue: { loadPendingInvitations: async () => {}, pendingInvitations: () => [] } },
         { provide: NotificationBadgeService, useValue: { refresh: async () => {}, totalPending: () => 0 } },
@@ -37,6 +39,30 @@ describe('HomePage OVR', () => {
     expect(fixture.nativeElement.textContent).toContain('XP y nivel no disponibles');
     expect(fixture.nativeElement.textContent).not.toContain('7608');
     expect(fixture.nativeElement.querySelector('[role=progressbar]')).toBeNull();
+  });
+
+  it('permite reintentar la actividad si falla el historial', async () => {
+    historyFails = true;
+    fixture.componentInstance.ionViewWillEnter();
+    await fixture.whenStable();
+    fixture.detectChanges();
+    expect(fixture.nativeElement.textContent).toContain('No se pudo cargar la actividad reciente');
+    expect(fixture.nativeElement.textContent).not.toContain('Sin partido agendado');
+    expect(fixture.nativeElement.textContent).not.toContain('0 partidos consecutivos');
+
+    historyFails = false;
+    fixture.nativeElement.querySelector('.home-retry').click();
+    await fixture.whenStable();
+    fixture.detectChanges();
+    expect(fixture.nativeElement.textContent).toContain('Sin partido agendado');
+    expect(fixture.nativeElement.querySelector('.home-retry')).toBeNull();
+  });
+
+  it('ofrece crear equipo cuando el jugador no tiene uno', () => {
+    fixture.detectChanges();
+    fixture.nativeElement.querySelector('.home-team').click();
+    expect(TestBed.inject(NavigationService).safeNavigate).toHaveBeenCalledWith(['/sessions/create']);
+    expect(fixture.nativeElement.querySelector('.home-team').textContent).toContain('Crear equipo');
   });
 
   it('abre el historial desde la actividad reciente', () => {

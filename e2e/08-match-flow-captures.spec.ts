@@ -25,6 +25,26 @@ test.describe('Flujo visual integral de partidos', () => {
       await capture(page, `08-inicio-${viewport.width}.png`);
     }
   });
+  test('Inicio permite recuperar la actividad cuando falla el historial', async ({ page }) => {
+    await installFlowFixture(page);
+    const pattern = '**/api/v1/matches/by-player*/ath-flow';
+    await page.route(pattern, route => route.fulfill({ status: 500, json: {} }));
+    await page.goto('/home');
+    await expect(page.getByRole('alert')).toContainText('No se pudo cargar la actividad reciente');
+    await expect(page.getByText('Sin partido agendado')).toHaveCount(0);
+    await page.unroute(pattern);
+    await page.getByRole('button', { name: 'Reintentar' }).click();
+    await expect(page.getByText('Sin partido agendado')).toBeVisible();
+    await expect(page.getByRole('alert')).toHaveCount(0);
+  });
+  test('Inicio ofrece crear equipo cuando no hay equipo asociado', async ({ page }) => {
+    await installFlowFixture(page);
+    await page.route('**/api/v1/teams/by-player/ath-flow', route => json(route, []));
+    await page.goto('/home');
+    await page.getByRole('button', { name: /Sin equipo.*Crear equipo/ }).click();
+    await expect(page).toHaveURL(/\/sessions\/create$/);
+    await expect(page.getByRole('button', { name: 'Crear equipo', exact: true })).toBeVisible();
+  });
   test('Inicio muestra OVR y partido finalizado sin estados contradictorios', async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
     await installFlowFixture(page);

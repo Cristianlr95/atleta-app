@@ -51,7 +51,8 @@ export class HomePage {
 
   playerName = 'Jugador';
   overallHybridOvr: number | null = null;
-  streakValue = 0;
+  streakValue: number | null = null;
+  historyUnavailable = false;
 
   activities: HomeActivityItem[] = [];
   currentTeam: TeamSummary | null = null;
@@ -73,7 +74,7 @@ export class HomePage {
       void this.navigationService.safeNavigate(['/teams', String(this.currentTeam.id)]);
       return;
     }
-    void this.navigationService.safeNavigate(['/matches/create']);
+    void this.navigationService.safeNavigate(['/sessions/create']);
   }
 
   onOpenMatches(): void {
@@ -84,7 +85,7 @@ export class HomePage {
     void this.navigationService.safeNavigate(['/matches/history']);
   }
 
-  private loadHomeData(): void {
+  loadHomeData(): void {
     const session = this.authSessionService.currentSession;
     if (!session) {
       return;
@@ -92,10 +93,11 @@ export class HomePage {
 
     this.playerName = session.user.nombre || 'Jugador';
     this.isLoading = true;
+    this.historyUnavailable = false;
 
     forkJoin({
       overall: this.ratingsApiService.getOverall(session.user.atletaUuid).pipe(catchError(() => of(null))),
-      history: this.matchHistoryService.getPlayerHistory(session.user.atletaUuid).pipe(catchError(() => of([]))),
+      history: this.matchHistoryService.getPlayerHistory(session.user.atletaUuid).pipe(catchError(() => of(null))),
       teams: this.teamApiService.getByPlayer(session.user.atletaUuid).pipe(catchError(() => of([] as TeamSummary[]))),
     })
       .pipe(finalize(() => (this.isLoading = false)))
@@ -105,7 +107,16 @@ export class HomePage {
         void this.notificationBadgeService.refresh();
 
         this.pendingInvitations.set(this.invitationsStore.pendingInvitations().length);
-        this.applyHistoryContext(history);
+        if (history === null) {
+          this.historyUnavailable = true;
+          this.nextMatchLabel = 'No se pudieron cargar los partidos';
+          this.nextMatchDetail = 'Vuelve a intentarlo para consultar tu actividad.';
+          this.nextMatchStatus = 'NONE';
+          this.streakValue = null;
+          this.activities = [];
+        } else {
+          this.applyHistoryContext(history);
+        }
         this.currentTeam = teams[0] ?? null;
       });
   }
