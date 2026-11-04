@@ -2,6 +2,8 @@ import { Component, Input, booleanAttribute, forwardRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR, FormsModule } from '@angular/forms';
 
+let nextInputId = 0;
+
 @Component({
   selector: 'app-metallic-input',
   standalone: true,
@@ -17,6 +19,10 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR, FormsModule } from '@angular/f
   ]
 })
 export class MetallicInputComponent implements ControlValueAccessor {
+
+  readonly inputId = `metallic-input-${nextInputId++}`;
+  @Input() invalid = false;
+  @Input() describedBy: string | null = null;
 
   @Input() label?: string;
   @Input() placeholder: string = '';

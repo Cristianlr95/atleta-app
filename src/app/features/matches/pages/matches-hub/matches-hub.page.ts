@@ -219,10 +219,8 @@ export class MatchesHubPage implements OnDestroy {
     this.errorMessage = null;
 
     forkJoin({
-      upcoming: this.loadUpcomingForUser(session.user.atletaUuid).pipe(
-        catchError(() => of([] as PlayerMatchHistoryItem[])),
-      ),
-      history: this.matchHistoryService.getPlayerHistory(session.user.atletaUuid).pipe(catchError(() => of([] as MatchHistoryViewItem[]))),
+      upcoming: this.loadUpcomingForUser(session.user.atletaUuid),
+      history: this.matchHistoryService.getPlayerHistory(session.user.atletaUuid),
     })
       .pipe(
         takeUntil(this.leave$),
@@ -248,7 +246,6 @@ export class MatchesHubPage implements OnDestroy {
     return forkJoin({
       matches: this.matchesApiService.getByPlayerOrCreator(playerUuid).pipe(
         catchError(() => this.matchesApiService.getByPlayer(playerUuid)),
-        catchError(() => of([] as PlayerMatchHistoryItem[])),
       ),
       socialInvites: this.socialApiService.getMatchInvites(playerUuid).pipe(catchError(() => of([] as SocialRequestItem[]))),
     }).pipe(

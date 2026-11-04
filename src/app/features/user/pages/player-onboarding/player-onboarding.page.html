@@ -44,6 +44,8 @@
               <span>Alias</span>
               <input
                 id="player-alias"
+                [attr.aria-invalid]="onboardingForm.controls.alias.touched && onboardingForm.controls.alias.invalid"
+                [attr.aria-describedby]="onboardingForm.controls.alias.touched && onboardingForm.controls.alias.invalid ? 'alias-error' : null"
                 type="text"
                 formControlName="alias"
                 maxlength="30"
@@ -54,8 +56,8 @@
 
             <p
               *ngIf="onboardingForm.controls.alias.touched && onboardingForm.controls.alias.invalid"
-              class="onboarding-error">
-              Ingresa un alias de hasta 30 caracteres.
+              class="onboarding-error" id="alias-error">
+              Ingresa un alias de hasta 30 caracteres que no sea solo espacios.
             </p>
           </section>
 

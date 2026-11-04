@@ -1,4 +1,4 @@
-﻿import { CommonModule } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { Component, OnDestroy, inject } from '@angular/core';
 import {
   AbstractControl,
@@ -60,7 +60,7 @@ export class PlayerOnboardingPage implements OnDestroy {
 
   readonly onboardingForm = this.formBuilder.nonNullable.group(
     {
-      alias: ['', [Validators.required, Validators.maxLength(30)]],
+      alias: ['', [Validators.required, Validators.pattern(/.*\S.*/), Validators.maxLength(30)]],
       primaryPositionId: ['', [Validators.required]],
       secondaryPositionId: ['', [Validators.required]],
       tertiaryPositionId: ['', [Validators.required]],

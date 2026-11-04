@@ -46,9 +46,10 @@ export class PasswordResetPage {
     }
     this.submitting = true;
     this.error = null;
+    this.message = null;
     try {
       await firstValueFrom(this.authService.requestPasswordReset(this.requestForm.getRawValue().email));
-      this.message = 'Si el correo existe, recibiras un enlace de recuperacion.';
+      this.message = 'Si hay una cuenta asociada a ese correo, recibirás un enlace para restablecer tu contraseña. Revisa también la carpeta de spam.';
     } catch (error) {
       this.error = this.feedback.passwordResetError(error as ApiError);
     } finally {

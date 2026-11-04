@@ -9,6 +9,9 @@
           </div>
           <span class="ranking-workspace__demo" *ngIf="usesDevelopmentDemo">Datos de prueba</span>
         </header>
+        <p *ngIf="usesDevelopmentDemo" class="ranking-demo-notice" role="status">
+          Esta vista incluye datos de ejemplo. Las cifras de prueba se sustituyen cuando hay resultados reales disponibles.
+        </p>
 
         <section class="ranking-toolbar" aria-label="Filtros del ranking">
           <label class="ranking-toolbar__control">
@@ -28,11 +31,12 @@
           </label>
         </section>
 
-        <div class="leaderboard-roles" *ngIf="selectedScope === 'PLATFORM' && selectedMode === 'ROLE'" role="tablist" aria-label="Filtro de posiciones">
+        <div class="leaderboard-roles" *ngIf="selectedScope === 'PLATFORM' && selectedMode === 'ROLE'" role="group" aria-label="Filtro de posiciones">
           <button
             *ngFor="let option of roleOptions"
             type="button"
             class="leaderboard-roles__item"
+            [attr.aria-pressed]="selectedRole === option.role"
             [class.leaderboard-roles__item--active]="selectedRole === option.role"
             (click)="onSelectRole(option.role)">
             <img class="atleta-raster-icon" [src]="option.iconAsset" aria-hidden="true" alt="" />
@@ -67,10 +71,12 @@
 
         <p class="leaderboard-current" *ngIf="currentUserPositionText">{{ currentUserPositionText }}</p>
 
-        <div class="leaderboard-tools" aria-label="Filtros adicionales de la tabla">
+        <details class="leaderboard-extra-filters">
+          <summary>Buscar y ordenar</summary>
+          <div class="leaderboard-tools" aria-label="Filtros adicionales de la tabla">
           <label class="leaderboard-search">
             <span>Buscar</span>
-            <input type="search" [(ngModel)]="searchTerm" placeholder="Jugador o posición" aria-label="Buscar jugador o posición" />
+            <input #rankingSearch type="search" [(ngModel)]="searchTerm" placeholder="Jugador o posición" aria-label="Buscar jugador o posición" />
           </label>
           <label class="leaderboard-sort">
             <span>Ordenar tabla por</span>
@@ -81,18 +87,26 @@
               <option value="NAME">Nombre</option>
             </select>
           </label>
-        </div>
+          </div>
+        </details>
 
         <p *ngIf="modeLoading" class="leaderboard-message">Actualizando ranking...</p>
         <p *ngIf="modeError" class="leaderboard-message leaderboard-message--error">{{ modeError }}</p>
         <button *ngIf="modeError" type="button" class="leaderboard-retry" (click)="onRetryActive()">Reintentar</button>
 
         <app-metallic-leaderboard
+          *ngIf="!modeLoading && !modeError"
           [title]="modeTitle"
           [rows]="filteredRows"
+          [emptyMessage]="searchTerm.trim() && modeRows.length > 0 ? 'No encontramos jugadores con esa búsqueda.' : 'Todavía no hay datos para este ranking.'"
           [showRole]="selectedScope === 'PLATFORM'"
           [currentPlayerId]="currentUserId">
         </app-metallic-leaderboard>
+        <button
+          *ngIf="searchTerm.trim() && modeRows.length > 0 && filteredRows.length === 0 && !modeLoading && !modeError"
+          type="button" class="leaderboard-retry" (click)="searchTerm = ''; rankingSearch.focus()">
+          Limpiar búsqueda
+        </button>
       </section>
     </app-metallic-card>
   </div>

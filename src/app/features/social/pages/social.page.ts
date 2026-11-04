@@ -4,8 +4,6 @@ import { ActivatedRoute } from '@angular/router';
 import { IonicModule } from '@ionic/angular';
 import { NavigationService } from 'src/app/core/services/navigation.service';
 import { PageLoadGuard } from 'src/app/core/utils/page-load-guard';
-import { MatchStatus } from 'src/app/features/matches/models/progressive-match.models';
-import { MatchService } from 'src/app/features/matches/services/match.service';
 import { NotificationBadgeService } from 'src/app/features/matches/services/notification-badge.service';
 import { buildMainBottomNav } from 'src/app/shared/navigation/main-bottom-nav';
 import {
@@ -19,7 +17,6 @@ import { ActivityActionType, ActivityItem } from '../activity/models/activity.mo
 import { FriendsPanelComponent } from '../components/friends-panel/friends-panel.component';
 import {
   MatchInvitationsPanelComponent,
-  SocialConfirmedMatchView,
 } from '../components/match-invitations-panel/match-invitations-panel.component';
 import { SocialTabsComponent } from '../components/social-tabs/social-tabs.component';
 import { TeamsPanelComponent } from '../components/teams-panel/teams-panel.component';
@@ -48,7 +45,6 @@ export class SocialPage implements OnDestroy {
   private readonly route = inject(ActivatedRoute);
   private readonly navigationService = inject(NavigationService);
   private readonly notificationBadgeService = inject(NotificationBadgeService);
-  private readonly matchService = inject(MatchService);
 
   readonly socialIconAsset = 'assets/icons/atleta-raster-v1/ic_social_friends_96.png';
 
@@ -67,17 +63,7 @@ export class SocialPage implements OnDestroy {
 
   readonly principalTeam = computed(() => this.facade.teams()[0] ?? null);
 
-  readonly confirmedMatches = computed<SocialConfirmedMatchView[]>(() =>
-    this.matchService
-      .activeMatches()
-      .filter((match) => match.status === MatchStatus.CONFIRMED || match.status === MatchStatus.LIVE)
-      .map((match) => ({
-        id: (match.backendMatchId ?? Number(String(match.id).replace(/[^\d]/g, ''))) || 0,
-        title: `${match.team.name} ${match.status === MatchStatus.LIVE ? 'en juego' : 'confirmado'}`,
-        scheduledAt: match.scheduledAt,
-      }))
-      .filter((item) => item.id > 0),
-  );
+  readonly confirmedMatches = this.facade.confirmedMatches;
 
   get bottomNavItems(): ReadonlyArray<MetallicBottomNavItem> {
     return buildMainBottomNav('matches', this.notificationBadgeService.totalPending());

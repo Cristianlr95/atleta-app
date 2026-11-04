@@ -5,6 +5,7 @@ export interface AppConfig {
   storagePrefix: string;
   environmentName: string;
   googleClientId?: string;
+  uploadsEnabled?: boolean;
 }
 
 export const defaultAppConfig: AppConfig = normalizeAppConfig(environment.defaultAppConfig, {
@@ -27,6 +28,7 @@ export function normalizeAppConfig(
     storagePrefix,
     environmentName,
     googleClientId,
+    uploadsEnabled: config?.uploadsEnabled ?? fallback.uploadsEnabled ?? true,
   };
 }
 

@@ -1,4 +1,4 @@
-﻿<div class="match-history" *ngIf="items.length > 0; else emptyState">
+<div class="match-history" *ngIf="items.length > 0; else emptyState">
   <table class="match-history__table" aria-label="Historial de competicion por jugador">
     <thead>
       <tr>
@@ -19,17 +19,17 @@
     </thead>
     <tbody>
       <tr *ngFor="let item of items">
-        <td class="match-history__date">{{ item.dateLabel }}</td>
-        <td>{{ item.modalityLabel }}</td>
-        <td>{{ item.teamLabel }}</td>
-        <td>{{ item.positionLabel }}</td>
-        <td>{{ item.minutesPlayedLabel }}</td>
-        <td>{{ item.goals }}</td>
-        <td>{{ item.assists }}</td>
-        <td>{{ item.matchRatingLabel }}</td>
-        <td>{{ item.mvpLabel }}</td>
-        <td>{{ item.scoreLabel }}</td>
-        <td>
+        <td data-label="Fecha" class="match-history__date">{{ item.dateLabel }}</td>
+        <td data-label="Modalidad">{{ item.modalityLabel }}</td>
+        <td data-label="Equipo">{{ item.teamLabel }}</td>
+        <td data-label="Posición">{{ item.positionLabel }}</td>
+        <td data-label="Minutos">{{ item.minutesPlayedLabel }}</td>
+        <td data-label="Goles">{{ item.goals }}</td>
+        <td data-label="Asistencias">{{ item.assists }}</td>
+        <td data-label="Calificación">{{ item.matchRatingLabel }}</td>
+        <td data-label="MVP">{{ item.mvpLabel }}</td>
+        <td data-label="Marcador">{{ item.scoreLabel }}</td>
+        <td data-label="Estado">
           <span class="match-history__status" [ngClass]="getStatusClass(item.statusKey)">
             <span class="match-history__status-icon-wrap">
               <img class="match-history__status-icon atleta-raster-icon" [src]="getStatusIconAsset(item.statusKey)" aria-hidden="true" alt="" />
@@ -37,7 +37,7 @@
             {{ item.statusLabel }}
           </span>
         </td>
-        <td>
+        <td data-label="Resultado">
           <span
             class="match-history__outcome"
             [class.match-history__outcome--win]="item.outcomeVariant === 'win'"
@@ -47,7 +47,7 @@
             {{ item.outcomeLabel }}
           </span>
         </td>
-        <td>
+        <td data-label="Acción">
           <button type="button" class="match-history__action" (click)="onViewMatch(item)">
             Ver estado
           </button>
@@ -56,7 +56,7 @@
     </tbody>
   </table>
 </div>
-<p *ngIf="items.length > 4" class="match-history__hint">Desliza horizontal y vertical para ver todo</p>
+<p *ngIf="items.length > 0" class="match-history__hint">Desliza horizontalmente para ver todas las columnas</p>
 
 <ng-template #emptyState>
   <p class="match-history__empty">Aun no tienes registros de competicion.</p>

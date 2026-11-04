@@ -60,6 +60,12 @@ describe('API contracts smoke', () => {
     }).subscribe();
     expectRequest('POST', '/athletes/register').flush({});
 
+    service.registerAthlete({ nombre: 'Jugador Demo', email: 'beta@atleta.test', password: 'secret', genero: 'MASCULINO' }, 'codigo-local').subscribe();
+    const betaRegistration = expectRequest('POST', '/athletes/register');
+    expect(betaRegistration.request.headers.get('X-Beta-Invite')).toBe('codigo-local');
+    expect(betaRegistration.request.body.invitationCode).toBeUndefined();
+    betaRegistration.flush({});
+
     service.loginWithGoogle({ idToken: 'google-id-token' }).subscribe();
     expectRequest('POST', '/athletes/auth/google').flush({});
 

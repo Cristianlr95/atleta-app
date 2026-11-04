@@ -26,10 +26,11 @@ export class AuthApiService extends ApiService {
     return this.post<AuthApiResponse, GoogleLoginRequest>(API_ENDPOINTS.auth.googleLogin, payload);
   }
 
-  registerAthlete(payload: RegisterAthleteRequest): Observable<AuthApiResponse> {
+  registerAthlete(payload: RegisterAthleteRequest, invitationCode?: string): Observable<AuthApiResponse> {
     return this.post<AuthApiResponse, RegisterAthleteRequest>(
       API_ENDPOINTS.auth.registerAthlete,
       payload,
+      invitationCode ? { headers: { 'X-Beta-Invite': invitationCode } } : undefined,
     );
   }
 

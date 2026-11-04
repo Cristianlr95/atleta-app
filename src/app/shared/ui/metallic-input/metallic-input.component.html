@@ -1,12 +1,15 @@
 ﻿<div class="metallic-input-wrapper">
 
-  <label *ngIf="label" class="metallic-input__label">
+  <label *ngIf="label" class="metallic-input__label" [for]="inputId">
     {{ label }}
   </label>
 
   <div class="metallic-input">
 
     <input
+      [id]="inputId"
+      [attr.aria-invalid]="invalid ? 'true' : null"
+      [attr.aria-describedby]="describedBy"
       class="metallic-input__field"
       [class.metallic-input__field--with-toggle]="allowPasswordToggle && type === 'password'"
       [type]="resolvedType"

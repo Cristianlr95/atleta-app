@@ -25,6 +25,7 @@ export class MetallicLeaderboardComponent {
   @Input() rows: ReadonlyArray<LeaderboardDisplayRow> = [];
   @Input() currentPlayerId: string | null = null;
   @Input() showRole = false;
+  @Input() emptyMessage = 'Todavía no hay datos para este ranking.';
 
   readonly podiumIconAsset = `${this.iconBase}/ic_nav_ranking_96.png`;
   readonly medalIconAsset = `${this.iconBase}/ic_comp_medal_96.png`;

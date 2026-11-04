@@ -68,4 +68,16 @@ describe('TeamDetailPage', () => {
     expect(component.notFound).toBeTrue();
     expect(fixture.nativeElement.textContent).toContain('Volver a Social');
   });
+
+  it('uses initials when team and member images cannot load', () => {
+    component.ionViewWillEnter();
+    component.team!.logoUrl = '/missing-team-logo.png';
+    fixture.detectChanges();
+    fixture.nativeElement.querySelector('.team-hero img').dispatchEvent(new Event('error'));
+    fixture.nativeElement.querySelector('.team-member__player img').dispatchEvent(new Event('error'));
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelector('.team-hero img')).toBeNull();
+    expect(fixture.nativeElement.querySelector('.team-shield')?.textContent).toBe('A');
+    expect(fixture.nativeElement.querySelector('.team-member__player i')?.textContent).toBe('D');
+  });
 });

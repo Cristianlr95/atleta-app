@@ -190,6 +190,9 @@ export class NotificationService {
   }
 
   async notifyAlmostReady(missing: number): Promise<void> {
+    if (missing <= 0) {
+      return;
+    }
     await this.dispatch('Partido casi confirmado', `Faltan ${missing} para confirmar el partido.`);
   }
 

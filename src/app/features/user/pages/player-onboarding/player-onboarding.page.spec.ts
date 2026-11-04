@@ -74,6 +74,22 @@ describe('PlayerOnboardingPage', () => {
     expect(labels).toContain('DT');
   });
 
+  it('asocia el error de alias al campo', () => {
+    component.onboardingForm.controls.alias.setValue('   ');
+    component.onboardingForm.controls.alias.markAsTouched();
+    fixture.detectChanges();
+    const input: HTMLInputElement = fixture.nativeElement.querySelector('#player-alias');
+    expect(input.getAttribute('aria-invalid')).toBe('true');
+    expect(input.getAttribute('aria-describedby')).toBe('alias-error');
+    expect(fixture.nativeElement.querySelector('#alias-error')?.textContent).toContain('alias');
+  });
+  it('rechaza alias que solo contienen espacios', () => {
+    component.onboardingForm.controls.alias.setValue('   ');
+    component.onPositionsSelected(['1', '2', '3']);
+    component.onFinishSetup();
+    expect(component.onboardingForm.controls.alias.invalid).toBeTrue();
+    expect(onboardingService.completeOnboarding).not.toHaveBeenCalled();
+  });
   it('should not ask for genero during onboarding', () => {
     expect(component.onboardingForm.contains('genero')).toBeFalse();
   });

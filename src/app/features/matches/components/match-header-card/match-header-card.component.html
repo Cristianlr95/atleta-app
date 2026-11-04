@@ -3,6 +3,7 @@
     <div>
       <p class="match-header__title">{{ typeLabel }}</p>
       <p class="match-header__meta">{{ scheduledAtLabel }}</p>
+      <p *ngIf="match.rotativeGoalkeeper" class="match-header__meta">Arquero rotativo</p>
     </div>
     <app-match-status-badge [status]="match.status" [closePending]="!!match.closePending"></app-match-status-badge>
   </div>

@@ -10,7 +10,7 @@ test.describe('Smoke 01 - Auth login', () => {
   test('login redirects and keeps session', async ({ page }) => {
     await loginWithUi(page, users!.userA);
 
-    await expect(page).toHaveURL(/\/(player\/profile|player\/onboarding|sessions\/create|matches\/history|social)/);
+    await expect(page).toHaveURL(/\/(home|player\/onboarding)$/);
 
     await page.goto('/player/profile');
     await expect(page).not.toHaveURL(/\/login$/);

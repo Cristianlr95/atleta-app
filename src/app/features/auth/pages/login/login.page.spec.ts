@@ -25,6 +25,7 @@ describe('LoginPage', () => {
     authService.login.and.returnValue(of(buildSession()));
     authService.loginWithGoogleIdToken.and.returnValue(of(buildSession()));
     googleIdentityService.requestIdToken.and.resolveTo('google-id-token');
+    Object.assign(googleIdentityService, { isConfigured: () => true });
     router.navigate.and.resolveTo(true);
 
     await TestBed.configureTestingModule({
@@ -60,8 +61,27 @@ describe('LoginPage', () => {
     fixture.detectChanges();
   });
 
+  it('explica y asocia los errores de los campos al perder el foco', () => {
+    component.loginForm.controls.email.setValue('correo-invalido');
+    component.loginForm.controls.email.markAsTouched();
+    component.loginForm.controls.password.setValue('corta');
+    component.loginForm.controls.password.markAsTouched();
+    fixture.detectChanges();
+    const email: HTMLInputElement = fixture.nativeElement.querySelector('input[type=email]');
+    const password: HTMLInputElement = fixture.nativeElement.querySelector('input[type=password]');
+    expect(email.getAttribute('aria-describedby')).toBe('login-email-error');
+    expect(password.getAttribute('aria-describedby')).toBe('login-password-error');
+    expect(fixture.nativeElement.querySelector('#login-email-error')).not.toBeNull();
+    expect(fixture.nativeElement.querySelector('#login-password-error')).not.toBeNull();
+  });
   it('should create', () => {
     expect(component).toBeTruthy();
+  });
+
+  it('hides the Google sign-in option when this environment has no client ID', () => {
+    Object.assign(googleIdentityService, { isConfigured: () => false });
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelector('.login-google')).toBeNull();
   });
 
   it('authenticates with Google credential and navigates home', async () => {

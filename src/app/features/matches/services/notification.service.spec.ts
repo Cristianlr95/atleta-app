@@ -36,4 +36,10 @@ describe('NotificationService', () => {
     expect(service.notifications().length).toBe(4);
     expect(service.notifications()[0].message).toContain('Jugador 6');
   });
+
+  it('does not announce missing players when the minimum is already met', async () => {
+    await service.notifyAlmostReady(0);
+    await service.notifyAlmostReady(-1);
+    expect(service.notifications()).toEqual([]);
+  });
 });

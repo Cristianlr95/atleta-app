@@ -114,7 +114,7 @@ Que hace:
 
 Endpoints (evidencia: `src/main/java/com/atleta/demo/controller/RatingController.java`):
 - `POST /api/v1/ratings/update`
-- `POST /api/v1/ratings/update-rotative-goalkeeper`
+- El modo de arquero rotativo se elige al crear un partido; el calculo ocurre al cierre. La actualizacion manual `POST /api/v1/ratings/update-rotative-goalkeeper` sigue bloqueada (403).
 - `GET /api/v1/ratings/player/{playerProfileId}`
 - `POST /api/v1/ratings/player/{playerProfileId}/initialize-base`
 - `GET /api/v1/ratings/player/{playerProfileId}/role/{roleType}`

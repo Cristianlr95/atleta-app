@@ -1,4 +1,4 @@
-﻿<div class="leaderboard">
+<div class="leaderboard">
   <header class="leaderboard__header">
     <img class="atleta-raster-icon" [src]="podiumIconAsset" aria-hidden="true" alt="" />
     <h3>{{ title }}</h3>
@@ -10,7 +10,7 @@
         <tr>
           <th class="leaderboard__rank-heading">#</th>
           <th>Jugador</th>
-          <th *ngIf="showRole">Posición</th>
+          <th *ngIf="showRole" class="leaderboard__role-heading">Posición</th>
           <th>OVR</th>
           <th class="leaderboard__matches-heading">PJ</th>
         </tr>
@@ -27,6 +27,8 @@
           <td>
             <p class="leaderboard__alias">{{ row.alias }}</p>
             <p *ngIf="row.metaText" class="leaderboard__row-meta">{{ row.metaText }}</p>
+            <p *ngIf="showRole && row.roleText" class="leaderboard__mobile-role">{{ row.roleText }}</p>
+            <p *ngIf="row.matchesPlayed !== null && row.matchesPlayed !== undefined && row.metaText !== row.matchesPlayed + ' partidos'" class="leaderboard__mobile-matches">{{ row.matchesPlayed }} partidos</p>
           </td>
           <td *ngIf="showRole" class="leaderboard__role">{{ row.roleText || '—' }}</td>
           <td class="leaderboard__score">{{ row.scoreText }}</td>
@@ -36,5 +38,5 @@
     </table>
   </div>
 
-  <p *ngIf="rows.length === 0" class="leaderboard__empty">Sin datos de ranking.</p>
+  <p *ngIf="rows.length === 0" class="leaderboard__empty" role="status">{{ emptyMessage }}</p>
 </div>

@@ -2,21 +2,14 @@
   <div class="matches-create-container">
     <button type="button" class="wizard-back" (click)="onBack()">‹ Partidos</button>
     <app-metallic-card title="Crear Partido" [titleIconAsset]="titleIconAsset">
-      <header class="wizard-intro">
-        <div><span>Configuración del encuentro</span><p>Paso {{ step() }} de {{ totalSteps }} · {{ stepLabels[step() - 1] }}</p></div>
-        <strong>{{ step() }}/{{ totalSteps }}</strong>
-      </header>
-      <div class="wizard-steps" aria-label="Progreso de creación">
-        <span *ngFor="let label of stepLabels; let index = index" [class.wizard-steps__item--active]="step() === index + 1" [class.wizard-steps__item--complete]="step() > index + 1"><i>{{ index + 1 }}</i><b>{{ label }}</b></span>
-      </div>
+      <p class="wizard-progress" role="status">Paso {{ step() }} de {{ totalSteps }} · {{ stepLabels[step() - 1] }}</p>
 
-      <div class="wizard-actions">
-        <button type="button" class="wizard-action wizard-action--secondary" [disabled]="step() === 1" (click)="onPrevious()">Anterior</button>
-        <button type="button" class="wizard-action" [disabled]="!canContinue() || step() === totalSteps" (click)="onContinue()">Continuar</button>
-      </div>
-
-      <app-metallic-form-section *ngIf="step() === 1" title="Configurar partido" [titleIconAsset]="typeIconAsset" description="Define formato, agenda y lugar antes de convocar.">
+      <app-metallic-form-section *ngIf="step() === 1" description="Define formato, agenda y lugar antes de convocar.">
         <app-match-type-selector [selectedType]="selectedMatchType()" (selectedTypeChange)="selectedMatchType.set($event)"></app-match-type-selector>
+        <app-metallic-select label="Modalidad de arquero" [options]="goalkeeperOptions"
+          [ngModel]="rotativeGoalkeeper() ? 'rotative' : 'fixed'"
+          (ngModelChange)="rotativeGoalkeeper.set($event === 'rotative')"></app-metallic-select>
+        <p class="kit-help">Con arquero rotativo, todos los jugadores confirmados actualizan su calificación de arquero al cerrar el partido.</p>
         <div class="wizard-section-divider"><span>Agenda y cancha</span></div>
         <p *ngIf="loadTeamsError()" class="kit-help">{{ loadTeamsError() }}</p>
         <app-metallic-button *ngIf="loadTeamsError()" type="button" variant="secondary" (click)="onRetryLoadTeams()">
@@ -30,7 +23,7 @@
         </app-match-schedule-form>
       </app-metallic-form-section>
 
-      <app-metallic-form-section *ngIf="step() === 2" title="Convocar jugadores" [titleIconAsset]="playersIconAsset" description="Puedes invitar más personas que cupos: confirman por orden de aceptación.">
+      <app-metallic-form-section *ngIf="step() === 2" description="Puedes invitar más personas que cupos: confirman por orden de aceptación.">
         <div class="kit-grid">
           <app-metallic-select
             label="Vestimenta local"
@@ -46,6 +39,7 @@
           </app-metallic-select>
         </div>
         <p class="kit-help">Sugerencia: usa colores distintos para evitar confusiones en cancha.</p>
+        <p class="kit-help">Ya estás incluido en la convocatoria. Selecciona a los demás jugadores para invitarlos.</p>
         <p class="kit-help">{{ viabilityLabel() }}</p>
 
         <app-player-select-list
@@ -60,12 +54,13 @@
         </app-metallic-button>
       </app-metallic-form-section>
 
-      <app-metallic-form-section *ngIf="step() === 3" title="Confirmar y enviar" [titleIconAsset]="confirmIconAsset" description="Revisa la convocatoria antes de enviarla.">
+      <app-metallic-form-section *ngIf="step() === 3" description="Revisa la convocatoria antes de enviarla.">
         <div class="summary">
           <p><strong>Tipo:</strong> {{ matchTypeLabel }}</p>
           <p><strong>Modalidad:</strong> {{ modalityLabel }}</p>
+          <p><strong>Arquero:</strong> {{ rotativeGoalkeeper() ? 'Rotativo' : 'Fijo' }}</p>
           <p><strong>Convocatoria:</strong> {{ genderCategoryLabel }}</p>
-          <p><strong>Fecha:</strong> {{ schedule().scheduledAt | date:'short' }}</p>
+          <p><strong>Fecha:</strong> {{ schedule().scheduledAt | date:'dd/MM/yyyy, HH:mm' }}</p>
           <p><strong>Cancha:</strong> {{ schedule().venue?.name ?? schedule().location }}</p>
           <p><strong>Dirección:</strong> {{ schedule().venue?.address ?? schedule().location }}</p>
           <p><strong>Vestimenta:</strong> Local {{ kitColors().home }} | Visitante {{ kitColors().away }}</p>
@@ -79,6 +74,12 @@
           Cancelar y volver
         </app-metallic-button>
       </app-metallic-form-section>
+      <p *ngIf="step() === 1 && !canContinue()" class="kit-help">Para continuar, elige tipo de partido, equipo, fecha futura y cancha.</p>
+      <p *ngIf="step() === 2 && !canContinue()" class="kit-help">{{ viabilityLabel() }}</p>
+      <div class="wizard-actions">
+        <button *ngIf="step() > 1" type="button" class="wizard-action wizard-action--secondary" [disabled]="isSending()" (click)="onPrevious()">Anterior</button>
+        <button *ngIf="step() < totalSteps" type="button" class="wizard-action" [disabled]="!canContinue() || loadingPlayers()" (click)="onContinue()">{{ loadingPlayers() ? 'Cargando jugadores...' : 'Continuar' }}</button>
+      </div>
     </app-metallic-card>
   </div>
 </ion-content>

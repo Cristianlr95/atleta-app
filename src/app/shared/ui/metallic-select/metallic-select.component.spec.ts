@@ -18,4 +18,11 @@ describe('MetallicSelectComponent', () => {
   it('should create', () => {
     expect(component).toBeTruthy();
   });
+
+  it('associates its visible label with the native select', () => {
+    component.label = 'Equipo';
+    fixture.detectChanges();
+    const select: HTMLSelectElement = fixture.nativeElement.querySelector('select');
+    expect(select.labels?.[0]?.textContent?.trim()).toBe('Equipo');
+  });
 });

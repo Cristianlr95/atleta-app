@@ -2,7 +2,7 @@
   <button
     *ngFor="let item of items"
     type="button"
-    [attr.data-main-nav-route]="routeHref(item.id)"
+    (click)="onSelect(item.id)"
     class="metallic-bottom-nav__item"
     [attr.aria-label]="item.label"
     [attr.aria-current]="item.active ? 'page' : null"
@@ -18,6 +18,6 @@
       [attr.aria-label]="badgeAriaLabel(item)">
       {{ formatBadgeCount(item.badgeCount) }}
     </span>
-    <span>{{ item.label }}</span>
+    <span class="metallic-bottom-nav__label">{{ item.label }}</span>
   </button>
 </nav>

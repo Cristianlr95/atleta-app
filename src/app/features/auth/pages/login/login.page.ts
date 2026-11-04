@@ -38,6 +38,9 @@ export class LoginPage {
 
   readonly iconBase = 'assets/icons/atleta-raster-v1';
   readonly googleIconAsset = `${this.iconBase}/ic_brand_google_96.png`;
+  get googleAvailable(): boolean {
+    return this.googleIdentityService.isConfigured();
+  }
   isSubmitting = false;
   authError: string | null = null;
   readonly authNotice: string | null;
