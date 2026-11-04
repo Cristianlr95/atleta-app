@@ -10,6 +10,7 @@ import { InvitationsStore } from 'src/app/features/matches/stores/invitations.st
 import { RatingsApiService } from 'src/app/features/ratings/services/ratings-api.service';
 import { TeamSummary } from 'src/app/features/teams/models/team.models';
 import { TeamApiService } from 'src/app/features/teams/services/team-api.service';
+import { UserApiService } from 'src/app/features/user/services/user-api.service';
 import { buildMainBottomNav } from 'src/app/shared/navigation/main-bottom-nav';
 import {
   MetallicBottomNavComponent,
@@ -38,6 +39,7 @@ export class HomePage {
   private readonly invitationsStore = inject(InvitationsStore);
   private readonly notificationBadgeService = inject(NotificationBadgeService);
   private readonly teamApiService = inject(TeamApiService);
+  private readonly userApiService = inject(UserApiService);
 
   readonly iconBase = 'assets/icons/atleta-raster-v1';
   readonly titleIconAsset = `${this.iconBase}/ic_nav_home_96.png`;
@@ -53,6 +55,7 @@ export class HomePage {
 
   playerName = 'Jugador';
   overallHybridOvr: number | null = null;
+  primaryPositionXp: number | null = null;
   streakValue: number | null = null;
   historyUnavailable = false;
 
@@ -103,13 +106,16 @@ export class HomePage {
     this.invitationsUnavailable = false;
 
     forkJoin({
+      profile: this.userApiService.getPlayerProfile(session.user.atletaUuid).pipe(catchError(() => of(null))),
       overall: this.ratingsApiService.getOverall(session.user.atletaUuid).pipe(catchError(() => of(null))),
       history: this.matchHistoryService.getPlayerHistory(session.user.atletaUuid).pipe(catchError(() => of(null))),
       teams: this.teamApiService.getByPlayer(session.user.atletaUuid).pipe(catchError(() => of(null))),
       invitations: from(this.invitationsStore.loadPendingInvitations()).pipe(catchError(() => of(false))),
     })
       .pipe(finalize(() => (this.isLoading = false)))
-      .subscribe(({ overall, history, teams, invitations }) => {
+      .subscribe(({ profile, overall, history, teams, invitations }) => {
+        const xp = profile?.positions?.find((position) => position.prioridad === 1)?.xp;
+        this.primaryPositionXp = typeof xp === 'number' && Number.isSafeInteger(xp) && xp >= 0 ? xp : null;
         this.overallHybridOvr = overall?.hybridOVR ?? null;
         void this.notificationBadgeService.refresh();
 

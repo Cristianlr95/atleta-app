@@ -24,7 +24,7 @@
       <section class="home-metrics" aria-label="Resumen de rendimiento">
         <div class="home-metric"><span>OVR</span><strong>{{ overallHybridOvr !== null ? (overallHybridOvr | number:'1.0-0') : '--' }}</strong></div>
         <div class="home-metric"><span>Invitaciones</span><strong>{{ pendingInvitations() ?? '--' }}</strong></div>
-        <div class="home-metric"><span>XP total</span><strong>--</strong></div>
+        <div class="home-metric"><span>XP posición principal</span><strong>{{ primaryPositionXp ?? '--' }}</strong></div>
       </section>
 
       <div *ngIf="invitationsUnavailable" role="alert" class="home-load-error">No se pudieron cargar las invitaciones. <button type="button" class="home-retry" (click)="loadHomeData()">Reintentar</button></div>
@@ -35,7 +35,7 @@
         <button type="button" class="home-priority__cta" (click)="onOpenMatches()">Ver partidos</button>
       </section>
 
-      <section class="home-progress"><p class="home-hint">XP y nivel no disponibles.</p></section>
+      <section class="home-progress"><p class="home-hint">{{ primaryPositionXp === null ? 'XP y nivel no disponibles.' : 'Nivel no disponible.' }}</p></section>
 
       <section class="home-activity">
         <div class="home-activity__heading"><span>Actividad reciente</span><button type="button" (click)="onOpenHistory()">Ver historial</button></div>

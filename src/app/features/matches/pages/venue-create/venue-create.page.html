@@ -6,6 +6,11 @@
         <p>Selecciona en mapa por latitud/longitud o busca por direccion.</p>
       </div>
 
+      <div *ngIf="fieldsError()" role="alert" class="venue-create__error">
+        No se pudieron cargar las canchas guardadas.
+        <button type="button" class="venue-create__retry" (click)="loadFields()">Reintentar</button>
+      </div>
+
       <app-metallic-location-picker
         [savedFields]="fields()"
         [isSavingField]="loading()"

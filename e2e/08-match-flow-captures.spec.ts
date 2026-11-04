@@ -13,7 +13,8 @@ test.describe('Flujo visual integral de partidos', () => {
       await page.setViewportSize(viewport);
       await page.goto('/home');
       await expect(page.getByRole('button', { name: 'Ver historial' })).toBeVisible();
-      await expect(page.getByText('XP y nivel no disponibles.')).toBeVisible();
+      await expect(page.getByText('Nivel no disponible.')).toBeVisible();
+      await expect(page.locator('.home-metric').nth(2)).toContainText('120');
       await page.keyboard.press('Tab');
       await expect(page.getByRole('button', { name: /Mi equipo/i })).toBeFocused();
       await page.keyboard.press('Tab');
@@ -69,6 +70,25 @@ test.describe('Flujo visual integral de partidos', () => {
     await alert.getByRole('button', { name: 'Reintentar' }).click();
     await expect(alert).toHaveCount(0);
     await expect(page.locator('.home-metric').nth(1)).toContainText('0');
+  });
+
+  test('Inicio muestra XP real de la posición principal en móvil', async ({ page }) => {
+    await page.setViewportSize({ width: 320, height: 760 });
+    await installFlowFixture(page);
+    await page.goto('/home');
+    await expect(page.locator('.home-metric').nth(2)).toContainText('XP posición principal');
+    await expect(page.locator('.home-metric').nth(2)).toContainText('120');
+    await expect(page.getByText('Nivel no disponible.')).toBeVisible();
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true);
+  });
+
+  test('Inicio no inventa XP cuando falla la carga del perfil', async ({ page }) => {
+    await installFlowFixture(page);
+    let profileCalls = 0;
+    await page.route('**/api/v1/player-profiles/ath-flow', route => ++profileCalls === 1 ? json(route, playerProfile()) : route.fulfill({ status: 500, json: {} }));
+    await page.goto('/home');
+    await expect(page.locator('.home-metric').nth(2)).toContainText('--');
+    await expect(page.getByText('XP y nivel no disponibles.')).toBeVisible();
   });
 
   test('Inicio muestra OVR y partido finalizado sin estados contradictorios', async ({ page }) => {
@@ -131,6 +151,32 @@ test.describe('Flujo visual integral de partidos', () => {
     await expect(page.getByText('Invitados: 10')).toBeVisible();
     await expect(page.locator('p').filter({ hasText: /^Fecha:/ })).toContainText(/\d{2}\/\d{2}\/\d{4}, \d{2}:\d{2}/);
     await capture(page, '03-confirmar-convocatoria-mobile.png');
+  });
+
+  test('permite reintentar la carga de canchas guardadas', async ({ page }) => {
+    await installFlowFixture(page);
+    const pattern = '**/api/v1/fields?*';
+    await page.route(pattern, route => route.fulfill({ status: 500, json: {} }));
+    await page.goto('/matches/venues/new');
+    await expect(page.getByRole('alert').filter({ hasText: 'No se pudieron cargar las canchas guardadas' })).toBeVisible();
+    await page.unroute(pattern);
+    await page.getByRole('button', { name: 'Reintentar', exact: true }).click();
+    await expect(page.getByRole('alert').filter({ hasText: 'No se pudieron cargar las canchas guardadas' })).toHaveCount(0);
+    await expect(page.getByLabel('Canchas guardadas').getByRole('option', { name: /Cancha Central/ })).toHaveCount(1);
+  });
+
+  test('permite seleccionar coordenadas de cancha con teclado', async ({ page }) => {
+    await page.setViewportSize({ width: 320, height: 760 });
+    await installFlowFixture(page);
+    await page.goto('/matches/venues/new');
+    await page.getByLabel('Latitud', { exact: true }).fill('-36.82');
+    await page.getByLabel('Longitud', { exact: true }).fill('-73.05');
+    const button = page.getByRole('button', { name: 'Usar coordenadas' });
+    await button.focus();
+    await page.keyboard.press('Enter');
+    await expect(page.getByText('Coordenadas seleccionadas: -36.82 / -73.05')).toBeVisible();
+    await expect(page.getByRole('status').filter({ hasText: 'Coordenadas seleccionadas.' })).toBeVisible();
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true);
   });
 
   test('la búsqueda de canchas se abre al recibir foco por teclado', async ({ page }) => {
