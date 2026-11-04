@@ -34,6 +34,7 @@ export class SocialFacadeService {
   readonly errorMessage = this.errorMessageStore.asReadonly();
 
   readonly isLoading = this.activityService.loading;
+  readonly loadError = this.activityService.error;
   readonly activity = this.activityService.activity;
   readonly unreadCount = this.activityService.unreadCount;
   readonly teams = this.activityService.teams;

@@ -237,6 +237,36 @@ test.describe('Flujo visual integral de partidos', () => {
     await expect(page.getByText('No se pudieron cargar las estadísticas de competición.')).toBeVisible();
     await expect(page.locator('.competition-metrics')).toHaveCount(0);
   });
+  test('social distingue acciones y áreas táctiles con invitaciones en móvil', async ({ page }) => {
+    await page.setViewportSize({ width: 320, height: 760 });
+    await installFlowFixture(page);
+    const request = { id: 1, status: 'PENDIENTE', requesterUuid: 'a', requesterAlias: 'Ana', targetUuid: 'ath-flow', targetAlias: 'CapitanDev', teamId: 7, teamName: 'Azules', matchId: 42 };
+    await page.route('**/api/v1/social/friendships/ath-flow', route => json(route, [{ ...request, type: 'FRIENDSHIP' }]));
+    await page.route('**/api/v1/social/team-invites/ath-flow', route => json(route, [{ ...request, type: 'TEAM_INVITE' }]));
+    await page.route('**/api/v1/social/match-invites/ath-flow', route => json(route, [{ ...request, type: 'MATCH_INVITE' }]));
+    await page.goto('/social');
+    for (const [tab, name] of [['Amigos', 'Aceptar solicitud de Ana'], ['Equipos', 'Aceptar invitación a Azules'], ['Partidos', 'Aceptar invitación al partido 42 de Ana']]) {
+      await page.getByRole('group', { name: 'Secciones sociales' }).getByRole('button', { name: tab }).click();
+      const action = page.getByRole('button', { name, exact: true });
+      await expect(action).toBeVisible();
+      expect((await action.boundingBox())!.height).toBeGreaterThanOrEqual(44);
+      expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true);
+    }
+  });
+
+  test('social informa de fallos y permite reintentar sin mostrar listas vacías falsas', async ({ page }) => {
+    await installFlowFixture(page);
+    const pattern = '**/api/v1/social/friendships/ath-flow';
+    await page.route(pattern, route => route.fulfill({ status: 500, json: {} }));
+    await page.goto('/social');
+    await expect(page.getByRole('alert').filter({ hasText: 'No se pudo cargar la actividad social.' })).toBeVisible();
+    await expect(page.getByText('No hay actividad por ahora.')).toHaveCount(0);
+    await page.unroute(pattern);
+    await page.getByRole('button', { name: 'Reintentar carga social' }).click();
+    await expect(page.getByRole('alert').filter({ hasText: 'No se pudo cargar la actividad social.' })).toHaveCount(0);
+    await expect(page.getByText('No hay actividad por ahora.')).toBeVisible();
+  });
+
   test('social permite recorrer secciones en móvil sin desbordamiento', async ({ page }) => {
     await page.setViewportSize({ width: 320, height: 760 });
     await installFlowFixture(page);

@@ -103,6 +103,7 @@ function buildActivityServiceMock(): jasmine.SpyObj<ActivityService> {
   const empty = signal([]);
   return {
     loading: signal(false).asReadonly(),
+    error: signal<string | null>(null).asReadonly(),
     activity: empty.asReadonly(),
     unreadCount: signal(0).asReadonly(),
     teams: empty.asReadonly(),
