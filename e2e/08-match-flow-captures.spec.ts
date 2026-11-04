@@ -45,6 +45,32 @@ test.describe('Flujo visual integral de partidos', () => {
     await expect(page).toHaveURL(/\/sessions\/create$/);
     await expect(page.getByRole('button', { name: 'Crear equipo', exact: true })).toBeVisible();
   });
+  test('Inicio permite recuperar el equipo si su carga falla', async ({ page }) => {
+    await installFlowFixture(page);
+    const pattern = '**/api/v1/teams/by-player/ath-flow';
+    await page.route(pattern, route => route.fulfill({ status: 500, json: {} }));
+    await page.goto('/home');
+    const team = page.getByRole('button', { name: /Equipo no disponible.*Reintentar/ });
+    await expect(team).toBeVisible();
+    await page.unroute(pattern);
+    await team.click();
+    await expect(page.getByRole('button', { name: /Mi equipo.*Atleta Dev FC/ })).toBeVisible();
+  });
+
+  test('Inicio permite recuperar las invitaciones si su carga falla', async ({ page }) => {
+    await installFlowFixture(page);
+    const pattern = '**/api/v1/social/match-invites/ath-flow';
+    await page.route(pattern, route => route.fulfill({ status: 500, json: {} }));
+    await page.goto('/home');
+    const alert = page.getByRole('alert').filter({ hasText: 'No se pudieron cargar las invitaciones' });
+    await expect(alert).toBeVisible();
+    await expect(page.locator('.home-metric').nth(1)).toContainText('--');
+    await page.unroute(pattern);
+    await alert.getByRole('button', { name: 'Reintentar' }).click();
+    await expect(alert).toHaveCount(0);
+    await expect(page.locator('.home-metric').nth(1)).toContainText('0');
+  });
+
   test('Inicio muestra OVR y partido finalizado sin estados contradictorios', async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
     await installFlowFixture(page);
@@ -173,6 +199,15 @@ test.describe('Flujo visual integral de partidos', () => {
     await expect(page.locator('app-xp-reward-card .xp-item').first()).toContainText('XP estimados');
     await expect(page.locator('app-xp-reward-card .xp-level-up, app-xp-reward-card .xp-bar')).toHaveCount(0);
     await capture(page, '07-recompensas-mobile.png');
+  });
+
+  test('ajustes anuncia errores de validación sin enviar datos', async ({ page }) => {
+    await installFlowFixture(page);
+    await page.goto('/player/settings');
+    await page.getByRole('button', { name: 'Actualizar contrasena' }).click();
+    await expect(page.getByRole('alert').filter({ hasText: 'al menos 8 caracteres' })).toBeVisible();
+    await page.getByRole('button', { name: 'Eliminar mi cuenta' }).click();
+    await expect(page.getByRole('alert').filter({ hasText: 'Escribe ELIMINAR' })).toBeVisible();
   });
 
   test('perfil sin datos reales no muestra estadísticas ni trofeos de ejemplo', async ({ page }) => {

@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject, signal } from '@angular/core';
 import { IonicModule } from '@ionic/angular';
-import { catchError, finalize, forkJoin, of } from 'rxjs';
+import { catchError, finalize, forkJoin, from, of } from 'rxjs';
 import { AuthSessionService } from 'src/app/core/services/auth-session.service';
 import { NavigationService } from 'src/app/core/services/navigation.service';
 import { MatchHistoryViewItem, MatchHistoryService } from 'src/app/features/matches/services/match-history.service';
@@ -47,7 +47,9 @@ export class HomePage {
   nextMatchLabel = 'Sin partido agendado';
   nextMatchDetail = 'Crea o acepta una invitación para entrar en competencia.';
   nextMatchStatus: MatchHistoryViewItem['displayStatusKey'] | 'NONE' = 'NONE';
-  pendingInvitations = signal(0);
+  pendingInvitations = signal<number | null>(null);
+  invitationsUnavailable = false;
+  teamsUnavailable = false;
 
   playerName = 'Jugador';
   overallHybridOvr: number | null = null;
@@ -70,6 +72,10 @@ export class HomePage {
   }
 
   onOpenTeam(): void {
+    if (this.teamsUnavailable) {
+      this.loadHomeData();
+      return;
+    }
     if (this.currentTeam) {
       void this.navigationService.safeNavigate(['/teams', String(this.currentTeam.id)]);
       return;
@@ -94,19 +100,21 @@ export class HomePage {
     this.playerName = session.user.nombre || 'Jugador';
     this.isLoading = true;
     this.historyUnavailable = false;
+    this.invitationsUnavailable = false;
 
     forkJoin({
       overall: this.ratingsApiService.getOverall(session.user.atletaUuid).pipe(catchError(() => of(null))),
       history: this.matchHistoryService.getPlayerHistory(session.user.atletaUuid).pipe(catchError(() => of(null))),
-      teams: this.teamApiService.getByPlayer(session.user.atletaUuid).pipe(catchError(() => of([] as TeamSummary[]))),
+      teams: this.teamApiService.getByPlayer(session.user.atletaUuid).pipe(catchError(() => of(null))),
+      invitations: from(this.invitationsStore.loadPendingInvitations()).pipe(catchError(() => of(false))),
     })
       .pipe(finalize(() => (this.isLoading = false)))
-      .subscribe(async ({ overall, history, teams }) => {
+      .subscribe(({ overall, history, teams, invitations }) => {
         this.overallHybridOvr = overall?.hybridOVR ?? null;
-        await this.invitationsStore.loadPendingInvitations();
         void this.notificationBadgeService.refresh();
 
-        this.pendingInvitations.set(this.invitationsStore.pendingInvitations().length);
+        this.invitationsUnavailable = !invitations;
+        this.pendingInvitations.set(invitations ? this.invitationsStore.pendingInvitations().length : null);
         if (history === null) {
           this.historyUnavailable = true;
           this.nextMatchLabel = 'No se pudieron cargar los partidos';
@@ -117,7 +125,8 @@ export class HomePage {
         } else {
           this.applyHistoryContext(history);
         }
-        this.currentTeam = teams[0] ?? null;
+        this.teamsUnavailable = teams === null;
+        this.currentTeam = teams?.[0] ?? null;
       });
   }
 
