@@ -4,10 +4,11 @@
 
     <app-metallic-card title="Estadisticas" [titleIconAsset]="titleIconAsset">
       <p class="stats-kicker">Lectura competitiva</p>
-      <p class="stats-message" *ngIf="isLoading">Actualizando rendimiento...</p>
-      <p class="stats-message stats-message--error" *ngIf="errorMessage">{{ errorMessage }}</p>
+      <p class="stats-message" role="status" *ngIf="isLoading">Actualizando rendimiento...</p>
+      <p class="stats-message stats-message--error" role="alert" *ngIf="errorMessage">{{ errorMessage }}</p>
       <button *ngIf="errorMessage" type="button" class="stats-retry" (click)="onRetry()">Reintentar</button>
 
+      <ng-container *ngIf="!isLoading && !errorMessage">
       <app-metallic-stats [stats]="summaryStats" [compact]="true"></app-metallic-stats>
 
       <div class="stats-insight">
@@ -54,6 +55,7 @@
           <p class="stats-message">Juega o cierra partidos para construir historial competitivo.</p>
         </ng-template>
       </app-metallic-form-section>
+      </ng-container>
 
       <button type="button" class="stats-leaderboard" (click)="onOpenLeaderboard()">
         Ver ranking completo

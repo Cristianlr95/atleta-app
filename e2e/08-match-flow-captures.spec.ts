@@ -128,6 +128,21 @@ test.describe('Flujo visual integral de partidos', () => {
     await expect(page.getByText('No se pudo cargar la agenda e historial de partidos.')).toBeVisible();
     await expect(page.getByRole('button', { name: 'Reintentar carga' })).toBeVisible();
     await expect(page.getByText('Aun no tienes registros de competicion.')).toHaveCount(0);
+    await page.getByRole('tab', { name: 'Próximos' }).click();
+    await expect(page.getByRole('alert')).toContainText('No se pudo cargar la agenda');
+  });
+  test('ranking anuncia un error de carga y permite reintentar', async ({ page }) => {
+    await installFlowFixture(page);
+    await page.route('**/assets/app-config.json', route => json(route, {
+      apiBaseUrl: 'http://localhost:8080/api/v1', storagePrefix: 'atleta.dev', environmentName: 'test',
+    }));
+    const pattern = '**/api/v1/ratings/leaderboard*';
+    await page.route(pattern, route => route.fulfill({ status: 500, json: {} }));
+    await page.goto('/leaderboard');
+    await expect(page.getByRole('alert')).toBeVisible();
+    await page.unroute(pattern);
+    await page.getByRole('button', { name: 'Reintentar' }).click();
+    await expect(page.getByRole('alert')).toHaveCount(0);
   });
   test('documenta configurar, convocar y confirmar en movil', async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
@@ -254,6 +269,26 @@ test.describe('Flujo visual integral de partidos', () => {
     await expect(page.getByRole('alert').filter({ hasText: 'al menos 8 caracteres' })).toBeVisible();
     await page.getByRole('button', { name: 'Eliminar mi cuenta' }).click();
     await expect(page.getByRole('alert').filter({ hasText: 'Escribe ELIMINAR' })).toBeVisible();
+  });
+
+  test('estadísticas anuncia fallos y recupera los datos al reintentar', async ({ page }) => {
+    await installFlowFixture(page);
+    const pattern = '**/api/v1/matches/by-player*/ath-flow';
+    for (const width of [320, 1366]) {
+      await page.setViewportSize({ width, height: 844 });
+      await page.route(pattern, route => route.fulfill({ status: 500, json: {} }));
+      await page.goto('/stats');
+      await expect(page.getByRole('alert')).toContainText('No se pudieron cargar las estadísticas');
+      await expect(page.getByText('Juega o cierra partidos')).toHaveCount(0);
+      await page.unroute(pattern);
+      const retry = page.getByRole('button', { name: 'Reintentar' });
+      await retry.focus();
+      await expect(retry).toBeFocused();
+      await page.keyboard.press('Enter');
+      await expect(page.getByRole('alert')).toHaveCount(0);
+      await expect(page.getByText('Juega o cierra partidos', { exact: false })).toBeVisible();
+      expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true);
+    }
   });
 
   test('perfil sin datos reales no muestra estadísticas ni trofeos de ejemplo', async ({ page }) => {
