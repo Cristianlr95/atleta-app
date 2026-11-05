@@ -170,6 +170,7 @@ function buildSocialFacadeMock() {
   const facade = {
     activeTab: activeTab.asReadonly(),
     isLoading: signal(false).asReadonly(),
+    loadError: signal<string | null>(null).asReadonly(),
     activity: signal([]).asReadonly(),
     unreadCount: unreadCount.asReadonly(),
     teams: signal([]).asReadonly(),

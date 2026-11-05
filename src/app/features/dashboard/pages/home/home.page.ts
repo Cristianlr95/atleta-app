@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject, signal } from '@angular/core';
 import { IonicModule } from '@ionic/angular';
-import { catchError, finalize, forkJoin, of } from 'rxjs';
+import { catchError, finalize, forkJoin, from, of } from 'rxjs';
 import { AuthSessionService } from 'src/app/core/services/auth-session.service';
 import { NavigationService } from 'src/app/core/services/navigation.service';
 import { MatchHistoryViewItem, MatchHistoryService } from 'src/app/features/matches/services/match-history.service';
@@ -10,6 +10,7 @@ import { InvitationsStore } from 'src/app/features/matches/stores/invitations.st
 import { RatingsApiService } from 'src/app/features/ratings/services/ratings-api.service';
 import { TeamSummary } from 'src/app/features/teams/models/team.models';
 import { TeamApiService } from 'src/app/features/teams/services/team-api.service';
+import { UserApiService } from 'src/app/features/user/services/user-api.service';
 import { buildMainBottomNav } from 'src/app/shared/navigation/main-bottom-nav';
 import {
   MetallicBottomNavComponent,
@@ -17,6 +18,7 @@ import {
 } from 'src/app/shared/ui/metallic-bottom-nav/metallic-bottom-nav.component';
 import { MetallicCardComponent } from 'src/app/shared/ui/metallic-card/metallic-card.component';
 import { buildHomeActivity, HomeActivityItem } from '../../utils/home-activity.util';
+import { PositionLevel, positionLevel } from '../../utils/position-level.util';
 
 @Component({
   selector: 'app-home-page',
@@ -38,6 +40,7 @@ export class HomePage {
   private readonly invitationsStore = inject(InvitationsStore);
   private readonly notificationBadgeService = inject(NotificationBadgeService);
   private readonly teamApiService = inject(TeamApiService);
+  private readonly userApiService = inject(UserApiService);
 
   readonly iconBase = 'assets/icons/atleta-raster-v1';
   readonly titleIconAsset = `${this.iconBase}/ic_nav_home_96.png`;
@@ -47,11 +50,16 @@ export class HomePage {
   nextMatchLabel = 'Sin partido agendado';
   nextMatchDetail = 'Crea o acepta una invitación para entrar en competencia.';
   nextMatchStatus: MatchHistoryViewItem['displayStatusKey'] | 'NONE' = 'NONE';
-  pendingInvitations = signal(0);
+  pendingInvitations = signal<number | null>(null);
+  invitationsUnavailable = false;
+  teamsUnavailable = false;
 
   playerName = 'Jugador';
   overallHybridOvr: number | null = null;
-  streakValue = 0;
+  primaryPositionXp: number | null = null;
+  levelProgress: PositionLevel | null = null;
+  streakValue: number | null = null;
+  historyUnavailable = false;
 
   activities: HomeActivityItem[] = [];
   currentTeam: TeamSummary | null = null;
@@ -69,11 +77,15 @@ export class HomePage {
   }
 
   onOpenTeam(): void {
+    if (this.teamsUnavailable) {
+      this.loadHomeData();
+      return;
+    }
     if (this.currentTeam) {
       void this.navigationService.safeNavigate(['/teams', String(this.currentTeam.id)]);
       return;
     }
-    void this.navigationService.safeNavigate(['/matches/create']);
+    void this.navigationService.safeNavigate(['/sessions/create']);
   }
 
   onOpenMatches(): void {
@@ -84,7 +96,7 @@ export class HomePage {
     void this.navigationService.safeNavigate(['/matches/history']);
   }
 
-  private loadHomeData(): void {
+  loadHomeData(): void {
     const session = this.authSessionService.currentSession;
     if (!session) {
       return;
@@ -92,21 +104,38 @@ export class HomePage {
 
     this.playerName = session.user.nombre || 'Jugador';
     this.isLoading = true;
+    this.historyUnavailable = false;
+    this.invitationsUnavailable = false;
 
     forkJoin({
+      profile: this.userApiService.getPlayerProfile(session.user.atletaUuid).pipe(catchError(() => of(null))),
       overall: this.ratingsApiService.getOverall(session.user.atletaUuid).pipe(catchError(() => of(null))),
-      history: this.matchHistoryService.getPlayerHistory(session.user.atletaUuid).pipe(catchError(() => of([]))),
-      teams: this.teamApiService.getByPlayer(session.user.atletaUuid).pipe(catchError(() => of([] as TeamSummary[]))),
+      history: this.matchHistoryService.getPlayerHistory(session.user.atletaUuid).pipe(catchError(() => of(null))),
+      teams: this.teamApiService.getByPlayer(session.user.atletaUuid).pipe(catchError(() => of(null))),
+      invitations: from(this.invitationsStore.loadPendingInvitations()).pipe(catchError(() => of(false))),
     })
       .pipe(finalize(() => (this.isLoading = false)))
-      .subscribe(async ({ overall, history, teams }) => {
+      .subscribe(({ profile, overall, history, teams, invitations }) => {
+        const xp = profile?.positions?.find((position) => position.prioridad === 1)?.xp;
+        this.primaryPositionXp = typeof xp === 'number' && Number.isSafeInteger(xp) && xp >= 0 && xp <= 2147483647 ? xp : null;
+        this.levelProgress = this.primaryPositionXp === null ? null : positionLevel(this.primaryPositionXp);
         this.overallHybridOvr = overall?.hybridOVR ?? null;
-        await this.invitationsStore.loadPendingInvitations();
         void this.notificationBadgeService.refresh();
 
-        this.pendingInvitations.set(this.invitationsStore.pendingInvitations().length);
-        this.applyHistoryContext(history);
-        this.currentTeam = teams[0] ?? null;
+        this.invitationsUnavailable = !invitations;
+        this.pendingInvitations.set(invitations ? this.invitationsStore.pendingInvitations().length : null);
+        if (history === null) {
+          this.historyUnavailable = true;
+          this.nextMatchLabel = 'No se pudieron cargar los partidos';
+          this.nextMatchDetail = 'Vuelve a intentarlo para consultar tu actividad.';
+          this.nextMatchStatus = 'NONE';
+          this.streakValue = null;
+          this.activities = [];
+        } else {
+          this.applyHistoryContext(history);
+        }
+        this.teamsUnavailable = teams === null;
+        this.currentTeam = teams?.[0] ?? null;
       });
   }
 

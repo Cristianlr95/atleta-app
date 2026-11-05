@@ -71,3 +71,6 @@
 .home-brand img { width: 42px; height: 42px; border-radius: 10px; }
 .home-brand span { display: block; font-family: var(--font-family-display); font-weight: 800; font-size: 17px; letter-spacing: .08em; }
 .home-brand h1 { margin: 0; font: 600 11px var(--font-family-body); letter-spacing: .06em; text-transform: uppercase; color: var(--text-secondary); }
+
+.home-team { min-height: 44px; }
+.home-retry { min-height: 44px; border: 0; background: transparent; color: var(--tactical-visit); font-weight: 700; cursor: pointer; }

@@ -223,6 +223,18 @@ export class MetallicLocationPickerComponent implements AfterViewInit, OnChanges
     this.helperMessage = `Cancha seleccionada: ${selected.nombre}.`;
   }
 
+  onSetCoordinates(latitude: string, longitude: string): void {
+    const lat = Number(latitude);
+    const lng = Number(longitude);
+    if (!latitude.trim() || !longitude.trim() || !Number.isFinite(lat) || !Number.isFinite(lng) || Math.abs(lat) > 90 || Math.abs(lng) > 180) {
+      this.helperMessage = 'Introduce una latitud entre -90 y 90 y una longitud entre -180 y 180.';
+      return;
+    }
+    this.updateSelectedLocation(lat, lng, true);
+    this.selectedFieldId = '';
+    this.helperMessage = 'Coordenadas seleccionadas.';
+  }
+
   onSaveField(): void {
     const nombre = this.fieldName.trim();
     const direccion = this.fieldAddress.trim();

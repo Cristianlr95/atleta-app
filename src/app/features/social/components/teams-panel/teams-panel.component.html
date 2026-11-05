@@ -2,7 +2,7 @@
   <h4>Mi equipo principal</h4>
   <article class="teams-item" *ngIf="principalTeam; else noTeam">
     <p>{{ principalTeam.nombre }}</p>
-    <button type="button" (click)="openTeam.emit(principalTeam.id)">Abrir equipo</button>
+    <button type="button" [attr.aria-label]="'Abrir equipo ' + principalTeam.nombre" (click)="openTeam.emit(principalTeam.id)">Abrir equipo</button>
   </article>
   <ng-template #noTeam>
     <p class="teams-panel__state">No tienes equipo principal definido.</p>
@@ -14,9 +14,9 @@
     <article class="teams-item" *ngFor="let team of createdTeams">
       <p>{{ team.nombre }}</p>
       <div class="teams-item__actions">
-        <button type="button" (click)="openTeam.emit(team.id)">Administrar</button>
-        <button type="button" (click)="onPickTeamForInvite(team)">Invitar jugador</button>
-        <button type="button" (click)="onDeleteTeam(team)">Eliminar</button>
+        <button type="button" [attr.aria-label]="'Administrar ' + team.nombre" (click)="openTeam.emit(team.id)">Administrar</button>
+        <button type="button" [attr.aria-label]="'Invitar jugador a ' + team.nombre" (click)="onPickTeamForInvite(team)">Invitar jugador</button>
+        <button type="button" [attr.aria-label]="'Eliminar ' + team.nombre" (click)="onDeleteTeam(team)">Eliminar</button>
       </div>
     </article>
   </div>
@@ -27,8 +27,8 @@
     <article class="teams-item" *ngFor="let invite of pendingInvites">
       <p>{{ invite.requesterAlias }} te invito a {{ invite.teamName || ('Equipo ' + invite.teamId) }}</p>
       <div class="teams-item__actions">
-        <button type="button" (click)="respondInvite.emit({ inviteId: invite.id, accept: true })"><img class="atleta-raster-icon" src="assets/icons/atleta-raster-v1/ic_action_accept_96.png" aria-hidden="true" alt="" />Aceptar</button>
-        <button type="button" (click)="respondInvite.emit({ inviteId: invite.id, accept: false })"><img class="atleta-raster-icon" src="assets/icons/atleta-raster-v1/ic_action_reject_96.png" aria-hidden="true" alt="" />Rechazar</button>
+        <button type="button" [attr.aria-label]="'Aceptar invitación a ' + (invite.teamName || ('Equipo ' + invite.teamId))" (click)="respondInvite.emit({ inviteId: invite.id, accept: true })"><img class="atleta-raster-icon" src="assets/icons/atleta-raster-v1/ic_action_accept_96.png" aria-hidden="true" alt="" />Aceptar</button>
+        <button type="button" [attr.aria-label]="'Rechazar invitación a ' + (invite.teamName || ('Equipo ' + invite.teamId))" (click)="respondInvite.emit({ inviteId: invite.id, accept: false })"><img class="atleta-raster-icon" src="assets/icons/atleta-raster-v1/ic_action_reject_96.png" aria-hidden="true" alt="" />Rechazar</button>
       </div>
     </article>
   </div>
@@ -46,7 +46,7 @@
   <div class="teams-panel__list" *ngIf="inviteCandidates.length > 0">
     <article class="teams-item" *ngFor="let player of inviteCandidates">
       <p>{{ player.alias || player.athleteName || player.atletaUuid }}</p>
-      <button type="button" [disabled]="!canInvitePlayers" (click)="onSendInvite(player.atletaUuid)">Invitar</button>
+      <button type="button" [attr.aria-label]="'Invitar a ' + (player.alias || player.athleteName || player.atletaUuid)" [disabled]="!canInvitePlayers" (click)="onSendInvite(player.atletaUuid)">Invitar</button>
     </article>
   </div>
 </section>

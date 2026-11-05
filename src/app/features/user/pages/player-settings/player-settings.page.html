@@ -28,8 +28,8 @@
             <span>Confirmar nueva contrasena</span>
             <input type="password" name="confirmNewPassword" autocomplete="new-password" [(ngModel)]="confirmNewPassword" [disabled]="passwordChangeLoading" />
           </label>
-          <p class="settings-message settings-message--warning" *ngIf="passwordChangeError">{{ passwordChangeError }}</p>
-          <p class="settings-message settings-message--success" *ngIf="passwordChangeMessage">{{ passwordChangeMessage }}</p>
+          <p class="settings-message settings-message--warning" role="alert" *ngIf="passwordChangeError">{{ passwordChangeError }}</p>
+          <p class="settings-message settings-message--success" role="status" *ngIf="passwordChangeMessage">{{ passwordChangeMessage }}</p>
           <button type="submit" class="settings-submit" [disabled]="passwordChangeLoading">
             {{ passwordChangeLoading ? 'Actualizando...' : 'Actualizar contrasena' }}
           </button>
@@ -50,7 +50,7 @@
             <span>Escribe ELIMINAR para confirmar</span>
             <input type="text" name="deleteConfirmation" autocomplete="off" [(ngModel)]="deleteConfirmation" [disabled]="deleteLoading" />
           </label>
-          <p class="settings-message settings-message--warning" *ngIf="deleteError">{{ deleteError }}</p>
+          <p class="settings-message settings-message--warning" role="alert" *ngIf="deleteError">{{ deleteError }}</p>
           <button type="submit" class="settings-delete" [disabled]="deleteLoading">
             {{ deleteLoading ? 'Eliminando...' : 'Eliminar mi cuenta' }}
           </button>

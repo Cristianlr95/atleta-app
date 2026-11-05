@@ -37,10 +37,12 @@
 
 .friends-item__actions {
   display: flex;
+  flex-wrap: wrap;
   gap: 6px;
 }
 
 .friends-item__actions button {
+  min-height: 44px;
   display: inline-flex;
   align-items: center;
   gap: 6px;

@@ -7,25 +7,27 @@
       </header>
       <section class="home-overview">
         <div class="home-identity">
-          <div class="home-avatar">{{ playerName.charAt(0) }}</div>
+          <div class="home-avatar" aria-hidden="true">{{ playerName.charAt(0) }}</div>
           <div class="home-identity__meta">
             <p class="home-name">{{ playerName }}</p>
             <p class="home-subtitle">Jugador de Atleta</p>
-            <p class="home-streak">{{ streakValue }} partidos consecutivos</p>
+            <p class="home-streak" *ngIf="streakValue !== null">{{ streakValue }} partidos consecutivos</p>
           </div>
         </div>
         <button type="button" class="home-team" (click)="onOpenTeam()">
           <img class="atleta-raster-icon" [src]="teamIconAsset" aria-hidden="true" alt="" />
-          <span class="home-team__copy"><small>Mi equipo</small><strong>{{ currentTeam?.nombre ?? 'Sin equipo' }}</strong></span>
+          <span class="home-team__copy"><small>Mi equipo</small><strong>{{ teamsUnavailable ? 'Equipo no disponible · Reintentar' : (currentTeam?.nombre ?? 'Sin equipo · Crear equipo') }}</strong></span>
           <span class="home-team__arrow" aria-hidden="true">›</span>
         </button>
       </section>
 
       <section class="home-metrics" aria-label="Resumen de rendimiento">
         <div class="home-metric"><span>OVR</span><strong>{{ overallHybridOvr !== null ? (overallHybridOvr | number:'1.0-0') : '--' }}</strong></div>
-        <div class="home-metric"><span>Invitaciones</span><strong>{{ pendingInvitations() }}</strong></div>
-        <div class="home-metric"><span>XP total</span><strong>--</strong></div>
+        <div class="home-metric"><span>Invitaciones</span><strong>{{ pendingInvitations() ?? '--' }}</strong></div>
+        <div class="home-metric"><span>XP posición principal</span><strong>{{ primaryPositionXp ?? '--' }}</strong></div>
       </section>
+
+      <div *ngIf="invitationsUnavailable" role="alert" class="home-load-error">No se pudieron cargar las invitaciones. <button type="button" class="home-retry" (click)="loadHomeData()">Reintentar</button></div>
 
       <section class="home-priority" [class.home-priority--empty]="nextMatchStatus === 'NONE'">
         <div class="home-priority__label">En cancha</div>
@@ -33,11 +35,18 @@
         <button type="button" class="home-priority__cta" (click)="onOpenMatches()">Ver partidos</button>
       </section>
 
-      <section class="home-progress"><p class="home-hint">XP y nivel no disponibles.</p></section>
+      <section class="home-progress" aria-label="Progreso de posición principal">
+        <ng-container *ngIf="levelProgress as progress; else noLevel">
+          <div class="home-progress__heading"><span>Nivel de posición {{ progress.level }}</span><strong>{{ progress.currentXp }} / {{ progress.requiredXp }} XP</strong></div>
+          <div class="home-xp__track" role="progressbar" aria-label="Progreso hacia el siguiente nivel de posición" aria-valuemin="0" aria-valuemax="100" [attr.aria-valuenow]="progress.percent" [attr.aria-valuetext]="progress.currentXp + ' de ' + progress.requiredXp + ' XP'"><div class="home-xp__fill" [style.width.%]="progress.percent"></div></div>
+        </ng-container>
+        <ng-template #noLevel><p class="home-hint">XP y nivel no disponibles.</p></ng-template>
+      </section>
 
       <section class="home-activity">
         <div class="home-activity__heading"><span>Actividad reciente</span><button type="button" (click)="onOpenHistory()">Ver historial</button></div>
-        <p *ngIf="isLoading" class="home-loading">Actualizando actividad...</p>
+        <p *ngIf="isLoading" class="home-loading" role="status">Actualizando actividad...</p>
+        <div *ngIf="historyUnavailable" role="alert"><p>No se pudo cargar la actividad reciente.</p><button type="button" class="home-retry" (click)="loadHomeData()">Reintentar</button></div>
         <div class="home-feed"><article class="home-feed__item" *ngFor="let item of activities" [attr.data-variant]="item.variant">{{ item.text }}</article></div>
       </section>
     </app-metallic-card>

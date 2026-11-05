@@ -13,7 +13,8 @@ test.describe('Flujo visual integral de partidos', () => {
       await page.setViewportSize(viewport);
       await page.goto('/home');
       await expect(page.getByRole('button', { name: 'Ver historial' })).toBeVisible();
-      await expect(page.getByText('XP y nivel no disponibles.')).toBeVisible();
+      await expect(page.getByText('Nivel de posición 2')).toBeVisible();
+      await expect(page.locator('.home-metric').nth(2)).toContainText('120');
       await page.keyboard.press('Tab');
       await expect(page.getByRole('button', { name: /Mi equipo/i })).toBeFocused();
       await page.keyboard.press('Tab');
@@ -25,6 +26,71 @@ test.describe('Flujo visual integral de partidos', () => {
       await capture(page, `08-inicio-${viewport.width}.png`);
     }
   });
+  test('Inicio permite recuperar la actividad cuando falla el historial', async ({ page }) => {
+    await installFlowFixture(page);
+    const pattern = '**/api/v1/matches/by-player*/ath-flow';
+    await page.route(pattern, route => route.fulfill({ status: 500, json: {} }));
+    await page.goto('/home');
+    await expect(page.getByRole('alert')).toContainText('No se pudo cargar la actividad reciente');
+    await expect(page.getByText('Sin partido agendado')).toHaveCount(0);
+    await page.unroute(pattern);
+    await page.getByRole('button', { name: 'Reintentar' }).click();
+    await expect(page.getByText('Sin partido agendado')).toBeVisible();
+    await expect(page.getByRole('alert')).toHaveCount(0);
+  });
+  test('Inicio ofrece crear equipo cuando no hay equipo asociado', async ({ page }) => {
+    await installFlowFixture(page);
+    await page.route('**/api/v1/teams/by-player/ath-flow', route => json(route, []));
+    await page.goto('/home');
+    await page.getByRole('button', { name: /Sin equipo.*Crear equipo/ }).click();
+    await expect(page).toHaveURL(/\/sessions\/create$/);
+    await expect(page.getByRole('button', { name: 'Crear equipo', exact: true })).toBeVisible();
+  });
+  test('Inicio permite recuperar el equipo si su carga falla', async ({ page }) => {
+    await installFlowFixture(page);
+    const pattern = '**/api/v1/teams/by-player/ath-flow';
+    await page.route(pattern, route => route.fulfill({ status: 500, json: {} }));
+    await page.goto('/home');
+    const team = page.getByRole('button', { name: /Equipo no disponible.*Reintentar/ });
+    await expect(team).toBeVisible();
+    await page.unroute(pattern);
+    await team.click();
+    await expect(page.getByRole('button', { name: /Mi equipo.*Atleta Dev FC/ })).toBeVisible();
+  });
+
+  test('Inicio permite recuperar las invitaciones si su carga falla', async ({ page }) => {
+    await installFlowFixture(page);
+    const pattern = '**/api/v1/social/match-invites/ath-flow';
+    await page.route(pattern, route => route.fulfill({ status: 500, json: {} }));
+    await page.goto('/home');
+    const alert = page.getByRole('alert').filter({ hasText: 'No se pudieron cargar las invitaciones' });
+    await expect(alert).toBeVisible();
+    await expect(page.locator('.home-metric').nth(1)).toContainText('--');
+    await page.unroute(pattern);
+    await alert.getByRole('button', { name: 'Reintentar' }).click();
+    await expect(alert).toHaveCount(0);
+    await expect(page.locator('.home-metric').nth(1)).toContainText('0');
+  });
+
+  test('Inicio muestra XP real de la posición principal en móvil', async ({ page }) => {
+    await page.setViewportSize({ width: 320, height: 760 });
+    await installFlowFixture(page);
+    await page.goto('/home');
+    await expect(page.locator('.home-metric').nth(2)).toContainText('XP posición principal');
+    await expect(page.locator('.home-metric').nth(2)).toContainText('120');
+    await expect(page.getByText('Nivel de posición 2')).toBeVisible();
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true);
+  });
+
+  test('Inicio no inventa XP cuando falla la carga del perfil', async ({ page }) => {
+    await installFlowFixture(page);
+    let profileCalls = 0;
+    await page.route('**/api/v1/player-profiles/ath-flow', route => ++profileCalls === 1 ? json(route, playerProfile()) : route.fulfill({ status: 500, json: {} }));
+    await page.goto('/home');
+    await expect(page.locator('.home-metric').nth(2)).toContainText('--');
+    await expect(page.getByText('XP y nivel no disponibles.')).toBeVisible();
+  });
+
   test('Inicio muestra OVR y partido finalizado sin estados contradictorios', async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
     await installFlowFixture(page);
@@ -85,6 +151,32 @@ test.describe('Flujo visual integral de partidos', () => {
     await expect(page.getByText('Invitados: 10')).toBeVisible();
     await expect(page.locator('p').filter({ hasText: /^Fecha:/ })).toContainText(/\d{2}\/\d{2}\/\d{4}, \d{2}:\d{2}/);
     await capture(page, '03-confirmar-convocatoria-mobile.png');
+  });
+
+  test('permite reintentar la carga de canchas guardadas', async ({ page }) => {
+    await installFlowFixture(page);
+    const pattern = '**/api/v1/fields?*';
+    await page.route(pattern, route => route.fulfill({ status: 500, json: {} }));
+    await page.goto('/matches/venues/new');
+    await expect(page.getByRole('alert').filter({ hasText: 'No se pudieron cargar las canchas guardadas' })).toBeVisible();
+    await page.unroute(pattern);
+    await page.getByRole('button', { name: 'Reintentar', exact: true }).click();
+    await expect(page.getByRole('alert').filter({ hasText: 'No se pudieron cargar las canchas guardadas' })).toHaveCount(0);
+    await expect(page.getByLabel('Canchas guardadas').getByRole('option', { name: /Cancha Central/ })).toHaveCount(1);
+  });
+
+  test('permite seleccionar coordenadas de cancha con teclado', async ({ page }) => {
+    await page.setViewportSize({ width: 320, height: 760 });
+    await installFlowFixture(page);
+    await page.goto('/matches/venues/new');
+    await page.getByLabel('Latitud', { exact: true }).fill('-36.82');
+    await page.getByLabel('Longitud', { exact: true }).fill('-73.05');
+    const button = page.getByRole('button', { name: 'Usar coordenadas' });
+    await button.focus();
+    await page.keyboard.press('Enter');
+    await expect(page.getByText('Coordenadas seleccionadas: -36.82 / -73.05')).toBeVisible();
+    await expect(page.getByRole('status').filter({ hasText: 'Coordenadas seleccionadas.' })).toBeVisible();
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true);
   });
 
   test('la búsqueda de canchas se abre al recibir foco por teclado', async ({ page }) => {
@@ -155,6 +247,15 @@ test.describe('Flujo visual integral de partidos', () => {
     await capture(page, '07-recompensas-mobile.png');
   });
 
+  test('ajustes anuncia errores de validación sin enviar datos', async ({ page }) => {
+    await installFlowFixture(page);
+    await page.goto('/player/settings');
+    await page.getByRole('button', { name: 'Actualizar contrasena' }).click();
+    await expect(page.getByRole('alert').filter({ hasText: 'al menos 8 caracteres' })).toBeVisible();
+    await page.getByRole('button', { name: 'Eliminar mi cuenta' }).click();
+    await expect(page.getByRole('alert').filter({ hasText: 'Escribe ELIMINAR' })).toBeVisible();
+  });
+
   test('perfil sin datos reales no muestra estadísticas ni trofeos de ejemplo', async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
     await installFlowFixture(page);
@@ -182,6 +283,36 @@ test.describe('Flujo visual integral de partidos', () => {
     await expect(page.getByText('No se pudieron cargar las estadísticas de competición.')).toBeVisible();
     await expect(page.locator('.competition-metrics')).toHaveCount(0);
   });
+  test('social distingue acciones y áreas táctiles con invitaciones en móvil', async ({ page }) => {
+    await page.setViewportSize({ width: 320, height: 760 });
+    await installFlowFixture(page);
+    const request = { id: 1, status: 'PENDIENTE', requesterUuid: 'a', requesterAlias: 'Ana', targetUuid: 'ath-flow', targetAlias: 'CapitanDev', teamId: 7, teamName: 'Azules', matchId: 42 };
+    await page.route('**/api/v1/social/friendships/ath-flow', route => json(route, [{ ...request, type: 'FRIENDSHIP' }]));
+    await page.route('**/api/v1/social/team-invites/ath-flow', route => json(route, [{ ...request, type: 'TEAM_INVITE' }]));
+    await page.route('**/api/v1/social/match-invites/ath-flow', route => json(route, [{ ...request, type: 'MATCH_INVITE' }]));
+    await page.goto('/social');
+    for (const [tab, name] of [['Amigos', 'Aceptar solicitud de Ana'], ['Equipos', 'Aceptar invitación a Azules'], ['Partidos', 'Aceptar invitación al partido 42 de Ana']]) {
+      await page.getByRole('group', { name: 'Secciones sociales' }).getByRole('button', { name: tab }).click();
+      const action = page.getByRole('button', { name, exact: true });
+      await expect(action).toBeVisible();
+      expect((await action.boundingBox())!.height).toBeGreaterThanOrEqual(44);
+      expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true);
+    }
+  });
+
+  test('social informa de fallos y permite reintentar sin mostrar listas vacías falsas', async ({ page }) => {
+    await installFlowFixture(page);
+    const pattern = '**/api/v1/social/friendships/ath-flow';
+    await page.route(pattern, route => route.fulfill({ status: 500, json: {} }));
+    await page.goto('/social');
+    await expect(page.getByRole('alert').filter({ hasText: 'No se pudo cargar la actividad social.' })).toBeVisible();
+    await expect(page.getByText('No hay actividad por ahora.')).toHaveCount(0);
+    await page.unroute(pattern);
+    await page.getByRole('button', { name: 'Reintentar carga social' }).click();
+    await expect(page.getByRole('alert').filter({ hasText: 'No se pudo cargar la actividad social.' })).toHaveCount(0);
+    await expect(page.getByText('No hay actividad por ahora.')).toBeVisible();
+  });
+
   test('social permite recorrer secciones en móvil sin desbordamiento', async ({ page }) => {
     await page.setViewportSize({ width: 320, height: 760 });
     await installFlowFixture(page);
