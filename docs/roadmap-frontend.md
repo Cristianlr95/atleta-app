@@ -11,6 +11,7 @@
 - [x] Correcciones de estados de perfil, ranking, cierre y votación MVP cubiertas por pruebas simuladas.
 - [x] Estadísticas informa errores y permite reintentar sin mostrar datos vacíos como reales.
 - [x] Angular 20.3.35 elimina los avisos de seguridad de las dependencias de producción en la auditoría actual.
+- [x] Compilación sin las advertencias de Stencil ni del presupuesto de estilos de Perfil; equipos y logros tienen componentes y estilos propios.
 
 ## Pendiente
 
@@ -18,8 +19,7 @@
 2. Revisar accesibilidad con lectores de pantalla y dispositivos físicos, además de contrastes sobre imágenes.
 3. Completar la revisión visual y de errores para todas las combinaciones de perfil, equipos, agenda y ranking.
 4. Ajustar el balance de progresión con datos reales de partidas y revisar el motor XPService independiente antes de conectarlo al cierre.
-5. Reducir las advertencias conocidas de compilación de Stencil y del presupuesto CSS de Perfil.
-6. Revisar los avisos restantes de las dependencias de desarrollo y validar la aplicación Android en dispositivos reales. La versión de Piscina se fija temporalmente a 5.3.2 para corregir un aviso crítico; retirar esta excepción cuando Angular incorpore una versión corregida y verificar la compilación.
+5. Revisar los avisos restantes de las dependencias de desarrollo y validar la aplicación Android en dispositivos reales. La versión de Piscina se fija temporalmente a 5.3.2 para corregir un aviso crítico; retirar esta excepción cuando Angular incorpore una versión corregida y verificar la compilación.
 
 ## Progresión de posición
 
