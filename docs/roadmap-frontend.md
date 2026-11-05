@@ -9,6 +9,8 @@
 - [x] Canchas: selección por coordenadas con teclado y reintento de carga.
 - [x] Social: nombres accesibles, áreas táctiles y tratamiento de errores.
 - [x] Correcciones de estados de perfil, ranking, cierre y votación MVP cubiertas por pruebas simuladas.
+- [x] Estadísticas informa errores y permite reintentar sin mostrar datos vacíos como reales.
+- [x] Angular 20.3.35 elimina los avisos de seguridad de las dependencias de producción en la auditoría actual.
 
 ## Pendiente
 
@@ -17,7 +19,7 @@
 3. Completar la revisión visual y de errores para todas las combinaciones de perfil, equipos, agenda y ranking.
 4. Ajustar el balance de progresión con datos reales de partidas y revisar el motor XPService independiente antes de conectarlo al cierre.
 5. Reducir las advertencias conocidas de compilación de Stencil y del presupuesto CSS de Perfil.
-6. Resolver los avisos de seguridad altos de Angular mediante una actualización compatible y validar la aplicación Android en dispositivos reales.
+6. Revisar los avisos restantes de las dependencias de desarrollo y validar la aplicación Android en dispositivos reales. La versión de Piscina se fija temporalmente a 5.3.2 para corregir un aviso crítico; retirar esta excepción cuando Angular incorpore una versión corregida y verificar la compilación.
 
 ## Progresión de posición
 

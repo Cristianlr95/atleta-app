@@ -66,7 +66,7 @@
             <span><strong>{{ teamRecord.losses }}</strong>PP</span>
             <span><strong>{{ teamRecord.points }}</strong>PTS</span>
           </div>
-          <p class="leaderboard-message leaderboard-message--error" *ngIf="teamRecordError">{{ teamRecordError }}</p>
+          <p class="leaderboard-message leaderboard-message--error" role="alert" *ngIf="teamRecordError">{{ teamRecordError }}</p>
         </section>
 
         <p class="leaderboard-current" *ngIf="currentUserPositionText">{{ currentUserPositionText }}</p>
@@ -90,8 +90,8 @@
           </div>
         </details>
 
-        <p *ngIf="modeLoading" class="leaderboard-message">Actualizando ranking...</p>
-        <p *ngIf="modeError" class="leaderboard-message leaderboard-message--error">{{ modeError }}</p>
+        <p *ngIf="modeLoading" class="leaderboard-message" role="status">Actualizando ranking...</p>
+        <p *ngIf="modeError" class="leaderboard-message leaderboard-message--error" role="alert">{{ modeError }}</p>
         <button *ngIf="modeError" type="button" class="leaderboard-retry" (click)="onRetryActive()">Reintentar</button>
 
         <app-metallic-leaderboard

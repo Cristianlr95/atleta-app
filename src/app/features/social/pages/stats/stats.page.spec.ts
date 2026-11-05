@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { of } from 'rxjs';
+import { of, throwError } from 'rxjs';
 import { AuthSessionService } from 'src/app/core/services/auth-session.service';
 import { NavigationService } from 'src/app/core/services/navigation.service';
 import { MatchHistoryService, MatchHistoryViewItem } from 'src/app/features/matches/services/match-history.service';
@@ -120,6 +120,20 @@ describe('StatsPage', () => {
 
     expect(component.errorMessage).toBe('No se encontro una sesion valida.');
     expect(ratingsApiService.getOverall).not.toHaveBeenCalled();
+  });
+
+  it('announces a failed history load and displays data after retry', () => {
+    matchHistoryService.getPlayerHistory.and.returnValue(throwError(() => new Error('offline')));
+    component.ionViewWillEnter();
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelector('[role="alert"]').textContent).toContain('No se pudieron cargar');
+    expect(fixture.nativeElement.textContent).not.toContain('Juega o cierra partidos');
+
+    matchHistoryService.getPlayerHistory.and.returnValue(of([]));
+    component.onRetry();
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelector('[role="alert"]')).toBeNull();
+    expect(fixture.nativeElement.textContent).toContain('Juega o cierra partidos');
   });
 
   it('routes leaderboard CTA through NavigationService', () => {

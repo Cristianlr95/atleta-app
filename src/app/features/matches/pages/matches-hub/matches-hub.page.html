@@ -60,8 +60,8 @@
           </div>
         </div>
 
-        <p *ngIf="isLoading" class="matches-state">Cargando agenda...</p>
-        <p *ngIf="errorMessage" class="matches-state matches-state--error">{{ errorMessage }}</p>
+        <p *ngIf="isLoading" class="matches-state" role="status">Cargando agenda...</p>
+        <p *ngIf="errorMessage" class="matches-state matches-state--error" role="alert">{{ errorMessage }}</p>
         <p *ngIf="!isLoading && !errorMessage && upcomingMatches.length === 0 && pendingInvitationGroups().length === 0" class="matches-state">
           No tienes partidos activos, recientes ni próximos. Crea uno para activar la competencia.
         </p>
@@ -95,7 +95,7 @@
           <div><span>Partidos disputados</span><p>Resultados y rendimiento de tus encuentros finalizados.</p></div>
           <strong>{{ matchHistoryItems.length }} registros</strong>
         </header>
-        <p *ngIf="isLoading" class="matches-state">Cargando historial...</p>
+        <p *ngIf="isLoading" class="matches-state" role="status">Cargando historial...</p>
         <p *ngIf="errorMessage" class="matches-state matches-state--error" role="alert">{{ errorMessage }}</p>
         <div class="matches-panel matches-panel--outcomes">
           <app-metallic-stats [stats]="outcomeStats"></app-metallic-stats>
