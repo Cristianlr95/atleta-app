@@ -2,7 +2,7 @@
   <div class="stats-container">
     <app-page-nav></app-page-nav>
 
-    <app-metallic-card title="Estadisticas" [titleIconAsset]="titleIconAsset">
+    <app-metallic-card title="Estadísticas" [titleIconAsset]="titleIconAsset">
       <p class="stats-kicker">Lectura competitiva</p>
       <p class="stats-message" *ngIf="isLoading">Actualizando rendimiento...</p>
       <p class="stats-message stats-message--error" *ngIf="errorMessage">{{ errorMessage }}</p>
@@ -18,7 +18,7 @@
       <app-metallic-form-section
         title="Mapa por rol"
         [titleIconAsset]="rolesIconAsset"
-        description="Puntaje actual por posicion competitiva."
+        description="Puntuación actual por posición competitiva."
       >
         <div class="stats-roles" *ngIf="roleStats.length > 0; else noRoles">
           <article class="stats-role" *ngFor="let role of roleStats">
@@ -33,14 +33,14 @@
           </article>
         </div>
         <ng-template #noRoles>
-          <p class="stats-message">Aun no hay ratings por rol para mostrar.</p>
+          <p class="stats-message">Aún no hay ratings por rol para mostrar.</p>
         </ng-template>
       </app-metallic-form-section>
 
       <app-metallic-form-section
-        title="Ultimos partidos"
+        title="Últimos partidos"
         [titleIconAsset]="trendIconAsset"
-        description="Resumen rapido del historial usado para la tendencia."
+        description="Resumen rápido del historial usado para la tendencia."
       >
         <div class="stats-matches" *ngIf="recentMatches.length > 0; else noMatches">
           <article class="stats-match" *ngFor="let match of recentMatches" [ngClass]="match.resultClass">

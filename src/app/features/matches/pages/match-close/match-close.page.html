@@ -1,11 +1,11 @@
 <ion-content class="match-close-bg">
   <div class="match-close-container">
     <app-metallic-card title="Cierre del Partido" [titleIconAsset]="titleIconAsset">
-      <div class="steps" *ngIf="!closedSuccess()">
-        <button type="button" [class.active]="step() === 1">1. Ajustes</button>
-        <button type="button" [class.active]="step() === 2">2. Resumen</button>
-        <button type="button" [class.active]="step() === 3">3. Recompensas</button>
-      </div>
+      <ol class="steps" aria-label="Pasos del cierre" *ngIf="!closedSuccess()">
+        <li [attr.aria-current]="step() === 1 ? 'step' : null">1. Ajustes</li>
+        <li [attr.aria-current]="step() === 2 ? 'step' : null">2. Resumen</li>
+        <li [attr.aria-current]="step() === 3 ? 'step' : null">3. Recompensas</li>
+      </ol>
 
       <p *ngIf="loading()" class="feedback">Cargando resumen del partido...</p>
       <p *ngIf="error()" class="feedback feedback--error">{{ error() }}</p>
@@ -21,7 +21,7 @@
 
       <ng-container *ngIf="!loading() && !error() && !closedSuccess() && !closeBlockedReason()">
         <section *ngIf="step() === 1" class="panel">
-          <h3>Ajustes rapidos</h3>
+          <h3>Ajustes rápidos</h3>
           <p class="helper-copy">Ajusta marcador global y distribuye goles en la lista completa de jugadores.</p>
 
           <app-score-editor
@@ -38,7 +38,7 @@
             <span>Visita asignados: {{ assignedAwayGoals() }} / {{ awayScore() }}</span>
           </div>
           <p class="helper-copy helper-copy--warning" *ngIf="!scoreboardMatchesAssignedGoals()">
-            Para cerrar el acta, los goles asignados deben coincidir con el marcador. Un 0-0 tambien es valido.
+            Para cerrar el acta, los goles asignados deben coincidir con el marcador. Un 0-0 también es válido.
           </p>
 
           <div #playersTableWrap class="players-table-wrap players-table-scroll" *ngIf="players().length > 0; else noPlayersState">
@@ -105,7 +105,7 @@
           </app-match-summary-card>
 
           <div class="footer-actions">
-            <app-metallic-button variant="secondary" (click)="onBackStep()">Atras</app-metallic-button>
+            <app-metallic-button variant="secondary" (click)="onBackStep()">Atrás</app-metallic-button>
             <app-metallic-button variant="accent" (click)="onNextStep()">Ver recompensas</app-metallic-button>
           </div>
         </section>
@@ -115,7 +115,7 @@
           <app-xp-reward-card [rewards]="xpRewards()"></app-xp-reward-card>
 
           <div class="footer-actions">
-            <app-metallic-button variant="secondary" (click)="onBackStep()">Atras</app-metallic-button>
+            <app-metallic-button variant="secondary" (click)="onBackStep()">Atrás</app-metallic-button>
             <app-metallic-button variant="accent" [disabled]="saving() || !isCreator()" (click)="onConfirmClose()">
               {{ saving() ? 'Confirmando...' : 'Confirmar cierre del partido' }}
             </app-metallic-button>
@@ -125,7 +125,7 @@
       </ng-container>
 
       <section *ngIf="closedSuccess()" class="success">
-        <h3>Partido Finalizado</h3>
+        <h3>Partido finalizado</h3>
         <p>Experiencia aplicada correctamente.</p>
         <section *ngIf="aiSummary() as summary" class="ai-summary" aria-live="polite">
           <span class="eyebrow">Resumen del partido</span>

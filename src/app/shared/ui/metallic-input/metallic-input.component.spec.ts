@@ -27,4 +27,12 @@ describe('MetallicInputComponent', () => {
     const input: HTMLInputElement = fixture.nativeElement.querySelector('input');
     expect(input.labels?.[0]?.textContent?.trim()).toBe('Email');
   });
+
+  it('exposes invalid state on the native input', () => {
+    component.invalid = true;
+    fixture.detectChanges();
+
+    const input: HTMLInputElement = fixture.nativeElement.querySelector('input');
+    expect(input.getAttribute('aria-invalid')).toBe('true');
+  });
 });

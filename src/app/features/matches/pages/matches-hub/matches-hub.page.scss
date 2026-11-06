@@ -57,6 +57,16 @@
   color: var(--text-muted);
 }
 
+.matches-state--empty {
+  display: grid;
+  justify-items: start;
+  gap: 12px;
+}
+
+.matches-state--empty p {
+  margin: 0;
+}
+
 .matches-state--error { color: #ff677d; }
 
 .matches-invites,
@@ -193,7 +203,7 @@
 
 .matches-filters__clear {
   align-self: end;
-  min-height: 36px;
+  min-height: 44px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -238,7 +248,7 @@
   align-items: center;
   gap: 6px;
   flex-shrink: 0;
-  min-height: 36px;
+  min-height: 44px;
   padding: 7px 12px;
   border: 0;
   border-radius: 4px;
@@ -248,6 +258,11 @@
   font-weight: 700;
   text-transform: uppercase;
   cursor: pointer;
+
+  &:focus-visible {
+    outline: 2px solid #fff;
+    outline-offset: 3px;
+  }
 }
 
 .matches-create-quick img { font-size: 16px; }

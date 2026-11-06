@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { of } from 'rxjs';
+import { of, throwError } from 'rxjs';
 import { AuthSessionService } from 'src/app/core/services/auth-session.service';
 import { NavigationService } from 'src/app/core/services/navigation.service';
 import { MatchHistoryService, MatchHistoryViewItem } from 'src/app/features/matches/services/match-history.service';
@@ -118,8 +118,40 @@ describe('StatsPage', () => {
 
     component.ionViewWillEnter();
 
-    expect(component.errorMessage).toBe('No se encontro una sesion valida.');
+    expect(component.errorMessage).toBe('No se encontró una sesión válida.');
     expect(ratingsApiService.getOverall).not.toHaveBeenCalled();
+  });
+
+  it('distinguishes missing ratings from request failures', () => {
+    ratingsApiService.getOverall.and.returnValue(
+      throwError(() => ({ status: 404, message: 'Not found' })),
+    );
+    ratingsApiService.getByRole.and.returnValue(
+      throwError(() => ({ status: 404, message: 'Not found' })),
+    );
+    matchHistoryService.getPlayerHistory.and.returnValue(
+      throwError(() => ({ status: 404, message: 'Not found' })),
+    );
+
+    component.ionViewWillEnter();
+
+    expect(component.errorMessage).toBeNull();
+    expect(component.summaryStats[0].value).toBe('--');
+    expect(component.roleStats).toEqual([]);
+    expect(component.recentMatches).toEqual([]);
+  });
+
+  it('shows an error instead of presenting failed requests as empty stats', () => {
+    ratingsApiService.getOverall.and.returnValue(
+      throwError(() => ({ status: 500, message: 'Server error' })),
+    );
+
+    component.ionViewWillEnter();
+
+    expect(component.errorMessage).toBe('No se pudieron cargar las estadísticas. Inténtalo de nuevo.');
+    expect(component.summaryStats[0].value).toBe('--');
+    expect(component.roleStats).toEqual([]);
+    expect(component.recentMatches).toEqual([]);
   });
 
   it('routes leaderboard CTA through NavigationService', () => {

@@ -5,7 +5,7 @@ export function getMatchStatusLabel(status: MatchStatus): string {
     return 'Invitaciones enviadas';
   }
   if (status === MatchStatus.PARTIAL_CONFIRMATIONS) {
-    return 'Armandose el partido';
+    return 'Armándose el partido';
   }
   if (status === MatchStatus.CONFIRMED) {
     return 'Partido confirmado';
@@ -14,7 +14,7 @@ export function getMatchStatusLabel(status: MatchStatus): string {
     return 'En juego';
   }
   if (status === MatchStatus.INVALID) {
-    return 'Partido invalido';
+    return 'Partido inválido';
   }
   return 'Finalizado';
 }

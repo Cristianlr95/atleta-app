@@ -20,13 +20,13 @@ export function buildMatchProgress(
     status === MatchStatus.CONFIRMED
       ? 'Partido confirmado. Ya puedes formar equipos.'
       : status === MatchStatus.INVALID
-        ? 'Partido invalido por tiempo o confirmaciones insuficientes.'
+        ? 'Partido inválido por tiempo o confirmaciones insuficientes.'
       : status === MatchStatus.LIVE
         ? closePending
           ? 'Partido terminado. Pendiente cierre de resultados.'
-          : 'El partido esta en juego.'
+          : 'El partido está en juego.'
       : status === MatchStatus.PARTIAL_CONFIRMATIONS
-        ? 'Armandose el partido.'
+        ? 'Armándose el partido.'
       : missing > 0
         ? `Faltan ${missing} para confirmar el partido`
         : 'Invitaciones enviadas.';
@@ -53,7 +53,7 @@ export function buildConfirmedPlayers(match: Match, participants: MatchParticipa
       name: item.name,
       gender: item.gender ?? fallback?.gender,
       role: fallback?.role ?? 'JUGADOR',
-      position: item.position ?? fallback?.position ?? 'Sin posicion',
+      position: item.position ?? fallback?.position ?? 'Sin posición',
       teamId: fallback?.teamId,
       avatarUrl: item.avatarUrl,
       ovr: fallback?.ovr ?? 65,

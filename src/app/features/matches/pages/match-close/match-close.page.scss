@@ -18,9 +18,14 @@
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 6px;
   margin-bottom: 12px;
+  padding: 0;
+  list-style: none;
 }
 
-.steps button {
+.steps li {
+  display: grid;
+  min-height: 44px;
+  place-items: center;
   border: 1px solid rgba(125, 157, 212, 0.3);
   border-radius: 999px;
   background: rgba(10, 16, 30, 0.8);
@@ -28,9 +33,10 @@
   padding: 7px;
   font-weight: 700;
   font-size: 0.88rem;
+  text-align: center;
 }
 
-.steps button.active {
+.steps li[aria-current='step'] {
   color: #eff6ff;
   border-color: rgba(125, 194, 255, 0.55);
   box-shadow: 0 0 12px rgba(125, 194, 255, 0.2);
@@ -308,4 +314,3 @@
     max-height: 52vh;
   }
 }
-

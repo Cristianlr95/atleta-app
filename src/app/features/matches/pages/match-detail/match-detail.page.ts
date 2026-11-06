@@ -332,7 +332,7 @@ export class MatchDetailPage implements OnDestroy {
       return 'Partido finalizado con historial y XP base consolidados. Falta definir el MVP.';
     }
 
-    return 'Partido finalizado. La ventana MVP ya cerro.';
+    return 'Partido finalizado. La ventana MVP ya cerró.';
   });
   readonly currentUserUuid = computed(() => this.authSessionService.currentSession?.user?.atletaUuid ?? '');
   readonly currentUserParticipantStatus = computed(() => {
@@ -714,7 +714,7 @@ export class MatchDetailPage implements OnDestroy {
 
       const current = this.currentUserInvitation();
       if (!current?.id) {
-        throw new Error('No se encontro la invitacion pendiente para este partido.');
+        throw new Error('No se encontró la invitación pendiente para este partido.');
       }
 
       const updated = await this.invitationsStore.respondInvitation(current.id, accept);

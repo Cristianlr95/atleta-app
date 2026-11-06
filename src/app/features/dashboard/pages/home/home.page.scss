@@ -43,9 +43,9 @@
   .home-team { width:auto; flex:1; min-width:0; padding:0 0 0 8px; border-top:0; border-left:1px solid rgba(112,159,166,.28); }
   .home-team img { display:none; }
   .home-team__copy strong { overflow-wrap:anywhere; font-size:13px; }
-  .home-priority { grid-template-columns:1fr auto; gap:4px 8px; padding:12px; }
+  .home-priority { grid-template-columns:1fr; gap:4px 8px; padding:12px; }
   .home-priority__label { grid-column:1 / -1; }
-  .home-priority__cta { align-self:center; }
+  .home-priority__cta { align-self:start; justify-self:start; }
   .home-progress { padding:16px 0; }
 }
 
@@ -58,6 +58,8 @@
   .home-team { width: 100%; padding: 10px 0 0; border-left: 0; border-top: 1px solid rgba(112,159,166,.28); }
   .home-metric { padding-inline: 6px; }
   .home-metric span { font-size: 10px; letter-spacing: 0; overflow-wrap: normal; }
+  .home-priority { grid-template-columns: 1fr; }
+  .home-priority__cta { justify-self: start; }
 }
 
 .home-activity {
@@ -67,10 +69,13 @@
 @media (min-width: 361px) and (max-width: 420px) {
   .home-team img { display: block; width: 22px; height: 22px; flex: none; }
 }
-.home-brand { display: flex; justify-content: center; align-items: center; gap: 10px; padding: 2px 0 12px; color: var(--text-primary); }
-.home-brand img { width: 42px; height: 42px; border-radius: 10px; }
-.home-brand span { display: block; font-family: var(--font-family-display); font-weight: 800; font-size: 17px; letter-spacing: .08em; }
-.home-brand h1 { margin: 0; font: 600 11px var(--font-family-body); letter-spacing: .06em; text-transform: uppercase; color: var(--text-secondary); }
+.home-brand { display: flex; align-items: center; gap: 10px; margin: -18px -18px 16px; padding: 14px 18px; border-bottom: 1px solid var(--tactical-line); background: #18212c; color: var(--text-primary); }
+.home-brand img { width: 32px; height: 32px; border-radius: 8px; }
+.home-brand h1 { margin: 0; font-family: var(--font-family-display); font-size: 17px; font-weight: 700; letter-spacing: .045em; line-height: 1.2; text-transform: uppercase; }
 
 .home-team { min-height: 44px; }
 .home-retry { min-height: 44px; border: 0; background: transparent; color: var(--tactical-visit); font-weight: 700; cursor: pointer; }
+
+@media (max-width: 520px) {
+  .home-brand { margin: -14px -14px 16px; padding: 12px 14px; }
+}

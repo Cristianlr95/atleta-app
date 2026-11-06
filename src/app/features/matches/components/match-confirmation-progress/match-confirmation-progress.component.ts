@@ -29,7 +29,7 @@ export class MatchConfirmationProgressComponent {
       return 'Partido confirmado';
     }
     if (this.match.status === MatchStatus.LIVE) {
-      return this.match.closePending ? 'Partido terminado. Falta cargar goles y cerrar.' : 'El partido ya esta en juego';
+      return this.match.closePending ? 'Partido terminado. Falta cargar goles y cerrar.' : 'El partido ya está en juego';
     }
     return this.progress.statusMessage;
   }
