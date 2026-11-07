@@ -1,75 +1,87 @@
 <div class="field-picker" [class.field-picker--disabled]="disabled">
   <div class="field-picker__layout">
-    <div
-      class="field-picker__pitch"
-      [attr.role]="isMultiSelectMode ? 'group' : 'radiogroup'"
-      [attr.aria-label]="
-        isMultiSelectMode
-          ? 'Selecciona tus posiciones por orden de prioridad'
-          : 'Selecciona tu posicion principal'
-      ">
-      <div class="field-picker__line field-picker__line--mid"></div>
-      <div class="field-picker__circle"></div>
-      <div class="field-picker__box field-picker__box--top"></div>
-      <div class="field-picker__box field-picker__box--bottom"></div>
-      <div class="field-picker__goal field-picker__goal--top"></div>
-      <div class="field-picker__goal field-picker__goal--bottom"></div>
+    <div class="field-picker__pitch-frame">
+      <div class="field-picker__pitch-label">
+        <span>Campo</span>
+        <small>{{ effectiveSelectedValues.length }}/{{ maxSelections }} elegidas</small>
+      </div>
+      <div
+        class="field-picker__pitch"
+        [attr.role]="isMultiSelectMode ? 'group' : 'radiogroup'"
+        [attr.aria-label]="
+          isMultiSelectMode
+            ? 'Selecciona tus posiciones por orden de prioridad'
+            : 'Selecciona tu posicion principal'
+        ">
+        <div class="field-picker__line field-picker__line--mid"></div>
+        <div class="field-picker__circle"></div>
+        <div class="field-picker__box field-picker__box--top"></div>
+        <div class="field-picker__box field-picker__box--bottom"></div>
+        <div class="field-picker__goal field-picker__goal--top"></div>
+        <div class="field-picker__goal field-picker__goal--bottom"></div>
 
-      <button
-        *ngFor="let node of pitchNodes"
-        type="button"
-        class="field-picker__position"
-        [class.field-picker__position--active]="isSelected(node.value)"
-        [style.left.%]="node.x"
-        [style.top.%]="node.y"
-        [attr.aria-pressed]="isSelected(node.value)"
-        [attr.aria-label]="node.label"
-        [disabled]="disabled"
-        (click)="onSelect(node.value)">
-        <span class="field-picker__order" *ngIf="selectedOrder(node.value) as order">{{ order }}</span>
-        <ion-icon [src]="isSelected(node.value) ? selectedIconAsset : defaultIconAsset" aria-hidden="true"></ion-icon>
-        <span>{{ shortLabel(node.label) }}</span>
-      </button>
+        <button
+          *ngFor="let node of pitchNodes"
+          type="button"
+          class="field-picker__position"
+          [class.field-picker__position--active]="isSelected(node.value)"
+          [style.left.%]="node.x"
+          [style.top.%]="node.y"
+          [attr.aria-pressed]="isSelected(node.value)"
+          [attr.aria-label]="positionAriaLabel(node)"
+          [disabled]="disabled"
+          (click)="onSelect(node.value)">
+          <span class="field-picker__order" *ngIf="selectedOrder(node.value) as order">{{ order }}</span>
+          <img class="atleta-raster-icon"
+            [src]="isSelected(node.value) ? selectedIconAsset : defaultIconAsset"
+            aria-hidden="true" alt="" />
+          <span>{{ shortLabel(node.label) }}</span>
+        </button>
+      </div>
     </div>
 
-    <aside class="field-picker__role-panel" *ngIf="specialRoleNodes.length > 0" aria-label="Roles especiales">
-      <p class="field-picker__role-eyebrow">Rol especial</p>
-      <h3 class="field-picker__role-title">Direccion tecnica</h3>
-      <p class="field-picker__role-copy">
-        DT se elige como rol estrategico fuera del campo para diferenciarlo visualmente de las posiciones de juego.
-      </p>
+    <aside class="field-picker__side-panel" aria-label="Prioridades y roles especiales">
+      <div class="field-picker__selection-panel">
+        <p class="field-picker__role-eyebrow">Tu orden</p>
+        <div class="field-picker__slots">
+          <div
+            *ngFor="let priority of [1, 2, 3]"
+            class="field-picker__slot"
+            [class.field-picker__slot--filled]="effectiveSelectedValues.length >= priority">
+            <span>{{ priority }}</span>
+            <div>
+              <small>{{ priorityLabel(priority) }}</small>
+              <strong>{{ selectedLabelAt(priority - 1) || 'Por elegir' }}</strong>
+            </div>
+          </div>
+        </div>
+      </div>
 
-      <button
-        *ngFor="let node of specialRoleNodes"
-        type="button"
-        class="field-picker__role-card"
-        [class.field-picker__role-card--active]="isSelected(node.value)"
-        [attr.aria-pressed]="isSelected(node.value)"
-        [attr.aria-label]="node.label"
-        [disabled]="disabled"
-        (click)="onSelect(node.value)">
-        <span class="field-picker__order" *ngIf="selectedOrder(node.value) as order">{{ order }}</span>
-        <span class="field-picker__role-badge">DT</span>
-        <span class="field-picker__role-content">
-          <span class="field-picker__role-name">{{ node.label }}</span>
-          <span class="field-picker__role-description">{{ roleDescription(node.role) }}</span>
-        </span>
-        <ion-icon [src]="isSelected(node.value) ? selectedIconAsset : defaultIconAsset" aria-hidden="true"></ion-icon>
-      </button>
+      <div class="field-picker__role-panel" *ngIf="specialRoleNodes.length > 0">
+        <div>
+          <p class="field-picker__role-eyebrow">Fuera del campo</p>
+          <h3 class="field-picker__role-title">Dirección técnica</h3>
+        </div>
+        <button
+          *ngFor="let node of specialRoleNodes"
+          type="button"
+          class="field-picker__role-card"
+          [class.field-picker__role-card--active]="isSelected(node.value)"
+          [attr.aria-pressed]="isSelected(node.value)"
+          [attr.aria-label]="positionAriaLabel(node)"
+          [disabled]="disabled"
+          (click)="onSelect(node.value)">
+          <span class="field-picker__order" *ngIf="selectedOrder(node.value) as order">{{ order }}</span>
+          <span class="field-picker__role-badge">DT</span>
+          <span class="field-picker__role-content">
+            <span class="field-picker__role-name">{{ node.label }}</span>
+            <span class="field-picker__role-description">{{ roleDescription(node.role) }}</span>
+          </span>
+          <img class="atleta-raster-icon"
+            [src]="isSelected(node.value) ? selectedIconAsset : defaultIconAsset"
+            aria-hidden="true" alt="" />
+        </button>
+      </div>
     </aside>
   </div>
-
-  <p class="field-picker__selected" *ngIf="!isMultiSelectMode && selectedValue">
-    Posicion seleccionada:
-    <strong>{{ selectedLabel }}</strong>
-  </p>
-
-  <p class="field-picker__selected" *ngIf="isMultiSelectMode && selectedLabels.length > 0">
-    Posiciones elegidas:
-    <strong>{{ selectedLabels.join(' / ') }}</strong>
-  </p>
-
-  <p class="field-picker__hint" *ngIf="isMultiSelectMode">
-    Elige hasta {{ maxSelections }} y se guardan por orden (1, 2, 3).
-  </p>
 </div>

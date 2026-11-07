@@ -5,11 +5,15 @@ import {
   CreateFriendRequestPayload,
   CreateMatchInvitePayload,
   CreateMatchInvitesBatchPayload,
+  MatchInviteDeliveryResult,
   CreateTeamInvitePayload,
+  PushTokenRecord,
+  RegisterPushTokenPayload,
   RespondRequestPayload,
   SocialPlayerLookupItem,
   SocialNotificationItem,
   SocialRequestItem,
+  UnreadNotificationCount,
 } from '../models/social.models';
 
 @Injectable({ providedIn: 'root' })
@@ -66,6 +70,13 @@ export class SocialApiService extends ApiService {
     );
   }
 
+  createMatchInvitesBatchDetailed(payload: CreateMatchInvitesBatchPayload) {
+    return this.post<MatchInviteDeliveryResult[], CreateMatchInvitesBatchPayload>(
+      API_ENDPOINTS.social.matchInvitesBatchDetailed,
+      payload,
+    );
+  }
+
   respondMatchInvite(inviteId: number, payload: RespondRequestPayload) {
     return this.put<SocialRequestItem, RespondRequestPayload>(
       `${API_ENDPOINTS.social.matchInvites}/${inviteId}/decision`,
@@ -75,6 +86,10 @@ export class SocialApiService extends ApiService {
 
   getNotifications(playerUuid: string) {
     return this.get<SocialNotificationItem[]>(`${API_ENDPOINTS.social.notifications}/${playerUuid}`);
+  }
+
+  getUnreadNotificationCount() {
+    return this.get<UnreadNotificationCount>(API_ENDPOINTS.social.notificationUnreadCount);
   }
 
   markNotificationRead(notificationId: number, playerUuid: string) {
@@ -87,6 +102,14 @@ export class SocialApiService extends ApiService {
 
   sendIncompleteFormReminder(playerUuid: string) {
     return this.post<SocialNotificationItem, null>(`${API_ENDPOINTS.social.reminders}/${playerUuid}`, null);
+  }
+
+  registerPushToken(payload: RegisterPushTokenPayload) {
+    return this.post<PushTokenRecord, RegisterPushTokenPayload>(API_ENDPOINTS.social.pushTokens, payload);
+  }
+
+  revokePushToken(deviceId: string) {
+    return this.delete<void>(API_ENDPOINTS.social.pushTokens, { params: { deviceId } });
   }
 
   searchPlayers(query: string) {

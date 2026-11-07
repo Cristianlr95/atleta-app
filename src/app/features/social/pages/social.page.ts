@@ -4,8 +4,6 @@ import { ActivatedRoute } from '@angular/router';
 import { IonicModule } from '@ionic/angular';
 import { NavigationService } from 'src/app/core/services/navigation.service';
 import { PageLoadGuard } from 'src/app/core/utils/page-load-guard';
-import { MatchStatus } from 'src/app/features/matches/models/progressive-match.models';
-import { MatchService } from 'src/app/features/matches/services/match.service';
 import { NotificationBadgeService } from 'src/app/features/matches/services/notification-badge.service';
 import { buildMainBottomNav } from 'src/app/shared/navigation/main-bottom-nav';
 import {
@@ -19,7 +17,6 @@ import { ActivityActionType, ActivityItem } from '../activity/models/activity.mo
 import { FriendsPanelComponent } from '../components/friends-panel/friends-panel.component';
 import {
   MatchInvitationsPanelComponent,
-  SocialConfirmedMatchView,
 } from '../components/match-invitations-panel/match-invitations-panel.component';
 import { SocialTabsComponent } from '../components/social-tabs/social-tabs.component';
 import { TeamsPanelComponent } from '../components/teams-panel/teams-panel.component';
@@ -48,9 +45,8 @@ export class SocialPage implements OnDestroy {
   private readonly route = inject(ActivatedRoute);
   private readonly navigationService = inject(NavigationService);
   private readonly notificationBadgeService = inject(NotificationBadgeService);
-  private readonly matchService = inject(MatchService);
 
-  readonly socialIconAsset = 'assets/icons/atleta/ic_match_invite_24.svg';
+  readonly socialIconAsset = 'assets/icons/atleta-raster-v1/ic_social_friends_96.png';
 
   private friendSearchHandle?: number;
   private inviteSearchHandle?: number;
@@ -67,21 +63,10 @@ export class SocialPage implements OnDestroy {
 
   readonly principalTeam = computed(() => this.facade.teams()[0] ?? null);
 
-  readonly confirmedMatches = computed<SocialConfirmedMatchView[]>(() =>
-    this.matchService
-      .activeMatches()
-      .filter((match) => match.status === MatchStatus.CONFIRMED || match.status === MatchStatus.LIVE)
-      .map((match) => ({
-        id: (match.backendMatchId ?? Number(String(match.id).replace(/[^\d]/g, ''))) || 0,
-        title: `${match.team.name} ${match.status === MatchStatus.LIVE ? 'en juego' : 'confirmado'}`,
-        scheduledAt: match.scheduledAt,
-      }))
-      .filter((item) => item.id > 0),
-  );
+  readonly confirmedMatches = this.facade.confirmedMatches;
 
   get bottomNavItems(): ReadonlyArray<MetallicBottomNavItem> {
-    const badgeCount = this.notificationBadgeService.totalPending() + this.facade.unreadCount();
-    return buildMainBottomNav('matches', badgeCount);
+    return buildMainBottomNav('matches', this.notificationBadgeService.totalPending());
   }
 
   ionViewWillEnter(): void {
@@ -90,13 +75,21 @@ export class SocialPage implements OnDestroy {
 
   private async loadOnEnter(): Promise<void> {
     await this.enterLoadGuard.runSingle(async () => {
-      const requestedTab = this.route.snapshot.queryParamMap.get('tab');
-      if (requestedTab === 'activity' || requestedTab === 'friends' || requestedTab === 'teams' || requestedTab === 'matches') {
+      const requestedTab = this.resolveRequestedTab();
+      if (requestedTab) {
         this.facade.setActiveTab(requestedTab);
       }
       await this.facade.initialize();
       await this.notificationBadgeService.refresh();
     });
+  }
+
+  private resolveRequestedTab(): 'activity' | 'friends' | 'teams' | 'matches' | null {
+    const requestedTab = this.route.snapshot.queryParamMap.get('tab') ?? this.route.snapshot.data['defaultSocialTab'];
+    if (requestedTab === 'activity' || requestedTab === 'friends' || requestedTab === 'teams' || requestedTab === 'matches') {
+      return requestedTab;
+    }
+    return null;
   }
 
   ngOnDestroy(): void {
@@ -119,21 +112,7 @@ export class SocialPage implements OnDestroy {
   }
 
   onNavItemSelected(itemId: string): void {
-    if (itemId === 'home') {
-      void this.navigationService.safeNavigate(['/home']);
-      return;
-    }
-    if (itemId === 'matches') {
-      void this.navigationService.safeNavigate(['/matches']);
-      return;
-    }
-    if (itemId === 'ranking') {
-      void this.navigationService.safeNavigate(['/leaderboard']);
-      return;
-    }
-    if (itemId === 'profile') {
-      void this.navigationService.safeNavigate(['/player/profile']);
-    }
+    void this.navigationService.goToMainBottomSection(itemId);
   }
 
   onActivityAction(event: { activityId: string; action: ActivityActionType }): void {
@@ -166,11 +145,11 @@ export class SocialPage implements OnDestroy {
       return;
     }
     if (item.target.teamId) {
-      void this.navigationService.safeNavigate(['/sessions/create']);
+      void this.navigationService.safeNavigate(['/teams', String(item.target.teamId)]);
       return;
     }
     if (item.target.userId) {
-      void this.navigationService.safeNavigate(['/player/profile']);
+      void this.navigationService.safeNavigate(['/players', item.target.userId]);
     }
   }
 
@@ -192,16 +171,20 @@ export class SocialPage implements OnDestroy {
     }, 320);
   }
 
-  onOpenProfile(_playerUuid: string): void {
-    void this.navigationService.safeNavigate(['/player/profile']);
+  onOpenProfile(playerUuid: string): void {
+    void this.navigationService.safeNavigate(['/players', playerUuid]);
   }
 
-  onOpenTeam(_teamId: number): void {
-    void this.navigationService.safeNavigate(['/sessions/create']);
+  onOpenTeam(teamId: number): void {
+    void this.navigationService.safeNavigate(['/teams', String(teamId)]);
   }
 
   onOpenMatch(matchId: number): void {
     void this.navigationService.safeNavigate(['/matches', String(matchId)]);
+  }
+
+  async onRespondMatchInvite(event: { inviteId: number; accept: boolean }): Promise<void> {
+    await this.respondMatchInvite(event.inviteId, event.accept);
   }
 
   onRetryLoad(): void {
@@ -229,7 +212,7 @@ export class SocialPage implements OnDestroy {
       return;
     }
     if (item.id.startsWith('match-')) {
-      void this.facade.respondMatchInvite(item.target.requestId, true);
+      void this.respondMatchInvite(item.target.requestId, true);
     }
   }
 
@@ -246,8 +229,13 @@ export class SocialPage implements OnDestroy {
       return;
     }
     if (item.id.startsWith('match-')) {
-      void this.facade.respondMatchInvite(item.target.requestId, false);
+      void this.respondMatchInvite(item.target.requestId, false);
     }
+  }
+
+  private async respondMatchInvite(inviteId: number, accept: boolean): Promise<void> {
+    await this.facade.respondMatchInvite(inviteId, accept);
+    await this.notificationBadgeService.refresh();
   }
 }
 

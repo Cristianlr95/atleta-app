@@ -1,4 +1,4 @@
-﻿import { CommonModule } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { Component, computed, effect, inject, signal, viewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { IonicModule } from '@ionic/angular';
@@ -16,18 +16,18 @@ import {
 import { MetallicCardComponent } from 'src/app/shared/ui/metallic-card/metallic-card.component';
 import { MatchSummaryCardComponent, TeamEventSummary } from '../../components/match-summary-card/match-summary-card.component';
 import { ScoreEditorComponent } from '../../components/score-editor/score-editor.component';
-import { MatchState } from '../../models/match-state.models';
 import { XpRewardCardComponent, XpRewardItem } from '../../components/xp-reward-card/xp-reward-card.component';
 import {
   MatchClosePreviewResponse,
   MatchResponse,
   MatchPlayerSummary,
-  MatchStatus as BackendMatchStatus,
+  MatchAiSummaryResponse,
 } from '../../models/match.models';
 import { MatchService } from '../../services/match.service';
 import { MatchesApiService } from '../../services/matches-api.service';
 import { NotificationBadgeService } from '../../services/notification-badge.service';
 import { MatchStore } from '../../stores/match.store';
+import { getMatchCloseBlockedReason } from '../../utils/match-close-window.util';
 
 interface ClosePlayerOption {
   userId: string;
@@ -64,16 +64,19 @@ export class MatchClosePage {
   private readonly appToast = inject(AppToastService);
   private readonly authSessionService = inject(AuthSessionService);
 
-  readonly iconBase = 'assets/icons/atleta';
-  readonly titleIconAsset = `${this.iconBase}/ic_status_finished_24.svg`;
-  readonly adjustIconAsset = `${this.iconBase}/ic_action_edit_24.svg`;
-  readonly rewardIconAsset = `${this.iconBase}/ic_comp_xp_24.svg`;
+  readonly iconBase = 'assets/icons/atleta-raster-v1';
+  readonly titleIconAsset = `${this.iconBase}/ic_status_finished_96.png`;
+  readonly adjustIconAsset = `${this.iconBase}/ic_action_edit_96.png`;
+  readonly rewardIconAsset = `${this.iconBase}/ic_comp_xp_96.png`;
 
   readonly step = signal<1 | 2 | 3>(1);
   readonly loading = signal(false);
   readonly saving = signal(false);
   readonly error = signal<string | null>(null);
+  readonly closeBlockedReason = signal<string | null>(null);
   readonly closedSuccess = signal(false);
+  readonly aiSummary = signal<MatchAiSummaryResponse | null>(null);
+  readonly aiSummaryUnavailable = signal(false);
 
   readonly routeMatchId = signal('');
   readonly localMatchId = signal('');
@@ -120,13 +123,13 @@ export class MatchClosePage {
       .map((player) => {
         const goals = this.getCount(this.goalCounts(), player.userId);
         return {
-          icon: goals > 0 ? '⚽' : '🎯',
+          iconAsset: `${this.iconBase}/ic_event_goal_96.png`,
           text: `${player.name}${goals > 0 ? ` (${goals} gol${goals > 1 ? 'es' : ''})` : ''}`,
           goals,
         };
       })
       .filter((item) => item.goals > 0)
-      .map((item) => ({ icon: item.icon, text: item.text })),
+      .map((item) => ({ iconAsset: item.iconAsset, text: item.text })),
   );
 
   readonly awayEvents = computed<TeamEventSummary[]>(() =>
@@ -135,13 +138,13 @@ export class MatchClosePage {
       .map((player) => {
         const goals = this.getCount(this.goalCounts(), player.userId);
         return {
-          icon: goals > 0 ? '⚽' : '🎯',
+          iconAsset: `${this.iconBase}/ic_event_goal_96.png`,
           text: `${player.name}${goals > 0 ? ` (${goals} gol${goals > 1 ? 'es' : ''})` : ''}`,
           goals,
         };
       })
       .filter((item) => item.goals > 0)
-      .map((item) => ({ icon: item.icon, text: item.text })),
+      .map((item) => ({ iconAsset: item.iconAsset, text: item.text })),
   );
 
   readonly xpRewards = computed<XpRewardItem[]>(() =>
@@ -149,9 +152,6 @@ export class MatchClosePage {
       ? this.players().map((player) => {
           const preview = this.closePreview()?.players.find((item) => item.playerUuid === player.userId);
           const totalXp = preview?.estimatedXp ?? 0;
-          const fromLevel = Math.max(1, Math.floor(40 / 10));
-          const toLevel = Math.max(fromLevel, Math.floor((40 + totalXp) / 10));
-          const progress = Math.min(100, ((40 + totalXp) % 10) * 10);
 
           return {
             id: player.userId,
@@ -159,20 +159,14 @@ export class MatchClosePage {
             position: player.position,
             xp: totalXp,
             currentOvr: preview?.currentHybridOvr ?? null,
-            fromLevel,
-            toLevel,
-            progressPercent: progress,
           };
         })
       : this.players().map((player) => {
       const goals = this.getCount(this.goalCounts(), player.userId);
-      const base = 10;
+      const base = 5;
       const result = this.resultXpFor(player.teamLabel);
       const goalXp = goals * this.goalXpByPosition(player.position);
-      const totalXp = base + result + goalXp;
-      const fromLevel = Math.max(1, Math.floor(40 / 10));
-      const toLevel = Math.max(fromLevel, Math.floor((40 + totalXp) / 10));
-      const progress = Math.min(100, ((40 + totalXp) % 10) * 10);
+      const totalXp = Math.min(25, base + result + goalXp);
 
       return {
         id: player.userId,
@@ -180,19 +174,23 @@ export class MatchClosePage {
         position: player.position,
         xp: totalXp,
         currentOvr: null,
-        fromLevel,
-        toLevel,
-        progressPercent: progress,
       };
     })),
   );
 
   readonly canContinue = computed(() => {
+    if (this.closeBlockedReason()) {
+      return false;
+    }
     if (this.step() === 1) {
-      return this.homeScore() > 0 || this.awayScore() > 0;
+      return this.players().length > 0 && this.scoreboardMatchesAssignedGoals();
     }
     return true;
   });
+
+  readonly scoreboardMatchesAssignedGoals = computed(() =>
+    this.assignedHomeGoals() === this.homeScore() && this.assignedAwayGoals() === this.awayScore(),
+  );
 
   constructor() {
     effect(() => {
@@ -230,7 +228,7 @@ export class MatchClosePage {
   }
 
   onNextStep(): void {
-    if (!this.canContinue() || this.step() === 3) {
+    if (this.closeBlockedReason() || !this.canContinue() || this.step() === 3) {
       return;
     }
     const nextStep = (this.step() + 1) as 1 | 2 | 3;
@@ -253,21 +251,7 @@ export class MatchClosePage {
   }
 
   onNavItemSelected(itemId: string): void {
-    if (itemId === 'home') {
-      void this.navigationService.safeNavigate(['/home']);
-      return;
-    }
-    if (itemId === 'matches') {
-      void this.navigationService.safeNavigate(['/matches']);
-      return;
-    }
-    if (itemId === 'ranking') {
-      void this.navigationService.safeNavigate(['/leaderboard']);
-      return;
-    }
-    if (itemId === 'profile') {
-      void this.navigationService.safeNavigate(['/player/profile']);
-    }
+    void this.navigationService.goToMainBottomSection(itemId);
   }
 
   onHomeScoreChange(nextScore: number): void {
@@ -329,7 +313,7 @@ export class MatchClosePage {
   }
 
   async onConfirmClose(): Promise<void> {
-    if (this.saving() || !this.isCreator()) {
+    if (this.saving() || !this.isCreator() || this.closeBlockedReason()) {
       return;
     }
 
@@ -341,9 +325,10 @@ export class MatchClosePage {
     this.saving.set(true);
     try {
       const backendMatchId = this.matchResponse()?.id;
-      if (backendMatchId) {
-        await this.ensureMatchStartedForClose(backendMatchId);
+      if (!backendMatchId) {
+        throw new Error('No se pudo resolver el partido en backend.');
       }
+      await this.validateMatchForClose(backendMatchId);
 
       for (const player of this.players()) {
         const goalDelta = this.getCount(this.goalCounts(), player.userId) - this.getCount(this.baselineGoalCounts(), player.userId);
@@ -365,6 +350,7 @@ export class MatchClosePage {
       await this.matchService.finishMatch(localMatchId);
       await this.matchStore.refresh(this.routeMatchId(), true);
       this.closedSuccess.set(true);
+      await this.loadAiSummary(backendMatchId);
       await this.appToast.success('Partido finalizado y recompensas aplicadas.');
     } catch (error) {
       await this.appToast.error(this.errorMapper.toUserMessage(error, 'matches'));
@@ -373,24 +359,12 @@ export class MatchClosePage {
     }
   }
 
-  private async ensureMatchStartedForClose(backendMatchId: number): Promise<void> {
-    const actorUuid = this.authSessionService.currentSession?.user?.atletaUuid;
-    if (!actorUuid) {
-      throw new Error('Sesion no disponible para iniciar el partido.');
-    }
-
+  private async validateMatchForClose(backendMatchId: number): Promise<void> {
     const latest = await firstValueFrom(this.matchesApiService.getById(backendMatchId));
-    const status = latest.estado as BackendMatchStatus;
-
-    if (status === 'INICIADO' || status === 'FINALIZADO') {
-      return;
+    const reason = getMatchCloseBlockedReason(latest);
+    if (reason) {
+      throw new Error(reason);
     }
-
-    if (status === 'INVALIDO') {
-      throw new Error('El partido esta marcado como invalido y no puede cerrarse.');
-    }
-
-    await firstValueFrom(this.matchesApiService.updateMatchStatus(backendMatchId, 'INICIADO', actorUuid));
   }
 
   trackByPlayerId(_index: number, item: ClosePlayerOption): string {
@@ -406,6 +380,11 @@ export class MatchClosePage {
     this.routeMatchId.set(routeMatchId);
     this.loading.set(true);
     this.error.set(null);
+    this.closeBlockedReason.set(null);
+    this.closedSuccess.set(false);
+    this.aiSummary.set(null);
+    this.aiSummaryUnavailable.set(false);
+    this.step.set(1);
 
     try {
       const state = await this.matchStore.refresh(routeMatchId, true);
@@ -425,6 +404,10 @@ export class MatchClosePage {
       }
 
       this.matchResponse.set(response);
+      this.closeBlockedReason.set(this.getCloseBlockedReason(response));
+      if (this.closeBlockedReason()) {
+        return;
+      }
       const localTeam = response.matchTeams?.find((t) => t.esLocal);
       const awayTeam = response.matchTeams?.find((t) => !t.esLocal);
       const baseTeamName = localTeam?.team?.nombre ?? awayTeam?.team?.nombre ?? state.match.team.name ?? 'Club';
@@ -436,7 +419,7 @@ export class MatchClosePage {
         this.awayName.set(`${baseTeamName} Visita`);
       }
 
-      const playerOptions = this.buildPlayers(response.players ?? [], state);
+      const playerOptions = this.buildPlayers(response.players ?? []);
       this.players.set(playerOptions);
 
       const initialGoalCounts = this.buildInitialGoalCounts(response);
@@ -455,73 +438,24 @@ export class MatchClosePage {
     }
   }
 
-  private buildPlayers(players: MatchPlayerSummary[], storeState: MatchState): ClosePlayerOption[] {
-    const localTeamId = this.matchResponse()?.matchTeams?.find((item) => item.esLocal)?.team?.id;
-    const awayTeamId = this.matchResponse()?.matchTeams?.find((item) => !item.esLocal)?.team?.id;
-    const responsePlayersByUuid = new Map(
-      (players ?? [])
-        .filter((item) => !!item.player?.atletaUuid)
-        .map((item) => [item.player!.atletaUuid, item] as const),
-    );
+  private buildPlayers(players: MatchPlayerSummary[]): ClosePlayerOption[] {
+    const teams = this.matchResponse()?.matchTeams ?? [];
     const seen = new Set<string>();
-
-    const fromAssignedTeams = [
-      ...storeState.match.homePlayers
-        .map((player) => {
-          const responsePlayer = responsePlayersByUuid.get(player.uuid);
-          return {
-            userId: player.uuid,
-            name: responsePlayer?.player?.alias ?? player.name ?? 'Jugador',
-            teamId: localTeamId ?? responsePlayer?.team?.id ?? player.teamId,
-            teamLabel: 'LOCAL' as const,
-            position: responsePlayer?.position?.nombre ?? player.position ?? 'Sin posicion',
-          };
-        }),
-      ...storeState.match.awayPlayers
-        .map((player) => {
-          const responsePlayer = responsePlayersByUuid.get(player.uuid);
-          return {
-            userId: player.uuid,
-            name: responsePlayer?.player?.alias ?? player.name ?? 'Jugador',
-            teamId: awayTeamId ?? responsePlayer?.team?.id ?? player.teamId,
-            teamLabel: 'VISITA' as const,
-            position: responsePlayer?.position?.nombre ?? player.position ?? 'Sin posicion',
-          };
-        }),
-    ].filter((item) => {
-      if (seen.has(item.userId)) {
+    return players.filter(player => {
+      const uuid = player.player?.atletaUuid;
+      if (!player.confirmado || !uuid || seen.has(uuid)) {
         return false;
       }
-      seen.add(item.userId);
+      seen.add(uuid);
       return true;
-    });
-
-    if (fromAssignedTeams.length > 0) {
-      return fromAssignedTeams;
-    }
-
-    const fallbackFromParticipants = storeState.confirmedParticipants.map((participant, index) => ({
-      userId: participant.userId,
-      name: participant.name || `Jugador ${index + 1}`,
-      teamId: participant.teamSide === 'AWAY' ? awayTeamId : localTeamId,
-      teamLabel:
-        participant.teamSide === 'AWAY'
-          ? ('VISITA' as const)
-          : ('LOCAL' as const),
-      position: participant.position ?? responsePlayersByUuid.get(participant.userId)?.position?.nombre ?? 'Sin posicion',
+    }).map(player => ({
+      userId: player.player!.atletaUuid,
+      name: player.player!.alias || 'Jugador',
+      teamId: player.team?.id,
+      teamLabel: player.teamSide ?? (teams.find(team => team.team?.id === player.team?.id)?.esLocal === false ? 'VISITA' : 'LOCAL'),
+      position: player.position?.nombre ?? 'Sin posicion',
     }));
-
-    const uniqueFallback = fallbackFromParticipants.filter((item) => {
-      if (seen.has(item.userId)) {
-        return false;
-      }
-      seen.add(item.userId);
-      return true;
-    });
-
-    return uniqueFallback;
   }
-
   private buildInitialGoalCounts(response: MatchResponse): Record<string, number> {
     const counts: Record<string, number> = {};
     for (const event of response.events ?? []) {
@@ -553,24 +487,24 @@ export class MatchClosePage {
     }
 
     if ((teamLabel === 'LOCAL' && this.homeScore() > this.awayScore()) || (teamLabel === 'VISITA' && this.awayScore() > this.homeScore())) {
-      return 10;
+      return 5;
     }
 
-    return 5;
+    return 2;
   }
 
   private goalXpByPosition(position: string): number {
     const normalized = position.toUpperCase();
-    if (normalized.includes('DEF')) {
-      return 15;
-    }
-    if (normalized.includes('MED')) {
-      return 12;
-    }
-    return 10;
+    if (normalized.includes('DEF')) return 6;
+    if (normalized.includes('MED')) return 5;
+    return 4;
   }
 
   private async loadClosePreview(): Promise<void> {
+    if (this.closeBlockedReason()) {
+      this.closePreview.set(null);
+      return;
+    }
     const backendMatchId = this.matchResponse()?.id;
     if (!backendMatchId) {
       return;
@@ -592,6 +526,19 @@ export class MatchClosePage {
       this.closePreview.set(preview);
     } catch {
       this.closePreview.set(null);
+    }
+  }
+
+  private getCloseBlockedReason(response: MatchResponse): string | null {
+    return getMatchCloseBlockedReason(response);
+  }
+
+  private async loadAiSummary(matchId: number): Promise<void> {
+    try {
+      this.aiSummary.set(await firstValueFrom(this.matchesApiService.generateAiSummary(matchId)));
+    } catch {
+      // The closing outcome remains valid even when an optional experience is unavailable.
+      this.aiSummaryUnavailable.set(true);
     }
   }
 }

@@ -1,8 +1,8 @@
-﻿.metallic-stats {
+.metallic-stats {
   padding: 0;
 
   ion-col {
-    padding: 8px;
+    padding: 5px;
   }
 }
 
@@ -10,108 +10,87 @@
   position: relative;
   height: 100%;
 
-  &__glow {
-    position: absolute;
-    inset: -2px;
-    background: linear-gradient(to right, var(--atleta-blue), var(--atleta-green));
-    border-radius: 12px;
-    opacity: 0;
-    filter: blur(8px);
-    transition: opacity 0.3s ease;
-  }
-
-  &:active &__glow {
-    opacity: 0.5;
+  &__glow,
+  &__shine-top,
+  &__corner {
+    display: none;
   }
 
   &__content {
     position: relative;
     height: 100%;
-    background:
-      linear-gradient(150deg, rgba(32, 47, 70, 0.92), rgba(8, 14, 25, 0.95)),
-      radial-gradient(circle at 100% 0%, rgba(88, 199, 255, 0.1), transparent 34%);
-    border: 1px solid rgba(176, 199, 231, 0.24);
-    border-radius: 12px;
-    padding: 20px;
-    transition: border-color 0.3s ease;
+    min-height: 106px;
+    padding: 15px;
+    border: 1px solid var(--tactical-line);
+    border-radius: 6px;
+    background: #07151c;
+    transition: border-color 150ms ease;
   }
 
   &:active &__content {
-    border-color: rgba(88, 199, 255, 0.58);
-  }
-
-  &__shine-top {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 1px;
-    background: linear-gradient(to right, transparent, rgba(88, 199, 255, 0.7), transparent);
-    opacity: 0.6;
+    border-color: var(--tactical-visit);
   }
 
   &__inner {
     display: flex;
+    height: 100%;
     align-items: flex-start;
     justify-content: space-between;
-    height: 100%;
+    gap: 10px;
   }
 
   &__info {
-    flex: 1;
     display: flex;
+    flex: 1;
     flex-direction: column;
     justify-content: center;
   }
 
   &__label {
-    color: #aebed5;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    font-family: var(--font-family-body);
-    font-weight: 500;
-    font-size: 0.95rem;
-    margin-bottom: 8px;
     display: block;
+    margin-bottom: 5px;
+    color: #81949a;
+    font-family: var(--font-family-body);
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
   }
 
   &__value {
-    font-size: 2.2rem;
-    font-family: var(--font-family-display);
-    font-weight: 700;
-    background: linear-gradient(to bottom right, #f1f7ff, #58c7ff 54%, #80e7b2);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
     display: block;
-    line-height: 1;
+    color: var(--tactical-local);
+    font-family: var(--font-family-display);
+    font-size: 2.35rem;
+    font-weight: 700;
+    line-height: 0.95;
   }
 
   &__value--small {
-    font-size: 1.2rem;
-    line-height: 1.1;
+    font-size: 1.35rem;
+    line-height: 1.05;
   }
 
   &__icon {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 48px;
-    height: 48px;
-    border-radius: 8px;
-    background: linear-gradient(to bottom right, rgba(88, 199, 255, 0.78), rgba(34, 49, 72, 0.92));
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    display: grid;
+    width: 40px;
+    height: 40px;
+    place-items: center;
+    border: 1px solid #29444f;
+    border-radius: 50%;
+    background: #0a1d25;
 
-    ion-icon {
-      font-size: 24px;
-      color: white;
+    img.atleta-raster-icon {
+      width: 21px;
+      height: 21px;
+      color: var(--tactical-visit);
     }
   }
 
   &__icon-button {
-    border: 0;
-    padding: 0;
     margin: 0;
+    padding: 0;
+    border: 0;
     background: transparent;
     cursor: pointer;
   }
@@ -119,85 +98,39 @@
   &__icon-button--disabled {
     cursor: default;
   }
-
-  &__corner {
-    position: absolute;
-    width: 8px;
-    height: 8px;
-    border-color: rgba(128, 231, 178, 0.72);
-    opacity: 0.3;
-
-    &--tr {
-      top: 8px;
-      right: 8px;
-      border-top: 1px solid;
-      border-right: 1px solid;
-    }
-
-    &--bl {
-      bottom: 8px;
-      left: 8px;
-      border-bottom: 1px solid;
-      border-left: 1px solid;
-    }
-  }
 }
 
 .metallic-stats--compact {
   ion-col {
-    padding: 6px;
+    padding: 4px;
   }
 
   .metallic-stat__content {
-    padding: 12px;
-    border-width: 1px;
+    min-height: 84px;
+    padding: 11px;
   }
 
   .metallic-stat__label {
-    font-size: 0.78rem;
-    margin-bottom: 5px;
+    font-size: 11px;
   }
 
   .metallic-stat__value {
-    font-size: 1.55rem;
+    font-size: 1.75rem;
   }
 
   .metallic-stat__value--small {
-    font-size: 1rem;
+    font-size: 1.05rem;
   }
 
   .metallic-stat__icon {
-    width: 34px;
-    height: 34px;
-
-    ion-icon {
-      font-size: 18px;
-    }
+    width: 32px;
+    height: 32px;
   }
 }
 
 @media (max-width: 480px) {
-  .metallic-stat {
-    &__content {
-      padding: 16px;
-    }
-
-    &__label {
-      font-size: 0.9rem;
-    }
-
-    &__value {
-      font-size: 2rem;
-    }
-  }
-
-  .metallic-stats--compact {
-    .metallic-stat__content {
-      padding: 10px;
-    }
-
-    .metallic-stat__value {
-      font-size: 1.35rem;
-    }
+  .metallic-stat__content {
+    min-height: 94px;
+    padding: 12px;
   }
 }

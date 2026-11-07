@@ -140,10 +140,17 @@
 }
 
 .team-preview__stars {
+  display: flex;
+  gap: 2px;
   margin: 0 0 6px;
   color: #ffd76a;
   font-size: 13px;
   letter-spacing: 1px;
+}
+
+.team-preview__stars img.atleta-raster-icon {
+  width: 16px;
+  height: 16px;
 }
 
 .team-preview__column p {

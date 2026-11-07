@@ -1,21 +1,33 @@
-﻿<ion-content class="login-bg">
+<ion-content class="login-bg">
   <div class="login-container">
-    <app-metallic-card title="Iniciar sesión" [titleIconAsset]="loginTitleIconAsset">
+    <div class="login-brand" aria-label="Atleta">
+      <img src="/assets/brand/atleta-app-icon-v1.png" alt="Logo Atleta" />
+      <span>ATLETA</span>
+    </div>
+    <app-metallic-card title="Iniciar sesión">
       <form class="login-form" [formGroup]="loginForm" (ngSubmit)="onLogin()">
         <app-metallic-input
           formControlName="email"
+          [invalid]="loginForm.controls.email.touched && loginForm.controls.email.invalid"
+          [describedBy]="loginForm.controls.email.touched && loginForm.controls.email.invalid ? 'login-email-error' : null"
           label="Email"
           type="email"
           placeholder="tu@email.com">
         </app-metallic-input>
 
+        <p id="login-email-error" class="login-error" *ngIf="loginForm.controls.email.touched && loginForm.controls.email.invalid">Ingresa un correo válido.</p>
+
         <app-metallic-input
           formControlName="password"
+          [invalid]="loginForm.controls.password.touched && loginForm.controls.password.invalid"
+          [describedBy]="loginForm.controls.password.touched && loginForm.controls.password.invalid ? 'login-password-error' : null"
           label="Contraseña"
           type="password"
           placeholder="••••••••"
           allowPasswordToggle>
         </app-metallic-input>
+
+        <p id="login-password-error" class="login-error" *ngIf="loginForm.controls.password.touched && loginForm.controls.password.invalid">Ingresa una contraseña de al menos 8 caracteres.</p>
 
         <app-metallic-button
           class="login-submit"
@@ -25,22 +37,26 @@
           {{ isSubmitting ? 'Ingresando...' : 'Iniciar sesión' }}
         </app-metallic-button>
 
-        <p *ngIf="authError" class="login-error">{{ authError }}</p>
+        <p role="alert" *ngIf="authError" class="login-error">{{ authError }}</p>
+        <p role="status" *ngIf="authNotice" class="login-notice">{{ authNotice }}</p>
 
         <button type="button" class="login-link" [disabled]="isSubmitting" (click)="onForgotPassword()">
           ¿Olvidaste tu contraseña?
         </button>
 
-        <div class="login-divider" aria-hidden="true">
+        <div *ngIf="googleAvailable" class="login-divider" aria-hidden="true">
           <span>o</span>
         </div>
 
         <app-metallic-button
+          *ngIf="googleAvailable"
+          class="login-google"
           type="button"
           variant="secondary"
+          [fullWidth]="true"
           [disabled]="isSubmitting"
           (click)="onContinueWithGoogle()">
-          <ion-icon [src]="googleIconAsset" aria-hidden="true"></ion-icon>
+          <img class="login-google__icon" [src]="googleIconAsset" aria-hidden="true" alt="" />
           Continuar con Google
         </app-metallic-button>
 

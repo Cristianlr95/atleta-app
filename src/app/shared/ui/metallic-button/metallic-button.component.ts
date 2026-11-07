@@ -13,4 +13,5 @@ export class MetallicButtonComponent  {
   @Input() variant: 'primary' | 'secondary' | 'accent' = 'primary';
   @Input() disabled: boolean = false;
   @Input() type: 'button' | 'submit' | 'reset' = 'button';
+  @Input() fullWidth = false;
 }

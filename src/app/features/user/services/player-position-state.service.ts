@@ -41,6 +41,10 @@ export class PlayerPositionStateService {
       .sort((a, b) => a.prioridad - b.prioridad);
   }
 
+  clearForPlayer(playerUuid: string): void {
+    this.writeAll(this.readAll().filter((item) => item.playerUuid !== playerUuid));
+  }
+
   private readAll(): PlayerAssignedPosition[] {
     try {
       const raw = localStorage.getItem(this.storageKey);

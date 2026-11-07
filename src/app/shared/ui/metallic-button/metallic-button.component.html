@@ -1,7 +1,7 @@
 <button
   [attr.type]="type"
   [disabled]="disabled"
-  [class]="'metallic-btn metallic-btn--' + variant"
+  [class]="'metallic-btn metallic-btn--' + variant + (fullWidth ? ' metallic-btn--full' : '')"
 >
   <span class="metallic-btn__content">
     <ng-content></ng-content>

@@ -5,11 +5,15 @@ import { ApiError } from '../models/api-error.model';
 import { AuthSession } from '../models/auth-session.model';
 import { AuthSessionInitializerService } from './auth-session-initializer.service';
 import { AuthSessionService } from './auth-session.service';
+import { TokenStorageService } from './token-storage.service';
+import { SessionRefreshService } from './session-refresh.service';
 
 describe('AuthSessionInitializerService', () => {
   let authSessionService: jasmine.SpyObj<AuthSessionService>;
   let userApiService: jasmine.SpyObj<UserApiService>;
   let service: AuthSessionInitializerService;
+  let tokenStorage: jasmine.SpyObj<TokenStorageService>;
+  let sessionRefresh: jasmine.SpyObj<SessionRefreshService>;
 
   beforeEach(() => {
     authSessionService = jasmine.createSpyObj<AuthSessionService>('AuthSessionService', [
@@ -18,12 +22,17 @@ describe('AuthSessionInitializerService', () => {
       'clearSession',
     ]);
     userApiService = jasmine.createSpyObj<UserApiService>('UserApiService', ['getAthlete']);
+    tokenStorage = jasmine.createSpyObj<TokenStorageService>('TokenStorageService', ['getRefreshToken']);
+    tokenStorage.getRefreshToken.and.returnValue(null);
+    sessionRefresh = jasmine.createSpyObj<SessionRefreshService>('SessionRefreshService', ['refreshAccessToken']);
 
     TestBed.configureTestingModule({
       providers: [
         AuthSessionInitializerService,
         { provide: AuthSessionService, useValue: authSessionService },
         { provide: UserApiService, useValue: userApiService },
+        { provide: TokenStorageService, useValue: tokenStorage },
+        { provide: SessionRefreshService, useValue: sessionRefresh },
       ],
     });
 
@@ -66,6 +75,21 @@ describe('AuthSessionInitializerService', () => {
       },
       tokens: seededSession.tokens,
     });
+  });
+
+  it('rotates an expired access token before validating the restored user', async () => {
+    const refreshed = buildSession();
+    tokenStorage.getRefreshToken.and.returnValue('refresh-token');
+    authSessionService.getValidSession.and.returnValues(null, refreshed);
+    sessionRefresh.refreshAccessToken.and.returnValue(of('access-2'));
+    userApiService.getAthlete.and.returnValue(of({
+      atletaUuid: 'ath-1', email: 'demo@atleta.cl', nombre: 'Demo',
+    }));
+
+    await service.initSession();
+
+    expect(sessionRefresh.refreshAccessToken).toHaveBeenCalledTimes(1);
+    expect(userApiService.getAthlete).toHaveBeenCalledWith('ath-1');
   });
 
   it('clears the session when backend rejects the token', async () => {

@@ -1,9 +1,10 @@
 ﻿import { CommonModule } from '@angular/common';
-import { Component, inject } from '@angular/core';
+import { Component, ElementRef, inject } from '@angular/core';
 import { AbstractControl, FormBuilder, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
 import { finalize } from 'rxjs/operators';
 import { ApiError } from 'src/app/core/models/api-error.model';
+import { APP_CONFIG } from 'src/app/core/config/app-config.token';
 import { NavigationService } from 'src/app/core/services/navigation.service';
 import { UserFeedbackService } from 'src/app/core/services/user-feedback.service';
 import { MetallicButtonComponent } from 'src/app/shared/ui/metallic-button/metallic-button.component';
@@ -30,15 +31,17 @@ import { AuthService } from '../../services/auth.service';
   ],
 })
 export class RegisterPage {
+  private readonly elementRef = inject<ElementRef<HTMLElement>>(ElementRef);
   private readonly formBuilder = inject(FormBuilder);
   private readonly authService = inject(AuthService);
   private readonly navigationService = inject(NavigationService);
   private readonly userFeedbackService = inject(UserFeedbackService);
+  readonly isBeta = inject(APP_CONFIG).environmentName === 'beta';
 
-  readonly iconBase = 'assets/icons/atleta';
-  readonly registerTitleIconAsset = `${this.iconBase}/ic_nav_profile_24.svg`;
-  readonly accountSectionIconAsset = `${this.iconBase}/ic_action_edit_24.svg`;
-  readonly securitySectionIconAsset = `${this.iconBase}/ic_action_save_24.svg`;
+  readonly iconBase = 'assets/icons/atleta-raster-v1';
+  readonly registerTitleIconAsset = `${this.iconBase}/ic_nav_profile_96.png`;
+  readonly accountSectionIconAsset = `${this.iconBase}/ic_action_edit_96.png`;
+  readonly securitySectionIconAsset = `${this.iconBase}/ic_auth_security_96.png`;
 
   isSubmitting = false;
   registerError: string | null = null;
@@ -55,6 +58,7 @@ export class RegisterPage {
       genero: ['', [Validators.required]],
       password: ['', [Validators.required, Validators.minLength(8), Validators.maxLength(100)]],
       confirmPassword: ['', [Validators.required]],
+      invitationCode: ['', this.isBeta ? [Validators.required] : []],
     },
     {
       validators: [this.passwordsMatchValidator],
@@ -64,6 +68,12 @@ export class RegisterPage {
   onRegister(): void {
     if (this.registerForm.invalid) {
       this.registerForm.markAllAsTouched();
+      const firstInvalid = this.elementRef.nativeElement.querySelector<HTMLElement>(
+        'form .ng-invalid input, form .ng-invalid select',
+      ) ?? this.elementRef.nativeElement.querySelector<HTMLElement>(
+        'app-metallic-input[formControlName="confirmPassword"] input',
+      );
+      firstInvalid?.focus();
       return;
     }
 
@@ -79,7 +89,7 @@ export class RegisterPage {
         email: formValue.email.trim().toLowerCase(),
         password: formValue.password,
         genero: formValue.genero as 'MASCULINO' | 'FEMENINO',
-      })
+      }, this.isBeta ? formValue.invitationCode.trim() : undefined)
       .pipe(finalize(() => (this.isSubmitting = false)))
       .subscribe({
         next: () => {
@@ -91,7 +101,9 @@ export class RegisterPage {
           });
         },
         error: (error: ApiError) => {
-          this.registerError = this.userFeedbackService.registerError(error);
+          this.registerError = this.isBeta && error.status === 403
+            ? 'El código de invitación no es válido.'
+            : this.userFeedbackService.registerError(error);
         },
       });
   }
@@ -107,6 +119,11 @@ export class RegisterPage {
     }
 
     return control.hasError(errorKey) && (control.touched || control.dirty);
+  }
+
+  isControlInvalid(controlName: string): boolean {
+    const control = this.registerForm.get(controlName);
+    return !!control && control.invalid && (control.touched || control.dirty);
   }
 
   get hasPasswordMismatch(): boolean {

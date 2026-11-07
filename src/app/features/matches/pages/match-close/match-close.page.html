@@ -1,4 +1,4 @@
-﻿<ion-content class="match-close-bg">
+<ion-content class="match-close-bg">
   <div class="match-close-container">
     <app-metallic-card title="Cierre del Partido" [titleIconAsset]="titleIconAsset">
       <div class="steps" *ngIf="!closedSuccess()">
@@ -13,7 +13,13 @@
         <app-metallic-button variant="secondary" (click)="onRetry()">Reintentar</app-metallic-button>
       </div>
 
-      <ng-container *ngIf="!loading() && !error() && !closedSuccess()">
+      <section *ngIf="!loading() && !error() && closeBlockedReason()" class="close-blocked" role="alert">
+        <h3>Este partido no puede cerrarse</h3>
+        <p>{{ closeBlockedReason() }}</p>
+        <app-metallic-button variant="secondary" (click)="onBackStep()">Volver a partidos</app-metallic-button>
+      </section>
+
+      <ng-container *ngIf="!loading() && !error() && !closedSuccess() && !closeBlockedReason()">
         <section *ngIf="step() === 1" class="panel">
           <h3>Ajustes rapidos</h3>
           <p class="helper-copy">Ajusta marcador global y distribuye goles en la lista completa de jugadores.</p>
@@ -31,6 +37,9 @@
             <span>Local asignados: {{ assignedHomeGoals() }} / {{ homeScore() }}</span>
             <span>Visita asignados: {{ assignedAwayGoals() }} / {{ awayScore() }}</span>
           </div>
+          <p class="helper-copy helper-copy--warning" *ngIf="!scoreboardMatchesAssignedGoals()">
+            Para cerrar el acta, los goles asignados deben coincidir con el marcador. Un 0-0 tambien es valido.
+          </p>
 
           <div #playersTableWrap class="players-table-wrap players-table-scroll" *ngIf="players().length > 0; else noPlayersState">
             <section class="team-section">
@@ -39,13 +48,13 @@
                 <div class="table-head">
                   <span>Jugador</span>
                   <span>- Gol</span>
-                  <span>+ Gol</span>
+                  <span><img class="atleta-raster-icon" src="assets/icons/atleta-raster-v1/ic_event_goal_96.png" aria-hidden="true" alt="" />Gol</span>
                   <span>Goles</span>
                 </div>
                 <div class="table-row" *ngFor="let player of localPlayers(); trackBy: trackByPlayerId">
                   <span class="player-cell">{{ player.name }}</span>
-                  <button class="mini-btn" type="button" [disabled]="!isCreator() || (goalCounts()[player.userId] || 0) <= 0" (click)="decrementGoal(player.userId)">-</button>
-                  <button class="mini-btn" type="button" [disabled]="!isCreator()" (click)="incrementGoal(player.userId)">+</button>
+                  <button class="mini-btn" type="button" [attr.aria-label]="'Restar gol a ' + player.name" [disabled]="!isCreator() || (goalCounts()[player.userId] || 0) <= 0" (click)="decrementGoal(player.userId)"><img class="atleta-raster-icon" src="assets/icons/atleta-raster-v1/ic_action_remove_96.png" aria-hidden="true" alt="" /></button>
+                  <button class="mini-btn" type="button" [attr.aria-label]="'Sumar gol a ' + player.name" [disabled]="!isCreator()" (click)="incrementGoal(player.userId)"><img class="atleta-raster-icon" src="assets/icons/atleta-raster-v1/ic_action_add_96.png" aria-hidden="true" alt="" /></button>
                   <strong>{{ goalCounts()[player.userId] || 0 }}</strong>
                 </div>
                 <div class="table-empty" *ngIf="localPlayers().length === 0">Sin jugadores en Local.</div>
@@ -58,13 +67,13 @@
                 <div class="table-head">
                   <span>Jugador</span>
                   <span>- Gol</span>
-                  <span>+ Gol</span>
+                  <span><img class="atleta-raster-icon" src="assets/icons/atleta-raster-v1/ic_event_goal_96.png" aria-hidden="true" alt="" />Gol</span>
                   <span>Goles</span>
                 </div>
                 <div class="table-row" *ngFor="let player of awayPlayers(); trackBy: trackByPlayerId">
                   <span class="player-cell">{{ player.name }}</span>
-                  <button class="mini-btn" type="button" [disabled]="!isCreator() || (goalCounts()[player.userId] || 0) <= 0" (click)="decrementGoal(player.userId)">-</button>
-                  <button class="mini-btn" type="button" [disabled]="!isCreator()" (click)="incrementGoal(player.userId)">+</button>
+                  <button class="mini-btn" type="button" [attr.aria-label]="'Restar gol a ' + player.name" [disabled]="!isCreator() || (goalCounts()[player.userId] || 0) <= 0" (click)="decrementGoal(player.userId)"><img class="atleta-raster-icon" src="assets/icons/atleta-raster-v1/ic_action_remove_96.png" aria-hidden="true" alt="" /></button>
+                  <button class="mini-btn" type="button" [attr.aria-label]="'Sumar gol a ' + player.name" [disabled]="!isCreator()" (click)="incrementGoal(player.userId)"><img class="atleta-raster-icon" src="assets/icons/atleta-raster-v1/ic_action_add_96.png" aria-hidden="true" alt="" /></button>
                   <strong>{{ goalCounts()[player.userId] || 0 }}</strong>
                 </div>
                 <div class="table-empty" *ngIf="awayPlayers().length === 0">Sin jugadores en Visita.</div>
@@ -102,7 +111,7 @@
         </section>
 
         <section *ngIf="step() === 3" class="panel">
-          <h3>XP Ganada</h3>
+          <h3>XP estimada</h3>
           <app-xp-reward-card [rewards]="xpRewards()"></app-xp-reward-card>
 
           <div class="footer-actions">
@@ -118,6 +127,16 @@
       <section *ngIf="closedSuccess()" class="success">
         <h3>Partido Finalizado</h3>
         <p>Experiencia aplicada correctamente.</p>
+        <section *ngIf="aiSummary() as summary" class="ai-summary" aria-live="polite">
+          <span class="eyebrow">Resumen del partido</span>
+          <h4>{{ summary.title }}</h4>
+          <p>{{ summary.summary }}</p>
+          <ul>
+            <li *ngFor="let highlight of summary.highlights">{{ highlight }}</li>
+          </ul>
+          <p class="helper-copy">{{ summary.mvpComment }}</p>
+        </section>
+        <p *ngIf="aiSummaryUnavailable()" class="helper-copy">El partido quedó cerrado correctamente. El resumen estará disponible más tarde.</p>
         <app-metallic-button variant="accent" (click)="onOpenMvp()">Ir a Votacion MVP</app-metallic-button>
       </section>
     </app-metallic-card>

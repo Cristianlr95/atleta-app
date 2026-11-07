@@ -11,6 +11,12 @@ Fecha de actualizacion: 2026-04-23
 - Servidor de desarrollo: `ng serve`.
 - Test E2E: Playwright.
 
+### Depuración Android con backend local
+
+El APK `debug` permite HTTP únicamente hacia `localhost`; la configuración de red de release no cambia. Para usarlo en emulador o dispositivo conectado por ADB, iniciar el backend local en el puerto 8080, configurar su CORS para aceptar el origen `https://localhost` de Capacitor y ejecutar `adb reverse tcp:8080 tcp:8080`. Construir el APK de desarrollo con `ATLETA_API_BASE_URL=http://localhost:8080/api/v1`; comprobar que otras variables de entorno no sustituyan esa URL. Al terminar, quitar el túnel con `adb reverse --remove tcp:8080`.
+
+No utilizar esta configuración HTTP para servidores remotos ni distribuir un APK de depuración como release. Las conexiones de producción deben usar HTTPS.
+
 ## 2. Hallazgos del estado actual
 ### Build y configuracion
 - El proyecto ya separaba `development` y `production` con `fileReplacements`, pero el `apiBaseUrl` estaba compilado fijo en `environment.ts` y `environment.prod.ts`.
@@ -29,7 +35,7 @@ Fecha de actualizacion: 2026-04-23
 ### Riesgos detectados
 - URL backend hardcodeada por build.
 - Tokens de sesion almacenados en `localStorage`.
-- `capacitor.config.ts` aun usa `appId: "io.ionic.starter"`.
+- Capacitor y Android ya usan el identificador real `com.cristianlr.atleta`; queda pendiente validar firma/canales de distribucion cuando exista release movil.
 - No habia estrategia formal para exponer solo variables publicas de frontend.
 
 ## 3. Cambios implementados en esta preparacion
@@ -60,6 +66,7 @@ ATLETA_STORAGE_PREFIX=atleta.dev
 - No definir passwords, JWT secretos, client secrets o credenciales de base de datos en el frontend.
 - `ATLETA_API_BASE_URL` debe apuntar al backend publico que el navegador puede alcanzar.
 - `ATLETA_STORAGE_PREFIX` define el namespace de `localStorage`.
+- `ATLETA_GOOGLE_CLIENT_ID` es opcional y habilita el login Google en frontend; nunca usar client secret en el cliente.
 
 ## 5. Como correr en local
 ### Opcion A: defaults locales

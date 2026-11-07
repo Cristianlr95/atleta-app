@@ -4,9 +4,10 @@
     [isOpen]="!!latestUnread()"
     [header]="latestUnread()?.title ?? ''"
     [message]="latestUnread()?.message ?? ''"
-    duration="3200"
-    position="top"
-    color="dark"
+    [buttons]="notificationToastButtons"
+    cssClass="atleta-notification-toast"
+    duration="2800"
+    position="bottom"
     (didDismiss)="onToastDismissed()">
   </ion-toast>
 </ion-app>

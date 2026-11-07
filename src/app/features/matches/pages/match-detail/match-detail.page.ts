@@ -1,11 +1,13 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnDestroy, computed, effect, inject, signal } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+import { firstValueFrom } from 'rxjs';
 import { IonicModule } from '@ionic/angular';
 import { AppToastService } from 'src/app/core/services/app-toast.service';
 import { AuthSessionService } from 'src/app/core/services/auth-session.service';
 import { ErrorMapperService } from 'src/app/core/services/error-mapper.service';
 import { NavigationService } from 'src/app/core/services/navigation.service';
+import { PageLoadGuard } from 'src/app/core/utils/page-load-guard';
 import { buildMainBottomNav } from 'src/app/shared/navigation/main-bottom-nav';
 import { MetallicButtonComponent } from 'src/app/shared/ui/metallic-button/metallic-button.component';
 import {
@@ -21,13 +23,19 @@ import {
   ParticipantSegment,
   ParticipantSegmentComponent,
 } from '../../components/participant-segment/participant-segment.component';
-import { TeamsBoardComponent } from '../../components/teams-board/teams-board.component';
+import { TeamsBoardChange, TeamsBoardComponent } from '../../components/teams-board/teams-board.component';
 import { VenueSelectedCardComponent } from '../../components/venue-selected-card/venue-selected-card.component';
 import { DEFAULT_MATCH_THEME_ID, MATCH_THEMES } from '../../models/match-theme.constants';
 import { MatchViewState, toMatchViewState } from '../../models/match-view-state.models';
-import { MatchState, lifecycleToUserLabel } from '../../models/match-state.models';
-import { MatchStatus, Player, PlayerInvitationStatus } from '../../models/progressive-match.models';
+import { MatchLifecycleState, MatchState, lifecycleToUserLabel } from '../../models/match-state.models';
+import {
+  InvitationDeliveryStatus,
+  MatchStatus,
+  Player,
+  PlayerInvitationStatus,
+} from '../../models/progressive-match.models';
 import { MatchLiveService } from '../../services/match-live.service';
+import { MatchesApiService } from '../../services/matches-api.service';
 import { MatchService } from '../../services/match.service';
 import { NotificationService } from '../../services/notification.service';
 import { NotificationBadgeService } from '../../services/notification-badge.service';
@@ -62,6 +70,7 @@ export class MatchDetailPage implements OnDestroy {
   private readonly matchStore = inject(MatchStore);
   private readonly matchService = inject(MatchService);
   private readonly matchLiveService = inject(MatchLiveService);
+  private readonly matchesApiService = inject(MatchesApiService);
   private readonly notificationService = inject(NotificationService);
   private readonly notificationBadgeService = inject(NotificationBadgeService);
   private readonly invitationsStore = inject(InvitationsStore);
@@ -70,12 +79,12 @@ export class MatchDetailPage implements OnDestroy {
   private readonly errorMapper = inject(ErrorMapperService);
   private readonly authSessionService = inject(AuthSessionService);
 
-  readonly iconBase = 'assets/icons/atleta';
-  readonly titleIconAsset = `${this.iconBase}/ic_nav_matches_24.svg`;
-  readonly progressIconAsset = `${this.iconBase}/ic_status_in_progress_24.svg`;
-  readonly participantsIconAsset = `${this.iconBase}/ic_match_invite_24.svg`;
-  readonly rankingIconAsset = `${this.iconBase}/ic_comp_stats_24.svg`;
-  readonly actionsIconAsset = `${this.iconBase}/ic_action_edit_24.svg`;
+  readonly iconBase = 'assets/icons/atleta-raster-v1';
+  readonly titleIconAsset = `${this.iconBase}/ic_nav_matches_96.png`;
+  readonly progressIconAsset = `${this.iconBase}/ic_status_in_progress_96.png`;
+  readonly participantsIconAsset = `${this.iconBase}/ic_match_participants_96.png`;
+  readonly rankingIconAsset = `${this.iconBase}/ic_comp_stats_96.png`;
+  readonly actionsIconAsset = `${this.iconBase}/ic_action_edit_96.png`;
 
   readonly themes = MATCH_THEMES;
   readonly selectedParticipantSegment = signal<ParticipantSegment>('CONFIRMED');
@@ -83,6 +92,9 @@ export class MatchDetailPage implements OnDestroy {
   readonly teamBalanceFeedback = signal<string | null>(null);
   readonly teamAssignmentError = signal<string | null>(null);
   readonly inviteActionLoading = signal(false);
+  readonly inviteRetryLoading = signal(false);
+  readonly startMatchLoading = signal(false);
+  readonly flowSteps = ['Convocar', 'Listo', 'En juego', 'Cerrar', 'Resultados'];
 
   private readonly routeMatchId = signal('');
   private readonly localMatchId = signal('');
@@ -95,6 +107,7 @@ export class MatchDetailPage implements OnDestroy {
   private autoPersistedTeamsSignature: string | null = null;
   private autoPersistTeamsInFlight = false;
   private lastLoadedMvpRouteMatchId: string | null = null;
+  private readonly enterLoadGuard = new PageLoadGuard();
 
   readonly resource = computed(() => this.matchStore.getStateSnapshot(this.routeMatchId()));
   readonly loadingMatch = computed(() => this.resource().loading && !this.resource().data);
@@ -112,6 +125,7 @@ export class MatchDetailPage implements OnDestroy {
 
   readonly confirmedParticipants = computed(() => this.state()?.confirmedParticipants ?? []);
   readonly pendingParticipants = computed(() => this.state()?.pendingParticipants ?? []);
+  readonly waitlistedParticipants = computed(() => this.state()?.waitlistedParticipants ?? []);
   readonly declinedParticipants = computed(() => this.state()?.declinedParticipants ?? []);
   readonly participants = computed(() => this.state()?.participants ?? []);
   readonly confirmedPlayers = computed(() => this.state()?.confirmedPlayers ?? []);
@@ -123,6 +137,9 @@ export class MatchDetailPage implements OnDestroy {
     if (this.selectedParticipantSegment() === 'DECLINED') {
       return this.declinedParticipants();
     }
+    if (this.selectedParticipantSegment() === 'WAITLIST') {
+      return this.waitlistedParticipants();
+    }
     return this.confirmedParticipants();
   });
 
@@ -130,6 +147,30 @@ export class MatchDetailPage implements OnDestroy {
     const currentUser = this.authSessionService.currentSession?.user?.atletaUuid?.trim().toLowerCase();
     const creatorUuid = this.match()?.creatorUuid?.trim().toLowerCase();
     return !!currentUser && !!creatorUuid && creatorUuid === currentUser;
+  });
+
+  readonly deliveryInvitations = computed(() => {
+    const match = this.match();
+    if (!match) {
+      return [];
+    }
+    return this.invitationsStore
+      .getMatchInvitations(match.id)
+      .filter((invitation) => invitation.targetUuid !== match.creatorUuid);
+  });
+  readonly failedDeliveryInvitations = computed(() =>
+    this.deliveryInvitations().filter(
+      (invitation) => invitation.deliveryStatus === InvitationDeliveryStatus.FAILED,
+    ),
+  );
+  readonly deliverySummary = computed(() => {
+    const invitations = this.deliveryInvitations();
+    const sent = invitations.filter(
+      (invitation) => invitation.deliveryStatus === InvitationDeliveryStatus.SENT,
+    ).length;
+    const failed = this.failedDeliveryInvitations().length;
+    const pending = invitations.length - sent - failed;
+    return `${sent} enviadas · ${pending} pendientes · ${failed} fallidas`;
   });
 
   readonly canShowTeams = computed(() => {
@@ -152,9 +193,16 @@ export class MatchDetailPage implements OnDestroy {
       return true;
     }
 
-    const scheduledAt = new Date(match.scheduledAt).getTime();
-    return Number.isFinite(scheduledAt) && scheduledAt <= Date.now();
+    return false;
   });
+
+  readonly canStartMatch = computed(
+    () => this.isCreator()
+      && this.match()?.status === MatchStatus.CONFIRMED
+      && !this.hasMatchStarted()
+      && this.assignedHomePlayers().length > 0
+      && this.assignedAwayPlayers().length > 0,
+  );
 
   readonly canEditTeams = computed(
     () => this.isCreator() && this.confirmedParticipants().length >= 2 && !this.hasMatchStarted(),
@@ -186,7 +234,10 @@ export class MatchDetailPage implements OnDestroy {
       return null;
     }
 
-    const kickoffRaw = match.startedAt ?? match.scheduledAt;
+    const kickoffRaw = match.startedAt;
+    if (!kickoffRaw) {
+      return null;
+    }
     const kickoffAt = new Date(kickoffRaw).getTime();
     if (!Number.isFinite(kickoffAt)) {
       return null;
@@ -199,12 +250,8 @@ export class MatchDetailPage implements OnDestroy {
       return false;
     }
 
-    if (this.match()?.closePending) {
-      return true;
-    }
-
     const closeAvailableAt = this.closeAvailableAt();
-    return closeAvailableAt !== null && this.now() >= closeAvailableAt;
+    return closeAvailableAt !== null && this.now() >= closeAvailableAt && this.now() <= closeAvailableAt + 2 * 60 * 60 * 1000;
   });
   readonly closeMatchMessage = computed(() => {
     if (!this.isCreator() || this.isFinalized()) {
@@ -224,6 +271,9 @@ export class MatchDetailPage implements OnDestroy {
       return 'El cierre se habilita 1 hora después del inicio del partido.';
     }
 
+    if (this.now() > closeAvailableAt + 2 * 60 * 60 * 1000) {
+      return 'La ventana de cierre de 3 horas ha vencido.';
+    }
     return `Podrás cerrar el partido desde las ${this.formatCloseTime(closeAvailableAt)}.`;
   });
   readonly canOpenMvpVote = computed(() => {
@@ -316,6 +366,27 @@ export class MatchDetailPage implements OnDestroy {
 
     const inviteStatus = this.currentUserInvitation()?.status;
     return inviteStatus === PlayerInvitationStatus.PENDING || inviteStatus === PlayerInvitationStatus.INVITED;
+  });
+  readonly canWithdrawFromMatch = computed(() => {
+    if (this.isCreator() || this.isFinalized() || this.hasMatchStarted()) {
+      return false;
+    }
+    const status = this.currentUserInvitation()?.status;
+    return status === PlayerInvitationStatus.ACCEPTED || status === PlayerInvitationStatus.WAITLIST;
+  });
+  readonly flowStepIndex = computed(() => {
+    switch (this.state()?.lifecycleState) {
+      case MatchLifecycleState.CREATED_CONFIRMED:
+        return 1;
+      case MatchLifecycleState.LIVE:
+        return 2;
+      case MatchLifecycleState.CLOSE_PENDING:
+        return 3;
+      case MatchLifecycleState.FINISHED:
+        return 4;
+      default:
+        return 0;
+    }
   });
 
   readonly selectedTheme = computed(() => {
@@ -425,9 +496,17 @@ export class MatchDetailPage implements OnDestroy {
   }
 
   ionViewWillEnter(): void {
-    void this.notificationBadgeService.refresh();
-    void this.invitationsStore.loadPendingInvitations();
-    void this.loadRouteMatch(true);
+    void this.loadOnEnter();
+  }
+
+  private async loadOnEnter(): Promise<void> {
+    await this.enterLoadGuard.runSingle(async () => {
+      await Promise.all([
+        this.notificationBadgeService.refresh(),
+        this.invitationsStore.loadPendingInvitations(),
+        this.loadRouteMatch(true),
+      ]);
+    });
   }
 
   ionViewWillLeave(): void {
@@ -461,7 +540,7 @@ export class MatchDetailPage implements OnDestroy {
     this.selectedParticipantSegment.set(segment);
   }
 
-  async onTeamsChange(payload: { home: Player[]; away: Player[] }): Promise<void> {
+  async onTeamsChange(payload: TeamsBoardChange): Promise<void> {
     if (!this.canEditTeams()) {
       return;
     }
@@ -472,7 +551,10 @@ export class MatchDetailPage implements OnDestroy {
     }
 
     try {
-      await this.matchService.setTeams(match.id, payload.home, payload.away);
+      await this.matchService.setTeams(match.id, payload.home, payload.away, {
+        homeFormationId: payload.homeFormationId,
+        awayFormationId: payload.awayFormationId,
+      });
       this.teamAssignmentError.set(null);
       await this.matchStore.refresh(this.routeMatchId(), true);
     } catch (error) {
@@ -496,6 +578,29 @@ export class MatchDetailPage implements OnDestroy {
     }
   }
 
+  async onRetryFailedInvitations(): Promise<void> {
+    const match = this.match();
+    if (!match || this.inviteRetryLoading() || this.failedDeliveryInvitations().length === 0) {
+      return;
+    }
+
+    this.inviteRetryLoading.set(true);
+    try {
+      const result = await this.matchService.retryFailedInvitations(match.id);
+      if (result.failed > 0) {
+        await this.appToastService.error(
+          `Se reenviaron ${result.sent}; ${result.failed} invitaciones siguen fallando.`,
+        );
+      } else {
+        await this.appToastService.success(`Reintento completado: ${result.sent} invitaciones enviadas.`);
+      }
+    } catch (error) {
+      await this.appToastService.error(this.errorMapper.toUserMessage(error, 'invitations'));
+    } finally {
+      this.inviteRetryLoading.set(false);
+    }
+  }
+
   onInviteMore(): void {
     const backendMatchId = this.match()?.backendMatchId;
     void this.navigationService.safeNavigate(['/social'], {
@@ -514,12 +619,34 @@ export class MatchDetailPage implements OnDestroy {
     await this.respondFromMatchState(false);
   }
 
+  async onWithdrawFromMatch(): Promise<void> {
+    await this.respondFromMatchState(false);
+  }
+
   async onFinishMatch(): Promise<void> {
     const routeMatchId = this.routeMatchId();
     if (!routeMatchId) {
       return;
     }
     void this.navigationService.safeNavigate(['/matches', routeMatchId, 'close']);
+  }
+
+  async onStartMatch(): Promise<void> {
+    const backendMatchId = this.match()?.backendMatchId;
+    if (!backendMatchId || !this.canStartMatch() || this.startMatchLoading()) {
+      return;
+    }
+
+    this.startMatchLoading.set(true);
+    try {
+      await firstValueFrom(this.matchesApiService.updateMatchStatus(backendMatchId, 'INICIADO'));
+      await this.matchStore.refresh(this.routeMatchId(), true);
+      await this.appToastService.success('Partido iniciado. Los equipos quedaron bloqueados.');
+    } catch (error) {
+      await this.appToastService.error(this.errorMapper.toUserMessage(error, 'matches'));
+    } finally {
+      this.startMatchLoading.set(false);
+    }
   }
 
   private async autoPersistBalancedTeams(matchId: string, confirmedPlayers: Player[]): Promise<void> {
@@ -551,21 +678,7 @@ export class MatchDetailPage implements OnDestroy {
   }
 
   onNavItemSelected(itemId: string): void {
-    if (itemId === 'home') {
-      void this.navigationService.safeNavigate(['/home']);
-      return;
-    }
-    if (itemId === 'matches') {
-      void this.navigationService.safeNavigate(['/matches']);
-      return;
-    }
-    if (itemId === 'ranking') {
-      void this.navigationService.safeNavigate(['/leaderboard']);
-      return;
-    }
-    if (itemId === 'profile') {
-      void this.navigationService.safeNavigate(['/player/profile']);
-    }
+    void this.navigationService.goToMainBottomSection(itemId);
   }
 
   onOpenMvpVote(): void {
@@ -577,7 +690,8 @@ export class MatchDetailPage implements OnDestroy {
   }
 
   private async respondFromMatchState(accept: boolean): Promise<void> {
-    if (!this.canRespondInvitationInMatch() || this.inviteActionLoading()) {
+    const canAct = this.canRespondInvitationInMatch() || (!accept && this.canWithdrawFromMatch());
+    if (!canAct || this.inviteActionLoading()) {
       return;
     }
 
@@ -615,7 +729,14 @@ export class MatchDetailPage implements OnDestroy {
       }
 
       await this.notificationBadgeService.refresh();
-      await this.appToastService.success(accept ? 'Invitacion aceptada.' : 'Invitacion rechazada.');
+      const wasConfirmed = invitation?.status === PlayerInvitationStatus.ACCEPTED;
+      await this.appToastService.success(
+        !accept
+          ? wasConfirmed ? 'Cupo liberado. El primer jugador en espera sera promovido.' : 'Invitacion rechazada.'
+          : updated.status === PlayerInvitationStatus.WAITLIST
+            ? 'El cupo ya esta completo. Quedaste en lista de espera.'
+            : 'Invitacion aceptada.',
+      );
     } catch (error) {
       await this.appToastService.error(this.errorMapper.toUserMessage(error, 'invitations'));
       if (this.routeMatchId()) {

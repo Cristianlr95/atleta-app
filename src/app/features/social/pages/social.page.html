@@ -1,9 +1,10 @@
-﻿<ion-content class="social-bg">
+<ion-content class="social-bg">
   <div class="social-container">
     <app-page-nav></app-page-nav>
 
     <app-metallic-card title="Social" [titleIconAsset]="socialIconAsset">
       <app-social-tabs
+        *ngIf="!facade.loadError() && !facade.isLoading()"
         [activeTab]="facade.activeTab()"
         [pendingFriends]="pendingFriends().length"
         [pendingTeams]="pendingTeams().length"
@@ -12,7 +13,7 @@
         (tabChange)="facade.setActiveTab($event)">
       </app-social-tabs>
 
-      <p class="social-message social-message--error" *ngIf="facade.errorMessage()">{{ facade.errorMessage() }}</p>
+      <p class="social-message social-message--error" role="alert" *ngIf="facade.errorMessage()">{{ facade.errorMessage() }}</p>
       <button
         *ngIf="facade.errorMessage()"
         type="button"
@@ -20,10 +21,14 @@
         (click)="onRetryLoad()">
         Reintentar
       </button>
-      <p class="social-message social-message--success" *ngIf="facade.successMessage()">{{ facade.successMessage() }}</p>
+      <p class="social-message social-message--success" role="status" *ngIf="facade.successMessage()">{{ facade.successMessage() }}</p>
+
+      <p class="social-message social-message--error" role="alert" *ngIf="facade.loadError()">{{ facade.loadError() }}</p>
+      <button *ngIf="facade.loadError()" type="button" class="social-retry" (click)="onRetryLoad()">Reintentar carga social</button>
+      <p class="social-message" role="status" *ngIf="facade.isLoading()">Cargando datos sociales...</p>
 
       <app-activity-feed
-        *ngIf="facade.activeTab() === 'activity'"
+        *ngIf="!facade.loadError() && !facade.isLoading() && facade.activeTab() === 'activity'"
         [loading]="facade.isLoading()"
         [items]="facade.activity()"
         [unreadCount]="facade.unreadCount()"
@@ -33,19 +38,20 @@
       </app-activity-feed>
 
       <app-friends-panel
-        *ngIf="facade.activeTab() === 'friends'"
+        *ngIf="!facade.loadError() && !facade.isLoading() && facade.activeTab() === 'friends'"
         [pendingRequests]="pendingFriends()"
         [acceptedFriendships]="acceptedFriendships()"
         [candidates]="facade.friendCandidates()"
         [loadingSearch]="facade.searchLoading()"
-        (search)="onFriendSearch($event)"
+        [currentPlayerUuid]="facade.playerUuid"
+        (searchChange)="onFriendSearch($event)"
         (sendRequest)="facade.sendFriendRequest($event)"
         (respondRequest)="facade.respondFriendRequest($event.requestId, $event.accept)"
         (openProfile)="onOpenProfile($event)">
       </app-friends-panel>
 
       <app-teams-panel
-        *ngIf="facade.activeTab() === 'teams'"
+        *ngIf="!facade.loadError() && !facade.isLoading() && facade.activeTab() === 'teams'"
         [principalTeam]="principalTeam()"
         [createdTeams]="facade.createdTeams()"
         [pendingInvites]="pendingTeams()"
@@ -58,10 +64,10 @@
       </app-teams-panel>
 
       <app-match-invitations-panel
-        *ngIf="facade.activeTab() === 'matches'"
+        *ngIf="!facade.loadError() && !facade.isLoading() && facade.activeTab() === 'matches'"
         [pendingInvites]="pendingMatches()"
         [confirmedMatches]="confirmedMatches()"
-        (respondInvite)="facade.respondMatchInvite($event.inviteId, $event.accept)"
+        (respondInvite)="onRespondMatchInvite($event)"
         (openMatch)="onOpenMatch($event)">
       </app-match-invitations-panel>
     </app-metallic-card>

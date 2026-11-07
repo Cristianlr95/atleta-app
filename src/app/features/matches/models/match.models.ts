@@ -1,3 +1,6 @@
+import { MatchType } from './progressive-match.models';
+import { SocialRequestItem } from '../../social/models/social.models';
+
 export type MatchModality = 'CINCO_VS_CINCO' | 'SEIS_VS_SEIS' | 'SIETE_VS_SIETE';
 export type MatchGenderCategory = 'MIXTO' | 'SOLO_MUJERES' | 'SOLO_HOMBRES';
 export type MatchStatus = 'CREADO' | 'INICIADO' | 'FINALIZADO' | 'INVALIDO';
@@ -15,11 +18,26 @@ export type PlayerGender = 'MASCULINO' | 'FEMENINO';
 export interface CreateMatchRequest {
   creadorUuid: string;
   modalidad: MatchModality;
+  matchType: MatchType;
+  rotativeGoalkeeper?: boolean;
   categoriaGenero?: MatchGenderCategory;
   fechaHoraProgramada: string;
   latitud?: number;
   longitud?: number;
   cuota?: number;
+}
+
+export interface CreateMatchOrchestratedRequest {
+  match: CreateMatchRequest;
+  teamId: number;
+  targetUuids: string[];
+  invitationMessage?: string;
+}
+
+export interface OrchestratedMatchCreationResponse {
+  match: MatchResponse;
+  invitations: SocialRequestItem[];
+  replayed: boolean;
 }
 
 export interface JoinMatchRequest {
@@ -75,6 +93,8 @@ export interface ConfirmMatchEventRequest {
 export interface MatchResponse {
   id: number;
   modalidad: MatchModality;
+  matchType?: MatchType;
+  rotativeGoalkeeper?: boolean;
   categoriaGenero?: MatchGenderCategory;
   fechaHoraProgramada: string;
   creador?: PlayerSummary;
@@ -99,6 +119,7 @@ export interface MatchResponse {
 export interface PlayerMatchHistoryItem {
   id: number;
   modalidad: MatchModality;
+  matchType?: MatchType;
   fechaHoraProgramada: string;
   estado: MatchStatus;
   cuota?: number;
@@ -177,6 +198,16 @@ export interface MatchClosePreviewResponse {
   finalScoreLocal: number;
   finalScoreAway: number;
   players: MatchClosePreviewPlayer[];
+}
+
+export interface MatchAiSummaryResponse {
+  matchId: number;
+  promptVersion: string;
+  source: string;
+  title: string;
+  summary: string;
+  highlights: string[];
+  mvpComment: string;
 }
 
 

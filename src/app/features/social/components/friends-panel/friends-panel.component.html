@@ -5,8 +5,8 @@
     <article class="friends-item" *ngFor="let item of pendingRequests">
       <p>{{ item.requesterAlias }} te envio una solicitud</p>
       <div class="friends-item__actions">
-        <button type="button" (click)="respondRequest.emit({ requestId: item.id, accept: true })">Aceptar</button>
-        <button type="button" (click)="respondRequest.emit({ requestId: item.id, accept: false })">Rechazar</button>
+        <button type="button" [attr.aria-label]="'Aceptar solicitud de ' + item.requesterAlias" (click)="respondRequest.emit({ requestId: item.id, accept: true })"><img class="atleta-raster-icon" src="assets/icons/atleta-raster-v1/ic_action_accept_96.png" aria-hidden="true" alt="" />Aceptar</button>
+        <button type="button" [attr.aria-label]="'Rechazar solicitud de ' + item.requesterAlias" (click)="respondRequest.emit({ requestId: item.id, accept: false })"><img class="atleta-raster-icon" src="assets/icons/atleta-raster-v1/ic_action_reject_96.png" aria-hidden="true" alt="" />Rechazar</button>
       </div>
     </article>
   </div>
@@ -14,12 +14,13 @@
   <h4>Buscar jugador</h4>
   <app-metallic-input [ngModel]="query" (ngModelChange)="onSearchQueryChange($event)" label="Alias, nombre o email" type="text"></app-metallic-input>
   <p class="friends-panel__state" *ngIf="loadingSearch">Buscando jugadores...</p>
+  <p class="friends-panel__state" *ngIf="showNoSearchResults">No encontramos jugadores con esa busqueda.</p>
   <div class="friends-panel__list" *ngIf="candidates.length > 0">
     <article class="friends-item" *ngFor="let candidate of candidates">
       <p>{{ formatCandidate(candidate) }}</p>
       <div class="friends-item__actions">
-        <button type="button" (click)="sendRequest.emit(candidate.atletaUuid)">Enviar solicitud</button>
-        <button type="button" (click)="openProfile.emit(candidate.atletaUuid)">Ver perfil</button>
+        <button type="button" [attr.aria-label]="'Enviar solicitud a ' + formatCandidate(candidate)" (click)="sendRequest.emit(candidate.atletaUuid)">Enviar solicitud</button>
+        <button type="button" [attr.aria-label]="'Ver perfil de ' + formatCandidate(candidate)" (click)="openProfile.emit(candidate.atletaUuid)">Ver perfil</button>
       </div>
     </article>
   </div>
@@ -30,7 +31,7 @@
     <article class="friends-item" *ngFor="let item of acceptedFriendships">
       <p>{{ item.requesterAlias }} y {{ item.targetAlias }}</p>
       <div class="friends-item__actions">
-        <button type="button" (click)="openProfile.emit(item.requesterUuid)">Ver perfil</button>
+        <button type="button" [attr.aria-label]="'Ver perfil de ' + (item.requesterUuid === currentPlayerUuid ? item.targetAlias : item.requesterAlias)" (click)="openProfile.emit(getFriendProfileUuid(item))">Ver perfil</button>
       </div>
     </article>
   </div>

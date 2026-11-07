@@ -12,6 +12,8 @@ WORKDIR /usr/share/nginx/html
 
 COPY docker/nginx/default.conf /etc/nginx/conf.d/default.conf
 COPY docker/entrypoint/40-write-app-config.sh /docker-entrypoint.d/40-write-app-config.sh
+RUN sed -i 's/\r$//' /docker-entrypoint.d/40-write-app-config.sh \
+    && chmod +x /docker-entrypoint.d/40-write-app-config.sh
 COPY --from=build /app/www ./
 
 ENV ATLETA_ENV_NAME=production

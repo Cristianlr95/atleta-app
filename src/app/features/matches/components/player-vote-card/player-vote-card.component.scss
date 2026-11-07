@@ -27,5 +27,21 @@
   font-weight: 800;
 }
 
-.vote-copy strong { color: #edf3ff; }
-.vote-copy small { color: #9eb0d1; }
+.vote-copy {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.vote-copy strong {
+  overflow: hidden;
+  color: #edf3ff;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.vote-copy small {
+  color: #9eb0d1;
+  line-height: 1.25;
+}

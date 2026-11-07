@@ -1,59 +1,85 @@
-@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Rajdhani:wght@300;400;500;600;700&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&display=swap");
 
 // Variables CSS personalizadas
 :root {
   // Fuentes
-  --font-family-display: 'Orbitron', sans-serif;
-  --font-family-body: 'Rajdhani', sans-serif;
-  
-  // Colores principales - Estilo Winning Eleven 10
-  --background: #080d17;
-  --foreground: #edf4ff;
-  --card: #171f31;
-  --card-foreground: #edf4ff;
-  --popover: #1c263a;
-  --popover-foreground: #edf4ff;
-  
+  --font-family-display: "Rajdhani", sans-serif;
+  --font-family-body: "Rajdhani", sans-serif;
+
+  // Superficies grafito: contraste óptimo para la identidad azul/cian/lima.
+  --background: #151a23;
+  --foreground: #f2f6fa;
+  --card: #1e2632;
+  --card-foreground: #f2f6fa;
+  --popover: #202a37;
+  --popover-foreground: #f2f6fa;
+
   // Colores plateados metálicos
-  --primary: #d7e2f2;
-  --primary-foreground: #07101f;
-  --secondary: #6f829e;
-  --secondary-foreground: #ffffff;
-  --muted: #263149;
-  --muted-foreground: #aebcd2;
-  --accent: #80e7b2;
-  --accent-foreground: #06150f;
-  --atleta-blue: #58c7ff;
-  --atleta-green: #80e7b2;
-  --atleta-gold: #ffd46b;
-  --atleta-red: #ff6b7c;
-  
+  --primary: #d7ff00;
+  --primary-foreground: #071014;
+  --secondary: #283443;
+  --secondary-foreground: #f0f4f5;
+  --muted: #28313e;
+  --muted-foreground: #aebac8;
+  --accent: #00d7f5;
+  --accent-foreground: #031015;
+  --atleta-blue: #00d7f5;
+  --atleta-green: #d7ff00;
+  --atleta-gold: #d7ff00;
+  --atleta-red: #ff5d73;
+  --tactical-local: #d7ff00;
+  --tactical-visit: #00d7f5;
+  --tactical-swap: #ff8a00;
+  --tactical-pitch: #032116;
+  --tactical-pitch-line: rgba(174, 211, 193, 0.42);
+  --tactical-surface: #06141b;
+  --tactical-surface-raised: #091a22;
+  --tactical-line: #17313b;
+
   // Otros
   --destructive: #ef476f;
   --destructive-foreground: #ffffff;
-  --border: rgba(176, 199, 231, 0.22);
-  --input-background: rgba(9, 15, 27, 0.84);
-  --radius: 0.5rem;
+  --border: #3b4a5e;
+  --input-background: #18212c;
+  --radius: 0.375rem;
   --atleta-page-bg:
-    radial-gradient(circle at 20% 0%, rgba(88, 199, 255, 0.18), transparent 34%),
-    radial-gradient(circle at 92% 16%, rgba(128, 231, 178, 0.12), transparent 30%),
-    linear-gradient(145deg, #050913 0%, #101827 46%, #050913 100%);
+    radial-gradient(circle at 50% -20%, rgba(0, 215, 245, 0.11), transparent 34%),
+    radial-gradient(circle at 12% 80%, rgba(215, 255, 0, 0.045), transparent 28%),
+    linear-gradient(180deg, #252e3a 0%, #151a23 56%, #10151d 100%);
   --atleta-stadium-overlay:
-    linear-gradient(180deg, rgba(4, 8, 15, 0.76) 0%, rgba(7, 12, 22, 0.9) 60%, rgba(3, 6, 12, 0.96) 100%),
-    radial-gradient(circle at 50% 0%, rgba(88, 199, 255, 0.16), transparent 44%);
-  --surface-1: rgba(18, 27, 43, 0.84);
-  --surface-2: rgba(10, 16, 28, 0.78);
-  --surface-3: rgba(27, 38, 58, 0.9);
-  --line-soft: rgba(176, 199, 231, 0.22);
-  --line-strong: rgba(205, 221, 245, 0.48);
-  --glow-blue: rgba(88, 199, 255, 0.34);
-  --glow-green: rgba(128, 231, 178, 0.28);
-  --shadow-deep: 0 18px 48px rgba(0, 0, 0, 0.48);
-  
+    linear-gradient(
+      180deg,
+      rgba(21, 26, 35, 0.88) 0%,
+      rgba(21, 26, 35, 0.94) 60%,
+      rgba(16, 21, 29, 0.97) 100%
+    ),
+    radial-gradient(circle at 50% 0%, rgba(0, 215, 245, 0.08), transparent 44%);
+  --surface-1: #1e2632;
+  --surface-2: #161e28;
+  --surface-3: #293544;
+  --line-soft: #3b4a5e;
+  --line-strong: #566980;
+  --glow-blue: rgba(0, 215, 245, 0.22);
+  --glow-green: rgba(215, 255, 0, 0.18);
+  --shadow-deep: 0 16px 36px rgba(0, 0, 0, 0.42);
+
   // Gradientes metálicos
-  --metallic-gradient: linear-gradient(135deg, #91a2ba 0%, #d7e2f2 34%, #f7fbff 50%, #b8c7dc 72%, #6f829e 100%);
-  --metallic-dark: linear-gradient(135deg, #3d4c66 0%, #6f829e 45%, #9fb0c9 100%);
-  --metallic-shine: linear-gradient(180deg, rgba(255,255,255,0.24) 0%, rgba(255,255,255,0) 52%, rgba(0,0,0,0.18) 100%);
+  --metallic-gradient: linear-gradient(
+    135deg,
+    #d7ff00 0%,
+    #d7ff00 100%
+  );
+  --metallic-dark: linear-gradient(
+    135deg,
+    #10222b 0%,
+    #10222b 100%
+  );
+  --metallic-shine: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.24) 0%,
+    rgba(255, 255, 255, 0) 52%,
+    rgba(0, 0, 0, 0.18) 100%
+  );
 }
 
 // Reset y estilos base
@@ -73,21 +99,31 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   font-family: var(--font-family-display);
   letter-spacing: 0.05em;
   text-transform: uppercase;
-  font-weight: 600;
+  font-weight: 700;
 }
 
 // Animaciones
 @keyframes shimmer {
-  0% { transform: translateX(-100%); }
-  100% { transform: translateX(100%); }
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
 }
 
 @keyframes pulse-glow {
-  0%, 100% {
+  0%,
+  100% {
     opacity: 0.5;
     transform: scale(1);
   }
@@ -98,12 +134,18 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 @keyframes float {
-  0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-10px); }
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
 }
 
 @keyframes icon-premium-pulse {
-  0%, 100% {
+  0%,
+  100% {
     filter: drop-shadow(0 0 4px rgba(192, 200, 216, 0.35));
     transform: translateY(0);
   }
@@ -115,9 +157,9 @@ h1, h2, h3, h4, h5, h6 {
 
 // Iconografia "game premium" reutilizable
 .atleta-game-icon {
-  --icon-bg-a: rgba(90, 101, 120, 0.42);
-  --icon-bg-b: rgba(20, 28, 42, 0.55);
-  --icon-border: rgba(192, 200, 216, 0.4);
+  --icon-bg-a: #0a1b23;
+  --icon-bg-b: #0a1b23;
+  --icon-border: #29444f;
 
   display: inline-flex;
   align-items: center;
@@ -125,15 +167,23 @@ h1, h2, h3, h4, h5, h6 {
   width: 28px;
   height: 28px;
   padding: 4px;
-  border-radius: 8px;
+  border-radius: 6px;
   border: 1px solid var(--icon-border);
   background: linear-gradient(165deg, var(--icon-bg-a), var(--icon-bg-b));
-  color: #dce6f7;
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.15),
-    0 0 0 1px rgba(8, 12, 20, 0.25),
-    0 6px 14px rgba(7, 10, 17, 0.35);
-  animation: icon-premium-pulse 2.2s ease-in-out infinite;
+  color: var(--tactical-visit);
+  box-shadow: none;
+  animation: none;
+}
+
+/* Raster icon system: generated 96px PNG sources scale with surrounding UI text. */
+img.atleta-raster-icon,
+img[src*="atleta-raster-v1"] {
+  width: 1em;
+  height: 1em;
+  display: inline-block;
+  flex: 0 0 auto;
+  object-fit: contain;
+  vertical-align: middle;
 }
 
 .atleta-game-icon--sm {
@@ -166,11 +216,11 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: linear-gradient(180deg, #7a8aa0 0%, #5a6578 100%);
+  background: #28424c;
   border-radius: 5px;
   border: 2px solid var(--background);
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(180deg, #8a9ab0 0%, #6a7588 100%);
+  background: #3b5b67;
 }

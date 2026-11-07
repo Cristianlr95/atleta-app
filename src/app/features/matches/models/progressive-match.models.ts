@@ -28,8 +28,16 @@ export enum MatchGenderCategory {
 export enum PlayerInvitationStatus {
   INVITED = 'INVITED',
   ACCEPTED = 'ACCEPTED',
+  WAITLIST = 'WAITLIST',
   DECLINED = 'DECLINED',
   PENDING = 'PENDING',
+}
+
+export enum InvitationDeliveryStatus {
+  PENDING = 'PENDING',
+  SENT = 'SENT',
+  FAILED = 'FAILED',
+  RETRYING = 'RETRYING',
 }
 
 export interface MatchTheme {
@@ -77,6 +85,8 @@ export interface Invitation {
   targetUuid: string;
   targetName: string;
   status: PlayerInvitationStatus;
+  deliveryStatus?: InvitationDeliveryStatus;
+  deliveryMessage?: string;
   createdAt: string;
   respondedAt?: string;
 }
@@ -95,10 +105,12 @@ export interface MatchParticipant {
 
 export interface Match {
   id: string;
+  creationIdempotencyKey?: string;
   backendMatchId?: number;
   creatorUuid: string;
   creatorName: string;
   type: MatchType;
+  rotativeGoalkeeper?: boolean;
   modality: MatchSize;
   genderCategory: MatchGenderCategory;
   status: MatchStatus;
@@ -125,6 +137,8 @@ export interface Match {
   themeId?: string;
   homeKitColor?: string;
   awayKitColor?: string;
+  homeFormationId?: string;
+  awayFormationId?: string;
   homePlayers: Player[];
   awayPlayers: Player[];
   createdAt: string;
@@ -132,6 +146,7 @@ export interface Match {
 
 export interface MatchDraftInput {
   type: MatchType;
+  rotativeGoalkeeper?: boolean;
   modality: MatchSize;
   genderCategory: MatchGenderCategory;
   team: Team;

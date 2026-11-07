@@ -13,11 +13,15 @@ import { RatingsApiService } from '../../ratings/services/ratings-api.service';
 import { RatingHistoryEntry } from '../../ratings/models/rating.models';
 import { MatchesApiService } from './matches-api.service';
 import { SocialApiService } from '../../social/services/social-api.service';
+import { MatchType } from '../models/progressive-match.models';
+import { toCanonicalMatchType } from '../models/match-type.mapper';
 
 export interface MatchHistoryViewItem {
   id: number;
   scheduledAtEpoch: number | null;
   modality: MatchModality;
+  matchType: MatchType;
+  typeLabel: string;
   status: MatchStatus;
   displayStatusKey: 'CREATED' | 'CONFIRMED' | 'LIVE' | 'FINISHED' | 'INVALID';
   modalityLabel: string;
@@ -103,6 +107,7 @@ export class MatchHistoryService {
     return {
       id: response.id,
       modalidad: response.modalidad,
+      matchType: response.matchType,
       fechaHoraProgramada: response.fechaHoraProgramada,
       estado: response.estado,
       cuota: response.cuota,
@@ -141,6 +146,8 @@ export class MatchHistoryService {
       id: item.id,
       scheduledAtEpoch: Number.isNaN(date.getTime()) ? null : date.getTime(),
       modality: item.modalidad,
+      matchType: toCanonicalMatchType(item.matchType),
+      typeLabel: this.mapMatchType(toCanonicalMatchType(item.matchType)),
       status: item.estado,
       displayStatusKey: this.resolveDisplayStatusKey(item),
       modalityLabel: this.mapModality(item.modalidad),
@@ -320,6 +327,16 @@ export class MatchHistoryService {
     }
 
     return '5 vs 5';
+  }
+
+  private mapMatchType(matchType: MatchType): string {
+    if (matchType === MatchType.INTERNAL) {
+      return 'Interno';
+    }
+    if (matchType === MatchType.POINTS) {
+      return 'Por los puntos';
+    }
+    return 'Amistoso';
   }
 
   private mapStatus(item: PlayerMatchHistoryItem): string {

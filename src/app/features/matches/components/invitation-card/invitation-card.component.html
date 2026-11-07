@@ -5,7 +5,7 @@
   <p class="invitation-card__meta">Invita: {{ match?.creatorName ?? 'Companero' }}</p>
 
   <div class="invitation-card__actions">
-    <button type="button" (click)="onAccept()" [disabled]="disabled">Aceptar</button>
-    <button type="button" (click)="onDecline()" [disabled]="disabled">No puedo</button>
+    <button type="button" (click)="onAccept()" [disabled]="disabled"><img class="atleta-raster-icon" src="assets/icons/atleta-raster-v1/ic_action_accept_96.png" aria-hidden="true" alt="" />Aceptar</button>
+    <button type="button" (click)="onDecline()" [disabled]="disabled"><img class="atleta-raster-icon" src="assets/icons/atleta-raster-v1/ic_action_reject_96.png" aria-hidden="true" alt="" />No puedo</button>
   </div>
 </article>

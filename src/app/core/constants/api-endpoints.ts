@@ -1,15 +1,22 @@
 ﻿export const API_ENDPOINTS = {
   auth: {
     login: '/athletes/login',
+    googleLogin: '/athletes/auth/google',
     registerAthlete: '/athletes/register',
     createPlayerProfile: '/player-profiles',
+    refresh: '/athletes/auth/refresh',
+    logout: '/athletes/auth/logout',
+    passwordResetRequest: '/athletes/password-reset/request',
+    passwordResetConfirm: '/athletes/password-reset/confirm',
   },
   matches: {
     base: '/matches',
+    orchestrated: '/matches/orchestrated',
     byPlayer: '/matches/by-player',
     byPlayerOrCreator: '/matches/by-player-or-creator',
     join: '/matches/join',
     events: '/matches/events',
+    aiSummary: '/matches',
   },
   ratings: {
     base: '/ratings',
@@ -19,7 +26,9 @@
   users: {
     athletes: '/athletes',
     playerProfiles: '/player-profiles',
+    playerProfileAchievements: '/player-profiles',
     playerProfilePositions: '/player-profiles/positions',
+    playerProfileTrustScore: '/player-profiles/trust-score',
     positions: '/positions',
   },
   teams: {
@@ -38,8 +47,11 @@
     teamInvites: '/social/team-invites',
     matchInvites: '/social/match-invites',
     matchInvitesBatch: '/social/match-invites/batch',
+    matchInvitesBatchDetailed: '/social/match-invites/batch/detailed',
     matchInvitesByMatch: '/social/match-invites/by-match',
     notifications: '/social/notifications',
+    notificationUnreadCount: '/social/notifications/unread-count',
+    pushTokens: '/social/notifications/push-tokens',
     reminders: '/social/notifications/reminders/forms',
     searchPlayers: '/social/players/search',
   },

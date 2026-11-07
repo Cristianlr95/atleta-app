@@ -1,19 +1,21 @@
 ﻿import { CommonModule } from '@angular/common';
 import { Component, Input } from '@angular/core';
+import { IonicModule } from '@ionic/angular';
 
 export interface TeamEventSummary {
-  icon: string;
+  iconAsset: string;
   text: string;
 }
 
 @Component({
   selector: 'app-match-summary-card',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, IonicModule],
   templateUrl: './match-summary-card.component.html',
   styleUrls: ['./match-summary-card.component.scss'],
 })
 export class MatchSummaryCardComponent {
+  private readonly iconBase = 'assets/icons/atleta-raster-v1';
   @Input({ required: true }) homeName = 'Local';
   @Input({ required: true }) awayName = 'Visita';
   @Input() homeColor = 'Azul';
@@ -30,12 +32,12 @@ export class MatchSummaryCardComponent {
     return this.homeScore > this.awayScore ? `${this.homeName} gana` : `${this.awayName} gana`;
   }
 
-  get resultBadge(): { icon: string; label: string; css: string } {
+  get resultBadge(): { iconAsset: string; label: string; css: string } {
     if (this.homeScore === this.awayScore) {
-      return { icon: '🟡', label: 'Empate', css: 'badge--draw' };
+      return { iconAsset: `${this.iconBase}/ic_result_draw_96.png`, label: 'Empate', css: 'badge--draw' };
     }
     return this.homeScore > this.awayScore
-      ? { icon: '🟢', label: 'Victoria Local', css: 'badge--win' }
-      : { icon: '🔴', label: 'Victoria Visita', css: 'badge--loss' };
+      ? { iconAsset: `${this.iconBase}/ic_result_win_96.png`, label: 'Victoria Local', css: 'badge--win' }
+      : { iconAsset: `${this.iconBase}/ic_result_loss_96.png`, label: 'Victoria Visita', css: 'badge--loss' };
   }
 }

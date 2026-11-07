@@ -35,15 +35,19 @@ export const onboardingCompletedGuard: CanActivateFn = (_route, state): Observab
         return of(createLoginRedirect(router, state));
       }
 
-      return of(true);
+      return of(createOnboardingRecoveryRedirect(router, state.url, error));
     }),
   );
 };
 
-export const onboardingPendingGuard: CanActivateFn = (_route, state): Observable<boolean | UrlTree> => {
+export const onboardingPendingGuard: CanActivateFn = (route, state): Observable<boolean | UrlTree> => {
   const router = inject(Router);
   const authSessionService = inject(AuthSessionService);
   const userApiService = inject(UserApiService);
+
+  if (route.queryParamMap?.get('demo') === '1') {
+    return of(true);
+  }
 
   const session = authSessionService.getValidSession();
   if (!session) {
@@ -66,7 +70,20 @@ export const onboardingPendingGuard: CanActivateFn = (_route, state): Observable
         return of(createLoginRedirect(router, state));
       }
 
-      return of(true);
+      return of(createOnboardingRecoveryRedirect(router, state.url, error));
     }),
   );
 };
+
+function createOnboardingRecoveryRedirect(
+  router: Router,
+  nextUrl: string,
+  error: ApiError,
+): UrlTree {
+  return router.createUrlTree(['/player/onboarding-status'], {
+    queryParams: {
+      reason: error.status === 0 ? 'offline' : 'server',
+      next: nextUrl,
+    },
+  });
+}

@@ -1,5 +1,5 @@
 import { Injectable, inject } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, firstValueFrom } from 'rxjs';
 import { map, tap } from 'rxjs/operators';
 import { ApiError } from 'src/app/core/models/api-error.model';
 import {
@@ -10,11 +10,13 @@ import {
 import { AuthSessionService } from 'src/app/core/services/auth-session.service';
 import { AuthApiResponse, LoginRequest, RegisterAthleteRequest } from '../models/auth.models';
 import { AuthApiService } from './auth-api.service';
+import { SessionDataCleanupService } from './session-data-cleanup.service';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private readonly authApiService = inject(AuthApiService);
   private readonly authSessionService = inject(AuthSessionService);
+  private readonly sessionDataCleanupService = inject(SessionDataCleanupService);
 
   login(credentials: LoginRequest): Observable<AuthSession> {
     return this.authApiService.login(credentials).pipe(
@@ -23,12 +25,43 @@ export class AuthService {
     );
   }
 
-  register(payload: RegisterAthleteRequest): Observable<AuthenticatedUser> {
-    return this.authApiService.registerAthlete(payload).pipe(map((response) => this.toUser(response)));
+  loginWithGoogleIdToken(idToken: string): Observable<AuthSession> {
+    return this.authApiService.loginWithGoogle({ idToken }).pipe(
+      map((response) => this.toSession(response, null)),
+      tap((session) => this.authSessionService.startSession(session)),
+    );
   }
 
-  logout(): void {
-    this.authSessionService.clearSession();
+  register(payload: RegisterAthleteRequest, invitationCode?: string): Observable<AuthenticatedUser> {
+    return this.authApiService.registerAthlete(payload, invitationCode).pipe(map((response) => this.toUser(response)));
+  }
+
+  async logout(): Promise<void> {
+    const playerUuid = this.authSessionService.currentSession?.user.atletaUuid;
+    const refreshToken = this.authSessionService.currentSession?.tokens.refreshToken;
+    try {
+      if (refreshToken) {
+        try {
+          await firstValueFrom(this.authApiService.logout({ refreshToken }));
+        } catch {
+          // Local logout must remain available while offline.
+        }
+      }
+    } finally {
+      try {
+        this.sessionDataCleanupService.clear(playerUuid);
+      } finally {
+        this.authSessionService.clearSession();
+      }
+    }
+  }
+
+  requestPasswordReset(email: string): Observable<void> {
+    return this.authApiService.requestPasswordReset({ email: email.trim() });
+  }
+
+  confirmPasswordReset(token: string, newPassword: string): Observable<void> {
+    return this.authApiService.confirmPasswordReset({ token, newPassword });
   }
 
   get isAuthenticated(): boolean {

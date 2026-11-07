@@ -8,7 +8,14 @@ import {
   PlayerAssignedPosition,
   PlayerPosition,
 } from '../models/position.models';
-import { AthleteProfile, PlayerProfile } from '../models/user.models';
+import {
+  AthleteProfile,
+  PlayerProfile,
+  PlayerAchievement,
+  TrustLogEntry,
+  UpdatePlayerProfileRequest,
+  UpdateTrustScoreRequest,
+} from '../models/user.models';
 
 @Injectable({ providedIn: 'root' })
 export class UserApiService extends ApiService {
@@ -16,14 +23,67 @@ export class UserApiService extends ApiService {
     return this.get<AthleteProfile>(`${API_ENDPOINTS.users.athletes}/${atletaUuid}`);
   }
 
+  changePassword(atletaUuid: string, payload: { currentPassword: string; newPassword: string }) {
+    return this.put<void, { currentPassword: string; newPassword: string }>(
+      `${API_ENDPOINTS.users.athletes}/${atletaUuid}/password`,
+      payload,
+    );
+  }
+
+  deleteAccount(atletaUuid: string, payload: { confirmation: string; currentPassword?: string }) {
+    return this.deleteWithBody<void, { confirmation: string; currentPassword?: string }>(
+      `${API_ENDPOINTS.users.athletes}/${atletaUuid}`,
+      payload,
+    );
+  }
+
   getPlayerProfile(atletaUuid: string) {
     return this.get<PlayerProfile>(`${API_ENDPOINTS.users.playerProfiles}/${atletaUuid}`);
+  }
+
+  getPublicPlayerProfile(atletaUuid: string) {
+    return this.get<PlayerProfile>(`${API_ENDPOINTS.users.playerProfiles}/${atletaUuid}/public`);
+  }
+
+  updatePlayerProfile(atletaUuid: string, payload: UpdatePlayerProfileRequest) {
+    return this.put<PlayerProfile, UpdatePlayerProfileRequest>(
+      `${API_ENDPOINTS.users.playerProfiles}/${atletaUuid}`,
+      payload,
+    );
+  }
+
+  uploadPlayerPicture(atletaUuid: string, file: File) {
+    const body = new FormData();
+    body.append('file', file, file.name);
+    return this.post<PlayerProfile, FormData>(
+      `${API_ENDPOINTS.users.playerProfiles}/${atletaUuid}/picture`,
+      body,
+    );
+  }
+
+  getPlayerAchievements(atletaUuid: string) {
+    return this.get<PlayerAchievement[]>(
+      `${API_ENDPOINTS.users.playerProfileAchievements}/${atletaUuid}/achievements`,
+    );
   }
 
   createPlayerProfile(payload: CreatePlayerProfileRequest) {
     return this.post<PlayerProfile, CreatePlayerProfileRequest>(
       API_ENDPOINTS.users.playerProfiles,
       payload,
+    );
+  }
+
+  updateTrustScore(payload: UpdateTrustScoreRequest) {
+    return this.put<PlayerProfile, UpdateTrustScoreRequest>(
+      API_ENDPOINTS.users.playerProfileTrustScore,
+      payload,
+    );
+  }
+
+  getTrustHistory(atletaUuid: string) {
+    return this.get<TrustLogEntry[]>(
+      `${API_ENDPOINTS.users.playerProfiles}/${atletaUuid}/trust-history`,
     );
   }
 

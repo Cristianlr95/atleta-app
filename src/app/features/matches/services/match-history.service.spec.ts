@@ -6,6 +6,7 @@ import { RatingsApiService } from '../../ratings/services/ratings-api.service';
 import { MatchesApiService } from './matches-api.service';
 import { MatchHistoryService } from './match-history.service';
 import { SocialApiService } from '../../social/services/social-api.service';
+import { MatchType } from '../models/progressive-match.models';
 
 describe('MatchHistoryService', () => {
   let service: MatchHistoryService;
@@ -82,6 +83,7 @@ describe('MatchHistoryService', () => {
         {
           id: 11,
           modalidad: 'CINCO_VS_CINCO',
+          matchType: MatchType.POINTS,
           fechaHoraProgramada: '2026-03-19T10:00:00',
           estado: 'FINALIZADO',
           resultado: 'GANADO',
@@ -95,6 +97,8 @@ describe('MatchHistoryService', () => {
 
     service.getPlayerHistory('ath-1').subscribe((history) => {
       expect(history[0].outcome).toBe('GANADO');
+      expect(history[0].matchType).toBe(MatchType.POINTS);
+      expect(history[0].typeLabel).toBe('Por los puntos');
       done();
     });
   });

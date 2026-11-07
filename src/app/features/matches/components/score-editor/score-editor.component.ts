@@ -1,14 +1,17 @@
 ﻿import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { IonicModule } from '@ionic/angular';
 
 @Component({
   selector: 'app-score-editor',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, IonicModule],
   templateUrl: './score-editor.component.html',
   styleUrls: ['./score-editor.component.scss'],
 })
 export class ScoreEditorComponent {
+  readonly addIconAsset = 'assets/icons/atleta-raster-v1/ic_action_add_96.png';
+  readonly removeIconAsset = 'assets/icons/atleta-raster-v1/ic_action_remove_96.png';
   @Input({ required: true }) homeScore = 0;
   @Input({ required: true }) awayScore = 0;
   @Input() homeLabel = 'Local';

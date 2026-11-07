@@ -5,7 +5,7 @@
   <div class="metallic-card__content">
     <div *ngIf="title" class="metallic-card__header">
       <div class="metallic-card__title-row">
-        <ion-icon *ngIf="titleIconAsset" [src]="titleIconAsset" class="metallic-card__title-icon atleta-game-icon atleta-game-icon--md"></ion-icon>
+        <img *ngIf="titleIconAsset" [src]="titleIconAsset" class="metallic-card__title-icon atleta-game-icon atleta-game-icon--md atleta-raster-icon" alt="" />
         <h3 class="metallic-card__title">{{ title }}</h3>
       </div>
     </div>

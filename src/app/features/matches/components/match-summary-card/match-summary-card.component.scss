@@ -48,10 +48,26 @@
 }
 
 .result-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   border-radius: 999px;
   padding: 6px 10px;
   font-weight: 700;
   font-size: 0.82rem;
+}
+
+.result-badge img.atleta-raster-icon,
+.summary-events p img.atleta-raster-icon {
+  width: 18px;
+  height: 18px;
+  flex: 0 0 18px;
+}
+
+.summary-events p {
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
 .badge--win { background: rgba(61, 168, 111, 0.2); color: #9ff0c3; }

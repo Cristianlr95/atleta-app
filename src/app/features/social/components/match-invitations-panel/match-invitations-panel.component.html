@@ -5,8 +5,8 @@
     <article class="match-item" *ngFor="let invite of pendingInvites">
       <p>{{ invite.requesterAlias }} te invito al partido #{{ invite.matchId }}</p>
       <div class="match-item__actions">
-        <button type="button" (click)="respondInvite.emit({ inviteId: invite.id, accept: true })">Aceptar</button>
-        <button type="button" (click)="respondInvite.emit({ inviteId: invite.id, accept: false })">No puedo</button>
+        <button type="button" [attr.aria-label]="'Aceptar invitación al partido ' + invite.matchId + ' de ' + invite.requesterAlias" (click)="respondInvite.emit({ inviteId: invite.id, accept: true })"><img class="atleta-raster-icon" src="assets/icons/atleta-raster-v1/ic_action_accept_96.png" aria-hidden="true" alt="" />Aceptar</button>
+        <button type="button" [attr.aria-label]="'No puedo asistir al partido ' + invite.matchId + ' de ' + invite.requesterAlias" (click)="respondInvite.emit({ inviteId: invite.id, accept: false })"><img class="atleta-raster-icon" src="assets/icons/atleta-raster-v1/ic_action_reject_96.png" aria-hidden="true" alt="" />No puedo</button>
       </div>
     </article>
   </div>
@@ -17,7 +17,7 @@
     <article class="match-item" *ngFor="let match of confirmedMatches">
       <p>{{ match.title }}</p>
       <small>{{ getCountdownLabel(match.scheduledAt) }}</small>
-      <button type="button" (click)="openMatch.emit(match.id)">Abrir detalle</button>
+      <button type="button" [attr.aria-label]="'Abrir detalle de ' + match.title" (click)="openMatch.emit(match.id)">Abrir detalle</button>
     </article>
   </div>
 </section>

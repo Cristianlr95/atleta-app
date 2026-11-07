@@ -1,7 +1,7 @@
 ﻿<div class="events-list" *ngIf="events.length > 0; else emptyState">
   <ion-item-sliding *ngFor="let event of events; trackBy: trackByEventId" class="event-row">
     <ion-item lines="none">
-      <span class="event-icon">{{ iconFor(event.type) }}</span>
+      <img class="event-icon atleta-raster-icon" [src]="iconFor(event.type)" aria-hidden="true" alt="" />
       <div class="event-copy">
         <strong>{{ titleFor(event) }}</strong>
         <small>{{ event.teamLabel }} <span *ngIf="event.persisted">- Guardado</span><span *ngIf="!event.persisted">- Pendiente</span></small>
@@ -22,4 +22,7 @@
   <div class="events-empty">No hay eventos aun. Agrega el primero.</div>
 </ng-template>
 
-<div class="events-add" (click)="addEvent.emit()">+ Agregar evento</div>
+<button type="button" class="events-add" (click)="addEvent.emit()">
+  <img class="atleta-raster-icon" src="assets/icons/atleta-raster-v1/ic_action_add_96.png" aria-hidden="true" alt="" />
+  Agregar evento
+</button>

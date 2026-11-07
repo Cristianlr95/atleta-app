@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { API_ENDPOINTS } from 'src/app/core/constants/api-endpoints';
 import { AuthSessionService } from 'src/app/core/services/auth-session.service';
 import { ApiService } from 'src/app/core/services/api.service';
@@ -7,28 +7,37 @@ import {
   ConfirmMatchEventRequest,
   ConfirmMatchPlayerRequest,
   CreateMatchRequest,
+  CreateMatchOrchestratedRequest,
   ImportTeamPlayersRequest,
   JoinMatchRequest,
   MatchPlayerSummary,
   MatchClosePreviewRequest,
   MatchClosePreviewResponse,
+  MatchAiSummaryResponse,
   MatchResponse,
   RegisterMatchEventRequest,
   RemoveMatchPlayerRequest,
   MatchStatus,
   PlayerMatchHistoryItem,
+  OrchestratedMatchCreationResponse,
   UpdateMatchTeamAssignmentsRequest,
 } from '../models/match.models';
 import { MatchMvpResponse } from '../models/match-mvp.models';
 
 @Injectable({ providedIn: 'root' })
 export class MatchesApiService extends ApiService {
-  constructor(private readonly authSessionService: AuthSessionService) {
-    super();
-  }
+  private readonly authSessionService = inject(AuthSessionService);
 
   createMatch(payload: CreateMatchRequest) {
     return this.post<MatchResponse, CreateMatchRequest>(API_ENDPOINTS.matches.base, payload);
+  }
+
+  createMatchOrchestrated(payload: CreateMatchOrchestratedRequest, idempotencyKey: string) {
+    return this.post<OrchestratedMatchCreationResponse, CreateMatchOrchestratedRequest>(
+      API_ENDPOINTS.matches.orchestrated,
+      payload,
+      { headers: { 'Idempotency-Key': idempotencyKey } },
+    );
   }
 
   getById(matchId: number) {
@@ -100,7 +109,7 @@ export class MatchesApiService extends ApiService {
       params['actorUuid'] = actorUuid;
     }
 
-    return this.put<void, null>(`${API_ENDPOINTS.matches.base}/${matchId}/status`, null, {
+    return this.put<MatchResponse, null>(`${API_ENDPOINTS.matches.base}/${matchId}/status`, null, {
       params,
     });
   }
@@ -112,19 +121,14 @@ export class MatchesApiService extends ApiService {
     );
   }
 
-  getMatchMvp(matchId: number, voterUserId?: string) {
-    return this.get<MatchMvpResponse>(`${API_ENDPOINTS.matches.base}/${matchId}/mvp`, {
-      params: voterUserId ? { voterUserId } : undefined,
-    });
+  getMatchMvp(matchId: number) {
+    return this.get<MatchMvpResponse>(`${API_ENDPOINTS.matches.base}/${matchId}/mvp`);
   }
 
-  voteMatchMvp(matchId: number, voterUserId: string, votedUserId: string) {
+  voteMatchMvp(matchId: number, votedUserId: string) {
     return this.post<MatchMvpResponse, { votedUserId: string }>(
       `${API_ENDPOINTS.matches.base}/${matchId}/mvp/vote`,
       { votedUserId },
-      {
-        params: { voterUserId },
-      },
     );
   }
 
@@ -132,6 +136,13 @@ export class MatchesApiService extends ApiService {
     return this.post<MatchClosePreviewResponse, MatchClosePreviewRequest>(
       `${API_ENDPOINTS.matches.base}/${matchId}/close/preview`,
       payload,
+    );
+  }
+
+  generateAiSummary(matchId: number) {
+    return this.post<MatchAiSummaryResponse, null>(
+      `${API_ENDPOINTS.matches.aiSummary}/${matchId}/ai-summary`,
+      null,
     );
   }
 }

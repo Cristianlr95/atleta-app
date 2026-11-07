@@ -1,11 +1,10 @@
 ﻿import { CommonModule } from '@angular/common';
 import { Component, Input } from '@angular/core';
-import { IonIcon } from '@ionic/angular/standalone';
 
 @Component({
   selector: 'app-metallic-form-section',
   standalone: true,
-  imports: [CommonModule, IonIcon],
+  imports: [CommonModule],
   templateUrl: './metallic-form-section.component.html',
   styleUrls: ['./metallic-form-section.component.scss'],
 })

@@ -1,7 +1,13 @@
 import { Injectable } from '@angular/core';
 import { API_ENDPOINTS } from 'src/app/core/constants/api-endpoints';
 import { ApiService } from 'src/app/core/services/api.service';
-import { CreateTeamRequest, TeamActiveMember, TeamSummary } from '../models/team.models';
+import {
+  CreateTeamRequest,
+  TeamActiveMember,
+  TeamExternalRecord,
+  TeamLeaderboardEntry,
+  TeamSummary,
+} from '../models/team.models';
 
 @Injectable({ providedIn: 'root' })
 export class TeamApiService extends ApiService {
@@ -23,8 +29,20 @@ export class TeamApiService extends ApiService {
     return this.get<TeamSummary[]>(`${API_ENDPOINTS.teams.byPlayer}/${playerUuid}`);
   }
 
+  getById(teamId: number) {
+    return this.get<TeamSummary>(`${API_ENDPOINTS.teams.base}/${teamId}`);
+  }
+
   getActiveMembers(teamId: number) {
     return this.get<TeamActiveMember[]>(`${API_ENDPOINTS.teams.base}/${teamId}/members/active`);
+  }
+
+  getLeaderboard(teamId: number) {
+    return this.get<TeamLeaderboardEntry[]>(`${API_ENDPOINTS.teams.base}/${teamId}/leaderboard`);
+  }
+
+  getExternalRecord(teamId: number) {
+    return this.get<TeamExternalRecord>(`${API_ENDPOINTS.teams.base}/${teamId}/external-record`);
   }
 
   deleteTeam(teamId: number, actorUuid: string) {

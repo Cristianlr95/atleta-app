@@ -1,4 +1,4 @@
-export type SocialRequestStatus = 'PENDIENTE' | 'ACEPTADA' | 'RECHAZADA' | 'CANCELADA';
+export type SocialRequestStatus = 'PENDIENTE' | 'ACEPTADA' | 'LISTA_ESPERA' | 'RECHAZADA' | 'CANCELADA';
 export type SocialNotificationType =
   | 'SOLICITUD_AMISTAD'
   | 'RESPUESTA_AMISTAD'
@@ -36,6 +36,26 @@ export interface SocialNotificationItem {
   createdAt?: string;
 }
 
+export interface UnreadNotificationCount {
+  unreadCount: number;
+}
+
+export interface RegisterPushTokenPayload {
+  token: string;
+  platform: string;
+  deviceId?: string;
+}
+
+export interface PushTokenRecord {
+  id: number;
+  playerUuid: string;
+  platform: string;
+  deviceId?: string;
+  active: boolean;
+  lastSeenAt?: string;
+  createdAt?: string;
+}
+
 export interface CreateFriendRequestPayload {
   requesterUuid: string;
   targetUuid: string;
@@ -62,6 +82,15 @@ export interface CreateMatchInvitesBatchPayload {
   requesterUuid: string;
   targetUuids: string[];
   message?: string;
+}
+
+export type MatchInviteDeliveryStatus = 'SENT' | 'ALREADY_SENT' | 'ALREADY_ACCEPTED' | 'FAILED';
+
+export interface MatchInviteDeliveryResult {
+  targetUuid: string;
+  status: MatchInviteDeliveryStatus;
+  invitation?: SocialRequestItem | null;
+  message?: string | null;
 }
 
 export interface RespondRequestPayload {

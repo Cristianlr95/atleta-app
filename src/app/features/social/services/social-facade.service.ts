@@ -1,8 +1,11 @@
-import { Injectable, computed, signal } from '@angular/core';
+import { Injectable, computed, inject, signal } from '@angular/core';
+import { firstValueFrom } from 'rxjs';
 import { AuthSessionService } from 'src/app/core/services/auth-session.service';
 import { ErrorMapperService } from 'src/app/core/services/error-mapper.service';
 import { PlayerInvitationStatus } from 'src/app/features/matches/models/progressive-match.models';
 import { MatchStore } from 'src/app/features/matches/stores/match.store';
+import { MatchesApiService } from 'src/app/features/matches/services/matches-api.service';
+import { PlayerMatchHistoryItem } from 'src/app/features/matches/models/match.models';
 import { ActivityService } from '../activity/services/activity.service';
 import { SocialPlayerLookupItem } from '../models/social.models';
 
@@ -10,6 +13,12 @@ export type SocialTabId = 'activity' | 'friends' | 'teams' | 'matches';
 
 @Injectable({ providedIn: 'root' })
 export class SocialFacadeService {
+  private readonly activityService = inject(ActivityService);
+  private readonly authSessionService = inject(AuthSessionService);
+  private readonly matchStore = inject(MatchStore);
+  private readonly matchesApi = inject(MatchesApiService);
+  private readonly playerMatchesStore = signal<PlayerMatchHistoryItem[]>([]);
+  private readonly errorMapper = inject(ErrorMapperService);
   private readonly activeTabStore = signal<SocialTabId>('activity');
   private readonly friendCandidatesStore = signal<SocialPlayerLookupItem[]>([]);
   private readonly inviteCandidatesStore = signal<SocialPlayerLookupItem[]>([]);
@@ -25,6 +34,7 @@ export class SocialFacadeService {
   readonly errorMessage = this.errorMessageStore.asReadonly();
 
   readonly isLoading = this.activityService.loading;
+  readonly loadError = this.activityService.error;
   readonly activity = this.activityService.activity;
   readonly unreadCount = this.activityService.unreadCount;
   readonly teams = this.activityService.teams;
@@ -32,6 +42,15 @@ export class SocialFacadeService {
   readonly teamInvites = this.activityService.teamInvites;
   readonly matchInvites = this.activityService.matchInvites;
   readonly notifications = this.activityService.notifications;
+  readonly confirmedMatches = computed(() => this.playerMatchesStore().filter((match) => {
+    const required = match.modalidad === 'SIETE_VS_SIETE' ? 14 : match.modalidad === 'SEIS_VS_SEIS' ? 12 : 10;
+    return match.estado === 'INICIADO' || (match.estado === 'CREADO' &&
+      (match.players ?? []).filter((player) => player.confirmado || player.rol === 'CAPITAN').length >= required);
+  }).map((match) => ({
+    id: match.id,
+    title: `${match.matchTeams?.find((team) => team.esLocal)?.team?.nombre ?? match.matchTeams?.[0]?.team?.nombre ?? 'Equipo'} ${match.estado === 'INICIADO' ? 'en juego' : 'confirmado'}`,
+    scheduledAt: match.fechaHoraProgramada,
+  })));
 
   readonly pendingFriends = computed(() =>
     this.activityService
@@ -67,13 +86,6 @@ export class SocialFacadeService {
     return this.authSessionService.currentSession?.user.atletaUuid ?? null;
   }
 
-  constructor(
-    private readonly activityService: ActivityService,
-    private readonly authSessionService: AuthSessionService,
-    private readonly matchStore: MatchStore,
-    private readonly errorMapper: ErrorMapperService,
-  ) {}
-
   async initialize(): Promise<void> {
     this.clearMessages();
     if (!this.playerUuid) {
@@ -82,6 +94,7 @@ export class SocialFacadeService {
     }
     try {
       await this.activityService.fetchActivity(this.playerUuid);
+      await this.loadPlayerMatches(this.playerUuid);
     } catch (error) {
       this.errorMessageStore.set(this.errorMapper.toUserMessage(error, 'social'));
     }
@@ -97,9 +110,14 @@ export class SocialFacadeService {
     }
     try {
       await this.activityService.fetchActivity(this.playerUuid);
+      await this.loadPlayerMatches(this.playerUuid);
     } catch (error) {
       this.errorMessageStore.set(this.errorMapper.toUserMessage(error, 'social'));
     }
+  }
+
+  private async loadPlayerMatches(playerUuid: string): Promise<void> {
+    this.playerMatchesStore.set(await firstValueFrom(this.matchesApi.getByPlayerOrCreator(playerUuid)));
   }
 
   async markActivityRead(activityId: string): Promise<void> {
@@ -197,8 +215,14 @@ export class SocialFacadeService {
     }
 
     try {
-      await this.activityService.respondMatchInvite(inviteId, { actorUuid: this.playerUuid, accept });
-      this.successMessageStore.set(accept ? 'Invitacion aceptada.' : 'Invitacion rechazada.');
+      const response = await this.activityService.respondMatchInvite(inviteId, { actorUuid: this.playerUuid, accept });
+      this.successMessageStore.set(
+        !accept
+          ? 'Invitacion rechazada.'
+          : response.status === 'LISTA_ESPERA'
+            ? 'El cupo esta completo. Quedaste en lista de espera.'
+            : 'Invitacion aceptada.',
+      );
     } catch (error) {
       this.errorMessageStore.set(this.errorMapper.toUserMessage(error, 'social'));
     } finally {
@@ -241,6 +265,7 @@ export class SocialFacadeService {
       this.friendCandidatesStore.set(players.filter((item) => item.atletaUuid !== this.playerUuid));
       this.errorMessageStore.set(null);
     } catch (error) {
+      this.friendCandidatesStore.set([]);
       this.errorMessageStore.set(this.errorMapper.toUserMessage(error, 'social'));
     } finally {
       this.searchLoadingStore.set(false);
@@ -260,6 +285,7 @@ export class SocialFacadeService {
       this.inviteCandidatesStore.set(players.filter((item) => item.atletaUuid !== this.playerUuid));
       this.errorMessageStore.set(null);
     } catch (error) {
+      this.inviteCandidatesStore.set([]);
       this.errorMessageStore.set(this.errorMapper.toUserMessage(error, 'social'));
     } finally {
       this.searchLoadingStore.set(false);
@@ -269,6 +295,16 @@ export class SocialFacadeService {
   clearMessages(): void {
     this.successMessageStore.set(null);
     this.errorMessageStore.set(null);
+  }
+
+  clearSessionState(): void {
+    this.activityService.clear();
+    this.playerMatchesStore.set([]);
+    this.activeTabStore.set('activity');
+    this.friendCandidatesStore.set([]);
+    this.inviteCandidatesStore.set([]);
+    this.searchLoadingStore.set(false);
+    this.clearMessages();
   }
 
   private async executeAction(action: () => Promise<void>, context: 'social'): Promise<void> {

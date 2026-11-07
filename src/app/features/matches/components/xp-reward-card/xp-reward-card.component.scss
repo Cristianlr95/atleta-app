@@ -24,6 +24,17 @@
   font-size: 0.86rem;
 }
 
+.xp-level-up {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.xp-level-up img.atleta-raster-icon {
+  width: 20px;
+  height: 20px;
+}
+
 .xp-bar {
   height: 8px;
   border-radius: 999px;

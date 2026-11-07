@@ -1,6 +1,6 @@
-﻿<ion-content class="mvp-vote-bg">
+<ion-content class="mvp-vote-bg">
   <div class="mvp-vote-container">
-    <app-metallic-card title="Jugador del Partido">
+    <app-metallic-card title="Jugador del Partido" [titleIconAsset]="mvpIconAsset">
       <p *ngIf="loading()" class="mvp-vote-message">Cargando votacion MVP...</p>
       <p *ngIf="loadError()" class="mvp-vote-message mvp-vote-message--error">{{ loadError() }}</p>
       <div class="mvp-vote-actions" *ngIf="loadError()">
@@ -16,7 +16,7 @@
           </p>
         </div>
 
-        <app-metallic-form-section title="Candidatos" description="Toca un jugador para votar.">
+        <app-metallic-form-section title="Candidatos" [titleIconAsset]="mvpIconAsset" [description]="isOpen() ? 'Toca un jugador para votar.' : 'La votación está cerrada.'">
           <div class="vote-grid" *ngIf="voteCards().length > 0; else noCandidates">
             <app-player-vote-card
               *ngFor="let card of voteCards()"
@@ -25,7 +25,7 @@
               [teamLabel]="card.teamLabel"
               [accent]="card.accent"
               [selected]="myVote() === card.userId"
-              [disabled]="!isOpen() || votingProcessing() === card.userId"
+              [disabled]="!isOpen() || !!votingProcessing()"
               (vote)="onVote($event)">
             </app-player-vote-card>
           </div>
@@ -34,16 +34,24 @@
           </ng-template>
         </app-metallic-form-section>
 
-        <app-metallic-form-section title="Tendencia de votos" description="Ranking actual de votacion.">
+        <app-metallic-form-section
+          [titleIconAsset]="timeIconAsset"
+          [title]="isOpen() ? 'Progreso de votacion' : 'Resultado de votos'"
+          [description]="isOpen() ? 'La tendencia se muestra al cerrar para evitar presion o voto tactico.' : 'Ranking final de votacion.'">
           <div class="mvp-progress-chip" *ngIf="totalEligibleVotes() > 0">{{ votesProgressLabel() }}</div>
-          <div class="mvp-tally-list" *ngIf="tally().length > 0; else noTally">
+          <div class="mvp-tally-list" *ngIf="!isOpen() && tally().length > 0; else noTally">
             <div class="mvp-tally-item" *ngFor="let item of tally(); let idx = index">
               <span>#{{ idx + 1 }} {{ item.alias || item.userId }}</span>
               <strong>{{ item.votes }}</strong>
             </div>
           </div>
           <ng-template #noTally>
-            <p class="mvp-vote-message">Aun no hay votos registrados.</p>
+            <p class="mvp-vote-message" *ngIf="isOpen(); else closedNoTally">
+              La tendencia queda oculta hasta el cierre para proteger la votacion.
+            </p>
+            <ng-template #closedNoTally>
+              <p class="mvp-vote-message">No hay votos registrados.</p>
+            </ng-template>
           </ng-template>
         </app-metallic-form-section>
 

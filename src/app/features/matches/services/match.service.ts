@@ -1,4 +1,4 @@
-import { computed, effect, Injectable, signal } from '@angular/core';
+import { computed, effect, inject, Injectable, signal } from '@angular/core';
 import { firstValueFrom, timeout } from 'rxjs';
 import { AuthSessionService } from 'src/app/core/services/auth-session.service';
 import {
@@ -7,6 +7,7 @@ import {
   MatchSize,
   MatchDraftInput,
   Invitation,
+  InvitationDeliveryStatus,
   MatchProgressView,
   MatchStatus,
   MatchType,
@@ -14,24 +15,30 @@ import {
   PlayerInvitationStatus,
   Venue,
 } from '../models/progressive-match.models';
+import { toCanonicalMatchType } from '../models/match-type.mapper';
 import { MatchPlayerSummary } from '../models/match.models';
 import { MatchesApiService } from './matches-api.service';
-import { InvitationService } from './invitation.service';
 import { NotificationService } from './notification.service';
+import { InvitationService } from './invitation.service';
 import { InvitationsStore } from '../stores/invitations.store';
-
-interface TeamAssignmentSnapshot {
-  homeIds: string[];
-  awayIds: string[];
-  updatedAt: string;
-}
+import {
+  MatchTeamAssignmentPersistenceService,
+  TeamAssignmentSnapshot,
+} from './match-team-assignment-persistence.service';
 
 @Injectable({ providedIn: 'root' })
 export class MatchService {
-  private static readonly TEAM_ASSIGNMENTS_KEY = 'atleta.match.team-assignments.v1';
+  private readonly authSessionService = inject(AuthSessionService);
+  private readonly matchesApiService = inject(MatchesApiService);
+  private readonly invitationsStore = inject(InvitationsStore);
+  private readonly invitationService = inject(InvitationService);
+  private readonly notificationService = inject(NotificationService);
+  private readonly teamAssignmentPersistenceService = inject(MatchTeamAssignmentPersistenceService);
   private readonly matchesStore = signal<Match[]>([]);
   private readonly isSubmittingStore = signal(false);
-  private readonly teamAssignmentsStore = signal<Record<string, TeamAssignmentSnapshot>>(this.loadTeamAssignments());
+  private readonly teamAssignmentsStore = signal<Record<string, TeamAssignmentSnapshot>>(
+    this.teamAssignmentPersistenceService.loadAll(),
+  );
   private readonly pendingStatusRecalc = new Set<string>();
   private statusRecalcTimer?: ReturnType<typeof setTimeout>;
 
@@ -43,13 +50,19 @@ export class MatchService {
     ),
   );
 
-  constructor(
-    private readonly authSessionService: AuthSessionService,
-    private readonly matchesApiService: MatchesApiService,
-    private readonly invitationService: InvitationService,
-    private readonly invitationsStore: InvitationsStore,
-    private readonly notificationService: NotificationService,
-  ) {
+  clearSessionState(): void {
+    if (this.statusRecalcTimer) {
+      clearTimeout(this.statusRecalcTimer);
+      this.statusRecalcTimer = undefined;
+    }
+    this.pendingStatusRecalc.clear();
+    this.matchesStore.set([]);
+    this.isSubmittingStore.set(false);
+    this.teamAssignmentsStore.set({});
+    this.teamAssignmentPersistenceService.clear();
+  }
+
+  constructor() {
     effect(() => {
       const invitations = this.invitationsStore.invitations();
       const matchIds = [...new Set(invitations.map((item) => item.matchId))];
@@ -58,11 +71,7 @@ export class MatchService {
 
     effect(() => {
       const assignments = this.teamAssignmentsStore();
-      try {
-        localStorage.setItem(MatchService.TEAM_ASSIGNMENTS_KEY, JSON.stringify(assignments));
-      } catch {
-        // no-op
-      }
+      this.teamAssignmentPersistenceService.saveAll(assignments);
     });
   }
 
@@ -71,11 +80,14 @@ export class MatchService {
     const creatorUuid = session?.user.atletaUuid ?? 'anon';
     const creatorName = session?.user.nombre ?? 'Jugador';
 
+    const draftNonce = this.createDraftNonce();
     const draft: Match = {
-      id: `match-${Date.now()}`,
+      id: `match-${draftNonce}`,
+      creationIdempotencyKey: `match-create-${creatorUuid}-${draftNonce}`,
       creatorUuid,
       creatorName,
       type: input.type,
+      rotativeGoalkeeper: input.rotativeGoalkeeper ?? false,
       modality: input.modality,
       genderCategory: input.genderCategory,
       status: MatchStatus.CREATED,
@@ -116,23 +128,27 @@ export class MatchService {
     this.isSubmittingStore.set(true);
 
     try {
-      const created = await firstValueFrom(
-        this.matchesApiService.createMatch({
-          creadorUuid: session.user.atletaUuid,
-          modalidad: draft.modality,
-          categoriaGenero: draft.genderCategory,
-          fechaHoraProgramada: this.toApiLocalDateTime(draft.scheduledAt),
-          latitud: draft.latitude,
-          longitud: draft.longitude,
-        }).pipe(timeout(10000)),
-      );
-
-      await firstValueFrom(
-        this.matchesApiService.addTeamToMatch({
-          matchId: created.id,
-          teamId: draft.team.id,
-          esLocal: true,
-        }).pipe(timeout(10000)),
+      const idempotencyKey = draft.creationIdempotencyKey ?? `match-create-${session.user.atletaUuid}-${draft.id}`;
+      const result = await firstValueFrom(
+        this.matchesApiService.createMatchOrchestrated(
+          {
+            match: {
+              creadorUuid: session.user.atletaUuid,
+              modalidad: draft.modality,
+              matchType: draft.type,
+              rotativeGoalkeeper: draft.rotativeGoalkeeper ?? false,
+              categoriaGenero: draft.genderCategory,
+              fechaHoraProgramada: this.toApiLocalDateTime(draft.scheduledAt),
+              latitud: draft.latitude,
+              longitud: draft.longitude,
+            },
+            teamId: draft.team.id,
+            targetUuids: [...new Set(invitedPlayers.map((item) => item.uuid))]
+              .filter((uuid) => uuid !== session.user.atletaUuid),
+            invitationMessage: `Te invito al partido del ${new Date(draft.scheduledAt).toLocaleString()}.`,
+          },
+          idempotencyKey,
+        ).pipe(timeout(15000)),
       );
 
       const inviteTargets = new Set(invitedPlayers.map((item) => item.uuid));
@@ -140,23 +156,85 @@ export class MatchService {
 
       const updatedDraft: Match = {
         ...draft,
-        backendMatchId: created.id,
+        rotativeGoalkeeper: result.match.rotativeGoalkeeper ?? draft.rotativeGoalkeeper ?? false,
+        creationIdempotencyKey: idempotencyKey,
+        backendMatchId: result.match.id,
         invitedCount: inviteTargets.size,
         status: MatchStatus.CREATED,
       };
 
       this.upsertMatch(updatedDraft);
       const optimisticInvites = this.buildOptimisticInvitations(updatedDraft, invitedPlayers);
-      this.invitationsStore.upsertInvitations(optimisticInvites);
+      const serverInvitesByTarget = new Map(result.invitations.map((invite) => [invite.targetUuid, invite]));
+      const committedInvites = optimisticInvites.map((invite) => {
+        const serverInvite = serverInvitesByTarget.get(invite.targetUuid);
+        if (!serverInvite) {
+          return {
+            ...invite,
+            deliveryStatus:
+              invite.targetUuid === session.user.atletaUuid
+                ? InvitationDeliveryStatus.SENT
+                : InvitationDeliveryStatus.FAILED,
+            deliveryMessage:
+              invite.targetUuid === session.user.atletaUuid
+                ? undefined
+                : 'El servidor no confirmo la entrega de esta invitacion.',
+          };
+        }
+        return {
+          ...invite,
+          backendMatchId: result.match.id,
+          backendInviteId: serverInvite.id,
+          status:
+            serverInvite.status === 'ACEPTADA'
+              ? PlayerInvitationStatus.ACCEPTED
+              : serverInvite.status === 'LISTA_ESPERA'
+                ? PlayerInvitationStatus.WAITLIST
+              : serverInvite.status === 'RECHAZADA'
+                ? PlayerInvitationStatus.DECLINED
+                : PlayerInvitationStatus.PENDING,
+          deliveryStatus: InvitationDeliveryStatus.SENT,
+          deliveryMessage: undefined,
+        };
+      });
+      this.invitationsStore.upsertInvitations(committedInvites);
       this.recalculateStatus(updatedDraft.id);
-      // No bloquea el flujo de UI en caso de latencia/atasco del batch.
-      void this.dispatchInvitationsInBackground(updatedDraft, invitedPlayers);
 
       return this.getMatchById(updatedDraft.id);
-    } catch {
-      return null;
     } finally {
       this.isSubmittingStore.set(false);
+    }
+  }
+
+  async retryFailedInvitations(matchId: string): Promise<{ sent: number; failed: number }> {
+    const match = this.getMatchById(matchId);
+    if (!match) {
+      throw new Error('No se encontro el partido para reintentar invitaciones.');
+    }
+
+    const failed = this.invitationsStore
+      .getMatchInvitations(matchId)
+      .filter((item) => item.deliveryStatus === InvitationDeliveryStatus.FAILED);
+    if (failed.length === 0) {
+      return { sent: 0, failed: 0 };
+    }
+
+    const failedIds = failed.map((item) => item.id);
+    this.invitationsStore.setDeliveryStatus(failedIds, InvitationDeliveryStatus.RETRYING);
+    try {
+      const retried = await this.invitationService.retryFailedInvitations(match, failed);
+      this.invitationsStore.upsertInvitations(retried);
+      return {
+        sent: retried.filter((item) => item.deliveryStatus === InvitationDeliveryStatus.SENT).length,
+        failed: retried.filter((item) => item.deliveryStatus === InvitationDeliveryStatus.FAILED).length,
+      };
+    } catch (error) {
+      this.invitationsStore.setDeliveryStatus(
+        failedIds,
+        InvitationDeliveryStatus.FAILED,
+        'No fue posible completar el reintento.',
+      );
+      throw error;
     }
   }
 
@@ -240,14 +318,19 @@ export class MatchService {
     }));
   }
 
-  async setTeams(matchId: string, homePlayers: Player[], awayPlayers: Player[]): Promise<void> {
+  async setTeams(
+    matchId: string,
+    homePlayers: Player[],
+    awayPlayers: Player[],
+    formations?: { homeFormationId?: string; awayFormationId?: string },
+  ): Promise<void> {
     const match = this.getMatchById(matchId);
     if (!match) {
       return;
     }
     this.validateTeamGenderBalance(match, homePlayers, awayPlayers);
 
-    const updated = { ...match, homePlayers, awayPlayers };
+    const updated = { ...match, homePlayers, awayPlayers, ...formations };
     this.upsertMatch(updated);
     this.persistTeamAssignment(updated, homePlayers, awayPlayers);
     await this.persistTeamAssignmentsToBackend(updated, homePlayers, awayPlayers);
@@ -324,12 +407,19 @@ export class MatchService {
     }
 
     const invitations = this.invitationsStore.getMatchInvitations(matchId);
-    const accepted = invitations.filter((item) => item.status === PlayerInvitationStatus.ACCEPTED).length;
+    const acceptedInvitations = invitations.filter((item) => item.status === PlayerInvitationStatus.ACCEPTED);
+    // El creador ocupa y confirma un cupo por definicion. No suele existir como
+    // invitacion, pero datos heredados pueden incluirlo: se cuenta exactamente una vez.
+    const creatorAlreadyIncluded = acceptedInvitations.some((item) => item.targetUuid === match.creatorUuid);
+    const accepted = acceptedInvitations.length + (match.creatorUuid && !creatorAlreadyIncluded ? 1 : 0);
     const pending = invitations.filter(
       (item) => item.status === PlayerInvitationStatus.PENDING || item.status === PlayerInvitationStatus.INVITED,
     ).length;
-    const nextInvitedCount = Math.max(match.invitedCount, invitations.length);
-    const nextStatus = this.resolveLifecycleStatus(match, accepted, pending, invitations.length);
+    const effectiveRosterSize = invitations.length + (
+      match.creatorUuid && !invitations.some((item) => item.targetUuid === match.creatorUuid) ? 1 : 0
+    );
+    const nextInvitedCount = Math.max(match.invitedCount, effectiveRosterSize);
+    const nextStatus = this.resolveLifecycleStatus(match, accepted, pending, effectiveRosterSize);
 
     const changed = match.status !== nextStatus;
     if (!changed && nextInvitedCount === match.invitedCount) {
@@ -337,11 +427,6 @@ export class MatchService {
     }
 
     this.upsertMatch({ ...match, status: nextStatus, invitedCount: nextInvitedCount });
-
-    if (changed && nextStatus === MatchStatus.PARTIAL_CONFIRMATIONS) {
-      const missing = Math.max(match.minRequired - accepted, 0);
-      void this.notificationService.notifyAlmostReady(missing);
-    }
 
     if (changed && nextStatus === MatchStatus.CONFIRMED) {
       void this.notificationService.notifyMatchConfirmed();
@@ -456,7 +541,7 @@ export class MatchService {
       Number.isFinite(latitude) && Number.isFinite(longitude)
         ? `Lat/Lng: ${latitude!.toFixed(6)}, ${longitude!.toFixed(6)}`
         : 'Cancha por definir';
-    const resolvedType = this.resolveMatchType(response, existingMatch);
+    const resolvedType = toCanonicalMatchType(response.matchType, existingMatch?.type);
 
     const hasBackendTeamSides = (response.players ?? []).some(
       (item) => item.teamSide === 'LOCAL' || item.teamSide === 'VISITA',
@@ -543,6 +628,15 @@ export class MatchService {
         const homeIds = new Set(homePlayers.map((player) => player.uuid));
         const awayIds = new Set(awayPlayers.map((player) => player.uuid));
 
+        const persistedHomeOrder = new Map(persisted.homeIds.map((id, index) => [id, index]));
+        const persistedAwayOrder = new Map(persisted.awayIds.map((id, index) => [id, index]));
+        homePlayers = [...homePlayers].sort(
+          (a, b) => (persistedHomeOrder.get(a.uuid) ?? Number.MAX_SAFE_INTEGER) - (persistedHomeOrder.get(b.uuid) ?? Number.MAX_SAFE_INTEGER),
+        );
+        awayPlayers = [...awayPlayers].sort(
+          (a, b) => (persistedAwayOrder.get(a.uuid) ?? Number.MAX_SAFE_INTEGER) - (persistedAwayOrder.get(b.uuid) ?? Number.MAX_SAFE_INTEGER),
+        );
+
         const missingHome = persistedHome
           .filter((player) => !homeIds.has(player.uuid) && !awayIds.has(player.uuid))
           .map((player) => ({ ...player, teamId: localTeam?.id ?? player.teamId }));
@@ -565,6 +659,7 @@ export class MatchService {
       creatorName:
         response.creador?.alias ?? captain?.alias ?? existingMatch?.creatorName ?? session?.user.nombre ?? 'Organizador',
       type: resolvedType,
+      rotativeGoalkeeper: response.rotativeGoalkeeper ?? false,
       modality: response.modalidad as MatchSize,
       genderCategory: (response.categoriaGenero as MatchGenderCategory) ?? MatchGenderCategory.MIXED,
       status: this.mapBackendStatus(response.estado, response.fechaHoraProgramada),
@@ -594,6 +689,8 @@ export class MatchService {
             : 10,
       homeKitColor: 'Azul',
       awayKitColor: 'Rojo',
+      homeFormationId: persisted?.homeFormationId,
+      awayFormationId: persisted?.awayFormationId,
       homePlayers,
       awayPlayers,
       createdAt: new Date().toISOString(),
@@ -610,27 +707,6 @@ export class MatchService {
     }
 
     return initial;
-  }
-
-  private resolveMatchType(
-    response: import('../models/match.models').MatchResponse,
-    existingMatch: Match | undefined,
-  ): MatchType {
-    if (existingMatch?.type) {
-      return existingMatch.type;
-    }
-
-    const teamIds = new Set(
-      (response.matchTeams ?? [])
-        .map((item) => item.team?.id)
-        .filter((id): id is number => typeof id === 'number' && Number.isFinite(id)),
-    );
-
-    if (teamIds.size <= 1) {
-      return MatchType.INTERNAL;
-    }
-
-    return MatchType.POINTS;
   }
 
   private mapBackendStatus(status: import('../models/match.models').MatchStatus, _scheduledAt?: string): MatchStatus {
@@ -652,13 +728,16 @@ export class MatchService {
     }
 
     const scheduled = new Date(match.scheduledAt).getTime();
-    const allConfirmed = totalInvited > 0 && accepted === totalInvited && pending === 0;
+    // Las invitaciones adicionales pueden terminar en lista de espera. El
+    // partido queda confirmado al completar los cupos de la modalidad, aunque
+    // aún existan respuestas pendientes para reemplazos.
+    const rosterComplete = accepted >= match.minRequired;
 
-    if (Number.isFinite(scheduled) && scheduled <= Date.now() && allConfirmed) {
+    if (Number.isFinite(scheduled) && scheduled <= Date.now() && rosterComplete) {
       return MatchStatus.LIVE;
     }
 
-    if (allConfirmed) {
+    if (rosterComplete) {
       return MatchStatus.CONFIRMED;
     }
 
@@ -707,76 +786,22 @@ export class MatchService {
   }
 
   private persistTeamAssignment(match: Match, homePlayers: Player[], awayPlayers: Player[]): void {
-    const key = this.getAssignmentKey(match);
+    const key = this.teamAssignmentPersistenceService.keyForMatch(match);
     if (!key) {
       return;
     }
 
     this.teamAssignmentsStore.update((state) => ({
       ...state,
-      [key]: {
-        homeIds: homePlayers.map((player) => player.uuid),
-        awayIds: awayPlayers.map((player) => player.uuid),
-        updatedAt: new Date().toISOString(),
-      },
+      [key]: this.teamAssignmentPersistenceService.createSnapshot(homePlayers, awayPlayers, new Date().toISOString(), {
+        homeFormationId: match.homeFormationId,
+        awayFormationId: match.awayFormationId,
+      }),
     }));
   }
 
   private getTeamAssignmentByBackendId(backendMatchId: number): TeamAssignmentSnapshot | null {
-    return this.teamAssignmentsStore()[`backend-${backendMatchId}`] ?? null;
-  }
-
-  private getAssignmentKey(match: Match): string | null {
-    if (match.backendMatchId) {
-      return `backend-${match.backendMatchId}`;
-    }
-    if (match.id) {
-      return `local-${match.id}`;
-    }
-    return null;
-  }
-
-  private loadTeamAssignments(): Record<string, TeamAssignmentSnapshot> {
-    try {
-      const raw = localStorage.getItem(MatchService.TEAM_ASSIGNMENTS_KEY);
-      if (!raw) {
-        return {};
-      }
-      const parsed = JSON.parse(raw) as Record<string, TeamAssignmentSnapshot>;
-      return parsed && typeof parsed === 'object' ? parsed : {};
-    } catch {
-      return {};
-    }
-  }
-
-  private async withTimeout<T>(promise: Promise<T>, timeoutMs: number, fallback: T): Promise<T> {
-    let timer: ReturnType<typeof setTimeout> | undefined;
-    try {
-      return await Promise.race([
-        promise,
-        new Promise<T>((resolve) => {
-          timer = setTimeout(() => resolve(fallback), timeoutMs);
-        }),
-      ]);
-    } finally {
-      if (timer) {
-        clearTimeout(timer);
-      }
-    }
-  }
-
-  private async dispatchInvitationsInBackground(match: Match, invitedPlayers: Player[]): Promise<void> {
-    try {
-      const createdInvitations = await this.withTimeout(
-        this.invitationService.sendInvitations(match, invitedPlayers),
-        12000,
-        this.buildOptimisticInvitations(match, invitedPlayers),
-      );
-      this.invitationsStore.upsertInvitations(createdInvitations);
-      this.recalculateStatus(match.id);
-    } catch {
-      // Si falla el lote, el partido ya fue creado y el usuario puede continuar desde estado/historial.
-    }
+    return this.teamAssignmentsStore()[this.teamAssignmentPersistenceService.keyForBackendMatch(backendMatchId)] ?? null;
   }
 
   private buildOptimisticInvitations(match: Match, invitedPlayers: Player[]): Invitation[] {
@@ -803,8 +828,17 @@ export class MatchService {
       targetUuid: player.uuid,
       targetName: player.name,
       status: player.uuid === creatorUuid ? PlayerInvitationStatus.ACCEPTED : PlayerInvitationStatus.PENDING,
+      deliveryStatus: InvitationDeliveryStatus.PENDING,
       createdAt: now,
     }));
+  }
+
+  private createDraftNonce(): string {
+    const cryptoApi = globalThis.crypto;
+    if (cryptoApi && typeof cryptoApi.randomUUID === 'function') {
+      return cryptoApi.randomUUID();
+    }
+    return `${Date.now()}-${Math.random().toString(36).slice(2)}`;
   }
 
   private async persistTeamAssignmentsToBackend(match: Match, homePlayers: Player[], awayPlayers: Player[]): Promise<void> {

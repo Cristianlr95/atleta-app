@@ -1,31 +1,31 @@
-import { Injectable, computed, inject, signal } from '@angular/core';
-import { AuthSessionService } from 'src/app/core/services/auth-session.service';
-import { NotificationService } from './notification.service';
+import { Injectable, Injector, computed, inject, signal } from '@angular/core';
 import { InvitationsStore } from '../stores/invitations.store';
 
 @Injectable({ providedIn: 'root' })
 export class NotificationBadgeService {
-  private readonly authSessionService = inject(AuthSessionService);
-  private readonly invitationsStore = inject(InvitationsStore);
-  private readonly notificationService = inject(NotificationService);
+  private readonly injector = inject(Injector);
+  private readonly pendingCountStore = signal(0);
+  private readonly refreshErrorStore = signal(false);
 
-  private readonly serverPendingCount = signal(0);
+  readonly refreshError = this.refreshErrorStore.asReadonly();
 
-  readonly totalPending = computed(() => {
-    return (
-      this.serverPendingCount() +
-      this.invitationsStore.pendingInvitations().length +
-      this.notificationService.pendingCount
-    );
-  });
+  // La insignia de Partidos representa solo acciones pendientes del jugador.
+  // Notificaciones informativas y envíos realizados no deben inflar este valor.
+  readonly totalPending = computed(() => this.pendingCountStore());
 
   async refresh(): Promise<void> {
-    const session = this.authSessionService.currentSession;
-    if (!session) {
-      this.serverPendingCount.set(0);
-      return;
+    // Se resuelve solo al actualizar: las vistas publicas pueden renderizar la barra
+    // sin inicializar toda la cadena autenticada de invitaciones.
+    const invitationsStore = this.injector.get(InvitationsStore);
+    const loaded = await invitationsStore.loadPendingInvitations();
+    this.refreshErrorStore.set(!loaded);
+    if (loaded) {
+      this.pendingCountStore.set(invitationsStore.pendingInvitations().length);
     }
+  }
 
-    this.serverPendingCount.set(0);
+  clear(): void {
+    this.pendingCountStore.set(0);
+    this.refreshErrorStore.set(false);
   }
 }

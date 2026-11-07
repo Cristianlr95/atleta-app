@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { IonicModule } from '@ionic/angular';
 import { SocialRequestItem } from '../../models/social.models';
 
 export interface SocialConfirmedMatchView {
@@ -11,7 +12,7 @@ export interface SocialConfirmedMatchView {
 @Component({
   selector: 'app-match-invitations-panel',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, IonicModule],
   templateUrl: './match-invitations-panel.component.html',
   styleUrls: ['./match-invitations-panel.component.scss'],
 })
@@ -27,15 +28,20 @@ export class MatchInvitationsPanelComponent {
       return 'Fecha por definir';
     }
 
-    const diffMs = new Date(value).getTime() - Date.now();
-    if (diffMs <= 0) {
+    const scheduledAt = new Date(value).getTime();
+    if (Number.isNaN(scheduledAt)) {
+      return 'Fecha por definir';
+    }
+
+    const diffMs = scheduledAt - Date.now();
+    if (diffMs <= 0 || diffMs < 60 * 60 * 1000) {
       return 'Comienza pronto';
     }
-    const hours = Math.floor(diffMs / (1000 * 60 * 60));
+    const hours = Math.ceil(diffMs / (1000 * 60 * 60));
     if (hours < 24) {
       return `En ${hours} h`;
     }
-    const days = Math.floor(hours / 24);
+    const days = Math.ceil(hours / 24);
     return `En ${days} d`;
   }
 }

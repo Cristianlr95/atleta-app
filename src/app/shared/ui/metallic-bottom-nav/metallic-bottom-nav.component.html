@@ -2,17 +2,22 @@
   <button
     *ngFor="let item of items"
     type="button"
+    (click)="onSelect(item.id)"
     class="metallic-bottom-nav__item"
     [attr.aria-label]="item.label"
+    [attr.aria-current]="item.active ? 'page' : null"
     [class.metallic-bottom-nav__item--active]="item.active"
-    [class.metallic-bottom-nav__item--cta]="item.variant === 'cta'"
-    (click)="onSelect(item.id)">
-    <ion-icon
+    [class.metallic-bottom-nav__item--cta]="item.variant === 'cta'">
+    <img
       [src]="resolveIconAsset(item)"
-      class="atleta-game-icon atleta-game-icon--nav"
-      aria-hidden="true">
-    </ion-icon>
-    <span class="metallic-bottom-nav__badge" *ngIf="(item.badgeCount ?? 0) > 0">{{ item.badgeCount }}</span>
-    <span>{{ item.label }}</span>
+      class="atleta-game-icon atleta-game-icon--nav atleta-raster-icon"
+      aria-hidden="true" alt="" />
+    <span
+      class="metallic-bottom-nav__badge"
+      *ngIf="(item.badgeCount ?? 0) > 0"
+      [attr.aria-label]="badgeAriaLabel(item)">
+      {{ formatBadgeCount(item.badgeCount) }}
+    </span>
+    <span class="metallic-bottom-nav__label">{{ item.label }}</span>
   </button>
 </nav>

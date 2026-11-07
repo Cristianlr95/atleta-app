@@ -33,23 +33,23 @@ export function getMatchStatusTone(status: MatchStatus): 'neutral' | 'warning' |
 }
 
 export function getMatchStatusIconAsset(status: MatchStatus): string {
-  const base = 'assets/icons/atleta';
+  const base = 'assets/icons/atleta-raster-v1';
 
   if (status === MatchStatus.CONFIRMED) {
-    return `${base}/ic_status_confirmed_24.svg`;
+    return `${base}/ic_status_confirmed_96.png`;
   }
   if (status === MatchStatus.PARTIAL_CONFIRMATIONS) {
-    return `${base}/ic_status_in_assembly_24.svg`;
+    return `${base}/ic_status_in_assembly_96.png`;
   }
   if (status === MatchStatus.LIVE) {
-    return `${base}/ic_status_in_progress_24.svg`;
+    return `${base}/ic_status_in_progress_96.png`;
   }
   if (status === MatchStatus.INVALID) {
-    return `${base}/ic_status_canceled_24.svg`;
+    return `${base}/ic_status_canceled_96.png`;
   }
   if (status === MatchStatus.FINISHED) {
-    return `${base}/ic_status_finished_24.svg`;
+    return `${base}/ic_status_finished_96.png`;
   }
 
-  return `${base}/ic_status_pending_24.svg`;
+  return `${base}/ic_status_pending_96.png`;
 }

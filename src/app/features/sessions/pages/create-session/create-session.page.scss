@@ -1,11 +1,11 @@
 .session-bg {
-  --background: none;
+  --background: var(--atleta-page-bg);
   --atleta-icon-color: #e8fbff;
   --atleta-icon-glow-main: rgba(124, 234, 255, 0.72);
   --atleta-icon-glow-deep: rgba(29, 119, 142, 0.56);
   --atleta-icon-nav-main: rgba(132, 238, 255, 0.8);
   --atleta-icon-nav-deep: rgba(22, 98, 120, 0.62);
-  background:
+  background: var(--atleta-page-bg),
     linear-gradient(rgba(10, 12, 20, 0.75), rgba(10, 12, 20, 0.86)),
     url('/assets/backgrounds/stadium.png');
 

@@ -1,17 +1,7 @@
 .profile-bg {
-  --background: none;
-  --atleta-icon-color: #edf1ff;
-  --atleta-icon-glow-main: rgba(183, 174, 255, 0.68);
-  --atleta-icon-glow-deep: rgba(84, 69, 161, 0.52);
-  --atleta-icon-nav-main: rgba(196, 186, 255, 0.76);
-  --atleta-icon-nav-deep: rgba(70, 58, 142, 0.58);
-  background:
-    linear-gradient(rgba(10, 12, 20, 0.78), rgba(10, 12, 20, 0.9)),
-    url('/assets/backgrounds/stadium.png');
-
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
+  --background: var(--atleta-page-bg);
+  --atleta-icon-color: var(--tactical-visit);
+  background: var(--atleta-page-bg);
 }
 
 .profile-container {
@@ -26,28 +16,22 @@
   display: flex;
   justify-content: space-between;
   gap: 14px;
-}
-
-.profile-identity {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
+  align-items: flex-start;
 }
 
 .profile-name {
   margin: 0;
-  color: #e8eef5;
-  font-family: 'Orbitron', sans-serif;
+  color: var(--text-primary);
+  font-family: var(--font-family-display);
   font-size: 22px;
   letter-spacing: 0.04em;
   line-height: 1.1;
 }
 
-.profile-alias,
-.profile-email {
+.profile-alias {
   margin: 0;
-  color: #c7d2e6;
-  font-family: 'Rajdhani', sans-serif;
+  color: var(--text-muted);
+  font-family: var(--font-family-body);
   font-size: 16px;
   line-height: 1.2;
 }
@@ -55,7 +39,7 @@
 .profile-message {
   margin: 0;
   text-align: center;
-  font-family: 'Rajdhani', sans-serif;
+  font-family: "Rajdhani", sans-serif;
   font-size: 15px;
   font-weight: 700;
 }
@@ -68,222 +52,124 @@
   color: #9fc0f6;
 }
 
-.profile-teams {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 10px;
-}
-
-.profile-team {
-  display: grid;
-  gap: 10px;
-  padding: 10px;
-  border-radius: 10px;
-  border: 1px solid rgba(122, 138, 160, 0.35);
-  background: rgba(10, 16, 25, 0.5);
-}
-
-.profile-team__head {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
+.profile-settings-link {
+  display: inline-flex;
   align-items: center;
+  gap: 7px;
+  padding: 7px 11px;
+  border: 1px solid rgba(0, 215, 245, 0.46);
+  border-radius: 9px;
+  background: rgba(7, 30, 39, 0.72);
+  color: var(--text-primary);
+  font-family: var(--font-family-display);
+  font-size: 13px;
+}
+
+.profile-header__eyebrow,
+.section-kicker {
+  margin: 0;
+  color: var(--tactical-visit);
+  font: 700 11px var(--font-family-display);
+  letter-spacing: .12em;
+}
+
+.player-command-center {
+  display: grid;
+  grid-template-columns: 160px minmax(210px, .95fr) minmax(255px, 1.15fr);
+  grid-template-areas:
+    "identity roles stats"
+    "identity competition stats";
   gap: 10px;
+  margin: 8px 0 16px;
+  padding: 4px 0;
 }
 
-.profile-team__actions {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: flex-end;
-  gap: 6px;
-}
-
-.profile-team__btn {
-  border: 1px solid rgba(126, 144, 168, 0.45);
-  border-radius: 8px;
-  background: rgba(12, 19, 31, 0.72);
-  color: #edf4ff;
-  font-family: 'Rajdhani', sans-serif;
-  font-size: 12px;
-  font-weight: 700;
-  padding: 5px 10px;
-}
-
-.profile-team__btn--icon {
-  min-width: 62px;
-}
-
-.profile-team__btn:disabled {
-  opacity: 0.6;
-}
-
-.profile-team__btn--danger {
-  border-color: rgba(214, 110, 110, 0.5);
-  color: #ffd3d3;
-}
-
-.profile-team__logo {
-  width: 42px;
-  height: 42px;
-  border-radius: 8px;
-  object-fit: cover;
-}
-
-.profile-team__meta {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
+.player-command-center__identity,
+.player-command-center__roles,
+.player-command-center__stats,
+.player-command-center__competition {
   min-width: 0;
+  padding: 8px 10px;
 }
 
-.profile-team__name {
-  margin: 0;
-  color: #e8eef5;
-  font-family: 'Rajdhani', sans-serif;
-  font-size: 16px;
-  font-weight: 700;
-  line-height: 1.1;
-  word-break: break-word;
-}
+.player-command-center__identity { grid-area: identity; }
+.player-command-center__roles { grid-area: roles; border-left: 1px solid rgba(0, 215, 245, .2); }
+.player-command-center__stats { grid-area: stats; border-left: 1px solid rgba(0, 215, 245, .2); }
+.player-command-center__competition { grid-area: competition; border-top: 1px solid rgba(0, 215, 245, .2); }
 
-.profile-team__detail {
-  margin: 0;
-  color: #afc1dc;
-  font-family: 'Rajdhani', sans-serif;
-  font-size: 13px;
-}
+.player-command-center__identity { display: grid; align-content: start; justify-items: center; text-align: center; gap: 8px; }
+.player-photo { position: relative; width: 96px; height: 112px; overflow: hidden; border: 1px solid rgba(0, 215, 245, .7); border-radius: 8px; background: #122838; box-shadow: inset 0 0 0 3px rgba(0, 215, 245, .08); }
+.player-photo > img { width: 100%; height: 100%; object-fit: cover; }
+.player-photo--placeholder { display: grid; place-items: center; background: linear-gradient(145deg, #174c73, #102333); }
+.player-photo--placeholder span { color: var(--tactical-visit); font: 700 55px var(--font-family-display); }
+.player-photo__input { position: absolute; width: 1px; height: 1px; overflow: hidden; opacity: 0; }
+.player-photo__edit { position: absolute; right: 6px; bottom: 6px; display: grid; width: 30px; height: 30px; place-items: center; border: 1px solid rgba(215, 255, 0, .75); border-radius: 50%; background: rgba(4, 16, 22, .9); box-shadow: 0 2px 8px rgba(0, 0, 0, .42); }
+.player-photo__edit .atleta-raster-icon { width: 18px; height: 18px; }
+.player-photo__edit:disabled { opacity: .55; }
+.player-identity { display: grid; gap: 3px; }
+.profile-alias { color: var(--tactical-local); font-size: 15px; }
 
-.profile-team-invite {
-  margin-top: 0;
-  border: 1px solid rgba(122, 138, 160, 0.35);
-  border-radius: 10px;
-  background: rgba(10, 16, 25, 0.48);
-  padding: 10px;
-  display: grid;
-  gap: 8px;
-  width: 100%;
-  overflow: hidden;
-}
+.player-command-center__roles { display: grid; align-content: start; gap: 8px; }
+.position-priority-list { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 5px; margin: 0; padding: 0; list-style: none; }
+.position-priority-list li { display: grid; justify-items: center; gap: 2px; min-width: 0; color: var(--text-primary); font: 600 12px/1.05 var(--font-family-body); text-align: center; }
+.position-priority-list li span { display: inline-grid; place-items: center; width: 22px; height: 22px; border: 1px solid rgba(0, 215, 245, .58); border-radius: 50%; color: var(--tactical-visit); font: 700 10px var(--font-family-display); }
+.position-priority-list__empty { color: var(--text-muted) !important; font-size: 13px !important; }
+.ovr-block { display: grid; grid-template-columns: auto auto; align-items: center; justify-items: start; gap: 5px; width: fit-content; margin-top: 2px; padding: 7px 0 0; border: 0; border-top: 1px solid rgba(0, 215, 245, .22); background: transparent; text-align: left; cursor: pointer; }
+.ovr-block span { color: var(--text-muted); font: 700 11px var(--font-family-display); letter-spacing: .1em; }
+.ovr-block strong { color: var(--tactical-local); font: 700 30px/1 var(--font-family-display); }
+.ovr-block:focus-visible { outline: 2px solid var(--tactical-visit); outline-offset: 4px; border-radius: 3px; }
+.ovr-popover-content { display: grid; gap: 4px; max-width: 220px; padding: 12px 14px; background: #07151d; color: var(--text-primary); }
+.ovr-popover-content p { margin: 0; color: var(--tactical-visit); font: 700 11px var(--font-family-display); letter-spacing: .1em; }
+.ovr-popover-content strong { font: 700 15px var(--font-family-display); }
+.ovr-popover-content span { color: var(--text-muted); font: 13px/1.25 var(--font-family-body); }
+.team-affiliation { display: grid; gap: 2px; margin-top: 5px; padding-top: 8px; border-top: 1px solid rgba(0, 215, 245, .2); }
+.team-affiliation > span { color: var(--text-muted); font: 700 10px var(--font-family-display); letter-spacing: .1em; }
+.team-affiliation strong { overflow: hidden; color: var(--tactical-local); font: 700 14px var(--font-family-display); text-overflow: ellipsis; white-space: nowrap; }
+.team-affiliation__empty { color: var(--text-muted) !important; }
+.team-affiliation small { color: var(--tactical-visit); font: 11px var(--font-family-body); }
 
-.profile-team-invite__title {
-  margin: 0;
-  color: #dce8fa;
-  font-family: 'Rajdhani', sans-serif;
-  font-size: 13px;
-  font-weight: 700;
-}
+.player-command-center__stats { display: grid; align-content: start; gap: 9px; }
+.stats-layout { display: grid; grid-template-columns: minmax(0, 1fr) minmax(116px, .62fr); align-items: stretch; gap: 10px; }
+.player-command-center__stats app-metallic-role-hexagon { display: block; min-width: 0; }
+.stats-insights { display: grid; align-content: start; gap: 7px; padding-left: 10px; border-left: 1px solid rgba(0, 215, 245, .22); }
+.stats-insights > p { margin: 0 0 2px; color: var(--tactical-visit); font: 700 12px var(--font-family-display); letter-spacing: .1em; }
+.stats-insights > div { display: grid; gap: 2px; padding-bottom: 7px; border-bottom: 1px solid rgba(122, 138, 160, .22); }
+.stats-insights span { color: var(--text-muted); font: 700 12px/1.4 var(--font-family-body); letter-spacing: .03em; }
+.stats-insights strong { color: var(--text-primary); font: 700 16px/1.3 var(--font-family-body); }
+.stats-insights small { color: var(--tactical-local); font: 700 12px var(--font-family-display); }
+.player-command-center__competition { display: grid; align-content: start; gap: 8px; }
+.competition-metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 5px 12px; }
+.competition-metrics div { display: flex; align-items: baseline; justify-content: space-between; gap: 5px; padding-bottom: 4px; border-bottom: 1px solid rgba(122, 138, 160, .22); }
+.competition-metrics span { color: var(--text-muted); font: 700 11px var(--font-family-display); letter-spacing: .06em; }
+.competition-metrics strong { color: var(--text-primary); font: 700 17px var(--font-family-display); white-space: nowrap; }
+.competition-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; margin-top: auto; }
+.competition-actions button { min-height: 36px; border: 1px solid rgba(0, 215, 245, .48); border-radius: 8px; background: rgba(7, 30, 39, .72); color: var(--text-primary); font: 700 11px var(--font-family-display); padding: 6px; }
+.competition-actions button:first-child { border-color: rgba(215, 255, 0, .56); background: rgba(64, 87, 6, .34); }
 
-.profile-team-invite__subtitle {
-  margin: 0;
-  color: #afc1dc;
-  font-family: 'Rajdhani', sans-serif;
-  font-size: 12px;
-  font-weight: 700;
-}
-
-.profile-team-members {
-  max-height: 220px;
-  overflow: auto;
-  display: grid;
-  gap: 6px;
-  padding-right: 2px;
-}
-
-.profile-team-members__item {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  border: 1px solid rgba(122, 138, 160, 0.25);
-  border-radius: 8px;
-  background: rgba(7, 12, 20, 0.65);
-  padding: 7px 8px;
-}
-
-.profile-team-members__item p {
-  margin: 0;
-  color: #e8eef5;
-  font-family: 'Rajdhani', sans-serif;
-  font-size: 13px;
-  font-weight: 700;
-}
-
-.profile-team-members__item small {
-  color: #afc1dc;
-  font-family: 'Rajdhani', sans-serif;
-  font-size: 12px;
-}
-
-.profile-team-members__item span {
-  border: 1px solid rgba(126, 144, 168, 0.35);
-  border-radius: 999px;
-  background: rgba(12, 19, 31, 0.72);
-  color: #e6f0ff;
-  font-family: 'Rajdhani', sans-serif;
-  font-size: 11px;
-  font-weight: 700;
-  padding: 2px 8px;
-  white-space: nowrap;
-}
-
-.profile-team-members__right {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 4px;
-}
-
-.profile-team-invite__input {
-  width: 100%;
-  min-width: 0;
-  height: 36px;
-  border-radius: 8px;
-  border: 1px solid rgba(126, 144, 168, 0.4);
-  background: rgba(8, 13, 22, 0.7);
-  color: #eaf3ff;
-  font-family: 'Rajdhani', sans-serif;
-  font-size: 14px;
-  padding: 0 10px;
+@media (max-width: 1080px) {
+  .player-command-center { grid-template-columns: 155px minmax(0, 1fr); grid-template-areas: "identity roles" "identity competition" "stats stats"; }
+  .player-command-center__stats { margin-top: 8px; padding-top: 15px; border-top: 1px solid rgba(0, 215, 245, .34); border-left: 0; }
 }
 
 @media (max-width: 520px) {
-  .profile-team__head {
-    grid-template-columns: 1fr;
-    align-items: start;
-  }
+  .player-command-center { grid-template-columns: minmax(0, 1fr); grid-template-areas: "identity" "roles" "stats" "competition"; gap: 8px; padding: 4px 0; }
+  .player-command-center__identity { grid-template-columns: 82px minmax(0, 1fr); align-items: center; justify-items: start; text-align: left; gap: 14px; }
 
-  .profile-team__actions {
-    justify-content: flex-start;
-  }
-}
+  .player-photo { width: 82px; height: 98px; }
+  .profile-name { font-size: 16px; }
+  .profile-alias { font-size: 13px; }
+  .player-command-center__roles,
+  .player-command-center__stats,
+  .player-command-center__competition { border-top: 1px solid rgba(0, 215, 245, .2); border-left: 0; }
 
-.profile-team-invite__list {
-  display: grid;
-  gap: 8px;
-}
-
-.profile-team-invite__item {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  border: 1px solid rgba(122, 138, 160, 0.25);
-  border-radius: 8px;
-  background: rgba(7, 12, 20, 0.65);
-  padding: 8px;
-}
-
-.profile-team-invite__meta p {
-  margin: 0;
-  color: #e8eef5;
-  font-family: 'Rajdhani', sans-serif;
-  font-size: 13px;
-  font-weight: 700;
-}
-
-.profile-team-invite__meta small {
-  color: #afc1dc;
-  font-family: 'Rajdhani', sans-serif;
-  font-size: 12px;
+  .player-command-center__stats { margin-top: 10px; padding-top: 16px; border-top-color: rgba(0, 215, 245, .4); }
+  .stats-layout { grid-template-columns: minmax(0, 1fr); gap: 14px; }
+  .stats-insights { padding: 0; border-left: 0; }
+  .stats-insights span { font: 14px/1.4 var(--font-family-body); }
+  .stats-insights strong { font-size: 17px; line-height: 1.3; }
+  .position-priority-list { display: flex; flex-wrap: wrap; gap: 10px; }
+  .position-priority-list li { display: flex; align-items: center; gap: 6px; font-size: 15px; line-height: 1.4; }
+  .position-priority-list strong { overflow-wrap: normal; }
 }
 
 .profile-footer {
@@ -297,18 +183,20 @@
   }
 }
 
-.profile-footer__nav {
-  display: block;
-}
-
 @media (max-width: 420px) {
+  .profile-header { flex-direction: row; align-items: center; }
+  .profile-settings-link { flex: 0 0 auto; }
+
   .profile-name {
     font-size: 20px;
   }
 
-  .profile-alias,
-  .profile-email {
+  .profile-alias {
     font-size: 15px;
   }
 }
 
+.role-stat-values { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px 14px; margin: 0; font: 14px/1.4 var(--font-family-body); }
+.role-stat-values div { display: flex; justify-content: space-between; gap: 6px; }
+.role-stat-values dt { color: var(--text-secondary); }
+.role-stat-values dd { margin: 0; color: var(--tactical-local); font-weight: 700; }

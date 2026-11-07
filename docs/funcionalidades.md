@@ -111,52 +111,67 @@ Atleta Frontend es una aplicacion para jugadores de futbol amateur centrada en i
 - Soporte web notification.
 - Soporte local notification con Capacitor.
 
+### Smoke de contratos HTTP FE - `Parcial`
+- Existe cobertura unitaria para rutas de servicios API en auth, player profile/trust score, matches/MVP, teams y ratings.
+- Valida metodo HTTP, URL base `/api/v1`, path y query params criticos con `HttpTestingController`.
+- Protege que `PUT /player-profiles/trust-score` se envie sin `playerUuid` en body, delegando identidad al JWT del backend.
+- Pendiente: smoke automatizado contra backend real levantado.
+
 ## Funcionalidades parciales
 
-### Social hub - `Parcial`
+### Social hub - `Rehabilitado parcial`
 - Existe una pantalla `SocialPage` con tabs de actividad, amigos, equipos y partidos.
 - Tiene facade, activity feed, paneles de solicitudes y acciones.
-- Hoy no esta accesible desde routing porque `/social` redirige a `/matches`.
+- `/social` vuelve a estar accesible desde routing protegido.
+- `/invitations` reutiliza `SocialPage` entrando en la tab de partidos.
 
-### Stats - `Parcial`
+### Stats - `Implementada read-only`
 - Existe la pagina `/stats`.
-- Actualmente solo muestra un mensaje de futura integracion.
+- Muestra OVR actual, rol destacado, efectividad, G+A, mapa por rol y ultimos partidos.
+- Consume ratings e historial existentes; no realiza acciones mutables.
 
-### Badge de notificaciones - `Parcial`
+### Badge de notificaciones - `Implementada`
 - Hay agregacion local de pendientes.
-- `NotificationBadgeService.refresh()` no consulta backend ni actualiza conteos remotos.
+- `NotificationBadgeService.refresh()` consulta `/social/notifications/unread-count` y usa invitaciones pendientes como fallback.
 
 ### Push notifications remotas - `Parcial`
 - La infraestructura cliente existe.
-- El token se guarda localmente, pero no se sincroniza con endpoint backend definitivo.
+- El token se sincroniza con `/social/notifications/push-tokens`; queda pendiente validar envio remoto con proveedor real.
 
 ### Modos demo - `Parcial`
 - Algunas pantallas caen a modo demo si falta sesion o falla carga.
 
 ## Funcionalidades pendientes
 
-### Google auth - `Pendiente`
-- El login tiene CTA "Continuar con Google", pero el metodo no implementa flujo real.
+### Google auth - `Implementada configurable`
+- El login usa Google Identity Services cuando `ATLETA_GOOGLE_CLIENT_ID` esta configurado.
+- El id token se envia a `/athletes/auth/google` y reutiliza la sesion JWT existente.
 
-### Recuperacion de password - `Pendiente`
-- Existe el handler `onForgotPassword()`, pero no hace nada.
+### Password de cuenta - `Parcial`
+- Cambio de contrasena autenticado implementado en Perfil > Seguridad de cuenta usando `PUT /athletes/{atletaUuid}/password`.
+- La pantalla permite solicitar un enlace y confirmar una nueva contrasena con token; el backend expone ambos endpoints.
+- Pendiente: configurar y verificar la entrega real de correo y el flujo completo en el ambiente de destino.
 
-### Registro real de push token en backend - `Pendiente`
-- Solo hay persistencia local.
+### Registro real de push token en backend - `Implementada`
+- El token se persiste localmente y se registra en backend con `deviceId` estable por usuario.
 
-### Badge server-side real - `Pendiente`
-- El conteo remoto no esta implementado.
+### Badge server-side real - `Implementada`
+- El conteo remoto consulta `/social/notifications/unread-count` y se combina con invitaciones pendientes locales.
 
-### Rehabilitar o retirar modulo social - `Pendiente`
-- El codigo existe, pero el routing lo dejo fuera del producto navegable.
+### Rehabilitar o retirar modulo social - `Decidido`
+- Decision: rehabilitar `social` como ruta secundaria del flujo competitivo, no retirarlo.
+- Motivo: sus servicios y modelos ya son dependencias reales de perfil, equipos, invitaciones y notificaciones.
+- Validacion automatizada: `SocialPage` cubre tab por query/data, dedupe de carga, badge y navegacion inferior.
+- Pendiente posterior: validar UX mobile y consistencia contra backend real tras aceptar/rechazar solicitudes.
 
 ## Funcionalidades recomendadas
 
-### Consolidar historial de partidos - `Recomendada`
-- Unificar `matches-history` y la vista history dentro de `matches-hub`.
+### Consolidar historial de partidos - `Implementada`
+- El historial vive en la pestana `history` de `matches-hub`.
+- `/matches/history` se mantiene como ruta compatible que abre esa pestana.
 
-### Unificar entrada de "social" - `Recomendada`
-- Reintegrar `SocialPage` o absorber sus paneles dentro de una ruta activa.
+### Unificar entrada de "social" - `En progreso`
+- `SocialPage` ya esta reintegrada en `/social`; falta validar si debe tener entrada visible propia en la navegacion principal.
 
 ### Configuracion runtime de backend - `Recomendada`
 - Evitar `apiBaseUrl` compilado fijo para despliegues.
@@ -177,12 +192,13 @@ Atleta Frontend es una aplicacion para jugadores de futbol amateur centrada en i
 
 ## Integraciones con backend
 - Auth: `/athletes/login`, `/athletes/register`
-- User/Profile: `/player-profiles`, `/player-profiles/{uuid}`, `/player-profiles/{uuid}/positions`, `/positions`
+- User/Profile: `/player-profiles`, `/player-profiles/{uuid}`, `/player-profiles/{uuid}/positions`, `/player-profiles/trust-score`, `/player-profiles/{uuid}/trust-history`, `/positions`
 - Teams: `/teams`, `/teams/by-player/{uuid}`, `/teams/by-creator/{uuid}`, `/teams/{id}/members/active`, `/teams/logo`
 - Matches: `/matches`, `/matches/by-player/{uuid}`, `/matches/by-player-or-creator/{uuid}`, `/matches/{id}`, `/matches/{id}/status`, `/matches/{id}/teams/{teamId}`, `/matches/{id}/teams/assignment`, `/matches/events`, `/matches/{id}/close/preview`, `/matches/{id}/mvp`, `/matches/{id}/mvp/vote`
 - Social: `/social/friendships`, `/social/team-invites`, `/social/match-invites`, `/social/notifications`, `/social/players/search`
 - Fields: `/fields`
 - Ratings: `/ratings/player/{id}/overall`, `/ratings/player/{id}`, `/ratings/player/{id}/history`, `/ratings/leaderboard`
+- Smoke unitario FE: `src/app/core/contracts/api-contracts.smoke.spec.ts`
 
 ## Checklist para futuras tareas
 - [ ] Leer `docs/memory.md`

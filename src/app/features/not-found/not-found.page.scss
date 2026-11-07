@@ -1,0 +1,41 @@
+:host {
+  display: block;
+  min-height: 100%;
+}
+
+.not-found {
+  min-height: 100%;
+  display: grid;
+  place-content: center;
+  gap: 12px;
+  padding: 32px 20px;
+  text-align: center;
+  color: #f4f6fb;
+}
+
+.not-found-code {
+  margin: 0;
+  color: #d6a84f;
+  font: 700 clamp(72px, 18vw, 144px)/.9 'Rajdhani', sans-serif;
+}
+
+h1,
+p {
+  margin: 0;
+}
+
+.not-found p:not(.not-found-code) {
+  max-width: 420px;
+  color: #b7c0d1;
+}
+
+.not-found-action {
+  justify-self: center;
+  margin-top: 12px;
+  padding: 12px 20px;
+  border-radius: 8px;
+  background: #d6a84f;
+  color: #16130d;
+  font-weight: 700;
+  text-decoration: none;
+}

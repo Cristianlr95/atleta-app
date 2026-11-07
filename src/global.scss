@@ -46,14 +46,94 @@
   --atleta-icon-nav-deep: rgba(50, 79, 122, 0.55);
 }
 
+* {
+  box-sizing: border-box;
+}
+
 html,
 body,
 ion-app {
   background: var(--atleta-page-bg);
+  width: 100%;
+  max-width: 100%;
+  overflow-x: clip;
+}
+
+ion-router-outlet,
+ion-router-outlet > .ion-page,
+ion-content::part(scroll) {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+}
+
+app-metallic-card,
+app-metallic-form-section,
+app-metallic-position-field-picker {
+  display: block;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.field-picker {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  container-type: inline-size;
+}
+
+.field-picker__layout,
+.field-picker__role-content {
+  min-width: 0;
+}
+
+.field-picker__role-description {
+  overflow-wrap: anywhere;
+}
+
+@container (min-width: 660px) {
+  .field-picker__layout {
+    grid-template-columns: minmax(0, 1.2fr) minmax(280px, 0.55fr);
+    gap: 18px;
+  }
+
+  .field-picker__role-panel {
+    justify-content: center;
+  }
+}
+
+@media (max-width: 360px) {
+  .field-picker__position {
+    width: 44px;
+    height: 44px;
+    font-size: 8px;
+  }
+
+  .field-picker__role-panel,
+  .field-picker__role-card {
+    padding: 12px;
+  }
+
+  .field-picker__role-card {
+    gap: 8px;
+  }
+
+  .field-picker__role-badge {
+    min-width: 42px;
+    height: 42px;
+    font-size: 19px;
+  }
+
+  .field-picker__role-name {
+    font-size: 18px;
+  }
 }
 
 ion-content {
   --color: var(--foreground);
+  // Routed standalone pages place their footer after ion-content in the DOM.
+  // Reserve its height so scrollable content remains reachable.
+  --padding-bottom: calc(env(safe-area-inset-bottom) + 82px);
   font-family: var(--font-family-body);
 }
 
@@ -62,6 +142,12 @@ ion-content::part(background) {
 }
 
 ion-footer {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 1000;
+  pointer-events: auto;
   background: rgba(4, 8, 15, 0.82);
   backdrop-filter: blur(18px);
   border-top: 1px solid rgba(176, 199, 231, 0.18);
@@ -78,6 +164,26 @@ input,
 select,
 textarea {
   font: inherit;
+}
+
+h1,
+h2,
+h3,
+p,
+ion-card-title,
+ion-card-subtitle,
+ion-label,
+ion-note,
+.metallic-card,
+.home-status-card,
+.home-feed__item {
+  overflow-wrap: anywhere;
+}
+
+ion-button,
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
 }
 
 button:focus-visible,
@@ -107,8 +213,7 @@ a:focus-visible {
 
 .home-bg,
 .matches-hub-bg,
-.leaderboard-bg,
-.matches-history-bg {
+.leaderboard-bg {
   background: var(--atleta-page-bg);
 }
 
@@ -124,7 +229,6 @@ a:focus-visible {
 .venue-create-container,
 .match-close-container,
 .mvp-vote-container,
-.matches-history-container,
 .stats-container,
 .social-container {
   width: min(100%, 940px);
@@ -155,8 +259,31 @@ ion-toast::part(container) {
   backdrop-filter: blur(16px);
 }
 
+ion-toast.atleta-notification-toast {
+  --width: min(430px, calc(100vw - 24px));
+  --max-width: 430px;
+  --offset-bottom: calc(72px + env(safe-area-inset-bottom));
+  --background: rgba(12, 24, 34, 0.97);
+  --color: #e8f4ff;
+  --button-color: #c7ff00;
+}
+
+ion-toast.atleta-notification-toast::part(container) {
+  border: 1px solid rgba(0, 207, 232, 0.4);
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.46), 0 0 16px rgba(0, 207, 232, 0.1);
+}
+
+ion-toast.atleta-notification-toast::part(header) {
+  color: #ffffff;
+  font-weight: 800;
+}
+
+ion-toast.atleta-notification-toast::part(message) {
+  color: #b9cddd;
+}
+
 /* Icon system: stronger, game-like definition across the app */
-ion-icon {
+img.atleta-raster-icon {
   --ionicon-stroke-width: 42px;
   color: var(--atleta-icon-color);
   transition: transform 180ms ease, filter 180ms ease, opacity 180ms ease;
@@ -204,12 +331,36 @@ ion-icon {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  ion-icon,
+  img.atleta-raster-icon,
   .atleta-game-icon {
     transition: none;
   }
 
   .atleta-game-icon:hover {
     transform: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .login-container,
+  .register-container,
+  .home-container,
+  .matches-hub-container,
+  .matches-create-container,
+  .match-detail-container,
+  .profile-container,
+  .leaderboard-container,
+  .session-container,
+  .venue-create-container,
+  .match-close-container,
+  .mvp-vote-container,
+  .stats-container,
+  .social-container {
+    padding-inline: 1rem;
+  }
+
+  ion-modal::part(content) {
+    width: 100%;
+    min-height: 100%;
   }
 }

@@ -1,6 +1,7 @@
-﻿import { CommonModule } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { Component, OnDestroy, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
 import { IonicModule } from '@ionic/angular';
 import { finalize, firstValueFrom, forkJoin, of, Subject } from 'rxjs';
 import { catchError, map, switchMap, takeUntil } from 'rxjs/operators';
@@ -16,7 +17,6 @@ import {
   CompetitionHistoryDisplayItem,
   MetallicCompetitionHistoryComponent,
 } from 'src/app/shared/ui/metallic-competition-history/metallic-competition-history.component';
-import { MetallicFormSectionComponent } from 'src/app/shared/ui/metallic-form-section/metallic-form-section.component';
 import { MetallicStatsComponent, Stat } from 'src/app/shared/ui/metallic-stats/metallic-stats.component';
 import { MatchHistoryViewItem, MatchHistoryService } from '../../services/match-history.service';
 import { PlayerMatchHistoryItem } from '../../models/match.models';
@@ -70,7 +70,6 @@ interface PendingMatchSummary {
     FormsModule,
     IonicModule,
     MetallicCardComponent,
-    MetallicFormSectionComponent,
     MetallicBottomNavComponent,
     MetallicStatsComponent,
     MetallicCompetitionHistoryComponent,
@@ -78,6 +77,7 @@ interface PendingMatchSummary {
 })
 export class MatchesHubPage implements OnDestroy {
   private readonly authSessionService = inject(AuthSessionService);
+  private readonly route = inject(ActivatedRoute);
   private readonly matchesApiService = inject(MatchesApiService);
   private readonly matchHistoryService = inject(MatchHistoryService);
   private readonly socialApiService = inject(SocialApiService);
@@ -88,14 +88,13 @@ export class MatchesHubPage implements OnDestroy {
   private readonly leave$ = new Subject<void>();
   private readonly playerOvrCache = new Map<string, number | null>();
 
-  readonly iconBase = 'assets/icons/atleta';
-  readonly titleIconAsset = `${this.iconBase}/ic_nav_matches_24.svg`;
-  readonly upcomingIconAsset = `${this.iconBase}/ic_status_in_assembly_24.svg`;
-  readonly historyIconAsset = `${this.iconBase}/ic_match_calendar_24.svg`;
-  readonly createIconAsset = `${this.iconBase}/ic_match_create_24.svg`;
-  readonly filterIconAsset = `${this.iconBase}/ic_action_filter_24.svg`;
-  readonly openIconAsset = `${this.iconBase}/ic_action_search_24.svg`;
-  readonly editIconAsset = `${this.iconBase}/ic_action_edit_24.svg`;
+  readonly iconBase = 'assets/icons/atleta-raster-v1';
+  readonly titleIconAsset = `${this.iconBase}/ic_nav_matches_96.png`;
+  readonly upcomingIconAsset = `${this.iconBase}/ic_status_in_assembly_96.png`;
+  readonly historyIconAsset = `${this.iconBase}/ic_match_calendar_96.png`;
+  readonly createIconAsset = `${this.iconBase}/ic_match_create_96.png`;
+  readonly filterIconAsset = `${this.iconBase}/ic_action_filter_96.png`;
+  readonly openIconAsset = `${this.iconBase}/ic_action_open_match_96.png`;
 
   selectedTab: MatchesTab = 'upcoming';
   isLoading = false;
@@ -119,6 +118,7 @@ export class MatchesHubPage implements OnDestroy {
   }
 
   ionViewWillEnter(): void {
+    this.applyRequestedTab();
     void this.initializeView();
   }
 
@@ -129,6 +129,13 @@ export class MatchesHubPage implements OnDestroy {
 
   onTabChange(tab: MatchesTab): void {
     this.selectedTab = tab;
+  }
+
+  private applyRequestedTab(): void {
+    const requestedTab = this.route.snapshot.queryParamMap.get('tab') ?? this.route.snapshot.data['defaultMatchesTab'];
+    if (requestedTab === 'upcoming' || requestedTab === 'history' || requestedTab === 'create') {
+      this.selectedTab = requestedTab;
+    }
   }
 
   onOpenMatch(matchId: number): void {
@@ -163,44 +170,27 @@ export class MatchesHubPage implements OnDestroy {
   }
 
   onNavItemSelected(itemId: string): void {
-    if (itemId === 'home') {
-      void this.navigationService.safeNavigate(['/home']);
-      return;
-    }
-
-    if (itemId === 'matches') {
-      void this.navigationService.safeNavigate(['/matches']);
-      return;
-    }
-
-    if (itemId === 'ranking') {
-      void this.navigationService.safeNavigate(['/leaderboard']);
-      return;
-    }
-
-    if (itemId === 'profile') {
-      void this.navigationService.safeNavigate(['/player/profile']);
-    }
+    void this.navigationService.goToMainBottomSection(itemId);
   }
 
   getStatusIconAsset(status: UpcomingStatusKey): string {
     if (status === 'CONFIRMED') {
-      return `${this.iconBase}/ic_status_finished_24.svg`;
+      return `${this.iconBase}/ic_status_confirmed_96.png`;
     }
 
     if (status === 'INICIADO') {
-      return `${this.iconBase}/ic_status_in_progress_24.svg`;
+      return `${this.iconBase}/ic_status_in_progress_96.png`;
     }
 
     if (status === 'FINALIZADO') {
-      return `${this.iconBase}/ic_status_finished_24.svg`;
+      return `${this.iconBase}/ic_status_finished_96.png`;
     }
 
     if (status === 'INVALIDO') {
-      return `${this.iconBase}/ic_status_canceled_24.svg`;
+      return `${this.iconBase}/ic_status_canceled_96.png`;
     }
 
-    return `${this.iconBase}/ic_status_pending_24.svg`;
+    return `${this.iconBase}/ic_status_pending_96.png`;
   }
 
   getStatusVisualClass(status: UpcomingStatusKey): string {
@@ -229,10 +219,8 @@ export class MatchesHubPage implements OnDestroy {
     this.errorMessage = null;
 
     forkJoin({
-      upcoming: this.loadUpcomingForUser(session.user.atletaUuid).pipe(
-        catchError(() => of([] as PlayerMatchHistoryItem[])),
-      ),
-      history: this.matchHistoryService.getPlayerHistory(session.user.atletaUuid).pipe(catchError(() => of([] as MatchHistoryViewItem[]))),
+      upcoming: this.loadUpcomingForUser(session.user.atletaUuid),
+      history: this.matchHistoryService.getPlayerHistory(session.user.atletaUuid),
     })
       .pipe(
         takeUntil(this.leave$),
@@ -258,7 +246,6 @@ export class MatchesHubPage implements OnDestroy {
     return forkJoin({
       matches: this.matchesApiService.getByPlayerOrCreator(playerUuid).pipe(
         catchError(() => this.matchesApiService.getByPlayer(playerUuid)),
-        catchError(() => of([] as PlayerMatchHistoryItem[])),
       ),
       socialInvites: this.socialApiService.getMatchInvites(playerUuid).pipe(catchError(() => of([] as SocialRequestItem[]))),
     }).pipe(
@@ -769,17 +756,17 @@ export class MatchesHubPage implements OnDestroy {
       {
         label: 'Victorias',
         value: outcomes.filter((outcome) => outcome === 'GANADO').length,
-        icon: 'trophy-outline',
+        icon: 'win',
       },
       {
         label: 'Empates',
         value: outcomes.filter((outcome) => outcome === 'EMPATADO').length,
-        icon: 'stats-chart-outline',
+        icon: 'draw',
       },
       {
         label: 'Derrotas',
         value: outcomes.filter((outcome) => outcome === 'PERDIDO').length,
-        icon: 'football-outline',
+        icon: 'loss',
       },
     ];
   }
@@ -791,7 +778,7 @@ export class MatchesHubPage implements OnDestroy {
       modalityKey: item.modality,
       statusKey: item.status,
       outcomeKey: item.outcome ?? 'NONE',
-      modalityLabel: item.modalityLabel,
+      modalityLabel: `${item.typeLabel} · ${item.modalityLabel}`,
       dateLabel: item.dateLabel,
       statusLabel: item.statusLabel,
       outcomeLabel: this.outcomeLabel(item.outcome),

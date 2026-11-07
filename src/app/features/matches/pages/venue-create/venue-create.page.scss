@@ -1,6 +1,6 @@
 .venue-create-bg {
-  --background: none;
-  background:
+  --background: var(--atleta-page-bg);
+  background: var(--atleta-page-bg),
     linear-gradient(rgba(10, 12, 20, 0.78), rgba(10, 12, 20, 0.9)),
     url('/assets/backgrounds/stadium.png');
   background-size: cover;
@@ -39,3 +39,5 @@
   color: #ffb6b6;
   font-size: 12px;
 }
+
+.venue-create__retry { min-height: 44px; color: var(--tactical-visit); background: transparent; border: 0; font-weight: 700; cursor: pointer; }

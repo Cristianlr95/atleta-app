@@ -36,6 +36,8 @@ import { MvpVoteStore } from '../../stores/mvp-vote.store';
   styleUrls: ['./match-mvp-vote.page.scss'],
 })
 export class MatchMvpVotePage implements OnDestroy {
+  readonly mvpIconAsset = 'assets/icons/atleta-raster-v1/ic_comp_mvp_96.png';
+  readonly timeIconAsset = 'assets/icons/atleta-raster-v1/ic_match_time_96.png';
   private readonly route = inject(ActivatedRoute);
   private readonly mvpVoteStore = inject(MvpVoteStore);
   private readonly appToastService = inject(AppToastService);
@@ -50,7 +52,7 @@ export class MatchMvpVotePage implements OnDestroy {
   readonly votingProcessing = signal<string | null>(null);
 
   readonly resource = computed(() => this.mvpVoteStore.getStateSnapshot(this.routeMatchId()));
-  readonly loading = computed(() => this.resource().loading);
+  readonly loading = computed(() => this.resource().loading && !this.resource().data);
   readonly loadError = computed(() => this.resource().error);
   readonly state = computed(() => this.resource().data);
   readonly candidates = computed(() => this.state()?.candidates ?? []);
@@ -64,11 +66,11 @@ export class MatchMvpVotePage implements OnDestroy {
   );
   readonly votesProgressLabel = computed(() => `${this.totalRecordedVotes()}/${this.totalEligibleVotes()} votos`);
   readonly voteCards = computed(() =>
-    this.candidates().map((candidate, index) => ({
+    this.candidates().map((candidate) => ({
       userId: candidate.userId,
       name: candidate.alias || candidate.userId,
-      teamLabel: index % 2 === 0 ? 'Equipo Local' : 'Equipo Visita',
-      accent: index % 2 === 0 ? '#4a88d6' : '#d66e4a',
+      teamLabel: 'Participante confirmado',
+      accent: this.myVote() === candidate.userId ? '#d6b04a' : '#4a88d6',
     })),
   );
 
@@ -143,21 +145,7 @@ export class MatchMvpVotePage implements OnDestroy {
   }
 
   onNavItemSelected(itemId: string): void {
-    if (itemId === 'home') {
-      void this.navigationService.safeNavigate(['/home']);
-      return;
-    }
-    if (itemId === 'matches') {
-      void this.navigationService.safeNavigate(['/matches']);
-      return;
-    }
-    if (itemId === 'ranking') {
-      void this.navigationService.safeNavigate(['/leaderboard']);
-      return;
-    }
-    if (itemId === 'profile') {
-      void this.navigationService.safeNavigate(['/player/profile']);
-    }
+    void this.navigationService.goToMainBottomSection(itemId);
   }
 
   private async load(force: boolean): Promise<void> {
@@ -182,8 +170,11 @@ export class MatchMvpVotePage implements OnDestroy {
     }
 
     this.countdownSub = interval(1000)
-      .pipe(startWith(0))
-      .subscribe(() => {
+      .pipe(startWith(-1))
+      .subscribe((tickIndex) => {
+        if (tickIndex >= 0 && (tickIndex + 1) % 5 === 0 && this.isOpen()) {
+          void this.mvpVoteStore.refresh(this.routeMatchId(), true);
+        }
         const ms = new Date(closesAt).getTime() - Date.now();
         if (ms <= 0) {
           this.remainingLabel.set('00:00:00');

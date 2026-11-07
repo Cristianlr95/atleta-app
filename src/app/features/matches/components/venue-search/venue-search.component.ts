@@ -1,9 +1,10 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
+import { Component, DestroyRef, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges, inject } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { IonicModule } from '@ionic/angular';
-import { Subject, debounceTime, distinctUntilChanged, from, switchMap, tap } from 'rxjs';
+import { Subject, catchError, from, of, switchMap, tap, timer } from 'rxjs';
 import { NavigationService } from 'src/app/core/services/navigation.service';
 import { MetallicButtonComponent } from 'src/app/shared/ui/metallic-button/metallic-button.component';
 import { MetallicInputComponent } from 'src/app/shared/ui/metallic-input/metallic-input.component';
@@ -18,6 +19,12 @@ import { VenueService } from '../../services/venue.service';
   styleUrls: ['./venue-search.component.scss'],
 })
 export class VenueSearchComponent implements OnInit, OnChanges {
+  private readonly destroyRef = inject(DestroyRef);
+  private readonly venueService = inject(VenueService);
+  private readonly formBuilder = inject(FormBuilder);
+  private readonly navigationService = inject(NavigationService);
+  private readonly route = inject(ActivatedRoute);
+
   @Input() selectedVenue: Venue | null = null;
   @Output() venueSelected = new EventEmitter<Venue>();
 
@@ -33,23 +40,23 @@ export class VenueSearchComponent implements OnInit, OnChanges {
 
   private readonly queryChange$ = new Subject<string>();
 
-  constructor(
-    private readonly venueService: VenueService,
-    private readonly formBuilder: FormBuilder,
-    private readonly navigationService: NavigationService,
-    private readonly route: ActivatedRoute,
-  ) {
+  constructor() {
     this.queryChange$
       .pipe(
-        debounceTime(280),
-        distinctUntilChanged(),
         tap(() => {
           this.isLoading = true;
           this.errorMessage = null;
         }),
         switchMap((query) =>
-          from(query.trim().length > 0 ? this.venueService.searchVenues(query) : this.venueService.getActiveVenues()),
+          timer(280).pipe(
+            switchMap(() => from(query.trim().length > 0 ? this.venueService.searchVenues(query) : this.venueService.getActiveVenues())),
+            catchError(() => {
+              this.errorMessage = 'No se pudo buscar canchas. Intenta nuevamente.';
+              return of([]);
+            }),
+          ),
         ),
+        takeUntilDestroyed(this.destroyRef),
       )
       .subscribe({
         next: (venues) => {
@@ -62,7 +69,7 @@ export class VenueSearchComponent implements OnInit, OnChanges {
         },
       });
 
-    this.queryForm.controls.query.valueChanges.subscribe((value) => this.queryChange$.next(value));
+    this.queryForm.controls.query.valueChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((value) => this.queryChange$.next(value));
   }
 
   ngOnInit(): void {
@@ -112,7 +119,7 @@ export class VenueSearchComponent implements OnInit, OnChanges {
   }
 
   private handleVenueCreatedQueryParam(): void {
-    this.route.queryParamMap.subscribe((params) => {
+    this.route.queryParamMap.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((params) => {
       const raw = params.get('venueCreated');
       if (!raw) {
         return;

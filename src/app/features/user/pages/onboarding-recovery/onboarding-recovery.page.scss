@@ -1,0 +1,45 @@
+.onboarding-recovery-bg {
+  --background: var(--atleta-page-bg);
+}
+
+.onboarding-recovery-container {
+  min-height: 100%;
+  width: min(100%, 560px);
+  margin-inline: auto;
+  padding: clamp(16px, 5vw, 48px);
+  display: grid;
+  place-items: center;
+}
+
+.onboarding-recovery {
+  display: grid;
+  gap: 14px;
+  text-align: center;
+}
+
+.onboarding-recovery h1,
+.onboarding-recovery p {
+  margin: 0;
+}
+
+.onboarding-recovery h1 {
+  color: var(--foreground);
+  font-size: clamp(1.2rem, 5vw, 1.75rem);
+}
+
+.onboarding-recovery p {
+  color: #bdcbe0;
+}
+
+.onboarding-recovery__eyebrow {
+  color: var(--atleta-gold) !important;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.onboarding-recovery__actions {
+  display: grid;
+  gap: 10px;
+  margin-top: 6px;
+}

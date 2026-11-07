@@ -12,3 +12,14 @@
   border-color: rgba(177, 125, 125, 0.45);
   color: #ffcccc;
 }
+
+.countdown span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.countdown img.atleta-raster-icon {
+  width: 18px;
+  height: 18px;
+}

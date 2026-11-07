@@ -11,7 +11,7 @@
 
   <ion-item lines="none" class="schedule-form__datetime">
     <ion-label position="stacked">Fecha y hora</ion-label>
-    <ion-datetime presentation="date-time" formControlName="scheduledAt"></ion-datetime>
+    <ion-datetime aria-label="Fecha y hora" presentation="date-time" formControlName="scheduledAt"></ion-datetime>
   </ion-item>
 
   <app-venue-search [selectedVenue]="selectedVenue" (venueSelected)="onVenueSelected($event)"></app-venue-search>

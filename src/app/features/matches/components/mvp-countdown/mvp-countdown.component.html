@@ -1,4 +1,4 @@
 ﻿<div class="countdown" [class.countdown--closed]="!isOpen">
-  <span *ngIf="isOpen">⏱ Quedan {{ remainingLabel }}</span>
-  <span *ngIf="!isOpen">Votacion cerrada</span>
+  <span *ngIf="isOpen"><img class="atleta-raster-icon" [src]="timeIconAsset" aria-hidden="true" alt="" />Quedan {{ remainingLabel }}</span>
+  <span *ngIf="!isOpen"><img class="atleta-raster-icon" [src]="closedIconAsset" aria-hidden="true" alt="" />Votacion cerrada</span>
 </div>

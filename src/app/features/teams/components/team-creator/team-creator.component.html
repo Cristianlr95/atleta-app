@@ -14,8 +14,9 @@
     </app-metallic-input>
   </div>
 
-  <label class="team-creator__file-label" for="teamLogoInput">Logo del equipo (opcional)</label>
+  <label *ngIf="uploadsEnabled" class="team-creator__file-label" for="teamLogoInput">Logo del equipo (opcional)</label>
   <input
+    *ngIf="uploadsEnabled"
     id="teamLogoInput"
     class="team-creator__file-input"
     type="file"
@@ -23,6 +24,7 @@
     (change)="onLogoSelected($event)"
   />
   <p *ngIf="selectedLogoName" class="team-creator__file-name">{{ selectedLogoName }}</p>
+  <p *ngIf="!uploadsEnabled" class="team-creator__file-name">La carga de logos no está disponible durante la beta.</p>
 
   <app-metallic-button
     class="team-creator__submit"

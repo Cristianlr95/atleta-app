@@ -1,11 +1,11 @@
-﻿import { CommonModule } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { Component, OnDestroy, inject } from '@angular/core';
-import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { IonicModule } from '@ionic/angular';
 import { Subject, Subscription, firstValueFrom, forkJoin, interval, of } from 'rxjs';
 import { catchError, finalize, takeUntil } from 'rxjs/operators';
 import { AuthSessionService } from 'src/app/core/services/auth-session.service';
+import { APP_CONFIG } from 'src/app/core/config/app-config.token';
 import { AppToastService } from 'src/app/core/services/app-toast.service';
 import { ErrorMapperService } from 'src/app/core/services/error-mapper.service';
 import { NavigationService } from 'src/app/core/services/navigation.service';
@@ -21,22 +21,20 @@ import {
 } from 'src/app/shared/ui/metallic-bottom-nav/metallic-bottom-nav.component';
 import { MetallicCardComponent } from 'src/app/shared/ui/metallic-card/metallic-card.component';
 import { MetallicFormSectionComponent } from 'src/app/shared/ui/metallic-form-section/metallic-form-section.component';
-import {
-  MetallicPlayerPositionsComponent,
-  PlayerPositionDisplay,
-} from 'src/app/shared/ui/metallic-player-positions/metallic-player-positions.component';
+import { PlayerPositionDisplay } from 'src/app/shared/ui/metallic-player-positions/metallic-player-positions.component';
 import {
   HexagonRole,
   HexagonRoleStat,
   MetallicRoleHexagonComponent,
 } from 'src/app/shared/ui/metallic-role-hexagon/metallic-role-hexagon.component';
-import { MetallicStatsComponent, Stat } from 'src/app/shared/ui/metallic-stats/metallic-stats.component';
 import { TeamActiveMember, TeamSummary } from 'src/app/features/teams/models/team.models';
 import { TeamApiService } from 'src/app/features/teams/services/team-api.service';
 import { buildMainBottomNav } from 'src/app/shared/navigation/main-bottom-nav';
 import { PlayerAssignedPosition } from '../../models/position.models';
-import { PlayerProfile } from '../../models/user.models';
+import { PlayerAchievement, PlayerProfile } from '../../models/user.models';
 import { PlayerPositionStateService } from '../../services/player-position-state.service';
+import { ProfileTeamsComponent } from './profile-teams/profile-teams.component';
+import { ProfileAchievementsComponent } from './profile-achievements/profile-achievements.component';
 import { UserApiService } from '../../services/user-api.service';
 
 interface TeamMemberView extends TeamActiveMember {
@@ -50,6 +48,12 @@ interface OutcomeSummary {
   total: number;
 }
 
+interface CompetitionSummary extends OutcomeSummary {
+  matches: number;
+  goals: number;
+  assists: number;
+}
+
 @Component({
   selector: 'app-player-profile',
   standalone: true,
@@ -57,18 +61,19 @@ interface OutcomeSummary {
   styleUrls: ['./player-profile.page.scss'],
   imports: [
     CommonModule,
-    FormsModule,
     IonicModule,
     MetallicCardComponent,
     MetallicFormSectionComponent,
+    ProfileTeamsComponent,
+    ProfileAchievementsComponent,
     MetallicRoleHexagonComponent,
-    MetallicStatsComponent,
     MetallicBottomNavComponent,
-    MetallicPlayerPositionsComponent,
   ],
 })
 export class PlayerProfilePage implements OnDestroy {
   private readonly authSessionService = inject(AuthSessionService);
+  private readonly appConfig = inject(APP_CONFIG);
+  readonly uploadsEnabled = this.appConfig.uploadsEnabled !== false;
   private readonly userApiService = inject(UserApiService);
   private readonly ratingsApiService = inject(RatingsApiService);
   private readonly matchHistoryService = inject(MatchHistoryService);
@@ -88,19 +93,20 @@ export class PlayerProfilePage implements OnDestroy {
   private autoRefreshSub: Subscription | null = null;
   private inviteSearchTimer?: number;
 
-  readonly iconBase = 'assets/icons/atleta';
-  readonly profileTitleIconAsset = `${this.iconBase}/ic_nav_profile_24.svg`;
-  readonly hexagonSectionIconAsset = `${this.iconBase}/ic_comp_stats_24.svg`;
-  readonly overviewSectionIconAsset = `${this.iconBase}/ic_comp_trophy_24.svg`;
-  readonly outcomesSectionIconAsset = `${this.iconBase}/ic_comp_streak_24.svg`;
-  readonly positionsSectionIconAsset = `${this.iconBase}/ic_match_lineup_24.svg`;
-  readonly teamsSectionIconAsset = `${this.iconBase}/ic_match_teams_24.svg`;
+  readonly iconBase = 'assets/icons/atleta-raster-v1';
+  readonly profileTitleIconAsset = `${this.iconBase}/ic_nav_profile_96.png`;
+  readonly teamsSectionIconAsset = `${this.iconBase}/ic_match_teams_96.png`;
+  readonly settingsIconAsset = `${this.iconBase}/ic_auth_security_96.png`;
+  readonly achievementsSectionIconAsset = `${this.iconBase}/ic_comp_medal_96.png`;
+
+  get currentPlayerUuid(): string | null { return this.authSessionService.currentSession?.user.atletaUuid ?? null; }
 
   get bottomNavItems(): ReadonlyArray<MetallicBottomNavItem> {
     return buildMainBottomNav('profile', this.notificationBadgeService.totalPending());
   }
 
   isLoading = false;
+  historyUnavailable = false;
   errorMessage: string | null = null;
 
   displayName = 'Jugador';
@@ -111,10 +117,12 @@ export class PlayerProfilePage implements OnDestroy {
   overallVersatilityPercent: number | null = null;
   overallBestRole: HexagonRole | null = null;
   overallBestRoleRating: number | null = null;
+  profilePictureUrl: string | null = null;
+  isPictureUploading = false;
+  competition: CompetitionSummary = { matches: 0, goals: 0, assists: 0, wins: 0, draws: 0, losses: 0, total: 0 };
 
-  roleStats: HexagonRoleStat[] = this.demoHexagon();
-  summaryStats: Stat[] = this.demoSummary();
-  outcomeStats: Stat[] = this.demoOutcomes();
+  roleStats: HexagonRoleStat[] = [];
+  achievements: PlayerAchievement[] = [];
   playerPositions: PlayerPositionDisplay[] = [];
   memberTeams: TeamSummary[] = [];
   expandedTeamId: number | null = null;
@@ -157,26 +165,48 @@ export class PlayerProfilePage implements OnDestroy {
   }
 
   onNavItemSelected(itemId: string): void {
-    if (itemId === 'home') {
-      void this.navigationService.safeNavigate(['/home']);
+    void this.navigationService.goToMainBottomSection(itemId);
+  }
+
+  openSettings(): void {
+    void this.navigationService.safeNavigate(['/player/settings']);
+  }
+
+  openMatchHistory(): void {
+    void this.navigationService.safeNavigate(['/matches/history']);
+  }
+
+  openMatches(): void {
+    void this.navigationService.safeNavigate(['/matches']);
+  }
+
+  async onPictureSelected(event: Event): Promise<void> {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.item(0);
+    input.value = '';
+    if (!file) {
       return;
     }
-
-    if (itemId === 'matches') {
-      void this.navigationService.safeNavigate(['/matches']);
+    const allowedTypes = ['image/png', 'image/jpeg', 'image/webp'];
+    if (!allowedTypes.includes(file.type) || file.size > 3 * 1024 * 1024) {
+      await this.appToastService.error('Selecciona una imagen PNG, JPG o WebP de hasta 3 MB.');
       return;
     }
-
-    if (itemId === 'ranking') {
-      void this.navigationService.safeNavigate(['/leaderboard']);
+    const athleteUuid = this.authSessionService.currentSession?.user.atletaUuid;
+    if (!athleteUuid) {
+      await this.appToastService.error('Inicia sesión para guardar tu foto.');
       return;
     }
-
-    if (itemId === 'profile') {
-      void this.navigationService.safeNavigate(['/player/profile']);
-      return;
+    try {
+      this.isPictureUploading = true;
+      const profile = await firstValueFrom(this.userApiService.uploadPlayerPicture(athleteUuid, file));
+      this.profilePictureUrl = this.resolvePictureUrl(profile.pictureUrl);
+      await this.appToastService.success('Foto de perfil actualizada.');
+    } catch (error) {
+      await this.appToastService.error(this.errorMapper.toUserMessage(error));
+    } finally {
+      this.isPictureUploading = false;
     }
-
   }
 
   isTeamCreator(team: TeamSummary): boolean {
@@ -274,8 +304,9 @@ export class PlayerProfilePage implements OnDestroy {
     const session = this.authSessionService.currentSession;
 
     if (!session) {
-      this.errorMessage = 'Mostrando datos de demostración. Inicia sesión para ver tus estadísticas reales.';
-      this.applyDemo();
+      this.errorMessage = 'Inicia sesión para ver tus estadísticas.';
+      this.roleStats = [];
+      this.achievements = [];
       return;
     }
 
@@ -286,11 +317,13 @@ export class PlayerProfilePage implements OnDestroy {
       this.errorMessage = null;
     }
 
+    this.historyUnavailable = false;
     forkJoin({
       profile: this.userApiService.getPlayerProfile(atletaUuid).pipe(catchError(() => of(null))),
+      achievements: this.userApiService.getPlayerAchievements(atletaUuid).pipe(catchError(() => of([] as PlayerAchievement[]))),
       overall: this.ratingsApiService.getOverall(atletaUuid).pipe(catchError(() => of(null))),
       ratings: this.ratingsApiService.getByRole(atletaUuid).pipe(catchError(() => of([]))),
-      history: this.matchHistoryService.getPlayerHistory(atletaUuid).pipe(catchError(() => of([]))),
+      history: this.matchHistoryService.getPlayerHistory(atletaUuid).pipe(catchError(() => { this.historyUnavailable = true; return of([]); })),
       teams: this.teamApiService.getByPlayer(atletaUuid).pipe(catchError(() => of([] as TeamSummary[]))),
       positions: this.userApiService
         .getPlayerPositions(atletaUuid)
@@ -300,7 +333,7 @@ export class PlayerProfilePage implements OnDestroy {
         takeUntil(this.leave$),
         finalize(() => (this.isLoading = false)),
       )
-      .subscribe(({ profile, overall, ratings, history, teams, positions }) => {
+      .subscribe(({ profile, achievements, overall, ratings, history, teams, positions }) => {
         this.applyProfileData(
           session.user.nombre,
           session.user.email,
@@ -311,6 +344,7 @@ export class PlayerProfilePage implements OnDestroy {
           teams,
           positions,
         );
+        this.achievements = achievements;
         if (this.expandedTeamId && !teams.some((team) => team.id === this.expandedTeamId)) {
           this.expandedTeamId = null;
           this.inviteQuery = '';
@@ -384,24 +418,6 @@ export class PlayerProfilePage implements OnDestroy {
     }
   }
 
-  memberRoleLabel(role: TeamActiveMember['rol']): string {
-    if (role === 'CAPITAN') {
-      return 'Capitan';
-    }
-    if (role === 'DT') {
-      return 'DT';
-    }
-    return 'Jugador';
-  }
-
-  isTeamExpanded(teamId: number): boolean {
-    return this.expandedTeamId === teamId;
-  }
-
-  memberOvrLabel(ovr: number | null): string {
-    return ovr === null ? 'OVR N/D' : `OVR ${Math.round(ovr)}`;
-  }
-
   private clearInviteSearchTimer(): void {
     if (this.inviteSearchTimer) {
       window.clearTimeout(this.inviteSearchTimer);
@@ -422,9 +438,10 @@ export class PlayerProfilePage implements OnDestroy {
     this.displayName = sessionName || 'Jugador';
     this.displayAlias = profile?.alias || overall?.alias || 'Sin alias';
     this.displayEmail = sessionEmail;
+    this.profilePictureUrl = this.resolvePictureUrl(profile?.pictureUrl);
 
     const mappedHexagon = this.mapRoleStats(overall, ratings);
-    this.roleStats = mappedHexagon.length > 0 ? mappedHexagon : this.demoHexagon();
+    this.roleStats = mappedHexagon;
 
     this.overallText = overall?.classification || 'Intermedio';
     this.overallHybridOvr = overall?.hybridOVR ?? null;
@@ -436,54 +453,26 @@ export class PlayerProfilePage implements OnDestroy {
     this.overallBestRoleRating = overall?.bestRoleRating ?? null;
     const outcomeSummary = this.summarizeOutcomes(history);
 
-    this.summaryStats = [
-      {
-        label: 'Nivel General',
-        value: overall ? overall.hybridOVR.toFixed(1) : '--',
-        icon: 'trophy-outline',
-        description:
-          'Valor general de rendimiento del jugador. Resume tus calificaciones por rol en un solo indicador.',
-      },
-      {
-        label: 'Rol Destacado',
-        value:
-          overall && overall.bestRoleRating !== undefined && overall.bestRoleRating !== null
-            ? `${this.toRoleAbbreviation(overall.bestRole)} ${overall.bestRoleRating.toFixed(1)}`
-            : '--',
-        icon: 'star-outline',
-        valueClass: 'metallic-stat__value--small',
-        description:
-          'Rol donde actualmente tienes tu mejor calificación. Incluye abreviación del rol y su puntaje.',
-      },
-      {
-        label: 'Partidos Jugados',
-        value:
-          outcomeSummary.total > 0
-            ? outcomeSummary.total
-            : overall?.totalMatchesPlayed ?? this.matchesFromRatings(ratings),
-        icon: 'football-outline',
-        description: 'Cantidad total de partidos registrados para tu perfil.',
-      },
-      {
-        label: 'Indice de Versatilidad',
-        value: `${this.versatilityPercent(this.roleStats)}%`,
-        icon: 'stats-chart-outline',
-        description:
-          'Porcentaje de roles en los que mantienes rendimiento competitivo. Un valor alto indica mayor adaptación.',
-      },
-    ];
-
-    this.outcomeStats = this.buildOutcomeStats(outcomeSummary);
+    this.competition = {
+      ...outcomeSummary,
+      matches: outcomeSummary.total || overall?.totalMatchesPlayed || this.matchesFromRatings(ratings),
+      goals: history.reduce((total, item) => total + item.goals, 0),
+      assists: history.reduce((total, item) => total + item.assists, 0),
+    };
     this.memberTeams = teams;
     this.playerPositions = this.toPositionDisplay(positions);
   }
 
-  private buildOutcomeStats(summary: OutcomeSummary): Stat[] {
-    return [
-      { label: 'Victorias', value: summary.wins, icon: 'trophy-outline' },
-      { label: 'Empates', value: summary.draws, icon: 'stats-chart-outline' },
-      { label: 'Derrotas', value: summary.losses, icon: 'football-outline' },
-    ];
+  roleDisplay(role: HexagonRole | null): string {
+    const labels: Record<HexagonRole, string> = {
+      ATAQUE: 'Ataque',
+      MEDIOCAMPO: 'Mediocampo',
+      CARRILERO: 'Carrilero',
+      DEFENSA: 'Defensa',
+      ARQUERO: 'Arquero',
+      DT: 'DT',
+    };
+    return role ? labels[role] : '--';
   }
 
   private summarizeOutcomes(history: MatchHistoryViewItem[]): OutcomeSummary {
@@ -504,13 +493,15 @@ export class PlayerProfilePage implements OnDestroy {
     this.displayName = name || 'Jugador demo';
     this.displayAlias = 'El Todoterreno';
     this.displayEmail = email || 'demo@atleta.app';
+    this.profilePictureUrl = 'assets/fixtures/player-profile-demo.png';
     this.roleStats = this.demoHexagon();
-    this.summaryStats = this.demoSummary();
-    this.outcomeStats = this.demoOutcomes();
+    this.competition = { matches: 18, goals: 12, assists: 6, wins: 11, draws: 3, losses: 4, total: 18 };
+    this.achievements = this.demoAchievements();
     this.memberTeams = [];
     this.playerPositions = [
       { name: 'Delantero', priorityLabel: 'Principal' },
       { name: 'Mediocampista', priorityLabel: 'Secundaria' },
+      { name: 'Defensa', priorityLabel: 'Terciaria' },
     ];
     this.overallText = 'Experto';
     this.overallHybridOvr = 83.8;
@@ -519,12 +510,33 @@ export class PlayerProfilePage implements OnDestroy {
     this.overallBestRoleRating = 85;
   }
 
+  private demoAchievements(): PlayerAchievement[] {
+    return [
+      { code: 'TOP_SCORER', title: 'Goleador', description: 'Marca goles en partidos finalizados.', metricLabel: 'goles', currentValue: 12, nextThreshold: 15, progressPercent: 80, tier: 'BRONZE', unlocked: true },
+      { code: 'TOP_ASSIST', title: 'Asistente máximo', description: 'Genera goles para tu equipo.', metricLabel: 'asistencias', currentValue: 6, nextThreshold: 12, progressPercent: 50, tier: 'BRONZE', unlocked: true },
+      { code: 'MATCH_VETERAN', title: 'Partidos jugados', description: 'Compite y confirma presencia en partidos finalizados.', metricLabel: 'partidos', currentValue: 18, nextThreshold: 30, progressPercent: 60, tier: 'BRONZE', unlocked: true },
+      { code: 'MATCH_CREATOR', title: 'Creador de partidos', description: 'Organiza encuentros válidos para la comunidad.', metricLabel: 'partidos creados', currentValue: 3, nextThreshold: 10, progressPercent: 30, tier: 'BRONZE', unlocked: true },
+      { code: 'MATCH_WINNER', title: 'Partidos ganados', description: 'Acumula victorias en partidos finalizados.', metricLabel: 'victorias', currentValue: 4, nextThreshold: 5, progressPercent: 80, tier: null, unlocked: false },
+    ];
+  }
+
 
   private toPositionDisplay(positions: PlayerAssignedPosition[]): PlayerPositionDisplay[] {
     return positions.map((position) => ({
       name: position.positionName,
       priorityLabel: this.priorityLabel(position.prioridad),
     }));
+  }
+
+  private resolvePictureUrl(pictureUrl?: string): string | null {
+    if (!pictureUrl) {
+      return null;
+    }
+    if (/^https?:\/\//i.test(pictureUrl)) {
+      return pictureUrl;
+    }
+    const apiOrigin = this.appConfig.apiBaseUrl.replace(/\/api\/v1\/?$/, '');
+    return `${apiOrigin}${pictureUrl.startsWith('/') ? pictureUrl : `/${pictureUrl}`}`;
   }
 
   private priorityLabel(prioridad: number): string {
@@ -629,45 +641,5 @@ export class PlayerProfilePage implements OnDestroy {
     ];
   }
 
-  private demoSummary(): Stat[] {
-    return [
-      {
-        label: 'Nivel General',
-        value: '83.8',
-        icon: 'trophy-outline',
-        description:
-          'Valor general de rendimiento del jugador. Resume tus calificaciones por rol en un solo indicador.',
-      },
-      {
-        label: 'Rol Destacado',
-        value: 'ATQ 85.0',
-        icon: 'star-outline',
-        valueClass: 'metallic-stat__value--small',
-        description:
-          'Rol donde actualmente tienes tu mejor calificación. Incluye abreviación del rol y su puntaje.',
-      },
-      {
-        label: 'Partidos Jugados',
-        value: 113,
-        icon: 'football-outline',
-        description: 'Cantidad total de partidos registrados para tu perfil.',
-      },
-      {
-        label: 'Indice de Versatilidad',
-        value: '67%',
-        icon: 'stats-chart-outline',
-        description:
-          'Porcentaje de roles en los que mantienes rendimiento competitivo. Un valor alto indica mayor adaptación.',
-      },
-    ];
-  }
-
-  private demoOutcomes(): Stat[] {
-    return [
-      { label: 'Victorias', value: 21, icon: 'trophy-outline' },
-      { label: 'Empates', value: 4, icon: 'stats-chart-outline' },
-      { label: 'Derrotas', value: 8, icon: 'football-outline' },
-    ];
-  }
 }
 

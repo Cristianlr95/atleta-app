@@ -76,7 +76,7 @@ export class MetallicLocationPickerComponent implements AfterViewInit, OnChanges
       return;
     }
 
-    this.leaflet = await import('leaflet');
+    this.leaflet = (await import('leaflet')).default;
     this.map = this.leaflet.map(this.mapContainer.nativeElement, {
       center: [this.centerLat, this.centerLng],
       zoom: this.zoom,
@@ -221,6 +221,18 @@ export class MetallicLocationPickerComponent implements AfterViewInit, OnChanges
 
     this.updateSelectedLocation(selected.latitud, selected.longitud, true);
     this.helperMessage = `Cancha seleccionada: ${selected.nombre}.`;
+  }
+
+  onSetCoordinates(latitude: string, longitude: string): void {
+    const lat = Number(latitude);
+    const lng = Number(longitude);
+    if (!latitude.trim() || !longitude.trim() || !Number.isFinite(lat) || !Number.isFinite(lng) || Math.abs(lat) > 90 || Math.abs(lng) > 180) {
+      this.helperMessage = 'Introduce una latitud entre -90 y 90 y una longitud entre -180 y 180.';
+      return;
+    }
+    this.updateSelectedLocation(lat, lng, true);
+    this.selectedFieldId = '';
+    this.helperMessage = 'Coordenadas seleccionadas.';
   }
 
   onSaveField(): void {

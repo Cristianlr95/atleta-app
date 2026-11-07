@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, ViewChild, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { IonicModule } from '@ionic/angular';
+import { IonicModule, IonContent } from '@ionic/angular';
 import { Router } from '@angular/router';
 import { AppToastService } from 'src/app/core/services/app-toast.service';
 import { ErrorMapperService } from 'src/app/core/services/error-mapper.service';
@@ -12,15 +12,15 @@ import { TeamApiService } from 'src/app/features/teams/services/team-api.service
 import { MetallicButtonComponent } from 'src/app/shared/ui/metallic-button/metallic-button.component';
 import { MetallicCardComponent } from 'src/app/shared/ui/metallic-card/metallic-card.component';
 import { MetallicFormSectionComponent } from 'src/app/shared/ui/metallic-form-section/metallic-form-section.component';
-import { MetallicProgressComponent } from 'src/app/shared/ui/metallic-progress/metallic-progress.component';
 import { MetallicSelectComponent, MetallicSelectOption } from 'src/app/shared/ui/metallic-select/metallic-select.component';
-import { PageNavComponent } from 'src/app/shared/ui/page-nav/page-nav.component';
+import { buildMainBottomNav } from 'src/app/shared/navigation/main-bottom-nav';
+import { MetallicBottomNavComponent, MetallicBottomNavItem } from 'src/app/shared/ui/metallic-bottom-nav/metallic-bottom-nav.component';
+import { NotificationBadgeService } from '../../services/notification-badge.service';
 import { MatchGenderCategory, MatchSize, MatchType, Player } from '../../models/progressive-match.models';
 import { MatchService } from '../../services/match.service';
 import { MatchScheduleFormComponent, MatchScheduleValue } from '../../components/match-schedule-form/match-schedule-form.component';
 import { MatchTypeSelectorComponent } from '../../components/match-type-selector/match-type-selector.component';
 import { PlayerSelectListComponent } from '../../components/player-select-list/player-select-list.component';
-import { RatingsApiService } from 'src/app/features/ratings/services/ratings-api.service';
 import { firstValueFrom } from 'rxjs';
 
 @Component({
@@ -32,8 +32,7 @@ import { firstValueFrom } from 'rxjs';
     IonicModule,
     MetallicCardComponent,
     MetallicFormSectionComponent,
-    MetallicProgressComponent,
-    PageNavComponent,
+    MetallicBottomNavComponent,
     MetallicButtonComponent,
     MatchTypeSelectorComponent,
     MatchScheduleFormComponent,
@@ -44,24 +43,26 @@ import { firstValueFrom } from 'rxjs';
   styleUrls: ['./matches-create.page.scss'],
 })
 export class MatchesCreatePage {
+  @ViewChild(IonContent) private content?: IonContent;
   private readonly authSessionService = inject(AuthSessionService);
   private readonly teamApiService = inject(TeamApiService);
-  private readonly ratingsApiService = inject(RatingsApiService);
   readonly matchService = inject(MatchService);
   private readonly navigationService = inject(NavigationService);
   private readonly appToastService = inject(AppToastService);
   private readonly errorMapper = inject(ErrorMapperService);
   private readonly router = inject(Router);
+  private readonly notificationBadgeService = inject(NotificationBadgeService);
 
   readonly step = signal(1);
-  readonly totalSteps = 4;
+  readonly totalSteps = 3;
+  readonly stepLabels = ['Configurar', 'Convocar', 'Confirmar'];
 
-  readonly iconBase = 'assets/icons/atleta';
-  readonly titleIconAsset = `${this.iconBase}/ic_match_create_24.svg`;
-  readonly typeIconAsset = `${this.iconBase}/ic_match_format_24.svg`;
-  readonly scheduleIconAsset = `${this.iconBase}/ic_match_calendar_24.svg`;
-  readonly playersIconAsset = `${this.iconBase}/ic_match_invite_24.svg`;
-  readonly confirmIconAsset = `${this.iconBase}/ic_action_accept_24.svg`;
+  readonly iconBase = 'assets/icons/atleta-raster-v1';
+  readonly titleIconAsset = `${this.iconBase}/ic_match_create_96.png`;
+  readonly typeIconAsset = `${this.iconBase}/ic_match_format_96.png`;
+  readonly scheduleIconAsset = `${this.iconBase}/ic_match_calendar_96.png`;
+  readonly playersIconAsset = `${this.iconBase}/ic_match_invite_96.png`;
+  readonly confirmIconAsset = `${this.iconBase}/ic_action_accept_96.png`;
 
   readonly teams = signal<TeamSummary[]>([]);
   readonly loadingTeams = signal(false);
@@ -71,6 +72,11 @@ export class MatchesCreatePage {
   private loadTeamsInFlight: Promise<void> | null = null;
 
   readonly selectedMatchType = signal<MatchType | null>(null);
+  readonly rotativeGoalkeeper = signal(false);
+  readonly goalkeeperOptions: MetallicSelectOption[] = [
+    { label: 'Arquero fijo', value: 'fixed' },
+    { label: 'Arquero rotativo', value: 'rotative' },
+  ];
   readonly schedule = signal<MatchScheduleValue>({
     teamId: null,
     modality: MatchSize.FIVE_VS_FIVE,
@@ -107,12 +113,9 @@ export class MatchesCreatePage {
 
   readonly canContinue = computed(() => {
     if (this.step() === 1) {
-      return this.selectedMatchType() !== null;
-    }
-
-    if (this.step() === 2) {
       const value = this.schedule();
       return (
+        this.selectedMatchType() !== null &&
         !!value.teamId &&
         !!value.location &&
         !!value.venue &&
@@ -121,9 +124,9 @@ export class MatchesCreatePage {
       );
     }
 
-    if (this.step() === 3) {
+    if (this.step() === 2) {
       return (
-        this.selectedPlayerIds().length > 0 &&
+        this.totalInvitedWithCreator() >= this.schedule().minRequired &&
         !!this.kitColors().home &&
         !!this.kitColors().away &&
         this.kitColors().home !== this.kitColors().away
@@ -133,12 +136,33 @@ export class MatchesCreatePage {
     return true;
   });
 
+  readonly totalInvitedWithCreator = computed(() => this.selectedPlayerIds().length + 1);
+
+  readonly viabilityLabel = computed(() => {
+    const total = this.totalInvitedWithCreator();
+    const minRequired = this.schedule().minRequired;
+    if (total >= minRequired) {
+      return `${total}/${minRequired} convocados. Partido viable si todos confirman.`;
+    }
+
+    return `${total}/${minRequired} convocados. Faltan ${minRequired - total} para armar partido.`;
+  });
+
   ionViewWillEnter(): void {
     void this.loadTeams();
+    void this.notificationBadgeService.refresh();
   }
+
+  get bottomNavItems(): ReadonlyArray<MetallicBottomNavItem> {
+    return buildMainBottomNav('matches', this.notificationBadgeService.totalPending());
+  }
+
+  onBack(): void { void this.navigationService.goBackOrProfile(); }
+  onNavItemSelected(itemId: string): void { void this.navigationService.goToMainBottomSection(itemId); }
 
   onPrevious(): void {
     this.step.update((current) => Math.max(1, current - 1));
+    void this.content?.scrollToTop(0);
   }
 
   async onContinue(): Promise<void> {
@@ -146,7 +170,7 @@ export class MatchesCreatePage {
       return;
     }
 
-    if (this.step() === 2) {
+    if (this.step() === 1) {
       await this.loadTeamPlayers();
       if (this.loadPlayersError()) {
         return;
@@ -154,6 +178,7 @@ export class MatchesCreatePage {
     }
 
     this.step.update((current) => Math.min(this.totalSteps, current + 1));
+    await this.content?.scrollToTop(0);
   }
 
   onScheduleChange(value: MatchScheduleValue): void {
@@ -167,7 +192,8 @@ export class MatchesCreatePage {
   }
 
   onSelectionChange(playerIds: string[]): void {
-    this.selectedPlayerIds.set(playerIds);
+    const creatorUuid = this.authSessionService.currentSession?.user.atletaUuid;
+    this.selectedPlayerIds.set([...new Set(playerIds)].filter((uuid) => uuid !== creatorUuid));
   }
 
   onKitColorChange(team: 'home' | 'away', color: string): void {
@@ -233,6 +259,7 @@ export class MatchesCreatePage {
     const selectedPlayers = this.teamPlayers().filter((player) => this.selectedPlayerIds().includes(player.uuid));
     const draft = this.matchService.createDraft({
       type,
+      rotativeGoalkeeper: this.rotativeGoalkeeper(),
       modality: value.modality,
       genderCategory: value.genderCategory,
       team: { id: team.id, name: team.nombre },
@@ -383,36 +410,19 @@ export class MatchesCreatePage {
     this.loadPlayersError.set(null);
     try {
       const members = await firstValueFrom(this.teamApiService.getActiveMembers(teamId));
-      const players = await Promise.all(
-        members.map(async (member) => {
-          const ovr = await this.resolvePlayerOvr(member.playerUuid);
-          return {
-            uuid: member.playerUuid,
-            name: member.alias,
-            position: member.primaryPositionName ?? 'Sin posición',
-            role: member.rol,
-            ovr,
-          } as Player;
-        }),
-      );
+      const creatorUuid = this.authSessionService.currentSession?.user.atletaUuid;
+      const players = members.filter((member) => member.playerUuid !== creatorUuid).map((member) => ({
+        uuid: member.playerUuid,
+        name: member.alias,
+        position: member.primaryPositionName ?? 'Sin posición',
+        role: member.rol,
+        ovr: Number.isFinite(Number(member.ovr)) ? Math.round(Number(member.ovr)) : 65,
+      } as Player));
       this.teamPlayers.set(players);
     } catch (error) {
       this.loadPlayersError.set(this.errorMapper.toUserMessage(error, 'matches'));
     } finally {
       this.loadingPlayers.set(false);
-    }
-  }
-
-  private async resolvePlayerOvr(playerUuid: string): Promise<number> {
-    try {
-      const overall = await firstValueFrom(this.ratingsApiService.getOverall(playerUuid));
-      const raw = Number(overall?.hybridOVR);
-      if (!Number.isFinite(raw)) {
-        return 65;
-      }
-      return Math.round(raw);
-    } catch {
-      return 65;
     }
   }
 

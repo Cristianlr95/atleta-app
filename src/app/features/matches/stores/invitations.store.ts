@@ -1,11 +1,19 @@
-import { computed, Injectable, signal } from '@angular/core';
+import { computed, Injectable, inject, signal } from '@angular/core';
 import { AuthSessionService } from 'src/app/core/services/auth-session.service';
 import { ErrorMapperService } from 'src/app/core/services/error-mapper.service';
-import { Invitation, PlayerInvitationStatus } from '../models/progressive-match.models';
+import { SocialRequestItem } from '../../social/models/social.models';
+import {
+  Invitation,
+  InvitationDeliveryStatus,
+  PlayerInvitationStatus,
+} from '../models/progressive-match.models';
 import { InvitationService } from '../services/invitation.service';
 
 @Injectable({ providedIn: 'root' })
 export class InvitationsStore {
+  private readonly invitationApi = inject(InvitationService);
+  private readonly errorMapper = inject(ErrorMapperService);
+  private readonly authSessionService = inject(AuthSessionService);
   private readonly invitationStore = signal<Invitation[]>([]);
   private readonly loadingStore = signal(false);
   private readonly errorStore = signal<string | null>(null);
@@ -32,12 +40,6 @@ export class InvitationsStore {
     }),
   );
 
-  constructor(
-    private readonly invitationApi: InvitationService,
-    private readonly errorMapper: ErrorMapperService,
-    private readonly authSessionService: AuthSessionService,
-  ) {}
-
   async loadPendingInvitations(): Promise<boolean> {
     this.loadingStore.set(true);
     this.errorStore.set(null);
@@ -55,14 +57,22 @@ export class InvitationsStore {
         status:
           invite.status === 'ACEPTADA'
             ? PlayerInvitationStatus.ACCEPTED
+            : invite.status === 'LISTA_ESPERA'
+              ? PlayerInvitationStatus.WAITLIST
             : invite.status === 'RECHAZADA'
               ? PlayerInvitationStatus.DECLINED
+              : invite.status === 'CANCELADA'
+                ? PlayerInvitationStatus.DECLINED
               : PlayerInvitationStatus.PENDING,
+        deliveryStatus: InvitationDeliveryStatus.SENT,
         createdAt: invite.createdAt ?? new Date().toISOString(),
         respondedAt: invite.respondedAt,
       }))
       .filter((invite) => !currentUserUuid || invite.targetUuid === currentUserUuid);
-      this.invitationStore.set(mapped);
+      const outgoing = this.invitationStore().filter(
+        (invitation) => !!currentUserUuid && invitation.targetUuid !== currentUserUuid,
+      );
+      this.invitationStore.set([...mapped, ...outgoing]);
       return true;
     } catch (error) {
       this.errorStore.set(this.errorMapper.toUserMessage(error, 'invitations'));
@@ -91,8 +101,21 @@ export class InvitationsStore {
     );
 
     try {
-      await this.invitationApi.respondInviteByBackendId(current.backendInviteId, accept);
-      return optimistic;
+      const response = await this.invitationApi.respondInviteByBackendId(current.backendInviteId, accept);
+      if (!response) {
+        throw new Error('No se pudo actualizar la invitacion.');
+      }
+      const resolved: Invitation = {
+        ...optimistic,
+        status: response.status === 'LISTA_ESPERA'
+          ? PlayerInvitationStatus.WAITLIST
+          : response.status === 'ACEPTADA'
+            ? PlayerInvitationStatus.ACCEPTED
+            : PlayerInvitationStatus.DECLINED,
+        respondedAt: response.respondedAt ?? optimistic.respondedAt,
+      };
+      this.invitationStore.update((items) => items.map((item) => item.id === invitationId ? resolved : item));
+      return resolved;
     } catch (error) {
       this.invitationStore.update((items) =>
         items.map((item) =>
@@ -151,6 +174,65 @@ export class InvitationsStore {
     this.invitationStore.set([...invitations, ...preserved]);
   }
 
+  hydrateMatchInvitations(
+    localMatchId: string,
+    backendMatchId: number,
+    invites: SocialRequestItem[],
+  ): void {
+    if (invites.length === 0) {
+      return;
+    }
+
+    const current = this.invitationStore().filter((item) => item.matchId === localMatchId);
+    const currentByTarget = new Map(current.map((item) => [item.targetUuid, item]));
+    const serverTargets = new Set(invites.map((item) => item.targetUuid));
+    const hydrated: Invitation[] = invites.map((invite) => {
+      const previous = currentByTarget.get(invite.targetUuid);
+      return {
+        id: previous?.id ?? `api-${invite.id}`,
+        matchId: localMatchId,
+        backendMatchId,
+        backendInviteId: invite.id,
+        targetUuid: invite.targetUuid,
+        targetName: previous?.targetName || invite.targetAlias || 'Jugador',
+        status:
+          invite.status === 'ACEPTADA'
+            ? PlayerInvitationStatus.ACCEPTED
+            : invite.status === 'LISTA_ESPERA'
+              ? PlayerInvitationStatus.WAITLIST
+            : invite.status === 'RECHAZADA'
+              ? PlayerInvitationStatus.DECLINED
+              : invite.status === 'CANCELADA'
+                ? PlayerInvitationStatus.DECLINED
+              : PlayerInvitationStatus.PENDING,
+        deliveryStatus: InvitationDeliveryStatus.SENT,
+        createdAt: invite.createdAt ?? previous?.createdAt ?? new Date().toISOString(),
+        respondedAt: invite.respondedAt,
+      };
+    });
+    const unresolved = current.filter(
+      (item) =>
+        !serverTargets.has(item.targetUuid) &&
+        (item.deliveryStatus === InvitationDeliveryStatus.FAILED ||
+          item.deliveryStatus === InvitationDeliveryStatus.RETRYING),
+    );
+    const otherMatches = this.invitationStore().filter((item) => item.matchId !== localMatchId);
+    this.invitationStore.set([...hydrated, ...unresolved, ...otherMatches]);
+  }
+
+  setDeliveryStatus(
+    invitationIds: string[],
+    deliveryStatus: InvitationDeliveryStatus,
+    deliveryMessage?: string,
+  ): void {
+    const ids = new Set(invitationIds);
+    this.invitationStore.update((items) =>
+      items.map((item) =>
+        ids.has(item.id) ? { ...item, deliveryStatus, deliveryMessage } : item,
+      ),
+    );
+  }
+
   replaceMatchInvitesByBackendMatch(
     backendMatchId: number,
     updates: Array<{ backendInviteId: number; status: PlayerInvitationStatus }>,
@@ -180,5 +262,11 @@ export class InvitationsStore {
         };
       }),
     );
+  }
+
+  clear(): void {
+    this.invitationStore.set([]);
+    this.loadingStore.set(false);
+    this.errorStore.set(null);
   }
 }

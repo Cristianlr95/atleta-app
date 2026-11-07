@@ -1,11 +1,14 @@
-﻿import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ActivatedRoute, Router } from '@angular/router';
 import { of } from 'rxjs';
+import { AppToastService } from 'src/app/core/services/app-toast.service';
 import { AuthSessionService } from 'src/app/core/services/auth-session.service';
 import { MatchHistoryViewItem } from 'src/app/features/matches/services/match-history.service';
+import { MatchType } from 'src/app/features/matches/models/progressive-match.models';
 import { MatchHistoryService } from 'src/app/features/matches/services/match-history.service';
 import { RatingsApiService } from 'src/app/features/ratings/services/ratings-api.service';
 import { provideAppConfigMock, provideHttpTesting } from 'src/test/testbed-providers';
+import { PlayerProfile } from '../../models/user.models';
 import { PlayerPositionStateService } from '../../services/player-position-state.service';
 import { UserApiService } from '../../services/user-api.service';
 import { PlayerProfilePage } from './player-profile.page';
@@ -13,8 +16,25 @@ import { PlayerProfilePage } from './player-profile.page';
 describe('PlayerProfilePage', () => {
   let component: PlayerProfilePage;
   let fixture: ComponentFixture<PlayerProfilePage>;
+  let authSessionService: { currentSession: unknown };
+  let userApiService: jasmine.SpyObj<UserApiService>;
+  let appToastService: jasmine.SpyObj<AppToastService>;
 
   beforeEach(async () => {
+    authSessionService = {
+      currentSession: null,
+    };
+    userApiService = jasmine.createSpyObj<UserApiService>('UserApiService', [
+      'getPlayerProfile',
+      'changePassword',
+    ]);
+    userApiService.getPlayerProfile.and.returnValue(of({} as PlayerProfile));
+    userApiService.changePassword.and.returnValue(of(void 0));
+    appToastService = jasmine.createSpyObj<AppToastService>('AppToastService', ['success', 'error', 'info']);
+    appToastService.success.and.resolveTo();
+    appToastService.error.and.resolveTo();
+    appToastService.info.and.resolveTo();
+
     await TestBed.configureTestingModule({
       imports: [PlayerProfilePage],
       providers: [
@@ -22,15 +42,15 @@ describe('PlayerProfilePage', () => {
         ...provideHttpTesting(),
         {
           provide: AuthSessionService,
-          useValue: {
-            currentSession: null,
-          },
+          useValue: authSessionService,
         },
         {
           provide: UserApiService,
-          useValue: {
-            getPlayerProfile: () => of(null),
-          },
+          useValue: userApiService,
+        },
+        {
+          provide: AppToastService,
+          useValue: appToastService,
         },
         {
           provide: RatingsApiService,
@@ -75,11 +95,42 @@ describe('PlayerProfilePage', () => {
     fixture.detectChanges();
   });
 
+  it('no muestra métricas provisionales mientras carga el perfil', () => {
+    component.isLoading = true;
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelector('.player-command-center')).toBeNull();
+    expect(fixture.nativeElement.textContent).toContain('Actualizando estadísticas');
+  });
+  it('no muestra ceros como estadísticas cuando falla el historial', () => {
+    component.historyUnavailable = true;
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelector('.competition-metrics')).toBeNull();
+    expect(fixture.nativeElement.textContent).toContain('No se pudieron cargar las estadísticas de competición');
+  });
+  it('no muestra estadísticas de ejemplo en un perfil sin datos', () => {
+    expect(component.roleStats).toEqual([]);
+    expect(component.achievements).toEqual([]);
+    (component as any).applyProfileData('Jugador', 'jugador@atleta.test', null, null, [], [], [], []);
+    expect(component.roleStats).toEqual([]);
+    fixture.detectChanges();
+    expect(fixture.nativeElement.textContent).toContain('No hay estadísticas por posición disponibles');
+    expect(fixture.nativeElement.textContent).toContain('No hay trofeos disponibles');
+  });
+  it('identifica el equipo y el estado del panel de integrantes', () => {
+    component.memberTeams = [{ id: 7, nombre: 'Azul' } as any];
+    fixture.detectChanges();
+    const button: HTMLButtonElement = fixture.nativeElement.querySelector('.profile-team__btn--icon');
+    expect(button.getAttribute('aria-expanded')).toBe('false');
+    expect(button.getAttribute('aria-label')).toContain('Azul');
+    component.expandedTeamId = 7;
+    fixture.detectChanges();
+    expect(button.getAttribute('aria-expanded')).toBe('true');
+  });
   it('should create', () => {
     expect(component).toBeTruthy();
   });
 
-  it('keeps Partidos Jugados aligned with victories, draws and losses', () => {
+  it('keeps the competition summary aligned with victories, draws and losses', () => {
     const history: MatchHistoryViewItem[] = [
       buildHistoryItem(1, 'GANADO'),
       buildHistoryItem(2, 'EMPATADO'),
@@ -119,12 +170,13 @@ describe('PlayerProfilePage', () => {
       [],
     );
 
-    const played = Number(component.summaryStats.find((stat) => stat.label === 'Partidos Jugados')?.value);
-    const totalOutcomes = component.outcomeStats.reduce((sum, stat) => sum + Number(stat.value), 0);
+    const played = component.competition.matches;
+    const totalOutcomes = component.competition.wins + component.competition.draws + component.competition.losses;
 
     expect(played).toBe(3);
     expect(played).toBe(totalOutcomes);
   });
+
 });
 
 function buildHistoryItem(
@@ -135,6 +187,8 @@ function buildHistoryItem(
     id,
     scheduledAtEpoch: null,
     modality: 'CINCO_VS_CINCO',
+    matchType: MatchType.FRIENDLY,
+    typeLabel: 'Amistoso',
     status: 'FINALIZADO',
     displayStatusKey: 'FINISHED',
     modalityLabel: '5 vs 5',

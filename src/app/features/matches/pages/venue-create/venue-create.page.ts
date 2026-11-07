@@ -1,9 +1,10 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, computed, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { IonicModule } from '@ionic/angular';
 import { catchError, firstValueFrom, of, timeout } from 'rxjs';
 import { NavigationService } from 'src/app/core/services/navigation.service';
+import { PageLoadGuard } from 'src/app/core/utils/page-load-guard';
 import { FieldLocationsApiService } from 'src/app/features/fields/services/field-locations-api.service';
 import {
   MetallicLocationPickerComponent,
@@ -26,24 +27,26 @@ import { PageNavComponent } from 'src/app/shared/ui/page-nav/page-nav.component'
   templateUrl: './venue-create.page.html',
   styleUrls: ['./venue-create.page.scss'],
 })
-export class VenueCreatePage implements OnInit {
+export class VenueCreatePage {
   private readonly fieldLocationsApiService = inject(FieldLocationsApiService);
   private readonly navigationService = inject(NavigationService);
   private readonly route = inject(ActivatedRoute);
+  private readonly enterLoadGuard = new PageLoadGuard();
 
-  readonly titleIconAsset = 'assets/icons/atleta/ic_match_location_24.svg';
+  readonly titleIconAsset = 'assets/icons/atleta-raster-v1/ic_match_location_96.png';
 
   readonly fields = signal<SavedFieldLocation[]>([]);
   readonly loading = signal(false);
   readonly saveError = signal<string | null>(null);
+  readonly fieldsError = signal(false);
 
   readonly selectedLat = signal<number | null>(null);
   readonly selectedLng = signal<number | null>(null);
 
   readonly hasCoordinates = computed(() => this.selectedLat() !== null && this.selectedLng() !== null);
 
-  async ngOnInit(): Promise<void> {
-    void this.loadFields();
+  ionViewWillEnter(): void {
+    void this.enterLoadGuard.runSingle(() => this.loadFields());
   }
 
   async onSaveField(payload: SaveFieldLocationRequest): Promise<void> {
@@ -68,13 +71,18 @@ export class VenueCreatePage implements OnInit {
     this.selectedLng.set(coords.lng);
   }
 
-  private async loadFields(): Promise<void> {
+  async loadFields(): Promise<void> {
+    this.fieldsError.set(false);
     const fields = await firstValueFrom(
       this.fieldLocationsApiService.getFieldLocations(undefined, true).pipe(
         timeout(4000),
-        catchError(() => of([])),
+        catchError(() => of(null)),
       ),
     );
+    if (fields === null) {
+      this.fieldsError.set(true);
+      return;
+    }
     this.fields.set(
       fields.map((item) => ({
         id: item.id,
