@@ -1,7 +1,14 @@
+:host {
+  display: block;
+  width: 100%;
+  max-width: 980px;
+  margin-inline: auto;
+}
+
 .metallic-bottom-nav {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(108px, 1fr));
-  gap: 7px;
+  gap: 8px;
   width: 100%;
 }
 
@@ -9,17 +16,17 @@
   position: relative;
   display: flex;
   min-width: 0;
-  min-height: 48px;
+  min-height: 56px;
   align-items: center;
   justify-content: center;
-  gap: 7px;
+  gap: 8px;
   border: 1px solid var(--tactical-line);
   border-radius: 6px;
   background: #07151c;
   color: #9eafb5;
   cursor: pointer;
   font-family: var(--font-family-display);
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 700;
   letter-spacing: 0.045em;
   text-transform: uppercase;
@@ -30,8 +37,8 @@
     color 150ms ease;
 
   img.atleta-raster-icon {
-    width: 20px;
-    height: 20px;
+    width: 24px;
+    height: 24px;
   }
 
   .metallic-bottom-nav__label {
@@ -61,7 +68,7 @@
   background: #0a2732;
   color: var(--tactical-visit);
   font-family: var(--font-family-display);
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.02em;
   line-height: 1;
@@ -89,16 +96,17 @@
   }
 
   .metallic-bottom-nav__item {
-    min-height: 56px;
+    min-height: 60px;
     padding: 5px 2px;
     flex-direction: column;
-    gap: 3px;
-    font-size: 12px;
+    gap: 4px;
+    font-size: 13px;
     letter-spacing: 0;
+    line-height: 1;
 
     img.atleta-raster-icon {
-      width: 24px;
-      height: 24px;
+      width: 28px;
+      height: 28px;
     }
   }
 }

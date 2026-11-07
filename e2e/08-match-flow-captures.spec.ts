@@ -2,8 +2,8 @@ import { expect, Page, Route, test } from '@playwright/test';
 import { mkdirSync } from 'node:fs';
 import { join } from 'node:path';
 
-const captureDirectory = join(process.cwd(), 'docs', 'flow-captures');
-const homeReviewDirectory = join(process.cwd(), 'docs', 'auditoria-ux-2026-11-06', 'inicio');
+const captureDirectory = join(process.cwd(), 'docs', 'auditoria-ux-2026-11-07', 'capturas', 'etapa-1', 'recorridos');
+const homeReviewDirectory = join(process.cwd(), 'docs', 'auditoria-ux-2026-11-07', 'capturas', 'etapa-1', 'inicio');
 
 test.describe('Flujo visual integral de partidos', () => {
   test.beforeAll(() => {
@@ -13,7 +13,12 @@ test.describe('Flujo visual integral de partidos', () => {
 
   test('muestra Inicio sin desbordamiento en movil y escritorio', async ({ page }) => {
     await installFlowFixture(page);
-    for (const viewport of [{ width: 320, height: 760 }, { width: 390, height: 844 }, { width: 1366, height: 768 }]) {
+    for (const viewport of [
+      { width: 320, height: 760 },
+      { width: 390, height: 844 },
+      { width: 768, height: 1024 },
+      { width: 1440, height: 900 },
+    ]) {
       await page.setViewportSize(viewport);
       await page.goto('/home');
       await expect(page.getByRole('button', { name: 'Ver historial' })).toBeVisible();
@@ -48,6 +53,95 @@ test.describe('Flujo visual integral de partidos', () => {
       });
     }
   });
+
+  test('la navegacion principal conserva legibilidad, foco y alineacion', async ({ page }) => {
+    await installFlowFixture(page);
+    for (const viewport of [
+      { width: 320, height: 760 },
+      { width: 390, height: 844 },
+      { width: 768, height: 1024 },
+      { width: 1440, height: 900 },
+    ]) {
+      await page.setViewportSize(viewport);
+      await page.goto('/home');
+
+      const nav = page.getByRole('navigation', { name: 'Navegación inferior' });
+      const buttons = nav.getByRole('button');
+      await expect(nav).toBeVisible();
+      await expect(buttons).toHaveCount(4);
+      await expect(buttons.first()).toHaveAttribute('aria-current', 'page');
+      await expect(buttons.nth(1)).toHaveCSS('font-size', viewport.width <= 600 ? '13px' : '14px');
+      await expect(buttons.nth(1).locator('img')).toHaveCSS(
+        'width',
+        viewport.width <= 600 ? '28px' : '24px',
+      );
+
+      const navBox = await nav.boundingBox();
+      expect(navBox).not.toBeNull();
+      expect(navBox!.x).toBeGreaterThanOrEqual(0);
+      expect(navBox!.x + navBox!.width).toBeLessThanOrEqual(viewport.width);
+      if (viewport.width === 1440) {
+        expect(navBox!.width).toBeLessThanOrEqual(980);
+        expect(Math.abs(navBox!.x - (viewport.width - navBox!.width) / 2)).toBeLessThanOrEqual(1);
+      }
+
+      const inactiveStyles = await buttons.nth(1).evaluate((element) => {
+        const button = getComputedStyle(element);
+        const icon = element.querySelector('img')!;
+        return {
+          color: button.color,
+          backgroundColor: button.backgroundColor,
+          fontSize: Number.parseFloat(button.fontSize),
+          iconSize: Number.parseFloat(getComputedStyle(icon).width),
+        };
+      });
+      expect(inactiveStyles.fontSize).toBeGreaterThanOrEqual(viewport.width <= 600 ? 13 : 14);
+      expect(inactiveStyles.iconSize).toBeGreaterThanOrEqual(viewport.width <= 600 ? 28 : 24);
+      expect(contrastRatio(inactiveStyles.color, inactiveStyles.backgroundColor)).toBeGreaterThanOrEqual(4.5);
+
+      for (let index = 0; index < 4; index += 1) {
+        await expect(buttons.nth(index)).toBeVisible();
+      }
+      const buttonHeights = await buttons.evaluateAll((elements) =>
+        elements.map((element) => element.getBoundingClientRect().height),
+      );
+      expect(buttonHeights).toHaveLength(4);
+      expect(buttonHeights.every((height) => height >= 44), `${viewport.width}px nav heights: ${buttonHeights.join(', ')}`).toBe(true);
+
+      const focusedNavItem = nav.locator('.metallic-bottom-nav__item:focus');
+      for (let tab = 0; tab < 20 && await focusedNavItem.count() === 0; tab += 1) {
+        await page.keyboard.press('Tab');
+      }
+      await expect(focusedNavItem).toHaveCount(1);
+      const focusStyles = await focusedNavItem.evaluate((element) => ({
+        isFocusVisible: element.matches(':focus-visible'),
+        outlineWidth: getComputedStyle(element).outlineWidth,
+      }));
+      expect(focusStyles.isFocusVisible, JSON.stringify(focusStyles)).toBe(true);
+      expect(Number.parseFloat(focusStyles.outlineWidth)).toBeGreaterThanOrEqual(2);
+
+      await page.locator('ion-content').last().evaluate((element) =>
+        (element as HTMLElement & { scrollToBottom: (duration?: number) => Promise<void> }).scrollToBottom(0),
+      );
+      await expect(nav).toBeVisible();
+      const footerBox = await page.locator('ion-footer').last().boundingBox();
+      expect(footerBox).not.toBeNull();
+      expect(footerBox!.y + footerBox!.height).toBeLessThanOrEqual(viewport.height);
+      expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true);
+
+      if (viewport.width === 1440) {
+        await page.addStyleTag({ content: 'html { zoom: 2; }' });
+        const zoomedDimensions = await page.evaluate(() => ({
+          clientWidth: document.documentElement.clientWidth,
+          scrollWidth: document.documentElement.scrollWidth,
+        }));
+        expect(zoomedDimensions.scrollWidth).toBeLessThanOrEqual(zoomedDimensions.clientWidth);
+        await expect(nav).toBeVisible();
+        await expect(buttons).toHaveCount(4);
+      }
+    }
+  });
+
   test('Inicio permite recuperar la actividad cuando falla el historial', async ({ page }) => {
     await installFlowFixture(page);
     const pattern = '**/api/v1/matches/by-player*/ath-flow';
@@ -120,7 +214,12 @@ test.describe('Flujo visual integral de partidos', () => {
     await page.route('**/api/v1/social/match-invites/ath-flow', route => route.fulfill({ status: 500, json: {} }));
     await page.route('**/api/v1/player-profiles/ath-flow', route => json(route, { ...playerProfile(), positions: [] }));
 
-    for (const viewport of [{ width: 320, height: 760 }, { width: 390, height: 844 }, { width: 1366, height: 768 }]) {
+    for (const viewport of [
+      { width: 320, height: 760 },
+      { width: 390, height: 844 },
+      { width: 768, height: 1024 },
+      { width: 1440, height: 900 },
+    ]) {
       await page.setViewportSize(viewport);
       await page.goto('/home');
       await expect(page.getByRole('alert').filter({ hasText: 'No se pudieron cargar las invitaciones' })).toBeVisible();
@@ -190,7 +289,12 @@ test.describe('Flujo visual integral de partidos', () => {
 
   test('perfil y ajustes conservan su jerarquía sin desbordamiento', async ({ page }) => {
     await installFlowFixture(page);
-    for (const viewport of [{ width: 390, height: 844 }, { width: 1366, height: 768 }]) {
+    for (const viewport of [
+      { width: 320, height: 760 },
+      { width: 390, height: 844 },
+      { width: 768, height: 1024 },
+      { width: 1440, height: 900 },
+    ]) {
       await page.setViewportSize(viewport);
       await page.goto('/player/profile');
       await expect(page.getByText('Perfil del jugador')).toBeVisible();
@@ -250,6 +354,7 @@ test.describe('Flujo visual integral de partidos', () => {
     await page.route(pattern, route => route.fulfill({ status: 500, json: {} }));
     await page.goto('/leaderboard');
     await expect(page.getByRole('alert')).toBeVisible();
+    await capture(page, 'ranking-error.png');
     await page.unroute(pattern);
     await page.getByRole('button', { name: 'Reintentar' }).click();
     await expect(page.getByRole('alert')).toHaveCount(0);
@@ -359,7 +464,12 @@ test.describe('Flujo visual integral de partidos', () => {
 
   test('agenda vacía ofrece una acción principal en móvil y escritorio', async ({ page }) => {
     await installFlowFixture(page);
-    for (const viewport of [{ width: 390, height: 844 }, { width: 1366, height: 768 }]) {
+    for (const viewport of [
+      { width: 320, height: 760 },
+      { width: 390, height: 844 },
+      { width: 768, height: 1024 },
+      { width: 1440, height: 900 },
+    ]) {
       await page.setViewportSize(viewport);
       await page.goto('/matches');
       await expect(page.getByRole('status')).toContainText('No tienes partidos activos, recientes ni próximos');
@@ -367,6 +477,7 @@ test.describe('Flujo visual integral de partidos', () => {
       await expect(createFirstMatch).toBeVisible();
       expect((await createFirstMatch.boundingBox())!.height).toBeGreaterThanOrEqual(44);
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true);
+      await capture(page, `matches-empty-${viewport.width}.png`);
       if (viewport.width === 390) {
         await createFirstMatch.click();
         await expect(page).toHaveURL(/\/matches\/create$/);
@@ -378,7 +489,12 @@ test.describe('Flujo visual integral de partidos', () => {
   test('agenda con partido próximo abre su estado en móvil y escritorio', async ({ page }) => {
     await installFlowFixture(page);
     await page.route('**/api/v1/matches/by-player-or-creator/ath-flow', route => json(route, [matchResponse('CREADO')]));
-    for (const viewport of [{ width: 390, height: 844 }, { width: 1366, height: 768 }]) {
+    for (const viewport of [
+      { width: 320, height: 760 },
+      { width: 390, height: 844 },
+      { width: 768, height: 1024 },
+      { width: 1440, height: 900 },
+    ]) {
       await page.setViewportSize(viewport);
       await page.goto('/matches');
       const match = page.locator('.matches-item').first();
@@ -387,6 +503,7 @@ test.describe('Flujo visual integral de partidos', () => {
       await expect(match).toContainText('Confirmado');
       const openState = match.getByRole('button', { name: 'Ver estado' });
       await expect(openState).toBeVisible();
+      await capture(page, `matches-upcoming-${viewport.width}.png`);
       await openState.click();
       await expect(page).toHaveURL(/\/matches\/64$/);
       await page.goto('/matches');
@@ -687,8 +804,13 @@ test.describe('Flujo visual integral de partidos', () => {
   });
   test('ranking permite filtrar posiciones en móvil y escritorio', async ({ page }) => {
     await installFlowFixture(page);
-    for (const width of [320, 1366]) {
-      await page.setViewportSize({ width, height: 844 });
+    for (const viewport of [
+      { width: 320, height: 760 },
+      { width: 390, height: 844 },
+      { width: 768, height: 1024 },
+      { width: 1440, height: 900 },
+    ]) {
+      await page.setViewportSize(viewport);
       await page.goto('/leaderboard');
       await page.getByLabel('Clasificar por').selectOption('ROLE');
       const group = page.getByRole('group', { name: 'Filtro de posiciones' });
@@ -697,7 +819,7 @@ test.describe('Flujo visual integral de partidos', () => {
       await buttons.first().click();
       await expect(buttons.first()).toHaveAttribute('aria-pressed', 'true');
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true);
-      await capture(page, `09-ranking-${width}.png`);
+      await capture(page, `ranking-filtered-${viewport.width}.png`);
     }
   });
   test('estadísticas distingue la ausencia de datos y se adapta a móvil y escritorio', async ({ page }) => {
@@ -885,6 +1007,26 @@ async function capture(page: Page, filename: string): Promise<void> {
 
 async function json(route: Route, body: unknown): Promise<void> {
   await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(body) });
+}
+
+function contrastRatio(foreground: string, background: string): number {
+  const luminance = (color: string): number => {
+    const channels = color.match(/\d+(?:\.\d+)?/g)?.slice(0, 3).map(Number);
+    if (!channels || channels.length !== 3) {
+      throw new Error(`Unsupported RGB color: ${color}`);
+    }
+
+    const [red, green, blue] = channels.map((channel) => {
+      const normalized = channel / 255;
+      return normalized <= 0.04045 ? normalized / 12.92 : ((normalized + 0.055) / 1.055) ** 2.4;
+    });
+
+    return 0.2126 * red + 0.7152 * green + 0.0722 * blue;
+  };
+  const foregroundLuminance = luminance(foreground);
+  const backgroundLuminance = luminance(background);
+  return (Math.max(foregroundLuminance, backgroundLuminance) + 0.05) /
+    (Math.min(foregroundLuminance, backgroundLuminance) + 0.05);
 }
 
 function playerProfile(): Record<string, unknown> {
