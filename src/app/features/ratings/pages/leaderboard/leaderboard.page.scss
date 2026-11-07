@@ -103,7 +103,7 @@
 
 .ranking-toolbar__control select {
   width: 100%;
-  min-height: 34px;
+  min-height: 44px;
   padding: 0 24px 0 0;
   border: 0;
   border-bottom: 2px solid var(--tactical-local);
@@ -128,7 +128,7 @@
   background: transparent;
   color: #a6b3bb;
   border-radius: 0;
-  min-height: 34px;
+  min-height: 44px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -195,7 +195,7 @@
 .leaderboard-search input,
 .leaderboard-sort select {
   width: 100%;
-  min-height: 38px;
+  min-height: 44px;
   border: 0;
   border-bottom: 1px solid rgba(112, 159, 166, 0.58);
   border-radius: 0;
@@ -266,6 +266,7 @@
 }
 
 .leaderboard-retry {
+  min-height: 44px;
   border: 1px solid rgba(180, 205, 255, 0.5);
   background: rgba(16, 24, 42, 0.82);
   color: #e6f1ff;
@@ -275,6 +276,15 @@
   font-weight: 700;
   margin: 0 auto 8px;
   display: block;
+}
+
+.leaderboard-roles__item:focus-visible,
+.leaderboard-search input:focus-visible,
+.leaderboard-sort select:focus-visible,
+.ranking-toolbar__control select:focus-visible,
+.leaderboard-retry:focus-visible {
+  outline: 2px solid var(--tactical-visit);
+  outline-offset: 3px;
 }
 
 .leaderboard-footer {

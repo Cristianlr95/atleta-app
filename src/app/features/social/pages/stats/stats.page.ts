@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnDestroy, inject } from '@angular/core';
 import { IonicModule } from '@ionic/angular';
-import { Subject, forkJoin, of } from 'rxjs';
+import { Observable, Subject, forkJoin, of, throwError } from 'rxjs';
 import { catchError, finalize, takeUntil } from 'rxjs/operators';
 import { AuthSessionService } from 'src/app/core/services/auth-session.service';
 import { NavigationService } from 'src/app/core/services/navigation.service';
@@ -97,7 +97,7 @@ export class StatsPage implements OnDestroy {
   private loadStats(): void {
     const session = this.authSessionService.currentSession;
     if (!session) {
-      this.errorMessage = 'No se encontro una sesion valida.';
+      this.errorMessage = 'No se encontró una sesión válida.';
       return;
     }
 
@@ -106,22 +106,44 @@ export class StatsPage implements OnDestroy {
     this.errorMessage = null;
 
     forkJoin({
-      overall: this.ratingsApiService.getOverall(playerUuid).pipe(catchError(() => of(null))),
-      roles: this.ratingsApiService.getByRole(playerUuid).pipe(catchError(() => of(null))),
-      history: this.matchHistoryService.getPlayerHistory(playerUuid).pipe(catchError(() => of(null))),
+      overall: this.emptyOnNotFound(this.ratingsApiService.getOverall(playerUuid), null),
+      roles: this.emptyOnNotFound(this.ratingsApiService.getByRole(playerUuid), [] as RatingByRole[]),
+      history: this.emptyOnNotFound(
+        this.matchHistoryService.getPlayerHistory(playerUuid),
+        [] as MatchHistoryViewItem[],
+      ),
     })
       .pipe(
         takeUntil(this.destroy$),
         finalize(() => (this.isLoading = false)),
       )
-      .subscribe(({ overall, roles, history }) => {
-        void this.notificationBadgeService.refresh();
-        if (roles === null || history === null) {
-          this.errorMessage = 'No se pudieron cargar las estadísticas. Inténtalo nuevamente.';
-          return;
-        }
-        this.applyStats(overall, roles, history);
+      .subscribe({
+        next: ({ overall, roles, history }) => {
+          void this.notificationBadgeService.refresh();
+          this.applyStats(overall, roles, history);
+        },
+        error: () => {
+          this.errorMessage = 'No se pudieron cargar las estadísticas. Inténtalo de nuevo.';
+          this.summaryStats = this.emptySummaryStats();
+          this.roleStats = [];
+          this.recentMatches = [];
+        },
       });
+  }
+
+  private emptyOnNotFound<T>(request: Observable<T>, emptyValue: T): Observable<T> {
+    return request.pipe(
+      catchError((error: unknown) => this.isNotFoundError(error)
+        ? of(emptyValue)
+        : throwError(() => error)),
+    );
+  }
+
+  private isNotFoundError(error: unknown): boolean {
+    return typeof error === 'object'
+      && error !== null
+      && 'status' in error
+      && error.status === 404;
   }
 
   private applyStats(
@@ -167,7 +189,7 @@ export class StatsPage implements OnDestroy {
         label: 'G+A',
         value: goals + assists,
         icon: 'goal-contribution',
-        description: 'Goles mas asistencias registrados en tu historial.',
+        description: 'Goles más asistencias registrados en tu historial.',
       },
     ];
 
@@ -187,6 +209,10 @@ export class StatsPage implements OnDestroy {
   }
 
   private buildRoleStats(overall: OverallRating | null, roles: RatingByRole[]): RoleStatView[] {
+    if (!overall && roles.length === 0) {
+      return [];
+    }
+
     const fromBreakdown = overall?.roleBreakdown
       ? this.orderedRoles().map((role) => ({
           role,
@@ -249,7 +275,7 @@ export class StatsPage implements OnDestroy {
     }
 
     const resultLine = `${input.wins}V ${input.draws}E ${input.losses}D`;
-    const roleLine = input.bestRoleLabel ? `Tu mejor rol actual es ${input.bestRoleLabel}.` : 'Aun no hay rol dominante.';
+    const roleLine = input.bestRoleLabel ? `Tu mejor rol actual es ${input.bestRoleLabel}.` : 'Aún no hay rol dominante.';
     return `${resultLine}. ${roleLine} Versatilidad ${input.versatility}% y aporte ofensivo ${input.goals + input.assists} G+A.`;
   }
 

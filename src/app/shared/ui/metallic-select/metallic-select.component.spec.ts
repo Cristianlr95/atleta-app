@@ -25,4 +25,12 @@ describe('MetallicSelectComponent', () => {
     const select: HTMLSelectElement = fixture.nativeElement.querySelector('select');
     expect(select.labels?.[0]?.textContent?.trim()).toBe('Equipo');
   });
+
+  it('exposes invalid state on the native select', () => {
+    component.invalid = true;
+    fixture.detectChanges();
+
+    const select: HTMLSelectElement = fixture.nativeElement.querySelector('select');
+    expect(select.getAttribute('aria-invalid')).toBe('true');
+  });
 });

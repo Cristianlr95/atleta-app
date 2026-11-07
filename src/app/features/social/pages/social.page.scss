@@ -30,6 +30,7 @@
 }
 
 .social-retry {
+  min-height: 44px;
   border: 1px solid rgba(180, 205, 255, 0.45);
   border-radius: 999px;
   background: rgba(14, 22, 40, 0.8);
@@ -38,4 +39,9 @@
   padding: 6px 14px;
   margin: 0 auto 10px;
   display: block;
+}
+
+.social-retry:focus-visible {
+  outline: 2px solid var(--tactical-visit);
+  outline-offset: 3px;
 }

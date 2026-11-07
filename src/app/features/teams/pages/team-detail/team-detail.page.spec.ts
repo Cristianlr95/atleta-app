@@ -60,6 +60,16 @@ describe('TeamDetailPage', () => {
     expect(navigationService.safeNavigate).toHaveBeenCalledWith(['/players', 'player-uuid']);
   });
 
+  it('renders the team and its empty roster when there are no active members', () => {
+    teamApiService.getActiveMembers.and.returnValue(of([]));
+    component.ionViewWillEnter();
+    fixture.detectChanges();
+
+    expect(component.team?.nombre).toBe('Atleta FC');
+    expect(component.members).toEqual([]);
+    expect(fixture.nativeElement.textContent).toContain('No hay integrantes activos.');
+  });
+
   it('offers a recoverable Social exit when the team is missing', () => {
     teamApiService.getById.and.returnValue(throwError(() => new HttpErrorResponse({ status: 404 })));
     component.ionViewWillEnter();

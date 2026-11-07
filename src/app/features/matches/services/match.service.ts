@@ -490,11 +490,11 @@ export class MatchService {
 
   private resolveStatusMessage(match: Match, missing: number, confirmed: number): string {
     if (match.status === MatchStatus.INVALID) {
-      return 'Partido invalido por tiempo o confirmaciones insuficientes.';
+      return 'Partido inválido por tiempo o confirmaciones insuficientes.';
     }
 
     if (match.status === MatchStatus.LIVE) {
-      return 'El partido esta en juego.';
+      return 'El partido está en juego.';
     }
 
     if (match.status === MatchStatus.CONFIRMED) {
@@ -502,7 +502,7 @@ export class MatchService {
     }
 
     if (match.status === MatchStatus.PARTIAL_CONFIRMATIONS) {
-      return 'Armandose el partido.';
+      return 'Armándose el partido.';
     }
 
     if (match.status === MatchStatus.CREATED) {
@@ -895,5 +895,4 @@ export class MatchService {
     }
   }
 }
-
 

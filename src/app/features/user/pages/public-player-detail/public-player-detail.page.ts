@@ -66,7 +66,7 @@ export class PublicPlayerDetailPage implements OnDestroy {
   private loadProfile(): void {
     const uuid = this.route.snapshot.paramMap.get('uuid');
     if (!uuid) {
-      this.showError('El jugador solicitado no es valido.', true);
+      this.showError('El jugador solicitado no es válido.', true);
       return;
     }
 
@@ -85,7 +85,7 @@ export class PublicPlayerDetailPage implements OnDestroy {
         error: (error: HttpErrorResponse) =>
           this.showError(
             error.status === 404
-              ? 'Este perfil ya no esta disponible.'
+              ? 'Este perfil ya no está disponible.'
               : 'No pudimos cargar el perfil. Intenta nuevamente.',
             error.status === 404,
           ),

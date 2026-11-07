@@ -34,7 +34,7 @@
     box-shadow 150ms ease;
 
   &::placeholder {
-    color: #64777e;
+    color: var(--muted-foreground);
   }
 
   &:hover:not(:disabled) {
@@ -44,6 +44,15 @@
   &:focus {
     border-color: var(--tactical-visit);
     box-shadow: 0 0 0 3px rgba(0, 215, 245, 0.11);
+  }
+
+  &[aria-invalid='true'] {
+    border-color: var(--destructive);
+  }
+
+  &[aria-invalid='true']:focus {
+    border-color: var(--destructive);
+    box-shadow: 0 0 0 3px rgba(239, 71, 111, 0.18);
   }
 
   &:disabled {

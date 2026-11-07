@@ -41,7 +41,7 @@
 
 .settings-back,
 .settings-submit {
-  min-height: 40px;
+  min-height: 44px;
   border: 1px solid rgba(0, 215, 245, .5);
   border-radius: 9px;
   background: rgba(7, 30, 39, .72);
@@ -49,14 +49,33 @@
   font: 700 13px var(--font-family-display);
   letter-spacing: .04em;
   padding: 8px 13px;
+  cursor: pointer;
 }
 
-.settings-back { align-self: flex-start; white-space: nowrap; }
+.settings-back {
+  align-self: flex-start;
+  white-space: nowrap;
+
+  &:focus-visible {
+    outline: 2px solid #fff;
+    outline-offset: 3px;
+  }
+}
 
 .settings-submit {
   justify-self: start;
   border-color: rgba(215, 255, 0, .7);
   background: rgba(76, 99, 5, .44);
+
+  &:focus-visible {
+    outline: 2px solid #fff;
+    outline-offset: 3px;
+  }
+
+  &:disabled {
+    opacity: .38;
+    cursor: not-allowed;
+  }
 }
 
 .settings-password-form { display: grid; gap: 12px; }
@@ -72,7 +91,7 @@
 .settings-password-field input {
   width: 100%;
   min-width: 0;
-  height: 42px;
+  min-height: 46px;
   border: 1px solid rgba(126, 144, 168, .48);
   border-radius: 9px;
   outline: none;
@@ -93,7 +112,7 @@
 
 .settings-delete {
   justify-self: start;
-  min-height: 40px;
+  min-height: 44px;
   border: 1px solid rgba(255, 90, 118, .75);
   border-radius: 9px;
   background: rgba(98, 12, 28, .56);
@@ -101,6 +120,17 @@
   font: 700 13px var(--font-family-display);
   letter-spacing: .04em;
   padding: 8px 13px;
+  cursor: pointer;
+
+  &:focus-visible {
+    outline: 2px solid #fff;
+    outline-offset: 3px;
+  }
+
+  &:disabled {
+    opacity: .38;
+    cursor: not-allowed;
+  }
 }
 
 @media (max-width: 520px) {

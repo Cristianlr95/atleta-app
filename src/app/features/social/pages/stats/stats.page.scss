@@ -37,6 +37,7 @@
 
 .stats-retry,
 .stats-leaderboard {
+  min-height: 44px;
   border: 1px solid rgba(215, 185, 109, 0.46);
   border-radius: 999px;
   background: linear-gradient(135deg, rgba(215, 185, 109, 0.18), rgba(66, 109, 174, 0.2));
@@ -46,6 +47,17 @@
   font-weight: 800;
   letter-spacing: 0.06em;
   padding: 8px 14px;
+}
+
+.stats-retry:focus-visible,
+.stats-leaderboard:focus-visible {
+  outline: 2px solid #f6d889;
+  outline-offset: 3px;
+}
+
+.stats-retry,
+.stats-leaderboard {
+  cursor: pointer;
 }
 
 .stats-retry {
@@ -171,4 +183,11 @@
 
 .stats-footer {
   background: rgba(4, 7, 15, 0.82);
+}
+
+@media (min-width: 768px) {
+  .stats-roles,
+  .stats-matches {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }

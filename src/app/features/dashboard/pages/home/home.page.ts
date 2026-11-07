@@ -187,14 +187,14 @@ export class HomePage {
 
   private resolveCurrentMatchLabel(item: MatchHistoryViewItem): string {
     if (item.displayStatusKey === 'LIVE') {
-      return `Partido jugandose: ${item.modalityLabel}`;
+      return `Partido en juego: ${item.modalityLabel}`;
     }
 
     if (item.displayStatusKey === 'FINISHED') {
-      return `Ultimo partido: ${item.modalityLabel}`;
+      return `Último partido: ${item.modalityLabel}`;
     }
 
-    return `Proximo partido: ${item.modalityLabel}`;
+    return `Próximo partido: ${item.modalityLabel}`;
   }
 
   private computeParticipationStreak(history: MatchHistoryViewItem[]): number {

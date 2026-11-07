@@ -4,7 +4,7 @@ import { Component, OnDestroy, inject } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { IonicModule } from '@ionic/angular';
 import { Subject, forkJoin, of } from 'rxjs';
-import { catchError, finalize, switchMap, takeUntil } from 'rxjs/operators';
+import { catchError, finalize, map, switchMap, takeUntil } from 'rxjs/operators';
 import { NavigationService } from 'src/app/core/services/navigation.service';
 import { buildMainBottomNav } from 'src/app/shared/navigation/main-bottom-nav';
 import { MetallicBottomNavComponent, MetallicBottomNavItem } from 'src/app/shared/ui/metallic-bottom-nav/metallic-bottom-nav.component';
@@ -58,7 +58,7 @@ export class TeamDetailPage implements OnDestroy {
   private loadTeam(): void {
     const teamId = Number(this.route.snapshot.paramMap.get('id'));
     if (!Number.isSafeInteger(teamId) || teamId <= 0) {
-      this.showError('El equipo solicitado no es valido.', true);
+      this.showError('El equipo solicitado no es válido.', true);
       return;
     }
     this.isLoading = true;
@@ -68,28 +68,33 @@ export class TeamDetailPage implements OnDestroy {
     this.notFound = false;
     forkJoin({ team: this.teamApiService.getById(teamId), members: this.teamApiService.getActiveMembers(teamId) })
       .pipe(
-        switchMap(({ team, members }) =>
-          forkJoin(
-            members.map((member) =>
-              forkJoin({
-                profile: this.userApiService.getPublicPlayerProfile(member.playerUuid).pipe(catchError(() => of(null))),
-                overall: this.ratingsApiService.getOverall(member.playerUuid).pipe(catchError(() => of(null))),
-              }).pipe(
-                switchMap(({ profile, overall }) => of({
-                  ...member,
-                  pictureUrl: profile?.pictureUrl ?? null,
-                  ovr: overall?.hybridOVR ?? null,
-                })),
-              ),
-            ),
-          ).pipe(switchMap((roster) => of({ team, members: roster }))),
-        ),
+        switchMap(({ team, members }) => {
+          const memberDetails$ = members.length > 0
+            ? forkJoin(
+                members.map((member) =>
+                  forkJoin({
+                    profile: this.userApiService
+                      .getPublicPlayerProfile(member.playerUuid)
+                      .pipe(catchError(() => of(null))),
+                    overall: this.ratingsApiService
+                      .getOverall(member.playerUuid)
+                      .pipe(catchError(() => of(null))),
+                  }).pipe(map(({ profile, overall }) => ({
+                    ...member,
+                    pictureUrl: profile?.pictureUrl ?? null,
+                    ovr: overall?.hybridOVR ?? null,
+                  }))),
+                ),
+              )
+            : of([] as TeamRosterMember[]);
+          return memberDetails$.pipe(map((roster) => ({ team, members: roster })));
+        }),
       )
       .pipe(takeUntil(this.destroy$), finalize(() => (this.isLoading = false)))
       .subscribe({
         next: ({ team, members }) => { this.team = team; this.members = members; },
         error: (error: HttpErrorResponse) => this.showError(
-          error.status === 404 ? 'Este equipo ya no esta disponible.' : 'No pudimos cargar el equipo. Intenta nuevamente.',
+          error.status === 404 ? 'Este equipo ya no está disponible.' : 'No pudimos cargar el equipo. Intenta nuevamente.',
           error.status === 404,
         ),
       });

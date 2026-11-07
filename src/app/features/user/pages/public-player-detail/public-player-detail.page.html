@@ -20,7 +20,7 @@
         <p class="detail-kicker">Jugador Atleta</p>
         <h1>{{ player.alias || 'Jugador sin alias' }}</h1>
         <dl class="detail-facts">
-          <div><dt>Genero</dt><dd>{{ genderLabel(player.genero) }}</dd></div>
+          <div><dt>Género</dt><dd>{{ genderLabel(player.genero) }}</dd></div>
           <div><dt>Confianza</dt><dd>{{ player.trustScore ?? '--' }}</dd></div>
         </dl>
 
@@ -28,7 +28,7 @@
           <h2>Posiciones</h2>
           <ol *ngIf="player.positions?.length; else noPositions">
             <li *ngFor="let assignment of player.positions">
-              <strong>{{ assignment.position?.nombre || 'Posicion' }}</strong>
+              <strong>{{ assignment.position?.nombre || 'Posición' }}</strong>
               <span>Prioridad {{ assignment.prioridad }}</span>
             </li>
           </ol>

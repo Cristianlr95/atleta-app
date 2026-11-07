@@ -34,7 +34,7 @@ export function lifecycleToUserLabel(state: MatchLifecycleState): string {
     return 'Cierre pendiente';
   }
   if (state === MatchLifecycleState.CREATED_WITH_PARTIAL_CONFIRMATIONS) {
-    return 'Armandose el partido';
+    return 'Armándose el partido';
   }
   if (state === MatchLifecycleState.CREATED_CONFIRMED) {
     return 'Partido confirmado';

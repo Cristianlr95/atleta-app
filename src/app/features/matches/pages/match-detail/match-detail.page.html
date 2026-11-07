@@ -1,7 +1,7 @@
 ﻿<ion-content class="match-detail-bg">
   <div class="match-detail-container">
     <app-metallic-card title="Estado del partido" [titleIconAsset]="titleIconAsset">
-      <p *ngIf="loadingMatch()" class="match-detail-live">Cargando informacion del partido...</p>
+      <p *ngIf="loadingMatch()" class="match-detail-live">Cargando información del partido...</p>
       <p *ngIf="loadError()" class="match-detail-feedback">{{ loadError() }}</p>
       <div class="match-detail-retry" *ngIf="loadError()">
         <app-metallic-button type="button" variant="secondary" (click)="onRetry()">
@@ -9,7 +9,7 @@
         </app-metallic-button>
       </div>
       <p *ngIf="!loadingMatch() && !loadError() && !match()" class="match-detail-feedback">
-        No se encontro informacion para este partido.
+        No se encontró información para este partido.
       </p>
 
       <nav *ngIf="match()" class="match-flow" aria-label="Estado del encuentro">
@@ -21,7 +21,7 @@
         </span>
       </nav>
 
-      <app-metallic-form-section title="Header partido" [titleIconAsset]="titleIconAsset" description="Estado, cuenta regresiva y cancha.">
+      <app-metallic-form-section title="Resumen del partido" [titleIconAsset]="titleIconAsset" description="Estado, cuenta regresiva y cancha.">
         <app-match-header-card
           *ngIf="match()"
           [match]="match()!"
@@ -41,7 +41,7 @@
 
       <app-metallic-form-section
         *ngIf="canRespondInvitationInMatch()"
-        title="Tu invitacion"
+        title="Tu invitación"
         [titleIconAsset]="actionsIconAsset"
         description="Responde tu asistencia directamente desde este estado.">
         <div class="match-detail-actions">
@@ -135,7 +135,7 @@
         </app-teams-board>
       </app-metallic-form-section>
 
-      <app-metallic-form-section title="Ubicacion" [titleIconAsset]="progressIconAsset" description="Cancha seleccionada para el partido.">
+      <app-metallic-form-section title="Ubicación" [titleIconAsset]="progressIconAsset" description="Cancha seleccionada para el partido.">
         <app-venue-selected-card [venue]="selectedVenue()"></app-venue-selected-card>
       </app-metallic-form-section>
 
@@ -150,18 +150,18 @@
         *ngIf="isFinalized()"
         title="Partido finalizado"
         [titleIconAsset]="rankingIconAsset"
-        description="El partido ya fue cerrado y el resultado quedo consolidado.">
+        description="El partido ya fue cerrado y el resultado quedó consolidado.">
         <div class="match-detail-impact">
           <p *ngIf="finalizedScoreLabel()">Marcador final: {{ finalizedScoreLabel() }}</p>
           <p *ngIf="finalizedResolutionLabel()">{{ finalizedResolutionLabel() }}</p>
           <p *ngIf="mvpVotesProgressLabel()">{{ mvpVotesProgressLabel() }}</p>
           <p *ngIf="mvpProgressHint()">{{ mvpProgressHint() }}</p>
-          <p *ngIf="canOpenMvpVote()">La votacion MVP esta disponible por 3 horas tras el cierre.</p>
-          <p *ngIf="!canOpenMvpVote()">La ventana de votacion MVP ya cerro.</p>
+          <p *ngIf="canOpenMvpVote()">La votación MVP está disponible por 3 horas tras el cierre.</p>
+          <p *ngIf="!canOpenMvpVote()">La ventana de votación MVP ya cerró.</p>
         </div>
         <div class="match-detail-actions" *ngIf="canOpenMvpVote()">
           <app-metallic-button type="button" variant="accent" (click)="onOpenMvpVote()">
-            Ir a Votacion MVP
+            Ir a votación MVP
           </app-metallic-button>
         </div>
       </app-metallic-form-section>
@@ -170,7 +170,7 @@
         *ngIf="isCreator()"
         title="Acciones"
         [titleIconAsset]="actionsIconAsset"
-        description="Acciones segun tu contexto en este partido.">
+        description="Acciones según tu contexto en este partido.">
         <p class="match-detail-feedback" *ngIf="closeMatchMessage()">
           {{ closeMatchMessage() }}
         </p>
