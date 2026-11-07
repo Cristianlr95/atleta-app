@@ -37,6 +37,23 @@ describe('LeaderboardPage', () => {
     fixture.detectChanges();
   });
 
+  it('expone el filtro de posición seleccionado', () => {
+    component.selectedMode = 'ROLE';
+    fixture.detectChanges();
+    const buttons = fixture.nativeElement.querySelectorAll('.leaderboard-roles button');
+    expect(buttons.length).toBeGreaterThan(0);
+    expect(Array.from<HTMLButtonElement>(buttons).some(button => button.getAttribute('aria-pressed') === 'true')).toBeTrue();
+  });
+  it('no duplica el número de partidos cuando el texto ya lo incluye', () => {
+    component.overallRows = [{ rank: 1, alias: 'Ana', scoreText: '63', matchesPlayed: 8, metaText: '8 partidos' }];
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelector('.leaderboard__mobile-matches')).toBeNull();
+  });
+  it('mantiene los partidos jugados disponibles en móvil', () => {
+    component.overallRows = [{ rank: 1, alias: 'Ana', scoreText: '63', matchesPlayed: 8 }];
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelector('.leaderboard__mobile-matches')?.textContent).toContain('8 partidos');
+  });
   it('should create', () => {
     expect(component).toBeTruthy();
   });

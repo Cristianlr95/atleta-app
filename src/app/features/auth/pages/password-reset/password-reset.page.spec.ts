@@ -31,6 +31,14 @@ describe('PasswordResetPage', () => {
     fixture.detectChanges();
   });
 
+  it('explica el correo inválido y lo asocia al campo', () => {
+    component.requestForm.controls.email.setValue('correo-invalido');
+    component.requestForm.controls.email.markAsTouched();
+    fixture.detectChanges();
+    const input: HTMLInputElement = fixture.nativeElement.querySelector('input[type=email]');
+    expect(input.getAttribute('aria-describedby')).toBe('reset-email-error');
+    expect(fixture.nativeElement.querySelector('#reset-email-error')?.textContent).toContain('correo válido');
+  });
   it('requests recovery with a non-enumerating confirmation', async () => {
     component.requestForm.setValue({ email: 'demo@atleta.cl' });
 
@@ -50,6 +58,15 @@ describe('PasswordResetPage', () => {
     expect(component.error).toContain('No se pudo conectar');
   });
 
+  it('explica la longitud inválida de la nueva contraseña', () => {
+    Object.defineProperty(component, 'confirmMode', { value: true });
+    component.confirmForm.controls.password.setValue('corta');
+    component.confirmForm.controls.password.markAsTouched();
+    fixture.detectChanges();
+    const input: HTMLInputElement = fixture.nativeElement.querySelector('input[type=password]');
+    expect(input.getAttribute('aria-describedby')).toBe('reset-password-error');
+    expect(fixture.nativeElement.querySelector('#reset-password-error')).not.toBeNull();
+  });
   it('prevents mismatched password confirmation', async () => {
     Object.defineProperty(component, 'token', { value: 'reset-token' });
     component.confirmForm.setValue({ password: 'secret-123', confirmation: 'different-123' });

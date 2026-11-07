@@ -132,3 +132,15 @@
   letter-spacing: 0.06em;
   text-transform: uppercase;
 }
+
+@media (max-width: 600px) {
+  .match-history { max-height: none; overflow: visible; border: 0; background: transparent; }
+  .match-history__table { min-width: 0; display: block; }
+  .match-history__table thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+  .match-history__table tbody { display: grid; gap: 12px; }
+  .match-history__table tr { display: block; border: 1px solid var(--tactical-line); border-radius: 6px; background: var(--tactical-surface); }
+  .match-history__table td { display: flex; justify-content: space-between; align-items: center; gap: 12px; white-space: normal; overflow-wrap: anywhere; }
+  .match-history__table td::before { content: attr(data-label); color: var(--text-muted); font-weight: 700; }
+  .match-history__action { min-height: 44px; }
+  .match-history__hint { display: none; }
+}

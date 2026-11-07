@@ -60,7 +60,7 @@
           <p><strong>Modalidad:</strong> {{ modalityLabel }}</p>
           <p><strong>Arquero:</strong> {{ rotativeGoalkeeper() ? 'Rotativo' : 'Fijo' }}</p>
           <p><strong>Convocatoria:</strong> {{ genderCategoryLabel }}</p>
-          <p><strong>Fecha:</strong> {{ schedule().scheduledAt | date:'short' }}</p>
+          <p><strong>Fecha:</strong> {{ schedule().scheduledAt | date:'dd/MM/yyyy, HH:mm' }}</p>
           <p><strong>Cancha:</strong> {{ schedule().venue?.name ?? schedule().location }}</p>
           <p><strong>Dirección:</strong> {{ schedule().venue?.address ?? schedule().location }}</p>
           <p><strong>Vestimenta:</strong> Local {{ kitColors().home }} | Visitante {{ kitColors().away }}</p>

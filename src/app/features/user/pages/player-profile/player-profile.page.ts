@@ -1,6 +1,5 @@
-﻿import { CommonModule } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { Component, OnDestroy, inject } from '@angular/core';
-import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { IonicModule } from '@ionic/angular';
 import { Subject, Subscription, firstValueFrom, forkJoin, interval, of } from 'rxjs';
@@ -34,6 +33,8 @@ import { buildMainBottomNav } from 'src/app/shared/navigation/main-bottom-nav';
 import { PlayerAssignedPosition } from '../../models/position.models';
 import { PlayerAchievement, PlayerProfile } from '../../models/user.models';
 import { PlayerPositionStateService } from '../../services/player-position-state.service';
+import { ProfileTeamsComponent } from './profile-teams/profile-teams.component';
+import { ProfileAchievementsComponent } from './profile-achievements/profile-achievements.component';
 import { UserApiService } from '../../services/user-api.service';
 
 interface TeamMemberView extends TeamActiveMember {
@@ -60,10 +61,11 @@ interface CompetitionSummary extends OutcomeSummary {
   styleUrls: ['./player-profile.page.scss'],
   imports: [
     CommonModule,
-    FormsModule,
     IonicModule,
     MetallicCardComponent,
     MetallicFormSectionComponent,
+    ProfileTeamsComponent,
+    ProfileAchievementsComponent,
     MetallicRoleHexagonComponent,
     MetallicBottomNavComponent,
   ],
@@ -97,11 +99,14 @@ export class PlayerProfilePage implements OnDestroy {
   readonly settingsIconAsset = `${this.iconBase}/ic_auth_security_96.png`;
   readonly achievementsSectionIconAsset = `${this.iconBase}/ic_comp_medal_96.png`;
 
+  get currentPlayerUuid(): string | null { return this.authSessionService.currentSession?.user.atletaUuid ?? null; }
+
   get bottomNavItems(): ReadonlyArray<MetallicBottomNavItem> {
     return buildMainBottomNav('profile', this.notificationBadgeService.totalPending());
   }
 
   isLoading = false;
+  historyUnavailable = false;
   errorMessage: string | null = null;
 
   displayName = 'Jugador';
@@ -116,8 +121,8 @@ export class PlayerProfilePage implements OnDestroy {
   isPictureUploading = false;
   competition: CompetitionSummary = { matches: 0, goals: 0, assists: 0, wins: 0, draws: 0, losses: 0, total: 0 };
 
-  roleStats: HexagonRoleStat[] = this.demoHexagon();
-  achievements: PlayerAchievement[] = this.demoAchievements();
+  roleStats: HexagonRoleStat[] = [];
+  achievements: PlayerAchievement[] = [];
   playerPositions: PlayerPositionDisplay[] = [];
   memberTeams: TeamSummary[] = [];
   expandedTeamId: number | null = null;
@@ -299,8 +304,9 @@ export class PlayerProfilePage implements OnDestroy {
     const session = this.authSessionService.currentSession;
 
     if (!session) {
-      this.errorMessage = 'Mostrando datos de demostración. Inicia sesión para ver tus estadísticas reales.';
-      this.applyDemo();
+      this.errorMessage = 'Inicia sesión para ver tus estadísticas.';
+      this.roleStats = [];
+      this.achievements = [];
       return;
     }
 
@@ -311,12 +317,13 @@ export class PlayerProfilePage implements OnDestroy {
       this.errorMessage = null;
     }
 
+    this.historyUnavailable = false;
     forkJoin({
       profile: this.userApiService.getPlayerProfile(atletaUuid).pipe(catchError(() => of(null))),
       achievements: this.userApiService.getPlayerAchievements(atletaUuid).pipe(catchError(() => of([] as PlayerAchievement[]))),
       overall: this.ratingsApiService.getOverall(atletaUuid).pipe(catchError(() => of(null))),
       ratings: this.ratingsApiService.getByRole(atletaUuid).pipe(catchError(() => of([]))),
-      history: this.matchHistoryService.getPlayerHistory(atletaUuid).pipe(catchError(() => of([]))),
+      history: this.matchHistoryService.getPlayerHistory(atletaUuid).pipe(catchError(() => { this.historyUnavailable = true; return of([]); })),
       teams: this.teamApiService.getByPlayer(atletaUuid).pipe(catchError(() => of([] as TeamSummary[]))),
       positions: this.userApiService
         .getPlayerPositions(atletaUuid)
@@ -337,7 +344,7 @@ export class PlayerProfilePage implements OnDestroy {
           teams,
           positions,
         );
-        this.achievements = achievements.length > 0 ? achievements : this.demoAchievements();
+        this.achievements = achievements;
         if (this.expandedTeamId && !teams.some((team) => team.id === this.expandedTeamId)) {
           this.expandedTeamId = null;
           this.inviteQuery = '';
@@ -411,24 +418,6 @@ export class PlayerProfilePage implements OnDestroy {
     }
   }
 
-  memberRoleLabel(role: TeamActiveMember['rol']): string {
-    if (role === 'CAPITAN') {
-      return 'Capitan';
-    }
-    if (role === 'DT') {
-      return 'DT';
-    }
-    return 'Jugador';
-  }
-
-  isTeamExpanded(teamId: number): boolean {
-    return this.expandedTeamId === teamId;
-  }
-
-  memberOvrLabel(ovr: number | null): string {
-    return ovr === null ? 'OVR N/D' : `OVR ${Math.round(ovr)}`;
-  }
-
   private clearInviteSearchTimer(): void {
     if (this.inviteSearchTimer) {
       window.clearTimeout(this.inviteSearchTimer);
@@ -452,7 +441,7 @@ export class PlayerProfilePage implements OnDestroy {
     this.profilePictureUrl = this.resolvePictureUrl(profile?.pictureUrl);
 
     const mappedHexagon = this.mapRoleStats(overall, ratings);
-    this.roleStats = mappedHexagon.length > 0 ? mappedHexagon : this.demoHexagon();
+    this.roleStats = mappedHexagon;
 
     this.overallText = overall?.classification || 'Intermedio';
     this.overallHybridOvr = overall?.hybridOVR ?? null;
@@ -519,30 +508,6 @@ export class PlayerProfilePage implements OnDestroy {
     this.overallVersatilityPercent = 67;
     this.overallBestRole = 'ATAQUE';
     this.overallBestRoleRating = 85;
-  }
-
-  achievementIconAsset(code: PlayerAchievement['code']): string {
-    const iconByCode: Record<PlayerAchievement['code'], string> = {
-      TOP_SCORER: `${this.iconBase}/ic_comp_goal_contribution_96.png`,
-      TOP_ASSIST: `${this.iconBase}/ic_event_assist_96.png`,
-      MATCH_VETERAN: `${this.iconBase}/ic_comp_stats_96.png`,
-      MATCH_CREATOR: `${this.iconBase}/ic_match_create_96.png`,
-      MATCH_WINNER: `${this.iconBase}/ic_result_win_96.png`,
-    };
-    return iconByCode[code];
-  }
-
-  achievementTierLabel(achievement: PlayerAchievement): string {
-    if (achievement.tier === 'GOLD') {
-      return 'Oro';
-    }
-    if (achievement.tier === 'SILVER') {
-      return 'Plata';
-    }
-    if (achievement.tier === 'BRONZE') {
-      return 'Bronce';
-    }
-    return `Próximo: ${achievement.nextThreshold}`;
   }
 
   private demoAchievements(): PlayerAchievement[] {

@@ -152,9 +152,6 @@ export class MatchClosePage {
       ? this.players().map((player) => {
           const preview = this.closePreview()?.players.find((item) => item.playerUuid === player.userId);
           const totalXp = preview?.estimatedXp ?? 0;
-          const fromLevel = Math.max(1, Math.floor(40 / 10));
-          const toLevel = Math.max(fromLevel, Math.floor((40 + totalXp) / 10));
-          const progress = Math.min(100, ((40 + totalXp) % 10) * 10);
 
           return {
             id: player.userId,
@@ -162,20 +159,14 @@ export class MatchClosePage {
             position: player.position,
             xp: totalXp,
             currentOvr: preview?.currentHybridOvr ?? null,
-            fromLevel,
-            toLevel,
-            progressPercent: progress,
           };
         })
       : this.players().map((player) => {
       const goals = this.getCount(this.goalCounts(), player.userId);
-      const base = 10;
+      const base = 5;
       const result = this.resultXpFor(player.teamLabel);
       const goalXp = goals * this.goalXpByPosition(player.position);
-      const totalXp = base + result + goalXp;
-      const fromLevel = Math.max(1, Math.floor(40 / 10));
-      const toLevel = Math.max(fromLevel, Math.floor((40 + totalXp) / 10));
-      const progress = Math.min(100, ((40 + totalXp) % 10) * 10);
+      const totalXp = Math.min(25, base + result + goalXp);
 
       return {
         id: player.userId,
@@ -183,9 +174,6 @@ export class MatchClosePage {
         position: player.position,
         xp: totalXp,
         currentOvr: null,
-        fromLevel,
-        toLevel,
-        progressPercent: progress,
       };
     })),
   );
@@ -499,21 +487,17 @@ export class MatchClosePage {
     }
 
     if ((teamLabel === 'LOCAL' && this.homeScore() > this.awayScore()) || (teamLabel === 'VISITA' && this.awayScore() > this.homeScore())) {
-      return 10;
+      return 5;
     }
 
-    return 5;
+    return 2;
   }
 
   private goalXpByPosition(position: string): number {
     const normalized = position.toUpperCase();
-    if (normalized.includes('DEF')) {
-      return 15;
-    }
-    if (normalized.includes('MED')) {
-      return 12;
-    }
-    return 10;
+    if (normalized.includes('DEF')) return 6;
+    if (normalized.includes('MED')) return 5;
+    return 4;
   }
 
   private async loadClosePreview(): Promise<void> {

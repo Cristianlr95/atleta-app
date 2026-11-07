@@ -153,7 +153,7 @@
   text-align: center;
 }
 
-.leaderboard__mobile-role { display: none; }
+.leaderboard__mobile-role, .leaderboard__mobile-matches { display: none; }
 
 @media (max-width: 600px) {
   .leaderboard__table { min-width: 0; table-layout: fixed; }
@@ -163,6 +163,7 @@
   .leaderboard__role-heading, .leaderboard__role,
   .leaderboard__matches-heading, .leaderboard__matches { display: none; }
   .leaderboard__table th, .leaderboard__table td { padding: 10px 6px; }
+  .leaderboard__mobile-matches { display: block; margin: 3px 0 0; color: var(--text-muted); font-size: 14px; }
   .leaderboard__mobile-role { display: block; margin: 3px 0 0; color: var(--text-muted); font-size: 14px; }
   .leaderboard__row-meta { font-size: 14px; }
   .leaderboard__score { font-size: 15px; }

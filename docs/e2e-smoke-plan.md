@@ -24,7 +24,7 @@ If credentials are missing, smoke specs are marked as skipped.
 ## Smoke 1: Auth and onboarding
 1. Open `/login`.
 2. Login with valid credentials.
-3. Expect redirect to `/player/profile` (or `/player/onboarding` if missing profile).
+3. Expect redirect to `/home` (or `/player/onboarding` if missing profile).
 4. Logout/login cycle keeps stable navigation without duplicate requests.
 
 ## Smoke 2: Create match and send invites
@@ -58,12 +58,16 @@ If credentials are missing, smoke specs are marked as skipped.
 
 ## Smoke 6: MVP vote post-cierre
 
-Prerequisito adicional: `E2E_FINALIZED_MATCH_ID` debe identificar un partido ya finalizado en el que `E2E_USER_B` sea participante confirmado. El smoke no intenta iniciar encuentros incompletos.
+Prerequisito adicional: `E2E_FINALIZED_MATCH_ID` debe identificar un partido ya finalizado en el que `E2E_USER_B` sea participante confirmado y aún no haya votado. El smoke no intenta iniciar encuentros incompletos.
 1. Seed match via API and accept at least one invitation.
 2. Transition match `CREADO -> INICIADO -> FINALIZADO`.
 3. Open `/matches/:id/mvp-vote` with confirmed participant.
 4. Enviar el voto y verificar el estado visual `Votado` en Jugador del Partido.
 5. Validate API returns `myVote` for current user.
+
+## Smoke: partido con cupos completos en Social
+
+`E2E_FULL_MATCH_ID` identifica un partido de cinco contra cinco con diez participantes confirmados; los usuarios A y B deben ser, respectivamente, creador e invitado confirmado, sin otros partidos completos en su lista de Social. El smoke abre el partido desde Social con ambas cuentas y comprueba los diez confirmados.
 
 ## Pass criteria
 - No infinite loading.

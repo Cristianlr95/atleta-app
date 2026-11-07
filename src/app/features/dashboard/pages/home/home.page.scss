@@ -16,3 +16,61 @@
 @media (max-width:640px) { .home-overview { align-items:flex-start; }.home-team { min-width:0; }.home-priority { grid-template-columns:1fr; gap:5px; }.home-priority__cta { justify-self:start; padding:6px 0; } }
 @media (min-width:900px) { .home-container { padding-top:32px; } }
 @media (max-width:420px) { .home-overview { display:grid; gap:14px; }.home-identity { align-items:flex-start; }.home-team { width:100%; padding:10px 0 0; border-left:0; border-top:1px solid rgba(112,159,166,.28); }.home-avatar { height:50px; width:50px; }.home-name { font-size:1.05rem; } }
+
+/* Inicio: jerarquía de jugador, métricas y próximo encuentro. */
+.home-overview { padding: 8px 0 22px; }
+.home-avatar { flex:none; width:68px; height:68px; font-size:1.8rem; border-width:2px; box-shadow:0 0 16px rgba(0,220,235,.18); }
+.home-name { font-size:1.35rem; }
+.home-subtitle, .home-streak, .home-status-card__detail, .home-feed__item { font-size:1rem; line-height:1.45; }
+.home-team__copy small, .home-priority__label, .home-metric span { font-size:12px; }
+.home-metrics { margin:18px 0; border-top:1px solid rgba(112,159,166,.28); }
+.home-metric { padding:15px 12px; }
+.home-metric strong { font-size:28px; }
+.home-metric:first-child { background:rgba(0,208,229,.08); border-bottom:2px solid var(--tactical-visit); }
+.home-priority { padding:18px; border:1px solid rgba(112,159,166,.3); border-left:4px solid var(--tactical-local); border-radius:8px; background:rgba(0,182,205,.06); }
+.home-status-card__title { font-size:1.15rem; }
+.home-priority__cta, .home-activity__heading button { min-height:44px; font-size:13px; }
+.home-progress { padding:22px 0; }
+.home-progress__heading, .home-activity__heading { font-size:14px; }
+.home-xp__track { height:10px; border-radius:6px; }
+.home-feed__item { padding:12px; }
+@media (max-width:420px) {
+  .home-overview { display:flex; gap:8px; align-items:center; }
+  .home-identity { gap:8px; align-items:center; min-width:0; }
+  .home-avatar { width:50px; height:50px; }
+  .home-name { font-size:1rem; }
+  .home-subtitle, .home-streak { font-size:.85rem; }
+  .home-team { width:auto; flex:1; min-width:0; padding:0 0 0 8px; border-top:0; border-left:1px solid rgba(112,159,166,.28); }
+  .home-team img { display:none; }
+  .home-team__copy strong { overflow-wrap:anywhere; font-size:13px; }
+  .home-priority { grid-template-columns:1fr auto; gap:4px 8px; padding:12px; }
+  .home-priority__label { grid-column:1 / -1; }
+  .home-priority__cta { align-self:center; }
+  .home-progress { padding:16px 0; }
+}
+
+.home-metric:first-child strong { font-size: 38px; font-style: italic; line-height: 1; }
+.home-metric:first-child { background: linear-gradient(120deg, rgba(80, 155, 174, .32), rgba(0, 208, 229, .06)); }
+.home-feed__item, .home-subtitle, .home-streak, .home-status-card__detail { font-family: Arial, sans-serif; }
+
+@media (max-width: 360px) {
+  .home-overview { display: grid; gap: 12px; }
+  .home-team { width: 100%; padding: 10px 0 0; border-left: 0; border-top: 1px solid rgba(112,159,166,.28); }
+  .home-metric { padding-inline: 6px; }
+  .home-metric span { font-size: 10px; letter-spacing: 0; overflow-wrap: normal; }
+}
+
+.home-activity {
+  background: linear-gradient(to bottom, #071219 5%, rgba(7,18,25,.96) 55%, rgba(7,18,25,.82)), url('/assets/backgrounds/stadium.png') center 82% / cover no-repeat;
+  padding: 16px 10px 28px;
+}
+@media (min-width: 361px) and (max-width: 420px) {
+  .home-team img { display: block; width: 22px; height: 22px; flex: none; }
+}
+.home-brand { display: flex; justify-content: center; align-items: center; gap: 10px; padding: 2px 0 12px; color: var(--text-primary); }
+.home-brand img { width: 42px; height: 42px; border-radius: 10px; }
+.home-brand span { display: block; font-family: var(--font-family-display); font-weight: 800; font-size: 17px; letter-spacing: .08em; }
+.home-brand h1 { margin: 0; font: 600 11px var(--font-family-body); letter-spacing: .06em; text-transform: uppercase; color: var(--text-secondary); }
+
+.home-team { min-height: 44px; }
+.home-retry { min-height: 44px; border: 0; background: transparent; color: var(--tactical-visit); font-weight: 700; cursor: pointer; }

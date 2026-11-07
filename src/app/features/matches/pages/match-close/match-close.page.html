@@ -1,4 +1,4 @@
-﻿<ion-content class="match-close-bg">
+<ion-content class="match-close-bg">
   <div class="match-close-container">
     <app-metallic-card title="Cierre del Partido" [titleIconAsset]="titleIconAsset">
       <div class="steps" *ngIf="!closedSuccess()">
@@ -111,7 +111,7 @@
         </section>
 
         <section *ngIf="step() === 3" class="panel">
-          <h3>XP Ganada</h3>
+          <h3>XP estimada</h3>
           <app-xp-reward-card [rewards]="xpRewards()"></app-xp-reward-card>
 
           <div class="footer-actions">

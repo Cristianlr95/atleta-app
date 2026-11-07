@@ -1,0 +1,15 @@
+        <div *ngIf="teams.length > 0; else noTeams" class="profile-teams">
+          <div class="profile-team" *ngFor="let team of teams">
+            <div class="profile-team__head">
+              <img *ngIf="team.logoUrl" class="profile-team__logo" [src]="team.logoUrl" [alt]="'Logo ' + team.nombre" />
+              <div class="profile-team__meta"><p class="profile-team__name">{{ team.nombre }}</p><p class="profile-team__detail" *ngIf="team.anioFundacion">Fundado: {{ team.anioFundacion }}</p></div>
+              <div class="profile-team__actions"><button type="button" class="profile-team__btn profile-team__btn--icon" [attr.aria-expanded]="isTeamExpanded(team.id)" [attr.aria-label]="(isTeamExpanded(team.id) ? 'Ocultar integrantes de ' : 'Ver integrantes de ') + team.nombre" (click)="teamToggle.emit(team.id)">{{ isTeamExpanded(team.id) ? 'Ocultar' : 'Ver integrantes' }}</button><button type="button" class="profile-team__btn profile-team__btn--danger" *ngIf="isTeamCreator(team)" (click)="remove.emit(team)">Eliminar</button></div>
+            </div>
+            <div class="profile-team-invite" *ngIf="isTeamExpanded(team.id)">
+              <p class="profile-team-invite__title">Participantes y nivel del equipo</p><p class="profile-message profile-message--info" *ngIf="teamMembersLoading">Cargando miembros...</p><p class="profile-message profile-message--warning" *ngIf="teamMembersError">{{ teamMembersError }}</p>
+              <div class="profile-team-members" *ngIf="!teamMembersLoading && teamMembers.length > 0"><div class="profile-team-members__item" *ngFor="let member of teamMembers"><div><p>{{ member.alias }}</p><small *ngIf="member.primaryPositionName">{{ member.primaryPositionName }}</small></div><div class="profile-team-members__right"><span>{{ memberRoleLabel(member.rol) }}</span><span>{{ memberOvrLabel(member.ovr) }}</span></div></div></div>
+              <ng-container *ngIf="isTeamCreator(team)"><p class="profile-team-invite__subtitle">Invitar jugador</p><input type="text" aria-label="Buscar jugadores para invitar" class="profile-team-invite__input" [ngModel]="inviteQuery" (ngModelChange)="queryChange.emit($event)" placeholder="Buscar por alias, nombre o email" /><p class="profile-message profile-message--info" *ngIf="inviteLoading">Buscando jugadores...</p><div class="profile-team-invite__list" *ngIf="inviteCandidates.length > 0"><div class="profile-team-invite__item" *ngFor="let player of inviteCandidates"><div class="profile-team-invite__meta"><p>{{ player.alias || player.athleteName || player.atletaUuid }}</p><small *ngIf="player.athleteEmail">{{ player.athleteEmail }}</small></div><button type="button" class="profile-team__btn" [disabled]="inviteSendingUuid === player.atletaUuid" (click)="invite.emit(player.atletaUuid)">{{ inviteSendingUuid === player.atletaUuid ? 'Enviando...' : 'Invitar' }}</button></div></div></ng-container>
+            </div>
+          </div>
+        </div>
+        <ng-template #noTeams><p class="profile-message profile-message--info">Aun no perteneces a ningun equipo.</p></ng-template>

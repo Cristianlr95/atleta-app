@@ -1,4 +1,4 @@
-﻿<div class="leaderboard">
+<div class="leaderboard">
   <header class="leaderboard__header">
     <img class="atleta-raster-icon" [src]="podiumIconAsset" aria-hidden="true" alt="" />
     <h3>{{ title }}</h3>
@@ -28,6 +28,7 @@
             <p class="leaderboard__alias">{{ row.alias }}</p>
             <p *ngIf="row.metaText" class="leaderboard__row-meta">{{ row.metaText }}</p>
             <p *ngIf="showRole && row.roleText" class="leaderboard__mobile-role">{{ row.roleText }}</p>
+            <p *ngIf="row.matchesPlayed !== null && row.matchesPlayed !== undefined && row.metaText !== row.matchesPlayed + ' partidos'" class="leaderboard__mobile-matches">{{ row.matchesPlayed }} partidos</p>
           </td>
           <td *ngIf="showRole" class="leaderboard__role">{{ row.roleText || '—' }}</td>
           <td class="leaderboard__score">{{ row.scoreText }}</td>

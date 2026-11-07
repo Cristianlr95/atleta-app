@@ -61,6 +61,19 @@ describe('LoginPage', () => {
     fixture.detectChanges();
   });
 
+  it('explica y asocia los errores de los campos al perder el foco', () => {
+    component.loginForm.controls.email.setValue('correo-invalido');
+    component.loginForm.controls.email.markAsTouched();
+    component.loginForm.controls.password.setValue('corta');
+    component.loginForm.controls.password.markAsTouched();
+    fixture.detectChanges();
+    const email: HTMLInputElement = fixture.nativeElement.querySelector('input[type=email]');
+    const password: HTMLInputElement = fixture.nativeElement.querySelector('input[type=password]');
+    expect(email.getAttribute('aria-describedby')).toBe('login-email-error');
+    expect(password.getAttribute('aria-describedby')).toBe('login-password-error');
+    expect(fixture.nativeElement.querySelector('#login-email-error')).not.toBeNull();
+    expect(fixture.nativeElement.querySelector('#login-password-error')).not.toBeNull();
+  });
   it('should create', () => {
     expect(component).toBeTruthy();
   });

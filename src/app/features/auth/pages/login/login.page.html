@@ -1,4 +1,4 @@
-﻿<ion-content class="login-bg">
+<ion-content class="login-bg">
   <div class="login-container">
     <div class="login-brand" aria-label="Atleta">
       <img src="/assets/brand/atleta-app-icon-v1.png" alt="Logo Atleta" />
@@ -8,18 +8,26 @@
       <form class="login-form" [formGroup]="loginForm" (ngSubmit)="onLogin()">
         <app-metallic-input
           formControlName="email"
+          [invalid]="loginForm.controls.email.touched && loginForm.controls.email.invalid"
+          [describedBy]="loginForm.controls.email.touched && loginForm.controls.email.invalid ? 'login-email-error' : null"
           label="Email"
           type="email"
           placeholder="tu@email.com">
         </app-metallic-input>
 
+        <p id="login-email-error" class="login-error" *ngIf="loginForm.controls.email.touched && loginForm.controls.email.invalid">Ingresa un correo válido.</p>
+
         <app-metallic-input
           formControlName="password"
+          [invalid]="loginForm.controls.password.touched && loginForm.controls.password.invalid"
+          [describedBy]="loginForm.controls.password.touched && loginForm.controls.password.invalid ? 'login-password-error' : null"
           label="Contraseña"
           type="password"
           placeholder="••••••••"
           allowPasswordToggle>
         </app-metallic-input>
+
+        <p id="login-password-error" class="login-error" *ngIf="loginForm.controls.password.touched && loginForm.controls.password.invalid">Ingresa una contraseña de al menos 8 caracteres.</p>
 
         <app-metallic-button
           class="login-submit"

@@ -149,8 +149,8 @@ Atleta Frontend es una aplicacion para jugadores de futbol amateur centrada en i
 
 ### Password de cuenta - `Parcial`
 - Cambio de contrasena autenticado implementado en Perfil > Seguridad de cuenta usando `PUT /athletes/{atletaUuid}/password`.
-- El boton "Olvidaste tu contrasena" ya no queda sin respuesta; informa que el reset por email aun requiere contrato backend.
-- Pendiente: reset por email/token cuando exista endpoint backend publico y flujo de entrega seguro.
+- La pantalla permite solicitar un enlace y confirmar una nueva contrasena con token; el backend expone ambos endpoints.
+- Pendiente: configurar y verificar la entrega real de correo y el flujo completo en el ambiente de destino.
 
 ### Registro real de push token en backend - `Implementada`
 - El token se persiste localmente y se registra en backend con `deviceId` estable por usuario.

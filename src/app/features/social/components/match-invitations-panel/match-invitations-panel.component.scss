@@ -41,6 +41,7 @@
 }
 
 .match-item button {
+  min-height: 44px;
   display: inline-flex;
   align-items: center;
   gap: 6px;
@@ -57,5 +58,6 @@
 
 .match-item__actions {
   display: flex;
+  flex-wrap: wrap;
   gap: 6px;
 }

@@ -107,8 +107,8 @@ export class StatsPage implements OnDestroy {
 
     forkJoin({
       overall: this.ratingsApiService.getOverall(playerUuid).pipe(catchError(() => of(null))),
-      roles: this.ratingsApiService.getByRole(playerUuid).pipe(catchError(() => of([] as RatingByRole[]))),
-      history: this.matchHistoryService.getPlayerHistory(playerUuid).pipe(catchError(() => of([] as MatchHistoryViewItem[]))),
+      roles: this.ratingsApiService.getByRole(playerUuid).pipe(catchError(() => of(null))),
+      history: this.matchHistoryService.getPlayerHistory(playerUuid).pipe(catchError(() => of(null))),
     })
       .pipe(
         takeUntil(this.destroy$),
@@ -116,6 +116,10 @@ export class StatsPage implements OnDestroy {
       )
       .subscribe(({ overall, roles, history }) => {
         void this.notificationBadgeService.refresh();
+        if (roles === null || history === null) {
+          this.errorMessage = 'No se pudieron cargar las estadísticas. Inténtalo nuevamente.';
+          return;
+        }
         this.applyStats(overall, roles, history);
       });
   }

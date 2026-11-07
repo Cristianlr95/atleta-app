@@ -103,16 +103,11 @@
   border: 1px solid rgba(125, 157, 212, 0.25);
   border-radius: 12px;
   padding: 8px;
-  max-height: 46vh;
-  overflow-y: auto;
   overflow-x: hidden;
-  -webkit-overflow-scrolling: touch;
   scrollbar-width: thin;
 }
 
 .players-table-scroll {
-  max-height: 46vh;
-  overflow-y: auto;
   overflow-x: hidden;
 }
 
@@ -146,7 +141,7 @@
 .table-head,
 .table-row {
   display: grid;
-  grid-template-columns: minmax(120px, 1fr) 38px 38px 42px;
+  grid-template-columns: minmax(80px, 1fr) 44px 44px 36px;
   align-items: center;
   gap: 4px;
   padding: 7px 6px;
@@ -194,8 +189,8 @@
 }
 
 .mini-btn {
-  height: 20px;
-  min-width: 20px;
+  height: 44px;
+  min-width: 44px;
   padding: 0;
   border: 1px solid rgba(153, 183, 227, 0.45);
   border-radius: 6px;
@@ -305,7 +300,7 @@
 
   .table-head,
   .table-row {
-    grid-template-columns: minmax(90px, 1fr) 32px 32px 36px;
+    grid-template-columns: minmax(65px, 1fr) 44px 44px 30px;
     font-size: 0.68rem;
   }
   

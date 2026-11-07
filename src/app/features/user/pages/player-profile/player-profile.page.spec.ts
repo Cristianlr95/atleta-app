@@ -1,4 +1,4 @@
-﻿import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ActivatedRoute, Router } from '@angular/router';
 import { of } from 'rxjs';
 import { AppToastService } from 'src/app/core/services/app-toast.service';
@@ -95,6 +95,37 @@ describe('PlayerProfilePage', () => {
     fixture.detectChanges();
   });
 
+  it('no muestra métricas provisionales mientras carga el perfil', () => {
+    component.isLoading = true;
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelector('.player-command-center')).toBeNull();
+    expect(fixture.nativeElement.textContent).toContain('Actualizando estadísticas');
+  });
+  it('no muestra ceros como estadísticas cuando falla el historial', () => {
+    component.historyUnavailable = true;
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelector('.competition-metrics')).toBeNull();
+    expect(fixture.nativeElement.textContent).toContain('No se pudieron cargar las estadísticas de competición');
+  });
+  it('no muestra estadísticas de ejemplo en un perfil sin datos', () => {
+    expect(component.roleStats).toEqual([]);
+    expect(component.achievements).toEqual([]);
+    (component as any).applyProfileData('Jugador', 'jugador@atleta.test', null, null, [], [], [], []);
+    expect(component.roleStats).toEqual([]);
+    fixture.detectChanges();
+    expect(fixture.nativeElement.textContent).toContain('No hay estadísticas por posición disponibles');
+    expect(fixture.nativeElement.textContent).toContain('No hay trofeos disponibles');
+  });
+  it('identifica el equipo y el estado del panel de integrantes', () => {
+    component.memberTeams = [{ id: 7, nombre: 'Azul' } as any];
+    fixture.detectChanges();
+    const button: HTMLButtonElement = fixture.nativeElement.querySelector('.profile-team__btn--icon');
+    expect(button.getAttribute('aria-expanded')).toBe('false');
+    expect(button.getAttribute('aria-label')).toContain('Azul');
+    component.expandedTeamId = 7;
+    fixture.detectChanges();
+    expect(button.getAttribute('aria-expanded')).toBe('true');
+  });
   it('should create', () => {
     expect(component).toBeTruthy();
   });

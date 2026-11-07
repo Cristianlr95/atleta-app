@@ -38,6 +38,7 @@ export class VenueCreatePage {
   readonly fields = signal<SavedFieldLocation[]>([]);
   readonly loading = signal(false);
   readonly saveError = signal<string | null>(null);
+  readonly fieldsError = signal(false);
 
   readonly selectedLat = signal<number | null>(null);
   readonly selectedLng = signal<number | null>(null);
@@ -70,13 +71,18 @@ export class VenueCreatePage {
     this.selectedLng.set(coords.lng);
   }
 
-  private async loadFields(): Promise<void> {
+  async loadFields(): Promise<void> {
+    this.fieldsError.set(false);
     const fields = await firstValueFrom(
       this.fieldLocationsApiService.getFieldLocations(undefined, true).pipe(
         timeout(4000),
-        catchError(() => of([])),
+        catchError(() => of(null)),
       ),
     );
+    if (fields === null) {
+      this.fieldsError.set(true);
+      return;
+    }
     this.fields.set(
       fields.map((item) => ({
         id: item.id,

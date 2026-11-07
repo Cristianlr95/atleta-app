@@ -28,6 +28,12 @@
     </button>
   </div>
 
+  <div class="location-picker__controls location-picker__coordinates">
+    <input #latitude class="location-picker__search" type="number" inputmode="decimal" min="-90" max="90" step="any" aria-label="Latitud" placeholder="Latitud" />
+    <input #longitude class="location-picker__search" type="number" inputmode="decimal" min="-180" max="180" step="any" aria-label="Longitud" placeholder="Longitud" />
+    <button type="button" class="location-picker__button" (click)="onSetCoordinates(latitude.value, longitude.value)">Usar coordenadas</button>
+  </div>
+
   <div #mapContainer class="location-picker__map" role="application" aria-label="Mapa para seleccionar ubicacion"></div>
 
   <p class="location-picker__hint">Toca el mapa para seleccionar un punto o elige una cancha guardada.</p>

@@ -1,6 +1,5 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
-import { firstValueFrom, forkJoin, of } from 'rxjs';
-import { catchError } from 'rxjs/operators';
+import { firstValueFrom, forkJoin } from 'rxjs';
 import { MatchService } from 'src/app/features/matches/services/match.service';
 import { TeamSummary } from 'src/app/features/teams/models/team.models';
 import { TeamApiService } from 'src/app/features/teams/services/team-api.service';
@@ -50,11 +49,11 @@ export class ActivityService {
     try {
       const snapshot = await firstValueFrom(
         forkJoin({
-          teams: this.teamApiService.getByPlayer(playerUuid).pipe(catchError(() => of([] as TeamSummary[]))),
-          friendships: this.socialApiService.getFriendships(playerUuid).pipe(catchError(() => of([] as SocialRequestItem[]))),
-          teamInvites: this.socialApiService.getTeamInvites(playerUuid).pipe(catchError(() => of([] as SocialRequestItem[]))),
-          matchInvites: this.socialApiService.getMatchInvites(playerUuid).pipe(catchError(() => of([] as SocialRequestItem[]))),
-          notifications: this.socialApiService.getNotifications(playerUuid).pipe(catchError(() => of([] as SocialNotificationItem[]))),
+          teams: this.teamApiService.getByPlayer(playerUuid),
+          friendships: this.socialApiService.getFriendships(playerUuid),
+          teamInvites: this.socialApiService.getTeamInvites(playerUuid),
+          matchInvites: this.socialApiService.getMatchInvites(playerUuid),
+          notifications: this.socialApiService.getNotifications(playerUuid),
         }),
       );
 

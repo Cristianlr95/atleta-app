@@ -1,4 +1,4 @@
-﻿.score-editor {
+.score-editor {
   display: grid;
   grid-template-columns: 1fr auto 1fr;
   gap: 8px;
@@ -22,14 +22,14 @@
 
 .controls {
   display: grid;
-  grid-template-columns: 34px 30px 34px;
+  grid-template-columns: 44px 22px 44px;
   gap: 4px;
   align-items: center;
 }
 
 .score-btn {
-  height: 28px;
-  min-width: 28px;
+  height: 44px;
+  min-width: 44px;
   border: 1px solid rgba(153, 183, 227, 0.45);
   border-radius: 8px;
   background: linear-gradient(180deg, rgba(162, 181, 211, 0.26), rgba(90, 112, 146, 0.2));

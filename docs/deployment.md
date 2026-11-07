@@ -11,6 +11,12 @@ Fecha de actualizacion: 2026-04-23
 - Servidor de desarrollo: `ng serve`.
 - Test E2E: Playwright.
 
+### Depuración Android con backend local
+
+El APK `debug` permite HTTP únicamente hacia `localhost`; la configuración de red de release no cambia. Para usarlo en emulador o dispositivo conectado por ADB, iniciar el backend local en el puerto 8080, configurar su CORS para aceptar el origen `https://localhost` de Capacitor y ejecutar `adb reverse tcp:8080 tcp:8080`. Construir el APK de desarrollo con `ATLETA_API_BASE_URL=http://localhost:8080/api/v1`; comprobar que otras variables de entorno no sustituyan esa URL. Al terminar, quitar el túnel con `adb reverse --remove tcp:8080`.
+
+No utilizar esta configuración HTTP para servidores remotos ni distribuir un APK de depuración como release. Las conexiones de producción deben usar HTTPS.
+
 ## 2. Hallazgos del estado actual
 ### Build y configuracion
 - El proyecto ya separaba `development` y `production` con `fileReplacements`, pero el `apiBaseUrl` estaba compilado fijo en `environment.ts` y `environment.prod.ts`.
