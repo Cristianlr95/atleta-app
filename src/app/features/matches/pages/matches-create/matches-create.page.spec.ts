@@ -14,9 +14,12 @@ import { MatchesCreatePage } from './matches-create.page';
 describe('MatchesCreatePage convocatoria', () => {
   let page: MatchesCreatePage;
   let matchService: jasmine.SpyObj<MatchService>;
+  let navigation: jasmine.SpyObj<NavigationService>;
 
   beforeEach(() => {
     matchService = jasmine.createSpyObj('MatchService', ['createDraft', 'sendInvitations']);
+    navigation = jasmine.createSpyObj<NavigationService>('NavigationService', ['safeNavigate', 'goBackOrProfile', 'goToMainBottomSection']);
+    navigation.safeNavigate.and.resolveTo(true);
     TestBed.configureTestingModule({
       providers: [
         { provide: AuthSessionService, useValue: { currentSession: { user: { atletaUuid: 'captain' } } } },
@@ -25,7 +28,7 @@ describe('MatchesCreatePage convocatoria', () => {
           { playerUuid: 'player-1', alias: 'Ana' },
         ]) } },
         { provide: MatchService, useValue: matchService },
-        { provide: NavigationService, useValue: {} },
+        { provide: NavigationService, useValue: navigation },
         { provide: AppToastService, useValue: { success: () => {}, info: () => {} } },
         { provide: ErrorMapperService, useValue: {} },
         { provide: Router, useValue: { navigate: async () => true } },
@@ -41,6 +44,11 @@ describe('MatchesCreatePage convocatoria', () => {
     expect(page.totalInvitedWithCreator()).toBe(2);
     page.onSelectionChange([]);
     expect(page.totalInvitedWithCreator()).toBe(1);
+  });
+
+  it('opens the team creation flow when no team is available yet', () => {
+    page.onCreateTeamForMatch();
+    expect(navigation.safeNavigate).toHaveBeenCalledWith(['/sessions/create']);
   });
 
   for (const minimum of [10, 12, 14]) {

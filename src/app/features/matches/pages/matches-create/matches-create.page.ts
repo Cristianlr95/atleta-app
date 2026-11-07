@@ -165,6 +165,10 @@ export class MatchesCreatePage {
     void this.content?.scrollToTop(0);
   }
 
+  onCreateTeamForMatch(): void {
+    void this.navigationService.safeNavigate(['/sessions/create']);
+  }
+
   async onContinue(): Promise<void> {
     if (!this.canContinue()) {
       return;
