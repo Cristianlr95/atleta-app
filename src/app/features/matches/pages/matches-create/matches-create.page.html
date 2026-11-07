@@ -15,7 +15,14 @@
         <app-metallic-button *ngIf="loadTeamsError()" type="button" variant="secondary" (click)="onRetryLoadTeams()">
           Reintentar equipos
         </app-metallic-button>
+        <ng-container *ngIf="!loadingTeams() && !loadTeamsError() && teams().length === 0">
+          <p class="kit-help">Todavía no tienes un equipo asociado. Crea uno para poder programar un partido.</p>
+          <app-metallic-button type="button" variant="primary" (click)="onCreateTeamForMatch()">
+            Crear equipo
+          </app-metallic-button>
+        </ng-container>
         <app-match-schedule-form
+          *ngIf="teams().length > 0 || loadingTeams() || loadTeamsError()"
           [teams]="teamOptions()"
           [loadingTeams]="loadingTeams()"
           [selectedTeamId]="schedule().teamId"
