@@ -1,7 +1,8 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { ActivatedRoute, Router } from '@angular/router';
-import { of } from 'rxjs';
+import { ActivatedRoute, convertToParamMap, ParamMap, Router } from '@angular/router';
+import { BehaviorSubject, of } from 'rxjs';
 import { AuthSession } from 'src/app/core/models/auth-session.model';
+import { NavigationService } from 'src/app/core/services/navigation.service';
 import { LoginPage } from './login.page';
 import { AuthService } from '../../services/auth.service';
 import { GoogleIdentityService } from '../../services/google-identity.service';
@@ -12,6 +13,7 @@ describe('LoginPage', () => {
   let authService: jasmine.SpyObj<AuthService>;
   let googleIdentityService: jasmine.SpyObj<GoogleIdentityService>;
   let router: jasmine.SpyObj<Router>;
+  let queryParams: BehaviorSubject<ParamMap>;
 
   beforeEach(async () => {
     authService = jasmine.createSpyObj<AuthService>('AuthService', [
@@ -21,12 +23,14 @@ describe('LoginPage', () => {
     googleIdentityService = jasmine.createSpyObj<GoogleIdentityService>('GoogleIdentityService', [
       'requestIdToken',
     ]);
-    router = jasmine.createSpyObj<Router>('Router', ['navigate']);
+    router = jasmine.createSpyObj<Router>('Router', ['navigate', 'navigateByUrl']);
     authService.login.and.returnValue(of(buildSession()));
     authService.loginWithGoogleIdToken.and.returnValue(of(buildSession()));
     googleIdentityService.requestIdToken.and.resolveTo('google-id-token');
     Object.assign(googleIdentityService, { isConfigured: () => true });
     router.navigate.and.resolveTo(true);
+    router.navigateByUrl.and.resolveTo(true);
+    queryParams = new BehaviorSubject(convertToParamMap({}));
 
     await TestBed.configureTestingModule({
       imports: [LoginPage],
@@ -45,13 +49,7 @@ describe('LoginPage', () => {
         },
         {
           provide: ActivatedRoute,
-          useValue: {
-            snapshot: {
-              queryParamMap: {
-                get: () => null,
-              },
-            },
-          },
+          useValue: { queryParamMap: queryParams },
         },
       ],
     }).compileComponents();
@@ -78,6 +76,40 @@ describe('LoginPage', () => {
     expect(component).toBeTruthy();
   });
 
+  it('enters the app after successful login even during the previous navigation lock', async () => {
+    jasmine.clock().install();
+    try {
+      jasmine.clock().mockDate(new Date());
+      await TestBed.inject(NavigationService).safeNavigate(['/login']);
+      component.loginForm.setValue({ email: 'demo@atleta.cl', password: 'valid-password' });
+
+      await component.onLogin();
+
+      expect(router.navigateByUrl).toHaveBeenCalledOnceWith('/home');
+    } finally {
+      jasmine.clock().uninstall();
+    }
+  });
+
+  it('uses updated registration parameters when Ionic reuses the login page', async () => {
+    queryParams.next(convertToParamMap({ email: 'new@atleta.test', next: '/player/onboarding' }));
+    expect(component.loginForm.controls.email.value).toBe('new@atleta.test');
+    component.loginForm.controls.password.setValue('valid-password');
+
+    await component.onLogin();
+
+    expect(router.navigateByUrl).toHaveBeenCalledOnceWith('/player/onboarding');
+  });
+
+  it('recovers from an old login redirect that points back to login', async () => {
+    queryParams.next(convertToParamMap({ next: '/login?next=%2Fplayer%2Fonboarding' }));
+    component.loginForm.setValue({ email: 'demo@atleta.cl', password: 'valid-password' });
+
+    await component.onLogin();
+
+    expect(router.navigateByUrl).toHaveBeenCalledOnceWith('/home');
+  });
+
   it('hides the Google sign-in option when this environment has no client ID', () => {
     Object.assign(googleIdentityService, { isConfigured: () => false });
     fixture.detectChanges();
@@ -89,7 +121,7 @@ describe('LoginPage', () => {
 
     expect(googleIdentityService.requestIdToken).toHaveBeenCalled();
     expect(authService.loginWithGoogleIdToken).toHaveBeenCalledOnceWith('google-id-token');
-    expect(router.navigate).toHaveBeenCalledWith(['/home'], undefined);
+    expect(router.navigateByUrl).toHaveBeenCalledWith('/home');
     expect(component.authError).toBeNull();
   });
 

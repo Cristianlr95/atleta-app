@@ -30,7 +30,11 @@ export class HttpErrorInterceptor implements HttpInterceptor {
   intercept(req: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {
     return next.handle(req).pipe(
       catchError((error: HttpErrorResponse) => {
-        if (error.status === 401 && this.canRefresh(req)) {
+        if (error.status !== 401 || this.isPublicEndpoint(req)) {
+          return throwError(() => this.httpErrorService.map(error));
+        }
+
+        if (!req.context.get(AUTH_RETRY)) {
           return this.sessionRefreshService.refreshAccessToken().pipe(
             switchMap((accessToken) => next.handle(req.clone({
               context: req.context.set(AUTH_RETRY, true),
@@ -40,16 +44,12 @@ export class HttpErrorInterceptor implements HttpInterceptor {
           );
         }
 
-        if (error.status === 401) {
-          return this.expireSession(error);
-        }
-
-        return throwError(() => this.httpErrorService.map(error));
+        return this.expireSession(error);
       }),
     );
   }
 
-  private canRefresh(req: HttpRequest<unknown>): boolean {
+  private isPublicEndpoint(req: HttpRequest<unknown>): boolean {
     const publicPaths = [
       API_ENDPOINTS.auth.login,
       API_ENDPOINTS.auth.registerAthlete,
@@ -59,7 +59,7 @@ export class HttpErrorInterceptor implements HttpInterceptor {
       API_ENDPOINTS.auth.passwordResetRequest,
       API_ENDPOINTS.auth.passwordResetConfirm,
     ];
-    return !req.context.get(AUTH_RETRY) && !publicPaths.some((path) => req.url.includes(path));
+    return publicPaths.some((path) => req.url.includes(path));
   }
 
   private expireSession(error: unknown): Observable<never> {
