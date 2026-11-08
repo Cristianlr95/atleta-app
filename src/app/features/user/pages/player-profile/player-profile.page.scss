@@ -117,7 +117,7 @@
 .ovr-block { display: grid; grid-template-columns: auto auto; align-items: center; justify-items: start; gap: 5px; width: fit-content; margin-top: 2px; padding: 7px 0 0; border: 0; border-top: 1px solid rgba(0, 215, 245, .22); background: transparent; text-align: left; cursor: pointer; }
 .ovr-block span { color: var(--text-muted); font: 700 11px var(--font-family-display); letter-spacing: .1em; }
 .ovr-block strong { color: var(--tactical-local); font: 700 30px/1 var(--font-family-display); }
-.ovr-block:focus-visible { outline: 2px solid var(--tactical-visit); outline-offset: 4px; border-radius: 3px; }
+.profile-container button:focus-visible { outline: 2px solid var(--tactical-visit); outline-offset: 3px; }
 .ovr-popover-content { display: grid; gap: 4px; max-width: 220px; padding: 12px 14px; background: #07151d; color: var(--text-primary); }
 .ovr-popover-content p { margin: 0; color: var(--tactical-visit); font: 700 11px var(--font-family-display); letter-spacing: .1em; }
 .ovr-popover-content strong { font: 700 15px var(--font-family-display); }

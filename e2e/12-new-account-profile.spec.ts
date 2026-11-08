@@ -5,7 +5,7 @@ const isolatedApi = process.env.ATLETA_E2E_ISOLATED_API;
 
 test.use({ trace: 'off', screenshot: 'off', video: 'off' });
 
-test('a newly registered account reaches onboarding and Profile with a persistent session', async ({ page }) => {
+test('a newly registered account reaches onboarding and Profile with a persistent session', async ({ page }, testInfo) => {
   test.setTimeout(90_000);
   test.skip(!isolatedApi, 'Requires a disposable local API and database.');
   expect(isolatedApi).toMatch(/^http:\/\/(localhost|127\.0\.0\.1):\d+$/);
@@ -74,6 +74,48 @@ test('a newly registered account reaches onboarding and Profile with a persisten
   expect((await lowercase).status()).toBe(200);
   await expect(returning).toHaveURL(/\/home$/);
   await expect(returning.getByRole('progressbar')).toHaveAttribute('aria-valuetext', '0 de 100 XP');
+
+  await test.step('H3 shows readable position values at each target width with demo data', async () => {
+    for (const width of [320, 390, 768, 1440]) {
+      await page.setViewportSize({ width, height: 900 });
+      await page.goto('/player/profile?demo=1');
+      await expect(page.locator('.profile-alias')).toHaveText('El Todoterreno');
+      const stats = page.getByRole('region', { name: 'Estadísticas por rol' });
+      await expect(stats.getByRole('img', { name: 'Hexagono de habilidades' })).toBeVisible();
+      const values = stats.locator('dl > div');
+      for (const [index, label] of ['Ataque', 'Mediocampo', 'Carrilero', 'Defensa', 'Arquero', 'DT'].entries()) {
+        await expect(values.nth(index).locator('dt')).toHaveText(label);
+        await expect(values.nth(index).locator('dt')).toBeVisible();
+        await expect(values.nth(index).locator('dd')).toHaveText(String([85, 78, 72, 65, 55, 60][index]));
+      }
+      const ovr = page.getByRole('button', { name: 'Ver qué significa OVR' });
+      await expect(ovr).toContainText('84');
+      await expect(page.locator('.competition-metrics strong')).toHaveText(['18', '12', '6', '11 / 3 / 4']);
+      await page.keyboard.press('Tab');
+      await ovr.focus();
+      await expect(ovr).toHaveCSS('outline-style', 'solid');
+      await expect(ovr).toHaveCSS('outline-width', '2px');
+      await page.keyboard.press('Enter');
+      await expect(page.getByText('Valoración general')).toBeVisible();
+      await page.keyboard.press('Escape');
+      await expect(page.getByText('Valoración general')).toBeHidden();
+      const scroll = await page.locator('ion-content.profile-bg').evaluate(async element => {
+        const content = await (element as HTMLIonContentElement).getScrollElement();
+        return content.scrollWidth - content.clientWidth;
+      });
+      expect(scroll).toBe(0);
+      await stats.evaluate(element => element.scrollIntoView({ block: 'center' }));
+      const footer = page.locator('ion-footer.profile-footer');
+      await expect.poll(async () => {
+        const section = await stats.boundingBox();
+        const navigation = await footer.boundingBox();
+        return !!section && !!navigation && section.y >= 0 && section.y + section.height <= navigation.y;
+      }).toBe(true);
+      await stats.screenshot({ path: testInfo.outputPath(`perfil-roles-${width}.png`) });
+    }
+    await page.getByRole('button', { name: 'Ajustes', exact: true }).click();
+    await expect(page).toHaveURL(/\/player\/settings$/);
+  });
 
   await page.goto('/player/onboarding-status');
   await page.getByRole('button', { name: 'Cerrar sesion' }).click();

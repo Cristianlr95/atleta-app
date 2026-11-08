@@ -55,10 +55,9 @@
               <p>RESUMEN</p>
               <div><span>ROL DESTACADO</span><strong>{{ roleDisplay(overallBestRole) }}</strong><small *ngIf="overallBestRoleRating">{{ overallBestRoleRating | number:'1.0-0' }}</small></div>
               <div><span>VERSATILIDAD</span><strong>{{ overallVersatilityPercent ?? '--' }}%</strong></div>
-              <div><span>NIVEL GENERAL</span><strong>{{ overallHybridOvr !== null ? (overallHybridOvr | number:'1.0-0') : '--' }}</strong></div>
             </aside>
           </div>
-          <dl class="role-stat-values" aria-label="Valores por posición">
+          <dl class="role-stat-values" aria-label="Valores por posición" *ngIf="roleStats.length > 0">
             <div *ngFor="let stat of roleStats"><dt>{{ roleDisplay(stat.role) }}</dt><dd>{{ stat.rating | number:'1.0-0' }}</dd></div>
           </dl>
         </section>
