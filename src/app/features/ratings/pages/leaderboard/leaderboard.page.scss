@@ -26,6 +26,12 @@
   padding: 20px 14px 92px;
 }
 
+.leaderboard-container > app-metallic-card {
+  width: 100%;
+  max-width: 64rem;
+  min-width: 0;
+}
+
 .ranking-workspace {
   width: 100%;
 }
@@ -292,6 +298,10 @@
   .ranking-toolbar {
     grid-template-columns: 1fr;
     gap: 8px;
+  }
+
+  .ranking-toolbar__control select {
+    min-height: 44px;
   }
 
   .leaderboard-roles {
