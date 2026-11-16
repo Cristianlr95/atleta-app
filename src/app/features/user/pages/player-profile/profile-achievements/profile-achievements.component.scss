@@ -4,7 +4,7 @@
 
 .achievement-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: 1fr;
   gap: 10px;
 }
 
@@ -12,15 +12,16 @@
   display: flex;
   gap: 10px;
   min-width: 0;
-  padding: 12px;
-  border: 1px solid rgba(0, 215, 245, 0.34);
-  border-radius: 10px;
-  background: linear-gradient(145deg, rgba(8, 29, 37, 0.94), rgba(4, 16, 22, 0.9));
+  padding: 4px 0 12px;
+  border: 0;
+  border-bottom: 1px solid var(--tactical-line);
+  border-radius: 0;
+  background: transparent;
 }
 
 .achievement-card--locked {
   border-color: rgba(121, 147, 154, 0.35);
-  opacity: 0.72;
+  opacity: 1;
 }
 
 .achievement-card--bronze { border-color: rgba(205, 132, 71, 0.72); }
@@ -59,7 +60,7 @@
 .achievement-card__heading span {
   color: var(--tactical-local);
   font-family: var(--font-family-display);
-  font-size: 10px;
+  font-size: 12px;
   white-space: nowrap;
 }
 
@@ -67,8 +68,8 @@
   margin-top: 3px;
   color: var(--text-muted);
   font-family: var(--font-family-body);
-  font-size: 12px;
-  line-height: 1.15;
+  font-size: 14px;
+  line-height: 1.4;
 }
 
 .achievement-card__progress {
@@ -91,7 +92,7 @@
   margin-top: 4px;
   color: #b8d5da;
   font-family: var(--font-family-display);
-  font-size: 11px;
+  font-size: 14px;
 }
 
 @media (max-width: 520px) {

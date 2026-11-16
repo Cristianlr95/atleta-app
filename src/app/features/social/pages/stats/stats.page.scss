@@ -35,8 +35,7 @@
   color: #ffb8a8;
 }
 
-.stats-retry,
-.stats-leaderboard {
+.stats-retry {
   border: 1px solid rgba(215, 185, 109, 0.46);
   border-radius: 999px;
   background: linear-gradient(135deg, rgba(215, 185, 109, 0.18), rgba(66, 109, 174, 0.2));
@@ -52,10 +51,7 @@
   margin-top: 8px;
 }
 
-.stats-leaderboard {
-  margin-top: 12px;
-  width: 100%;
-}
+
 
 .stats-insight {
   display: grid;

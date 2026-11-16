@@ -13,15 +13,13 @@
 .profile-team {
   display: grid;
   gap: 10px;
-  padding: 10px;
-  border-radius: 10px;
-  border: 1px solid rgba(122, 138, 160, 0.35);
-  background: rgba(10, 16, 25, 0.5);
+  padding: 0 0 12px;
+  border-bottom: 1px solid var(--tactical-line);
 }
 
 .profile-team__head {
   display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
+  grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
   gap: 10px;
 }
@@ -39,9 +37,10 @@
   background: rgba(12, 19, 31, 0.72);
   color: #edf4ff;
   font-family: "Rajdhani", sans-serif;
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 700;
-  padding: 5px 10px;
+  min-height: 44px;
+  padding: 8px 10px;
 }
 
 .profile-team__btn--icon {
@@ -183,8 +182,8 @@
 
 @media (max-width: 520px) {
   .profile-team__head {
-    grid-template-columns: 1fr;
-    align-items: start;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
   }
 
   .profile-team__actions {
@@ -221,3 +220,8 @@
   font-family: "Rajdhani", sans-serif;
   font-size: 12px;
 }
+
+.profile-team__btn:focus-visible { outline: 2px solid var(--tactical-visit); outline-offset: 3px; }
+
+.profile-team__head:has(.profile-team__logo) { grid-template-columns: 42px minmax(0, 1fr) auto; }
+@media (max-width: 520px) { .profile-team__head:has(.profile-team__logo) .profile-team__actions { grid-column: 2 / -1; } }

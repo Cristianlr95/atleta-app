@@ -1,6 +1,6 @@
 <ion-content class="stats-bg">
   <div class="stats-container">
-    <app-page-nav></app-page-nav>
+    <app-page-nav [showProfile]="false"></app-page-nav>
 
     <app-metallic-card title="Estadisticas" [titleIconAsset]="titleIconAsset">
       <p class="stats-kicker">Lectura competitiva</p>
@@ -57,9 +57,7 @@
       </app-metallic-form-section>
       </ng-container>
 
-      <button type="button" class="stats-leaderboard" (click)="onOpenLeaderboard()">
-        Ver ranking completo
-      </button>
+
     </app-metallic-card>
   </div>
 </ion-content>

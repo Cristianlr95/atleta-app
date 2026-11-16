@@ -4,7 +4,7 @@ import { mkdirSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { installH0H3Fixture } from './helpers/h0-h3-fixture';
 
-const evidenceDir = join(process.cwd(), 'docs/h0-h3-2026-11-16/after');
+const evidenceDir = join(process.cwd(), 'docs/profile-sections-2026-11-16/after');
 
 async function capture(page: Page, state: string, width: number, responses: unknown[] = []) {
   mkdirSync(evidenceDir, { recursive: true });
@@ -21,12 +21,17 @@ async function capture(page: Page, state: string, width: number, responses: unkn
 
 for (const width of [390, 1440]) {
   test(`H3 perfil normal con datos, teclado y accesos a ${width}px`, async ({ page }) => {
+    const runtimeErrors: string[] = [];
+    page.on('pageerror', error => runtimeErrors.push(error.message));
+    page.on('console', message => { if (message.type() === 'error') runtimeErrors.push(message.text()); });
     await page.setViewportSize({ width, height: 844 });
     const fixture = await installH0H3Fixture(page, 'data');
     await page.goto('/player/profile');
     await expect(page.locator('.ovr-block')).toContainText('68');
     await expect(page.getByText('NIVEL GENERAL', { exact: true })).toHaveCount(0);
     await expect(page.getByText('Aún no hay estadísticas', { exact: true })).toHaveCount(0);
+    const details = page.locator('.performance-details');
+    await expect(details).not.toHaveAttribute('open');
     const values = page.locator('.role-stat-values');
     await expect(values.locator('div')).toHaveCount(6);
     await expect(values.locator('div').filter({ hasText: 'Mediocampo' })).toHaveText('Mediocampo0');
@@ -40,7 +45,13 @@ for (const width of [390, 1440]) {
     await capture(page, 'ovr-explanation', width, fixture.requests);
     await page.keyboard.press('Escape');
     await expect(page.locator('.ovr-popover-content')).toHaveCount(0);
+    const teamActionBox = await page.getByRole('button', { name: 'Ver integrantes de Atleta Prueba FC' }).boundingBox();
+    const initialFooterBox = await page.locator('.profile-footer').boundingBox();
+    expect(teamActionBox!.y + teamActionBox!.height).toBeLessThanOrEqual(initialFooterBox!.y);
     await capture(page, 'data', width, fixture.requests);
+    await details.locator('summary').focus();
+    await page.keyboard.press('Enter');
+    await expect(details).toHaveAttribute('open');
     const chart = page.getByRole('img', { name: 'Hexagono de habilidades' });
     await page.locator('app-metallic-role-hexagon').evaluate(el => el.scrollIntoView({ block: 'start' }));
     const chartBox = await chart.boundingBox();
@@ -68,6 +79,18 @@ for (const width of [390, 1440]) {
     await page.getByRole('button', { name: 'Ajustes', exact: true }).focus();
     await page.keyboard.press('Enter');
     await expect(page).toHaveURL(/\/player\/settings$/);
+    expect(runtimeErrors).toEqual([]);
+  });
+
+  test(`H3 carga de perfil a ${width}px`, async ({ page }) => {
+    await page.setViewportSize({ width, height: 844 });
+    const fixture = await installH0H3Fixture(page, 'loading');
+    await page.goto('/player/profile');
+    await expect(page.getByRole('status')).toHaveText('Actualizando estadísticas...');
+    await expect(page.locator('.player-command-center')).toHaveCount(0);
+    await capture(page, 'loading', width, fixture.requests);
+    fixture.release();
+    await expect(page.locator('.ovr-block')).toContainText('68');
   });
 
   test(`H3 perfil nuevo sin estadísticas a ${width}px`, async ({ page }) => {
@@ -82,7 +105,7 @@ for (const width of [390, 1440]) {
     await capture(page, 'empty', width, fixture.requests);
     await page.getByRole('heading', { name: 'Trofeos y metas', exact: true }).scrollIntoViewIfNeeded();
     await expect(page.getByText('No hay trofeos disponibles.', { exact: true })).toBeVisible();
-    await page.getByRole('heading', { name: 'Gestionar equipos', exact: true }).scrollIntoViewIfNeeded();
+    await page.getByRole('heading', { name: 'Mi equipo', exact: true }).scrollIntoViewIfNeeded();
     await expect(page.getByText('Aun no perteneces a ningun equipo.', { exact: true })).toBeVisible();
     await capture(page, 'empty-teams-trophies', width, fixture.requests);
   });

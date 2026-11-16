@@ -19,8 +19,6 @@ import {
   MetallicBottomNavComponent,
   MetallicBottomNavItem,
 } from 'src/app/shared/ui/metallic-bottom-nav/metallic-bottom-nav.component';
-import { MetallicCardComponent } from 'src/app/shared/ui/metallic-card/metallic-card.component';
-import { MetallicFormSectionComponent } from 'src/app/shared/ui/metallic-form-section/metallic-form-section.component';
 import { PlayerPositionDisplay } from 'src/app/shared/ui/metallic-player-positions/metallic-player-positions.component';
 import {
   HexagonRole,
@@ -62,8 +60,6 @@ interface CompetitionSummary extends OutcomeSummary {
   imports: [
     CommonModule,
     IonicModule,
-    MetallicCardComponent,
-    MetallicFormSectionComponent,
     ProfileTeamsComponent,
     ProfileAchievementsComponent,
     MetallicRoleHexagonComponent,
@@ -181,14 +177,6 @@ export class PlayerProfilePage implements OnDestroy {
 
   retryStatistics(): void {
     this.loadProfile();
-  }
-
-  openMatchHistory(): void {
-    void this.navigationService.safeNavigate(['/matches/history']);
-  }
-
-  openMatches(): void {
-    void this.navigationService.safeNavigate(['/matches']);
   }
 
   async onPictureSelected(event: Event): Promise<void> {

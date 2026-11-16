@@ -86,10 +86,6 @@ export class StatsPage implements OnDestroy {
     void this.navigationService.goToMainBottomSection(itemId);
   }
 
-  onOpenLeaderboard(): void {
-    void this.navigationService.safeNavigate(['/leaderboard']);
-  }
-
   onRetry(): void {
     this.loadStats();
   }
