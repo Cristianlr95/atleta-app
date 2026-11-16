@@ -2,6 +2,8 @@
 
 ## Completado
 
+- [x] **Equipo: resumen, listado y modal**, nueva organización solicitada: media OVR con cobertura, hexágono por posición, lista lateral en móvil y detalle de jugador sin salir del equipo. 265 unitarias, 17 E2E seleccionadas y build/lint correctos. [Evidencia](team-list-2026-11-16/verificacion.md). [Datos backend pendientes](team-list-2026-11-16/backend-pendientes.md): goles/asistencias y PJ del equipo; beta pendiente de cuenta.
+
 - [x] **Inicio, Perfil y Plantel sin repetición de ficha**: Inicio muestra jornada/actividad; Perfil concentra datos personales y un único acceso al plantel. Fichas de equipo inspiradas en Squad Data con datos del contrato, cero/ausencia/error diferenciados, teclado y radar accesible. 263 unitarias y 29 E2E seleccionadas correctas; build/lint correctos. [Evidencias y mapa](home-profile-2026-11-16/verificacion.md), [plantel](team-squad-2026-11-16/verificacion.md). Beta pendiente.
 
 - [x] **H3 · Perfil por secciones y navegación**, opción 3 seleccionada: identidad/OVR compactos, rendimiento desplegable y trofeos/equipos planos. Perfil y Ranking desde barra inferior. 262 unitarias, 10 E2E a 390/1440 px, build/lint correctos. [Verificación](profile-sections-2026-11-16/verificacion.md) y [mapa de accesos](profile-sections-2026-11-16/navigation/mapa.md). Beta pendiente de cuenta.

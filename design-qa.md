@@ -1,5 +1,22 @@
 # Design QA
 
+## Equipo: lista y modal junto al OVR — 2026-11-16
+
+Fuente: [referencia del usuario](docs/team-list-2026-11-16/referencia.png), 322×332 px. Se adapta la relación OVR/hexágono a ATLETA; no se replica el marco ni los datos de PES. Implementación a 390×844 y 1440×844, densidad 1, sin reescalar el recorte como pantalla completa.
+
+Comparación completa: [lista móvil](docs/team-list-2026-11-16/after/plantel-list-390.png), [lista escritorio](docs/team-list-2026-11-16/after/plantel-list-1440.png), [modal móvil](docs/team-list-2026-11-16/after/player-modal-390.png), [modal escritorio](docs/team-list-2026-11-16/after/player-modal-1440.png). Regiones comprobadas: OVR y radar adyacentes en cabecera/modal, valores textuales, encabezados y columnas del plantel, cierre y navegación.
+
+Correcciones comprobadas:
+
+- P1: fichas permanentes y navegación a otra ruta sustituidas por lista y modal local.
+- P2: tokens de texto del overlay no se heredaban; se definen en este modal para mantener el contraste de ATLETA.
+- P2: regla global forzaba el modal al alto completo del móvil; excepción local del part(content), alto limitado y contenido con desplazamiento, sin alterar otros modales.
+- P2: tabla extensa en teléfono; desplazamiento interno, jugador fijo, ayuda y uso con teclado. Sin desbordamiento horizontal de la página.
+
+E2E verifica la proximidad geométrica del OVR al radar, etiquetas ≥11 px, Tab confinado, Escape y foco restaurado, cambio entre jugadores y permanencia en `/teams/10`. Carga/vacío/errores y ausencia/0 comprobados. El contrato no proporciona goles/asistencias del integrante; se muestra «Sin datos». Sin hallazgos P0/P1/P2 pendientes. Beta y dispositivo físico pendientes.
+
+final result: passed
+
 ## Inicio, Perfil y plantel deportivo — 2026-11-16
 
 Fuentes visuales preservadas: [referencia de plantel](docs/team-squad-2026-11-16/referencia.png), [Inicio anterior](docs/home-profile-2026-11-16/inicio-antes.png) y [Perfil anterior](docs/home-profile-2026-11-16/perfil-antes.png).

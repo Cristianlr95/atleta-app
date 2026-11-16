@@ -1,5 +1,12 @@
 # Memory Vivo - Atleta Frontend
 
+## Equipo con media y lista; detalle en modal · 16/11/2026
+
+- Nueva organización solicitada: OVR agregado/hexágono arriba, lista del plantel debajo, selección de jugador en modal sin cambiar de ruta. Sustituye las fichas permanentes anteriores. Commit probado `c00b1b3d677b3b394ee7679f24f2e0e02028ccc1`, base `dee6916`, misma rama y worktree aislados.
+- OVR = media de OVR disponibles de integrantes activos; cero válido incluido y cobertura visible. Cada eje del hexágono promedia esa posición sin rellenar ausentes. Modal con OVR junto al hexágono, teclado, cierre/Escape y retorno del foco al jugador.
+- PJ son totales de trayectoria por el contrato actual; goles/asistencias quedan «Sin datos», pendientes de API. No se consulta historial privado para inventar acumulados del equipo. [Pendientes backend](team-list-2026-11-16/backend-pendientes.md).
+- 265 unitarias, 17 E2E seleccionadas y build/lint correctos; evidencia móvil/escritorio. Beta, dispositivo físico y lector de pantalla pendientes. [Verificación](team-list-2026-11-16/verificacion.md).
+
 ## Inicio sin ficha duplicada y plantel deportivo · 16/11/2026
 
 - Base `a53ff9d`, misma rama/worktree aislados `codex/profile-sections-navigation-20261116`; commit final de fuente `fd33395f94fa879b99854d3399cd2c164454205e`. Raíz y checkout original preservados.
