@@ -2,6 +2,8 @@
 
 ## Completado
 
+- [x] **H5 · Ranking visual**, finalizado y aprobado el 16/11/2026: ancho móvil, vacíos, búsqueda/reintento, goles/MVP/forma de ejemplo y tabla lateral con puesto/jugador fijos. Acabado de la barra aprobado. Evidencia y límites en [h5-ranking-2026-11-16.md](h5-ranking-2026-11-16.md).
+
 - [x] Inicio adaptable, actividad, navegación, estados de error y XP por posición principal.
 - [x] Progresión gradual y barra accesible calculadas a partir de la XP de la posición principal.
 - [x] Historial móvil y reintento al fallar la carga.
@@ -14,6 +16,8 @@
 - [x] Compilación sin las advertencias de Stencil ni del presupuesto de estilos de Perfil; equipos y logros tienen componentes y estilos propios.
 
 ## Pendiente
+
+La finalización de H5 corresponde a la interfaz local aprobada. Conectar goles, MVP y últimos cinco resultados a la API sigue pendiente en `BE-RANK-01` a `BE-RANK-05` (`atleta-server/docs/backlog-ranking-h5.md`, rama `codex/h5-ranking-backlog-20261116`). Incluye adaptación de modelos/servicio frontend, cuenta de prueba y validación móvil/escritorio en beta.
 
 1. Validar flujos completos con datos reales de beta, incluidos cierre, voto MVP y notificaciones.
 2. Revisar accesibilidad con lectores de pantalla y dispositivos físicos, además de contrastes sobre imágenes.
