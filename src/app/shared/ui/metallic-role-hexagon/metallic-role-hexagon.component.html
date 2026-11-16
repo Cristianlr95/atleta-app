@@ -1,7 +1,7 @@
-﻿<div class="metallic-role-hexagon" [class.metallic-role-hexagon--compact]="compact">
+﻿<div class="metallic-role-hexagon" [class.metallic-role-hexagon--compact]="compact" [class.metallic-role-hexagon--embedded]="embedded">
   <div class="metallic-role-hexagon__header">
     <h3 class="metallic-role-hexagon__title">{{ title }}</h3>
-    <p class="metallic-role-hexagon__subtitle">{{ subtitle }}</p>
+    <p *ngIf="subtitle" class="metallic-role-hexagon__subtitle">{{ subtitle }}</p>
   </div>
 
   <div class="metallic-role-hexagon__chart-wrap">
@@ -39,7 +39,7 @@
       </g>
     </svg>
   </div>
-  <p class="metallic-role-hexagon__subtitle">S/V: Sin valoración. Consulta los valores por posición debajo del gráfico.</p>
+  <p class="metallic-role-hexagon__subtitle">{{ embedded ? 'S/V: Sin valoración.' : 'S/V: Sin valoración. Consulta los valores por posición debajo del gráfico.' }}</p>
 
   <div *ngIf="showSummary" class="metallic-role-hexagon__summary">
     <button type="button" class="metallic-role-hexagon__chip" (click)="showSummaryInfo('overall')">

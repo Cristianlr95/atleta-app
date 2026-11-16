@@ -153,3 +153,12 @@
   .metallic-role-hexagon__chip { padding: 6px 8px; font-size: 11px; }
   .metallic-role-hexagon__classification { margin-top: 8px; font-size: 10px; }
 }
+
+.metallic-role-hexagon--embedded {
+  border: 0;
+  padding: 0;
+  background: transparent;
+  .metallic-role-hexagon__chart-wrap { border: 0; background: transparent; }
+  .metallic-role-hexagon__header { margin-bottom: 4px; }
+  .metallic-role-hexagon__chart { max-width: 260px; }
+}

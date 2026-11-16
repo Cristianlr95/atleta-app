@@ -80,4 +80,36 @@ describe('TeamDetailPage', () => {
     expect(fixture.nativeElement.querySelector('.team-shield')?.textContent).toBe('A');
     expect(fixture.nativeElement.querySelector('.team-member__player i')?.textContent).toBe('D');
   });
+
+  it('keeps a team with an empty roster visible', () => {
+    teamApiService.getActiveMembers.and.returnValue(of([]));
+    component.ionViewWillEnter();
+    fixture.detectChanges();
+    expect(fixture.nativeElement.textContent).toContain('Atleta FC');
+    expect(fixture.nativeElement.textContent).toContain('No hay integrantes activos.');
+  });
+
+  it('distinguishes a rating failure from an unrated player and retries', () => {
+    ratingsApiService.getOverall.and.returnValue(throwError(() => ({ status: 500 })));
+    component.ionViewWillEnter();
+    fixture.detectChanges();
+    expect(fixture.nativeElement.textContent).toContain('No pudimos cargar las valoraciones.');
+    expect(fixture.nativeElement.querySelector('.team-member__ovr').textContent).not.toContain('Sin valoración');
+    ratingsApiService.getOverall.and.returnValue(of({ hybridOVR: 74 } as any));
+    fixture.nativeElement.querySelector('[aria-label="Reintentar valoraciones de Demo10"]').click();
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelector('[role="alert"]')).toBeNull();
+    expect(fixture.nativeElement.querySelector('.team-member__ovr').textContent).toContain('74');
+  });
+
+  it('renders real position values, preserving zero and missing ratings', () => {
+    ratingsApiService.getOverall.and.returnValue(of({ hybridOVR: 0, roleBreakdown: { ATAQUE: 79, MEDIOCAMPO: 0 } } as any));
+    component.ionViewWillEnter();
+    fixture.detectChanges();
+    const values = fixture.nativeElement.querySelector('.team-member__ratings');
+    expect(values.textContent).toContain('Mediocampo0');
+    expect(values.textContent).toContain('DefensaSin valoración');
+    expect(fixture.nativeElement.querySelector('.team-member__ovr').textContent).toContain('0');
+    expect(ratingsApiService.getOverall).toHaveBeenCalledOnceWith('player-uuid');
+  });
 });

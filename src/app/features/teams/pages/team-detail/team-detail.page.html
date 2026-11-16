@@ -1,9 +1,9 @@
 <ion-content class="team-bg">
   <main class="team-container">
     <button type="button" class="team-back" (click)="onBack()">‹ Volver</button>
-    <app-metallic-card title="Detalle de equipo" [titleIconAsset]="titleIconAsset">
-      <p class="team-status" *ngIf="isLoading">Cargando equipo...</p>
-      <section class="team-error" *ngIf="errorMessage">
+    <app-metallic-card>
+      <p class="team-status" role="status" *ngIf="isLoading">Cargando equipo...</p>
+      <section class="team-error" role="alert" *ngIf="errorMessage">
         <h2>{{ notFound ? 'Equipo no encontrado' : 'No se pudo cargar' }}</h2><p>{{ errorMessage }}</p>
         <div class="team-actions"><button *ngIf="!notFound" type="button" (click)="onRetry()">Reintentar</button><button type="button" (click)="onBackToSocial()">Volver a Social</button></div>
       </section>
@@ -11,23 +11,39 @@
         <header class="team-hero">
           <img *ngIf="selectedTeam.logoUrl" [src]="selectedTeam.logoUrl" [alt]="'Logo de ' + selectedTeam.nombre" (error)="selectedTeam.logoUrl = null">
           <div class="team-shield" *ngIf="!selectedTeam.logoUrl" aria-hidden="true">{{ selectedTeam.nombre.charAt(0) }}</div>
-          <div><p>Equipo Atleta</p><h1>{{ selectedTeam.nombre }}</h1><span *ngIf="selectedTeam.anioFundacion">Fundado en {{ selectedTeam.anioFundacion }}</span></div>
+          <div><p>Plantel del equipo</p><h1>{{ selectedTeam.nombre }}</h1><span *ngIf="selectedTeam.anioFundacion">Fundado en {{ selectedTeam.anioFundacion }}</span></div>
         </header>
         <dl class="team-stats" *ngIf="selectedTeam.stats as stats">
           <div><dt>PJ</dt><dd>{{ stats.partidosJugados }}</dd></div><div><dt>PG</dt><dd>{{ stats.partidosGanados }}</dd></div><div><dt>Pts</dt><dd>{{ stats.puntos }}</dd></div><div><dt>DG</dt><dd>{{ stats.diferenciagoles }}</dd></div>
         </dl>
         <section class="team-members"><div class="team-members__heading"><h2>Plantel activo</h2><span>{{ members.length }} jugadores</span></div>
-          <div class="team-roster-head" aria-hidden="true"><span>Jugador</span><span>Posición</span><span>OVR</span><span>Rol</span></div>
-          <button class="team-member" type="button" *ngFor="let member of members" (click)="onOpenPlayer(member.playerUuid)">
-            <span class="team-member__player">
-              <img *ngIf="member.pictureUrl" [src]="member.pictureUrl" [alt]="member.alias" (error)="member.pictureUrl = null">
-              <i *ngIf="!member.pictureUrl" aria-hidden="true">{{ member.alias.charAt(0) }}</i>
-              <strong>{{ member.alias }}</strong>
-            </span>
-            <small>{{ member.primaryPositionName || 'Sin posición' }}</small>
-            <b>{{ member.ovr ?? '—' }}</b>
-            <em>{{ member.rol }}</em>
-          </button>
+          <div class="team-roster">
+            <article class="team-member" *ngFor="let member of members" [attr.aria-label]="'Ficha de ' + member.alias">
+              <header class="team-member__header">
+                <div class="team-member__player">
+                  <img *ngIf="member.pictureUrl" [src]="member.pictureUrl" [alt]="'Foto de ' + member.alias" (error)="member.pictureUrl = null">
+                  <i *ngIf="!member.pictureUrl" aria-hidden="true">{{ member.alias.charAt(0) }}</i>
+                </div>
+                <div class="team-member__identity"><p>Jugador</p><h3>{{ member.alias }}</h3></div>
+                <div class="team-member__ovr"><span>OVR</span><strong>{{ member.ratingUnavailable ? 'No disponible' : member.ovr !== null ? (member.ovr | number:'1.0-0') : 'Sin valoración' }}</strong></div>
+              </header>
+              <dl class="team-member__info">
+                <div><dt>Posición principal</dt><dd>{{ member.primaryPositionName || 'Sin posición' }}</dd></div>
+                <div><dt>Rol en el equipo</dt><dd>{{ member.rol === 'CAPITAN' ? 'Capitán' : member.rol === 'DT' ? 'DT' : 'Jugador' }}</dd></div>
+              </dl>
+              <div class="team-member__analysis" *ngIf="member.roleStats.length > 0; else noRoleRatings">
+                <app-metallic-role-hexagon #radar [stats]="member.roleStats" [embedded]="true" [showSummary]="false" [showClassification]="false" [title]="'Rendimiento de ' + member.alias" subtitle=""></app-metallic-role-hexagon>
+                <dl class="team-member__ratings" [attr.aria-label]="'Valores por posición de ' + member.alias">
+                  <div *ngFor="let point of radar.points"><dt>{{ radar.roleLabel(point.role) | titlecase }}</dt><dd>{{ point.hasRating ? (point.rating | number:'1.0-0') : 'Sin valoración' }}</dd></div>
+                </dl>
+              </div>
+              <ng-template #noRoleRatings>
+                <p *ngIf="!member.ratingUnavailable" class="team-status team-member__empty">Aún no hay valoraciones por posición.</p>
+                <div *ngIf="member.ratingUnavailable" class="team-member__empty" role="alert"><p>No pudimos cargar las valoraciones.</p><button type="button" class="team-member__open" [attr.aria-label]="'Reintentar valoraciones de ' + member.alias" (click)="onRetry()">Reintentar</button></div>
+              </ng-template>
+              <button type="button" class="team-member__open" [attr.aria-label]="'Ver jugador ' + member.alias" (click)="onOpenPlayer(member.playerUuid)">Ver jugador</button>
+            </article>
+          </div>
           <p class="team-status" *ngIf="members.length === 0">No hay integrantes activos.</p>
         </section>
       </article>

@@ -46,6 +46,7 @@ export class MetallicRoleHexagonComponent {
   @Input() title = 'Hexagono de habilidades';
   @Input() subtitle = 'Perfil por rol (0-100)';
   @Input() compact = false;
+  @Input() embedded = false;
   @Input() showSummary = true;
   @Input() showClassification = true;
   @Input() overallValue: number | null = null;

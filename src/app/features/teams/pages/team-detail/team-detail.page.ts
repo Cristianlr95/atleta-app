@@ -4,11 +4,12 @@ import { Component, OnDestroy, inject } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { IonicModule } from '@ionic/angular';
 import { Subject, forkJoin, of } from 'rxjs';
-import { catchError, finalize, switchMap, takeUntil } from 'rxjs/operators';
+import { catchError, finalize, map, switchMap, takeUntil } from 'rxjs/operators';
 import { NavigationService } from 'src/app/core/services/navigation.service';
 import { buildMainBottomNav } from 'src/app/shared/navigation/main-bottom-nav';
 import { MetallicBottomNavComponent, MetallicBottomNavItem } from 'src/app/shared/ui/metallic-bottom-nav/metallic-bottom-nav.component';
 import { MetallicCardComponent } from 'src/app/shared/ui/metallic-card/metallic-card.component';
+import { HexagonRole, HexagonRoleStat, MetallicRoleHexagonComponent } from 'src/app/shared/ui/metallic-role-hexagon/metallic-role-hexagon.component';
 import { NotificationBadgeService } from 'src/app/features/matches/services/notification-badge.service';
 import { RatingsApiService } from 'src/app/features/ratings/services/ratings-api.service';
 import { UserApiService } from 'src/app/features/user/services/user-api.service';
@@ -18,12 +19,14 @@ import { TeamApiService } from '../../services/team-api.service';
 interface TeamRosterMember extends TeamActiveMember {
   pictureUrl: string | null;
   ovr: number | null;
+  roleStats: HexagonRoleStat[];
+  ratingUnavailable: boolean;
 }
 
 @Component({
   selector: 'app-team-detail-page',
   standalone: true,
-  imports: [CommonModule, IonicModule, MetallicCardComponent, MetallicBottomNavComponent],
+  imports: [CommonModule, IonicModule, MetallicCardComponent, MetallicBottomNavComponent, MetallicRoleHexagonComponent],
   templateUrl: './team-detail.page.html',
   styleUrls: ['./team-detail.page.scss'],
 })
@@ -36,7 +39,6 @@ export class TeamDetailPage implements OnDestroy {
   private readonly notificationBadgeService = inject(NotificationBadgeService);
   private readonly destroy$ = new Subject<void>();
 
-  readonly titleIconAsset = 'assets/icons/atleta-raster-v1/ic_match_teams_96.png';
   team: TeamSummary | null = null;
   members: TeamRosterMember[] = [];
   isLoading = false;
@@ -52,7 +54,7 @@ export class TeamDetailPage implements OnDestroy {
   onNavItemSelected(itemId: string): void { void this.navigationService.goToMainBottomSection(itemId); }
 
   get bottomNavItems(): ReadonlyArray<MetallicBottomNavItem> {
-    return buildMainBottomNav('home', this.notificationBadgeService.totalPending());
+    return buildMainBottomNav('profile', this.notificationBadgeService.totalPending());
   }
 
   private loadTeam(): void {
@@ -69,20 +71,29 @@ export class TeamDetailPage implements OnDestroy {
     forkJoin({ team: this.teamApiService.getById(teamId), members: this.teamApiService.getActiveMembers(teamId) })
       .pipe(
         switchMap(({ team, members }) =>
-          forkJoin(
+          (members.length === 0 ? of([] as TeamRosterMember[]) : forkJoin(
             members.map((member) =>
               forkJoin({
                 profile: this.userApiService.getPublicPlayerProfile(member.playerUuid).pipe(catchError(() => of(null))),
-                overall: this.ratingsApiService.getOverall(member.playerUuid).pipe(catchError(() => of(null))),
+                overall: this.ratingsApiService.getOverall(member.playerUuid).pipe(
+                  map(value => ({ value, unavailable: false })),
+                  catchError(error => of({ value: null, unavailable: error.status !== 404 })),
+                ),
               }).pipe(
-                switchMap(({ profile, overall }) => of({
+                map(({ profile, overall }) => ({
                   ...member,
                   pictureUrl: profile?.pictureUrl ?? null,
-                  ovr: overall?.hybridOVR ?? null,
+                  ovr: overall.value?.hybridOVR ?? null,
+                  ratingUnavailable: overall.unavailable,
+                  roleStats: (['ATAQUE', 'MEDIOCAMPO', 'CARRILERO', 'DEFENSA', 'ARQUERO', 'DT'] as HexagonRole[]).reduce<HexagonRoleStat[]>((stats, role) => {
+                    const value = overall.value?.roleBreakdown?.[role];
+                    if (typeof value === 'number' && Number.isFinite(value)) stats.push({ role, rating: value });
+                    return stats;
+                  }, []),
                 })),
               ),
             ),
-          ).pipe(switchMap((roster) => of({ team, members: roster }))),
+          )).pipe(map(roster => ({ team, members: roster }))),
         ),
       )
       .pipe(takeUntil(this.destroy$), finalize(() => (this.isLoading = false)))
