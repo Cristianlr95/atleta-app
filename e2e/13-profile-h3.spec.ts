@@ -37,13 +37,17 @@ for (const width of [390, 1440]) {
     await expect(ovr).toBeFocused();
     await page.keyboard.press('Enter');
     await expect(page.locator('.ovr-popover-content')).toContainText('Valoración general');
+    await capture(page, 'ovr-explanation', width, fixture.requests);
     await page.keyboard.press('Escape');
     await expect(page.locator('.ovr-popover-content')).toHaveCount(0);
     await capture(page, 'data', width, fixture.requests);
     const chart = page.getByRole('img', { name: 'Hexagono de habilidades' });
-    await chart.scrollIntoViewIfNeeded();
+    await page.locator('app-metallic-role-hexagon').evaluate(el => el.scrollIntoView({ block: 'start' }));
+    const chartBox = await chart.boundingBox();
+    const footerBox = await page.locator('.profile-footer').boundingBox();
+    expect(chartBox!.y + chartBox!.height).toBeLessThanOrEqual(footerBox!.y);
     const labelSize = await page.locator('.metallic-role-hexagon__label').first().evaluate(el => {
-      const svg = el.ownerSVGElement!;
+      const svg = el.closest('svg')!;
       return parseFloat(getComputedStyle(el).fontSize) * svg.getBoundingClientRect().width / svg.viewBox.baseVal.width;
     });
     expect(labelSize).toBeGreaterThanOrEqual(11);
@@ -57,7 +61,7 @@ for (const width of [390, 1440]) {
     const team = page.getByRole('button', { name: 'Ver integrantes de Atleta Prueba FC' });
     await team.focus();
     await page.keyboard.press('Enter');
-    await expect(team).toHaveAttribute('aria-expanded', 'true');
+    await expect(page.getByRole('button', { name: 'Ocultar integrantes de Atleta Prueba FC' })).toHaveAttribute('aria-expanded', 'true');
     await expect(page.locator('.profile-team-members')).toContainText('Ana');
     await capture(page, 'teams-trophies', width, fixture.requests);
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);

@@ -133,13 +133,13 @@
 .position-priority-list li span { display: inline-grid; place-items: center; width: 22px; height: 22px; border: 1px solid rgba(0, 215, 245, .58); border-radius: 50%; color: var(--tactical-visit); font: 700 10px var(--font-family-display); }
 .position-priority-list__empty { color: var(--text-muted) !important; font-size: 13px !important; }
 .ovr-block { display: grid; grid-template-columns: auto auto; align-items: center; justify-items: start; gap: 5px; width: fit-content; margin-top: 2px; padding: 7px 0 0; border: 0; border-top: 1px solid rgba(0, 215, 245, .22); background: transparent; text-align: left; cursor: pointer; }
-.ovr-block span { color: var(--text-muted); font: 700 11px var(--font-family-display); letter-spacing: .1em; }
+.ovr-block span { color: var(--text-secondary, #b6c2c6); font: 700 13px var(--font-family-display); letter-spacing: .1em; }
 .ovr-block strong { color: var(--tactical-local); font: 700 30px/1 var(--font-family-display); }
 .ovr-block:focus-visible { outline: 2px solid var(--tactical-visit); outline-offset: 4px; border-radius: 3px; }
-.ovr-popover-content { display: grid; gap: 4px; max-width: 220px; padding: 12px 14px; background: #07151d; color: var(--text-primary); }
+.ovr-popover-content { display: grid; gap: 4px; max-width: 220px; padding: 12px 14px; background: #07151d; color: var(--text-primary, #e7f5f7); }
 .ovr-popover-content p { margin: 0; color: var(--tactical-visit); font: 700 11px var(--font-family-display); letter-spacing: .1em; }
 .ovr-popover-content strong { font: 700 15px var(--font-family-display); }
-.ovr-popover-content span { color: var(--text-muted); font: 13px/1.25 var(--font-family-body); }
+.ovr-popover-content span { color: var(--text-muted, #b6c2c6); font: 13px/1.25 var(--font-family-body); }
 .team-affiliation { display: grid; gap: 2px; margin-top: 5px; padding-top: 8px; border-top: 1px solid rgba(0, 215, 245, .2); }
 .team-affiliation > span { color: var(--text-muted); font: 700 10px var(--font-family-display); letter-spacing: .1em; }
 .team-affiliation strong { overflow: hidden; color: var(--tactical-local); font: 700 14px var(--font-family-display); text-overflow: ellipsis; white-space: nowrap; }
