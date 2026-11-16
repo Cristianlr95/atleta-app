@@ -154,7 +154,7 @@ export class LeaderboardPage implements OnDestroy {
 
   get modeLoading(): boolean {
     if (this.selectedScope === 'TEAM') {
-      return this.isLoadingTeamRows;
+      return this.isLoadingTeams || this.isLoadingTeamRows;
     }
     return this.selectedMode === 'ROLE' ? this.isLoadingByRole : this.isLoadingOverall;
   }
@@ -164,6 +164,22 @@ export class LeaderboardPage implements OnDestroy {
       return this.teamRowsError || this.teamsError;
     }
     return this.selectedMode === 'ROLE' ? this.roleError : this.overallError;
+  }
+
+  get emptyMessage(): string {
+    if (this.searchTerm.trim() && this.modeRows.length > 0) {
+      return 'No encontramos jugadores con esa búsqueda.';
+    }
+    if (this.selectedScope === 'TEAM') {
+      return this.selectedTeamId
+        ? 'Todavía no hay jugadores clasificados en este equipo.'
+        : 'Todavía no perteneces a un equipo. Puedes consultar el ranking global.';
+    }
+    if (this.selectedMode === 'ROLE') {
+      const label = this.roleOptions.find(option => option.role === this.selectedRole)?.label;
+      return `Todavía no hay jugadores clasificados en ${label}. Prueba otra posición o consulta el ranking global.`;
+    }
+    return 'Todavía no hay jugadores clasificados en el ranking global. Puedes consultar otra posición o volver más adelante.';
   }
 
   get teamOptions(): MetallicSelectOption[] {

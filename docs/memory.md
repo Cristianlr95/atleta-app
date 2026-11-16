@@ -1,5 +1,12 @@
 # Memory Vivo - Atleta Frontend
 
+## H5 · Ranking — 16/11/2026
+
+- Rama local `codex/h5-ranking-review-20261116`, basada en `origin/develop` `d85e0402a5484af98c77a5609acedeccf444fbaf`, confirmado mediante fetch. Worktree aislado para conservar los cambios pendientes de `main`.
+- PR #23 conservado. Sin parche proporcionado; se revisó la implementación existente. Vacíos diferenciados (global, posición, equipo, sin equipo), retorno al global y carga de equipos sin anunciar vacíos prematuros. Búsqueda y limpieza existentes conservadas.
+- Build y lint correctos; 13 pruebas unitarias de Ranking, 254 unitarias totales y 6 E2E de Ranking correctos. Ancho disponible y recorridos simulados verificados en 320/390/1366/1440 px.
+- API de beta pendiente por falta de cuenta de prueba confirmada; no cerrar H5 como validado en beta. Evidencia, comandos y escenarios pendientes en [h5-ranking-2026-11-16.md](h5-ranking-2026-11-16.md). Sin push, integración ni despliegue.
+
 Fecha de actualizacion: 2026-05-06
 Fuente: auditoria directa del repositorio `atleta-app`
 

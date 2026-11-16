@@ -44,7 +44,7 @@
           </button>
         </div>
 
-        <div class="leaderboard-team-select" *ngIf="selectedScope === 'TEAM'">
+        <div class="leaderboard-team-select" *ngIf="selectedScope === 'TEAM' && teams.length > 0">
           <app-metallic-select
             label="Equipo"
             [options]="teamOptions"
@@ -53,7 +53,7 @@
           </app-metallic-select>
         </div>
 
-        <section class="team-record" *ngIf="selectedScope === 'TEAM'">
+        <section class="team-record" *ngIf="selectedScope === 'TEAM' && selectedTeamId">
           <div class="team-record__heading">
             <span>Récord contra otros equipos</span>
             <span *ngIf="isLoadingTeamRecord">Actualizando…</span>
@@ -98,10 +98,15 @@
           *ngIf="!modeLoading && !modeError"
           [title]="modeTitle"
           [rows]="filteredRows"
-          [emptyMessage]="searchTerm.trim() && modeRows.length > 0 ? 'No encontramos jugadores con esa búsqueda.' : 'Todavía no hay datos para este ranking.'"
+          [emptyMessage]="emptyMessage"
           [showRole]="selectedScope === 'PLATFORM'"
           [currentPlayerId]="currentUserId">
         </app-metallic-leaderboard>
+        <button
+          *ngIf="!modeLoading && !modeError && modeRows.length === 0 && (selectedScope === 'TEAM' || selectedMode === 'ROLE')"
+          type="button" class="leaderboard-retry" (click)="onModeChange('OVERALL'); onScopeChange('PLATFORM')">
+          Ver ranking global
+        </button>
         <button
           *ngIf="searchTerm.trim() && modeRows.length > 0 && filteredRows.length === 0 && !modeLoading && !modeError"
           type="button" class="leaderboard-retry" (click)="searchTerm = ''; rankingSearch.focus()">

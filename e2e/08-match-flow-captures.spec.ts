@@ -131,6 +131,88 @@ test.describe('Flujo visual integral de partidos', () => {
     await page.getByRole('tab', { name: 'Próximos' }).click();
     await expect(page.getByRole('alert')).toContainText('No se pudo cargar la agenda');
   });
+  for (const width of [320, 390, 1366, 1440]) {
+    test(`ranking H5 estados y recuperación a ${width}px`, async ({ page }) => {
+      await page.setViewportSize({ width, height: 844 });
+      await installFlowFixture(page);
+      await page.route('**/assets/app-config.json', route => json(route, {
+        apiBaseUrl: 'http://localhost:8080/api/v1', storagePrefix: 'atleta.dev', environmentName: 'test',
+      }));
+      const rows = [{ playerProfileId: 'ath-flow', alias: 'Ana', score: 63, matchesPlayed: 8, roleType: 'ATAQUE' }];
+      let empty = false;
+      let error = false;
+      let noTeam = false;
+      let releaseLoading!: () => void;
+      const loading = new Promise<void>(resolve => { releaseLoading = resolve; });
+      await page.route('**/api/v1/ratings/leaderboard*', async route => {
+        await loading;
+        if (error) return route.fulfill({ status: 500, json: {} });
+        const role = new URL(route.request().url()).searchParams.get('roleType');
+        return json(route, empty || role === 'DEFENSA' ? [] : rows);
+      });
+      await page.route('**/api/v1/teams/by-player/ath-flow', route => json(route,
+        noTeam ? [] : [{ id: 10, nombre: 'Atleta Dev FC' }]));
+      await page.route('**/api/v1/teams/10/leaderboard', route => json(route, empty ? [] : [
+        { ...rows[0], rank: 1, rated: true },
+      ]));
+      await page.route('**/api/v1/teams/10/external-record', route => json(route, {
+        matchesPlayed: 0, wins: 0, draws: 0, losses: 0, points: 0,
+      }));
+      await page.goto('/leaderboard');
+      await expect(page.getByText('Actualizando ranking...')).toBeVisible();
+      await expect(page.locator('.leaderboard__empty')).toHaveCount(0);
+      releaseLoading();
+      await expect(page.locator('tbody tr')).toHaveCount(1);
+      const card = page.locator('.leaderboard-container > app-metallic-card');
+      const box = await card.boundingBox();
+      const availableWidth = await page.locator('.leaderboard-container').evaluate(el => {
+        const style = getComputedStyle(el);
+        return el.clientWidth - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight);
+      });
+      expect(box!.width).toBeCloseTo(Math.min(availableWidth, 1024), 0);
+      expect(await card.evaluate(el => el.scrollWidth <= el.clientWidth)).toBe(true);
+      expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+      await page.screenshot({ path: `output/playwright/h5/global-${width}.png`, fullPage: true });
+      await page.getByText('Buscar y ordenar', { exact: true }).click();
+      await page.getByLabel('Buscar jugador o posición').fill('sin coincidencias');
+      await expect(page.locator('.leaderboard__empty')).toContainText('No encontramos jugadores');
+      await page.getByRole('button', { name: 'Limpiar búsqueda' }).click();
+      await expect(page.locator('tbody tr')).toHaveCount(1);
+      await expect(page.getByLabel('Buscar jugador o posición')).toBeFocused();
+      await page.getByLabel('Clasificar por').selectOption('ROLE');
+      await expect(page.locator('tbody tr')).toHaveCount(1);
+      await page.getByRole('button', { name: 'Defensa', exact: true }).click();
+      await expect(page.locator('.leaderboard__empty')).toContainText('clasificados en Defensa');
+      await page.getByRole('button', { name: 'Ver ranking global' }).click();
+      await expect(page.locator('tbody tr')).toHaveCount(1);
+      await page.getByLabel('Mostrar').selectOption('TEAM');
+      await expect(page.locator('tbody tr')).toHaveCount(1);
+      empty = true;
+      await page.reload();
+      await page.getByLabel('Mostrar').selectOption('TEAM');
+      await expect(page.locator('.leaderboard__empty')).toContainText('clasificados en este equipo');
+      await page.screenshot({ path: `output/playwright/h5/team-empty-${width}.png`, fullPage: true });
+      noTeam = true;
+      await page.reload();
+      await expect(page.locator('.leaderboard__empty')).toContainText('clasificados en el ranking global');
+      await page.getByLabel('Mostrar').selectOption('TEAM');
+      await expect(page.locator('.leaderboard__empty')).toContainText('Todavía no perteneces a un equipo');
+      await expect(page.locator('.team-record')).toHaveCount(0);
+      await expect(page.locator('.leaderboard-team-select')).toHaveCount(0);
+      await page.screenshot({ path: `output/playwright/h5/no-team-${width}.png`, fullPage: true });
+      await page.getByRole('button', { name: 'Ver ranking global' }).click();
+      await expect(page.getByLabel('Clasificar por')).toHaveValue('OVERALL');
+      error = true;
+      await page.reload();
+      await expect(page.getByRole('alert')).toContainText('No se pudo cargar el ranking general');
+      empty = false;
+      error = false;
+      await page.getByRole('button', { name: 'Reintentar', exact: true }).click();
+      await expect(page.getByRole('alert')).toHaveCount(0);
+      await expect(page.locator('tbody tr')).toHaveCount(1);
+    });
+  }
+
   test('ranking anuncia un error de carga y permite reintentar', async ({ page }) => {
     await installFlowFixture(page);
     await page.route('**/assets/app-config.json', route => json(route, {
