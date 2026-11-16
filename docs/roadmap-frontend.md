@@ -2,6 +2,8 @@
 
 ## Completado
 
+- [x] **H3 · Perfil por secciones y navegación**, opción 3 seleccionada: identidad/OVR compactos, rendimiento desplegable y trofeos/equipos planos. Perfil y Ranking desde barra inferior. 262 unitarias, 10 E2E a 390/1440 px, build/lint correctos. [Verificación](profile-sections-2026-11-16/verificacion.md) y [mapa de accesos](profile-sections-2026-11-16/navigation/mapa.md). Beta pendiente de cuenta.
+
 - [x] **H0 · Línea base de Inicio, Partidos, Ranking y Perfil**, completada antes de editar H3: 32 estados a 390/1440 px con captura o reutilización identificada y metadatos de ruta, entorno, revisión y estado. [Inventario](h0-h3-2026-11-16/linea-base.md).
 - [x] **H3 · Perfil normal**, implementado y verificado localmente: OVR único con explicación; «Sin valoración» distinto de cero; vacío y error 500 con reintento; gráfico ampliado, alternativa textual y accesos con teclado. 262 unitarias y 13 E2E pertinentes correctos, build/lint correctos. [Evidencia y límites](h0-h3-2026-11-16/verificacion.md).
 

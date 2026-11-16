@@ -1,5 +1,12 @@
 # Memory Vivo - Atleta Frontend
 
+## Perfil por secciones y accesos · 16/11/2026
+
+- Opción visual 3 seleccionada. Implementación `0b47f3ac0aac6a583317cd19e2cbf51b89237d08`, rama `codex/profile-sections-navigation-20261116`, base H0/H3 `6f9e0053345445b0add2d259528edd7dd97f663b`, mismo worktree aislado. Sin cambios en los checkouts originales.
+- Perfil compacto, rendimiento desplegable con teclado y secciones planas de trofeos/equipo. OVR único, cero frente a ausente, carga/vacío/error y reintento conservados.
+- Perfil y Ranking desde barra inferior: ocultado Perfil de PageNav en Estadísticas, Social, Crear sesión y Crear cancha; quitado CTA adicional a Ranking en Estadísticas y atajos duplicados a Partidos en Perfil. Crear cancha conserva Atrás. `/ranking` conserva la redirección a `/leaderboard` para enlaces antiguos. Onboarding y recuperación no son accesos de menú duplicados.
+- 262 unitarias, 10 E2E a 390/1440 px, build/lint correctos. Beta pendiente de cuenta; sin dispositivo físico ni lector de pantalla. [Evidencia](profile-sections-2026-11-16/verificacion.md), [mapa](profile-sections-2026-11-16/navigation/mapa.md).
+
 ## H0 y H3 · 16/11/2026
 
 - Worktree aislado `C:/Users/Crist/Proyectos/Atleta/.worktrees/h0-h3-profile`, rama `codex/h0-h3-profile-20261116`, base H5 aprobada `6fcd35b00356ed26bbb303f024ce6d82aa779176`. Checkouts originales y sus cambios pendientes preservados.

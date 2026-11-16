@@ -1,5 +1,25 @@
 # Design QA
 
+## Perfil por secciones — 2026-11-16
+
+Referencia elegida (opción 3): `C:/Users/Crist/.codex/generated_images/01a1e4a2-b285-7451-bc23-142c1c6ba68c/exec-dedc9677-094d-4927-94b9-90d145b46b92.png`.
+
+Implementación: [móvil](docs/profile-sections-2026-11-16/after/perfil-data-390.png), [escritorio](docs/profile-sections-2026-11-16/after/perfil-data-1440.png), [gráfico](docs/profile-sections-2026-11-16/after/perfil-chart-390.png), [valores](docs/profile-sections-2026-11-16/after/perfil-text-values-390.png).
+
+Fuente 852×1846 px normalizada a 390 px CSS de ancho (factor 390/852, alto aproximado 845). Capturas 390×844 y 1440×844, densidad 1. Comparación móvil en estado con datos y rendimiento cerrado; gráfico y valores inspeccionados aparte abiertos. La referencia define móvil; dos columnas es la adaptación de escritorio.
+
+Comparadas referencia y capturas completas: identidad/OVR, resumen, rendimiento, trofeos, equipo y menú. Fuentes, avatar e iconos existentes conservados. Se quitaron atajos a Partidos por petición posterior del usuario. Trofeos y equipo quedan como secciones visibles; rendimiento usa details/summary con teclado. No se añadieron controles de colapso sin necesidad.
+
+Historial de ajustes:
+
+- P2: logro a media columna en escritorio partía el título; corregido a una columna, comprobado en captura de 1440.
+- P2: botón de integrantes parcialmente fuera de vista inicial móvil; reducidos espacios y alineada fila. Captura final de 390 y aserción geométrica E2E confirman control completo sobre footer.
+- Gráfico móvil ampliado inspeccionado: texto SVG efectivo ≥11 px en ambos anchos, alternativa textual conserva cero y ausencia.
+
+Interacciones: OVR Enter/Escape, rendimiento Enter, integrantes Enter, Ajustes, barra inferior y reintento. Consola de Perfil con datos sin errores. Carga/vacío/500 y recuperación con API simulada. Sin hallazgos P0/P1/P2 pendientes. Beta, dispositivo físico y lector de pantalla pendientes.
+
+final result: passed
+
 ## Configuración de jugador — 2026-07-23
 
 - Referencia visual: `docs/audits/onboarding-redesign-2026-07-23/02-design-language-target.png`.
