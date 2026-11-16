@@ -103,6 +103,7 @@ export class PlayerProfilePage implements OnDestroy {
 
   isLoading = false;
   historyUnavailable = false;
+  teamsUnavailable = false;
   errorMessage: string | null = null;
 
   displayName = 'Jugador';
@@ -173,6 +174,14 @@ export class PlayerProfilePage implements OnDestroy {
 
   openSettings(): void {
     void this.navigationService.safeNavigate(['/player/settings']);
+  }
+
+  openTeamCreation(): void {
+    void this.navigationService.safeNavigate(['/sessions/create']);
+  }
+
+  openTeam(teamId: number): void {
+    void this.navigationService.safeNavigate(['/teams', String(teamId)]);
   }
 
   retryStatistics(): void {
@@ -317,6 +326,7 @@ export class PlayerProfilePage implements OnDestroy {
 
     this.errorMessage = null;
     this.historyUnavailable = false;
+    this.teamsUnavailable = false;
     const failStatistics = () => { this.errorMessage = 'No pudimos cargar las estadísticas.'; };
     forkJoin({
       profile: this.userApiService.getPlayerProfile(atletaUuid).pipe(catchError(() => { failStatistics(); return of(null); })),
@@ -331,7 +341,7 @@ export class PlayerProfilePage implements OnDestroy {
         failStatistics();
         return of([]);
       })),
-      teams: this.teamApiService.getByPlayer(atletaUuid).pipe(catchError(() => of([] as TeamSummary[]))),
+      teams: this.teamApiService.getByPlayer(atletaUuid).pipe(catchError(() => { this.teamsUnavailable = true; return of([] as TeamSummary[]); })),
       positions: this.userApiService
         .getPlayerPositions(atletaUuid)
         .pipe(catchError(() => of(this.playerPositionStateService.getByPlayer(atletaUuid)))),

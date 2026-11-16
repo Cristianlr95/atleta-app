@@ -7,9 +7,6 @@ import { NavigationService } from 'src/app/core/services/navigation.service';
 import { MatchHistoryViewItem, MatchHistoryService } from 'src/app/features/matches/services/match-history.service';
 import { NotificationBadgeService } from 'src/app/features/matches/services/notification-badge.service';
 import { InvitationsStore } from 'src/app/features/matches/stores/invitations.store';
-import { RatingsApiService } from 'src/app/features/ratings/services/ratings-api.service';
-import { TeamSummary } from 'src/app/features/teams/models/team.models';
-import { TeamApiService } from 'src/app/features/teams/services/team-api.service';
 import { UserApiService } from 'src/app/features/user/services/user-api.service';
 import { buildMainBottomNav } from 'src/app/shared/navigation/main-bottom-nav';
 import {
@@ -35,16 +32,10 @@ import { PositionLevel, positionLevel } from '../../utils/position-level.util';
 export class HomePage {
   private readonly authSessionService = inject(AuthSessionService);
   private readonly navigationService = inject(NavigationService);
-  private readonly ratingsApiService = inject(RatingsApiService);
   private readonly matchHistoryService = inject(MatchHistoryService);
   private readonly invitationsStore = inject(InvitationsStore);
   private readonly notificationBadgeService = inject(NotificationBadgeService);
-  private readonly teamApiService = inject(TeamApiService);
   private readonly userApiService = inject(UserApiService);
-
-  readonly iconBase = 'assets/icons/atleta-raster-v1';
-  readonly titleIconAsset = `${this.iconBase}/ic_nav_home_96.png`;
-  readonly teamIconAsset = `${this.iconBase}/ic_match_teams_96.png`;
 
   isLoading = false;
   nextMatchLabel = 'Sin partido agendado';
@@ -52,17 +43,13 @@ export class HomePage {
   nextMatchStatus: MatchHistoryViewItem['displayStatusKey'] | 'NONE' = 'NONE';
   pendingInvitations = signal<number | null>(null);
   invitationsUnavailable = false;
-  teamsUnavailable = false;
 
-  playerName = 'Jugador';
-  overallHybridOvr: number | null = null;
   primaryPositionXp: number | null = null;
   levelProgress: PositionLevel | null = null;
   streakValue: number | null = null;
   historyUnavailable = false;
 
   activities: HomeActivityItem[] = [];
-  currentTeam: TeamSummary | null = null;
 
   get bottomNavItems(): ReadonlyArray<MetallicBottomNavItem> {
     return buildMainBottomNav('home', this.notificationBadgeService.totalPending());
@@ -76,22 +63,6 @@ export class HomePage {
     void this.navigationService.goToMainBottomSection(itemId);
   }
 
-  onOpenTeam(): void {
-    if (this.teamsUnavailable) {
-      this.loadHomeData();
-      return;
-    }
-    if (this.currentTeam) {
-      void this.navigationService.safeNavigate(['/teams', String(this.currentTeam.id)]);
-      return;
-    }
-    void this.navigationService.safeNavigate(['/sessions/create']);
-  }
-
-  onOpenMatches(): void {
-    void this.navigationService.safeNavigate(['/matches']);
-  }
-
   onOpenHistory(): void {
     void this.navigationService.safeNavigate(['/matches/history']);
   }
@@ -102,24 +73,20 @@ export class HomePage {
       return;
     }
 
-    this.playerName = session.user.nombre || 'Jugador';
     this.isLoading = true;
     this.historyUnavailable = false;
     this.invitationsUnavailable = false;
 
     forkJoin({
       profile: this.userApiService.getPlayerProfile(session.user.atletaUuid).pipe(catchError(() => of(null))),
-      overall: this.ratingsApiService.getOverall(session.user.atletaUuid).pipe(catchError(() => of(null))),
       history: this.matchHistoryService.getPlayerHistory(session.user.atletaUuid).pipe(catchError(() => of(null))),
-      teams: this.teamApiService.getByPlayer(session.user.atletaUuid).pipe(catchError(() => of(null))),
       invitations: from(this.invitationsStore.loadPendingInvitations()).pipe(catchError(() => of(false))),
     })
       .pipe(finalize(() => (this.isLoading = false)))
-      .subscribe(({ profile, overall, history, teams, invitations }) => {
+      .subscribe(({ profile, history, invitations }) => {
         const xp = profile?.positions?.find((position) => position.prioridad === 1)?.xp;
         this.primaryPositionXp = typeof xp === 'number' && Number.isSafeInteger(xp) && xp >= 0 && xp <= 2147483647 ? xp : null;
         this.levelProgress = this.primaryPositionXp === null ? null : positionLevel(this.primaryPositionXp);
-        this.overallHybridOvr = overall?.hybridOVR ?? null;
         void this.notificationBadgeService.refresh();
 
         this.invitationsUnavailable = !invitations;
@@ -134,8 +101,6 @@ export class HomePage {
         } else {
           this.applyHistoryContext(history);
         }
-        this.teamsUnavailable = teams === null;
-        this.currentTeam = teams?.[0] ?? null;
       });
   }
 

@@ -14,11 +14,7 @@ test.describe('Flujo visual integral de partidos', () => {
       await page.goto('/home');
       await expect(page.getByRole('button', { name: 'Ver historial' })).toBeVisible();
       await expect(page.getByText('Nivel de posición 2')).toBeVisible();
-      await expect(page.locator('.home-metric').nth(2)).toContainText('120');
-      await page.keyboard.press('Tab');
-      await expect(page.getByRole('button', { name: /Mi equipo/i })).toBeFocused();
-      await page.keyboard.press('Tab');
-      await expect(page.getByRole('button', { name: 'Ver partidos' })).toBeFocused();
+      await expect(page.getByRole('progressbar')).toHaveAttribute('aria-valuetext', '20 de 125 XP');
       await page.keyboard.press('Tab');
       await expect(page.getByRole('button', { name: 'Ver historial' })).toBeFocused();
       const dimensions = await page.evaluate(() => ({ width: document.documentElement.clientWidth, scroll: document.documentElement.scrollWidth }));
@@ -38,24 +34,25 @@ test.describe('Flujo visual integral de partidos', () => {
     await expect(page.getByText('Sin partido agendado')).toBeVisible();
     await expect(page.getByRole('alert')).toHaveCount(0);
   });
-  test('Inicio ofrece crear equipo cuando no hay equipo asociado', async ({ page }) => {
+  test('Perfil ofrece crear equipo cuando no hay equipo asociado', async ({ page }) => {
     await installFlowFixture(page);
     await page.route('**/api/v1/teams/by-player/ath-flow', route => json(route, []));
-    await page.goto('/home');
-    await page.getByRole('button', { name: /Sin equipo.*Crear equipo/ }).click();
+    await page.goto('/player/profile');
+    await page.getByRole('button', { name: 'Crear equipo', exact: true }).click();
     await expect(page).toHaveURL(/\/sessions\/create$/);
+    await expect(page.getByRole('button', { name: 'Crear equipo', exact: true })).toHaveCount(1);
     await expect(page.getByRole('button', { name: 'Crear equipo', exact: true })).toBeVisible();
   });
-  test('Inicio permite recuperar el equipo si su carga falla', async ({ page }) => {
+  test('Perfil permite recuperar el equipo si su carga falla', async ({ page }) => {
     await installFlowFixture(page);
     const pattern = '**/api/v1/teams/by-player/ath-flow';
     await page.route(pattern, route => route.fulfill({ status: 500, json: {} }));
-    await page.goto('/home');
-    const team = page.getByRole('button', { name: /Equipo no disponible.*Reintentar/ });
+    await page.goto('/player/profile');
+    const team = page.getByRole('button', { name: 'Reintentar equipos' });
     await expect(team).toBeVisible();
     await page.unroute(pattern);
     await team.click();
-    await expect(page.getByRole('button', { name: /Mi equipo.*Atleta Dev FC/ })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Ver equipo Atleta Dev FC' })).toBeVisible();
   });
 
   test('Inicio permite recuperar las invitaciones si su carga falla', async ({ page }) => {
@@ -65,19 +62,19 @@ test.describe('Flujo visual integral de partidos', () => {
     await page.goto('/home');
     const alert = page.getByRole('alert').filter({ hasText: 'No se pudieron cargar las invitaciones' });
     await expect(alert).toBeVisible();
-    await expect(page.locator('.home-metric').nth(1)).toContainText('--');
+    await expect(page.locator('.home-invitations')).toContainText('--');
     await page.unroute(pattern);
     await alert.getByRole('button', { name: 'Reintentar' }).click();
     await expect(alert).toHaveCount(0);
-    await expect(page.locator('.home-metric').nth(1)).toContainText('0');
+    await expect(page.locator('.home-invitations')).toContainText('0');
   });
 
   test('Inicio muestra XP real de la posición principal en móvil', async ({ page }) => {
     await page.setViewportSize({ width: 320, height: 760 });
     await installFlowFixture(page);
     await page.goto('/home');
-    await expect(page.locator('.home-metric').nth(2)).toContainText('XP posición principal');
-    await expect(page.locator('.home-metric').nth(2)).toContainText('120');
+    await expect(page.getByRole('region', { name: 'Progreso de posición principal' })).toBeVisible();
+    await expect(page.getByRole('progressbar')).toHaveAttribute('aria-valuetext', '20 de 125 XP');
     await expect(page.getByText('Nivel de posición 2')).toBeVisible();
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true);
   });
@@ -87,17 +84,17 @@ test.describe('Flujo visual integral de partidos', () => {
     let profileCalls = 0;
     await page.route('**/api/v1/player-profiles/ath-flow', route => ++profileCalls === 1 ? json(route, playerProfile()) : route.fulfill({ status: 500, json: {} }));
     await page.goto('/home');
-    await expect(page.locator('.home-metric').nth(2)).toContainText('--');
+    await expect(page.getByRole('progressbar')).toHaveCount(0);
     await expect(page.getByText('XP y nivel no disponibles.')).toBeVisible();
   });
 
-  test('Inicio muestra OVR y partido finalizado sin estados contradictorios', async ({ page }) => {
+  test('Inicio reserva el OVR al Perfil y conserva el partido finalizado', async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
     await installFlowFixture(page);
     await page.route('**/api/v1/ratings/player/ath-flow/overall', route => json(route, { hybridOVR: 63.4 }));
     await page.route('**/api/v1/matches/by-player-or-creator/ath-flow', route => json(route, [matchResponse('FINALIZADO')]));
     await page.goto('/home');
-    await expect(page.locator('.home-metric').first()).toContainText('63');
+    await expect(page.getByText('OVR', { exact: true })).toHaveCount(0);
     await expect(page.locator('.home-priority')).toContainText('Finalizado');
     await expect(page.locator('.home-priority')).not.toContainText('Próximo');
     await capture(page, '08-inicio-con-datos-390.png');

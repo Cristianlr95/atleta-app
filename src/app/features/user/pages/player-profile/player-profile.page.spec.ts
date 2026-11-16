@@ -143,6 +143,27 @@ describe('PlayerProfilePage', () => {
     expect(component).toBeTruthy();
   });
 
+  it('keeps team creation in the empty profile', () => {
+    const navigate = spyOn(TestBed.inject(Router), 'navigate').and.resolveTo(true);
+    fixture.detectChanges();
+    fixture.nativeElement.querySelector('.profile-create-team').click();
+    expect(navigate).toHaveBeenCalledWith(['/sessions/create'], undefined);
+  });
+
+  it('does not offer team creation on a team API failure and retries', () => {
+    authSessionService.currentSession = { user: { atletaUuid: 'ath-1', nombre: 'Ana' } };
+    const teams = spyOn(TestBed.inject(TeamApiService), 'getByPlayer').and.returnValue(throwError(() => ({ status: 500 })));
+    component.ionViewWillEnter();
+    fixture.detectChanges();
+    expect(fixture.nativeElement.textContent).toContain('No pudimos cargar los equipos.');
+    expect(fixture.nativeElement.querySelector('.profile-create-team')).toBeNull();
+    teams.and.returnValue(of([]));
+    fixture.nativeElement.querySelector('.profile-teams-retry').click();
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelector('.profile-teams-retry')).toBeNull();
+    expect(fixture.nativeElement.querySelector('.profile-create-team')).not.toBeNull();
+  });
+
   it('does not repeat OVR as a general level', () => {
     component.overallHybridOvr = 68;
     component.roleStats = [{ role: 'ATAQUE', rating: 79 }];

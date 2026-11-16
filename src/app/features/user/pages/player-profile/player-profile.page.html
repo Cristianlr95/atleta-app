@@ -34,12 +34,6 @@
           </ng-template>
         </ion-popover>
         <div class="player-command-center__roles">
-          <div class="team-affiliation" aria-label="Equipo actual">
-            <span>EQUIPO ACTUAL</span>
-            <strong *ngIf="memberTeams.length > 0">{{ memberTeams[0].nombre }}</strong>
-            <strong *ngIf="memberTeams.length === 0" class="team-affiliation__empty">Sin equipo</strong>
-            <small *ngIf="memberTeams.length > 1">+{{ memberTeams.length - 1 }} equipo{{ memberTeams.length > 2 ? 's' : '' }}</small>
-          </div>
           <p class="section-kicker">POSICIONES PRIORITARIAS</p>
           <ol class="position-priority-list">
             <li *ngFor="let position of playerPositions; index as index"><span>{{ index + 1 }}º</span><strong>{{ position.name }}</strong></li>
@@ -83,10 +77,14 @@
 
       <section *ngIf="!isLoading" class="profile-section" aria-labelledby="profile-teams-title">
         <h2 id="profile-teams-title"><img class="atleta-raster-icon" [src]="teamsSectionIconAsset" alt="" width="24" height="24" />Mi equipo</h2>
-        <app-profile-teams [teams]="memberTeams" [currentPlayerUuid]="currentPlayerUuid" [expandedTeamId]="expandedTeamId"
+        <div *ngIf="teamsUnavailable" role="alert" class="profile-message profile-message--warning">No pudimos cargar los equipos.
+          <button type="button" class="profile-retry profile-teams-retry" (click)="retryStatistics()">Reintentar equipos</button>
+        </div>
+        <button *ngIf="!teamsUnavailable && memberTeams.length === 0" type="button" class="profile-settings-link profile-create-team" (click)="openTeamCreation()">Crear equipo</button>
+        <app-profile-teams *ngIf="!teamsUnavailable" [teams]="memberTeams" [currentPlayerUuid]="currentPlayerUuid" [expandedTeamId]="expandedTeamId"
           [teamMembers]="teamMembers" [teamMembersLoading]="teamMembersLoading" [teamMembersError]="teamMembersError"
           [inviteQuery]="inviteQuery" [inviteLoading]="inviteLoading" [inviteCandidates]="inviteCandidates" [inviteSendingUuid]="inviteSendingUuid"
-          (teamToggle)="toggleTeamAccordion($event)" (remove)="onDeleteTeam($event)" (queryChange)="onInviteQueryChange($event)" (invite)="onSendTeamInvite($event)">
+          (viewTeam)="openTeam($event)" (teamToggle)="toggleTeamAccordion($event)" (remove)="onDeleteTeam($event)" (queryChange)="onInviteQueryChange($event)" (invite)="onSendTeamInvite($event)">
         </app-profile-teams>
       </section>
     </main>

@@ -4,7 +4,7 @@ import { mkdirSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { installH0H3Fixture } from './helpers/h0-h3-fixture';
 
-const evidenceDir = join(process.cwd(), 'docs/profile-sections-2026-11-16/after');
+const evidenceDir = join(process.cwd(), 'docs/home-profile-2026-11-16/profile-states');
 
 async function capture(page: Page, state: string, width: number, responses: unknown[] = []) {
   mkdirSync(evidenceDir, { recursive: true });

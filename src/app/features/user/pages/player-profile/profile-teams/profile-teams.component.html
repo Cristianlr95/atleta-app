@@ -2,7 +2,7 @@
           <div class="profile-team" *ngFor="let team of teams">
             <div class="profile-team__head">
               <img *ngIf="team.logoUrl" class="profile-team__logo" [src]="team.logoUrl" [alt]="'Logo ' + team.nombre" />
-              <div class="profile-team__meta"><p class="profile-team__name">{{ team.nombre }}</p><p class="profile-team__detail" *ngIf="team.anioFundacion">Fundado: {{ team.anioFundacion }}</p></div>
+              <div class="profile-team__meta"><button type="button" class="profile-team__name" [attr.aria-label]="'Ver equipo ' + team.nombre" (click)="viewTeam.emit(team.id)">{{ team.nombre }}</button><p class="profile-team__detail" *ngIf="team.anioFundacion">Fundado: {{ team.anioFundacion }}</p></div>
               <div class="profile-team__actions"><button type="button" class="profile-team__btn profile-team__btn--icon" [attr.aria-expanded]="isTeamExpanded(team.id)" [attr.aria-label]="(isTeamExpanded(team.id) ? 'Ocultar integrantes de ' : 'Ver integrantes de ') + team.nombre" (click)="teamToggle.emit(team.id)">{{ isTeamExpanded(team.id) ? 'Ocultar' : 'Ver integrantes' }}</button><button type="button" class="profile-team__btn profile-team__btn--danger" *ngIf="isTeamCreator(team)" (click)="remove.emit(team)">Eliminar</button></div>
             </div>
             <div class="profile-team-invite" *ngIf="isTeamExpanded(team.id)">

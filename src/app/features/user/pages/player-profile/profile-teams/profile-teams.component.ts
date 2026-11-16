@@ -23,6 +23,7 @@ export class ProfileTeamsComponent {
   @Input() inviteCandidates: SocialPlayerLookupItem[] = [];
   @Input() inviteSendingUuid: string | null = null;
 
+  @Output() viewTeam = new EventEmitter<number>();
   @Output() teamToggle = new EventEmitter<number>();
   @Output() remove = new EventEmitter<TeamSummary>();
   @Output() queryChange = new EventEmitter<string>();
