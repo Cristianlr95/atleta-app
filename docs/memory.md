@@ -6,6 +6,7 @@
 - PR #23 conservado. Sin parche proporcionado; se revisó la implementación existente. Vacíos diferenciados (global, posición, equipo, sin equipo), retorno al global y carga de equipos sin anunciar vacíos prematuros. Búsqueda y limpieza existentes conservadas.
 - Build y lint correctos; 13 pruebas unitarias de Ranking, 254 unitarias totales y 6 E2E de Ranking correctos. Ancho disponible y recorridos simulados verificados en 320/390/1366/1440 px.
 - API de beta pendiente por falta de cuenta de prueba confirmada; no cerrar H5 como validado en beta. Evidencia, comandos y escenarios pendientes en [h5-ranking-2026-11-16.md](h5-ranking-2026-11-16.md). Sin push, integración ni despliegue.
+- Ampliación visual solicitada después: goles, veces MVP y últimos cinco resultados G/E/P, con cifras únicamente en el dataset de ejemplo. El usuario eligió propuesta visual primero; backend y beta siguen pendientes. Teléfono con filas apiladas, filtros compactos y sin desplazamiento horizontal; desktop conserva tabla. Build/lint correctos, 15 unitarias de Ranking, 256 unitarias totales y 7 E2E correctos. Nuevas capturas en `output/playwright/h5-stats/` (320/390/768/1366 px).
 
 Fecha de actualizacion: 2026-05-06
 Fuente: auditoria directa del repositorio `atleta-app`

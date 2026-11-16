@@ -296,13 +296,22 @@
 }
 
 @media (max-width: 420px) {
+  .leaderboard-container { padding: 12px 10px 92px; }
+
+  .ranking-workspace__header { gap: 8px; align-items: center; margin-bottom: 10px; }
+  .ranking-workspace__eyebrow { display: none; }
+  .ranking-workspace__description { margin: 0; font-size: 13px; }
+  .ranking-workspace__demo { white-space: nowrap; font-size: 9px; }
+  .ranking-demo-notice { padding: 8px 10px; margin-bottom: 8px; font-size: 13px; }
+
   .ranking-toolbar {
-    grid-template-columns: 1fr;
-    gap: 8px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
   }
 
   .ranking-toolbar__control select {
     min-height: 44px;
+    font-size: 13px;
   }
 
   .leaderboard-roles {

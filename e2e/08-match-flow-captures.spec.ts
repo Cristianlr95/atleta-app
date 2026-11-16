@@ -213,6 +213,43 @@ test.describe('Flujo visual integral de partidos', () => {
     });
   }
 
+  test('ranking muestra goles, MVP y forma reciente de ejemplo sin desbordar', async ({ page }) => {
+    await installFlowFixture(page);
+    await page.route('**/assets/app-config.json', route => json(route, {
+      apiBaseUrl: 'http://localhost:8080/api/v1', storagePrefix: 'atleta.dev', environmentName: 'development',
+    }));
+    for (const width of [320, 390, 768, 1366]) {
+      await page.setViewportSize({ width, height: 844 });
+      await page.goto('/leaderboard');
+      const row = page.locator('tbody tr').first();
+      await expect(row).toContainText('Matías Rojas');
+      await expect(row.locator('.leaderboard__goals')).toContainText('16');
+      await expect(row.locator('.leaderboard__mvp')).toContainText('5');
+      await expect(row.locator('.leaderboard__result')).toHaveCount(5);
+      await expect(row.locator('.leaderboard__results')).toHaveAccessibleName('Últimos resultados, más reciente a la derecha');
+      await expect(row.locator('.leaderboard__goals')).toBeVisible();
+      await expect(row.locator('.leaderboard__mvp')).toBeVisible();
+      await expect(row.locator('.leaderboard__results')).toBeVisible();
+      expect(await row.evaluate(el => el.scrollWidth <= el.clientWidth)).toBe(true);
+      expect(await page.locator('.leaderboard__table-wrap').evaluate(el => el.scrollWidth <= el.clientWidth)).toBe(true);
+      expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+      await page.evaluate(() => Promise.all(Array.from(document.images, img => img.decode().catch(() => undefined))));
+      await page.screenshot({ path: `output/playwright/h5-stats/demo-${width}.png`, fullPage: true });
+      const lastRow = page.locator('tbody tr').last();
+      await page.locator('ion-content').last().evaluate(async element => {
+        await (element as HTMLElement & { scrollToBottom: (duration?: number) => Promise<void> }).scrollToBottom(0);
+      });
+      await expect(lastRow.locator('.leaderboard__results')).toBeVisible();
+      const lastBox = await lastRow.boundingBox();
+      const footerBox = await page.locator('.leaderboard-footer').boundingBox();
+      expect(lastBox!.y + lastBox!.height).toBeLessThanOrEqual(footerBox!.y);
+      await page.getByLabel('Clasificar por').selectOption('ROLE');
+      await expect(page.locator('tbody tr').first().locator('.leaderboard__goals')).toContainText('16');
+      await page.getByLabel('Mostrar').selectOption('TEAM');
+      await expect(page.locator('tbody tr').first().locator('.leaderboard__mvp')).toContainText('5');
+    }
+  });
+
   test('ranking anuncia un error de carga y permite reintentar', async ({ page }) => {
     await installFlowFixture(page);
     await page.route('**/assets/app-config.json', route => json(route, {

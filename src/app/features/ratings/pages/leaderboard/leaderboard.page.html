@@ -10,14 +10,14 @@
           <span class="ranking-workspace__demo" *ngIf="usesDevelopmentDemo">Datos de prueba</span>
         </header>
         <p *ngIf="usesDevelopmentDemo" class="ranking-demo-notice" role="status">
-          Esta vista incluye datos de ejemplo. Las cifras de prueba se sustituyen cuando hay resultados reales disponibles.
+          Vista previa con datos de ejemplo.
         </p>
 
         <section class="ranking-toolbar" aria-label="Filtros del ranking">
           <label class="ranking-toolbar__control">
             <span>Mostrar</span>
             <select [ngModel]="selectedScope" (ngModelChange)="onScopeChange($any($event))">
-              <option value="PLATFORM">Todos los jugadores</option>
+              <option value="PLATFORM">Global</option>
               <option value="TEAM">Mi equipo</option>
             </select>
           </label>
