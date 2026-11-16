@@ -1,5 +1,11 @@
 # Memory Vivo - Atleta Frontend
 
+## Perfil con hexágono visible; sin listas repetidas · 16/11/2026
+
+- Ajuste solicitado: gráfico de Perfil visible sin acordeón; partidos/goles/asistencias/balance debajo. Se retiran los promedios desplegables del plantel y las listas visibles de posiciones de Perfil/modal; se conserva su alternativa accesible sin ocupar espacio.
+- Base `b2502a1`, misma rama/worktree. Commit probado `9bb209f31a34f754615010ad9a8a2e2e12ed297a`. Build/lint, 265 unitarias y 14 E2E a 390/1440 correctos. [Evidencias](profile-visible-radar-2026-11-16/verificacion.md).
+- Datos ausentes y fallos conservan sus estados; no se generan valoraciones ficticias. Goles/asistencias del plantel y beta siguen pendientes de API/cuenta; sin publicación.
+
 ## Equipo con media y lista; detalle en modal · 16/11/2026
 
 - Nueva organización solicitada: OVR agregado/hexágono arriba, lista del plantel debajo, selección de jugador en modal sin cambiar de ruta. Sustituye las fichas permanentes anteriores. Commit probado `c00b1b3d677b3b394ee7679f24f2e0e02028ccc1`, base `dee6916`, misma rama y worktree aislados.

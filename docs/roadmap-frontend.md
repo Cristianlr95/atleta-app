@@ -2,6 +2,8 @@
 
 ## Completado
 
+- [x] **Perfil con gráfico visible y sin desgloses repetidos**: se elimina el acordeón, las métricas pasan debajo y las listas de valores del Perfil/modal y promedios del plantel dejan de ocupar espacio visual. Alternativas accesibles conservadas. Build/lint, 265 unitarias y 14 E2E correctos. [Evidencia](profile-visible-radar-2026-11-16/verificacion.md); beta pendiente.
+
 - [x] **Equipo: resumen, listado y modal**, nueva organización solicitada: media OVR con cobertura, hexágono por posición, lista lateral en móvil y detalle de jugador sin salir del equipo. 265 unitarias, 17 E2E seleccionadas y build/lint correctos. [Evidencia](team-list-2026-11-16/verificacion.md). [Datos backend pendientes](team-list-2026-11-16/backend-pendientes.md): goles/asistencias y PJ del equipo; beta pendiente de cuenta.
 
 - [x] **Inicio, Perfil y Plantel sin repetición de ficha**: Inicio muestra jornada/actividad; Perfil concentra datos personales y un único acceso al plantel. Fichas de equipo inspiradas en Squad Data con datos del contrato, cero/ausencia/error diferenciados, teclado y radar accesible. 263 unitarias y 29 E2E seleccionadas correctas; build/lint correctos. [Evidencias y mapa](home-profile-2026-11-16/verificacion.md), [plantel](team-squad-2026-11-16/verificacion.md). Beta pendiente.

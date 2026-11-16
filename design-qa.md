@@ -1,5 +1,15 @@
 # Design QA
 
+## Hexágono permanente y limpieza de desgloses — 2026-11-16
+
+Referencia: capturas aportadas por el usuario del acordeón, métricas y listas repetidas. Se adapta el flujo existente de ATLETA sin nuevos assets. Implementación a 390×844 y 1440×844, densidad 1: [Perfil móvil](docs/profile-visible-radar-2026-11-16/profile-states/perfil-data-390.png), [Perfil escritorio](docs/profile-visible-radar-2026-11-16/profile-states/perfil-data-1440.png), [plantel](docs/profile-visible-radar-2026-11-16/team-states/plantel-list-390.png), [modal](docs/profile-visible-radar-2026-11-16/team-states/player-modal-390.png).
+
+Comparación completa y por regiones: hexágono visible sin pulsaciones, métricas debajo, ausencia de listas repetidas y desplegable de promedios, alineación de Trofeos/Equipo en escritorio. Las valoraciones textuales se mantienen accesibles sin espacio visual. La leyenda deja de anunciar una lista visible debajo del gráfico.
+
+P2 corregidos: gráfico inicialmente oculto, estadísticas antes del gráfico, desgloses duplicados y hueco vertical de la columna secundaria. Verificados teclado, reintentos, estados de carga/vacío/error, cero frente a ausencia y modal. No hay hallazgos P0/P1/P2 pendientes. Beta, dispositivo físico y lector de pantalla pendientes.
+
+final result: passed
+
 ## Equipo: lista y modal junto al OVR — 2026-11-16
 
 Fuente: [referencia del usuario](docs/team-list-2026-11-16/referencia.png), 322×332 px. Se adapta la relación OVR/hexágono a ATLETA; no se replica el marco ni los datos de PES. Implementación a 390×844 y 1440×844, densidad 1, sin reescalar el recorte como pantalla completa.
