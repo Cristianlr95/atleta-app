@@ -47,12 +47,13 @@ describe('LeaderboardPage', () => {
   it('no duplica el número de partidos cuando el texto ya lo incluye', () => {
     component.overallRows = [{ rank: 1, alias: 'Ana', scoreText: '63', matchesPlayed: 8, metaText: '8 partidos' }];
     fixture.detectChanges();
-    expect(fixture.nativeElement.querySelector('.leaderboard__mobile-matches')).toBeNull();
+    const playerText: string = fixture.nativeElement.querySelector('.leaderboard__player').textContent;
+    expect(playerText.match(/8 partidos/g)?.length).toBe(1);
   });
   it('mantiene los partidos jugados disponibles en móvil', () => {
     component.overallRows = [{ rank: 1, alias: 'Ana', scoreText: '63', matchesPlayed: 8 }];
     fixture.detectChanges();
-    expect(fixture.nativeElement.querySelector('.leaderboard__mobile-matches')?.textContent).toContain('8 partidos');
+    expect(fixture.nativeElement.querySelector('.leaderboard__matches')?.textContent).toContain('8');
   });
   it('should create', () => {
     expect(component).toBeTruthy();

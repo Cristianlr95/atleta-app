@@ -231,10 +231,28 @@ test.describe('Flujo visual integral de partidos', () => {
       await expect(row.locator('.leaderboard__mvp')).toBeVisible();
       await expect(row.locator('.leaderboard__results')).toBeVisible();
       expect(await row.evaluate(el => el.scrollWidth <= el.clientWidth)).toBe(true);
-      expect(await page.locator('.leaderboard__table-wrap').evaluate(el => el.scrollWidth <= el.clientWidth)).toBe(true);
+      const tableWrap = page.locator('.leaderboard__table-wrap');
+      expect(await tableWrap.evaluate(el => el.scrollWidth > el.clientWidth)).toBe(width <= 800);
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
       await page.evaluate(() => Promise.all(Array.from(document.images, img => img.decode().catch(() => undefined))));
       await page.screenshot({ path: `output/playwright/h5-stats/demo-${width}.png`, fullPage: true });
+      if (width <= 800) {
+        const nameBefore = await row.locator('.leaderboard__player').boundingBox();
+        const rankBefore = await row.locator('.leaderboard__rank').boundingBox();
+        await tableWrap.focus();
+        await page.keyboard.press('ArrowRight');
+        await expect.poll(() => tableWrap.evaluate(el => el.scrollLeft)).toBeGreaterThan(0);
+        await tableWrap.evaluate(el => { el.scrollLeft = el.scrollWidth; });
+        const nameAfter = await row.locator('.leaderboard__player').boundingBox();
+        const rankAfter = await row.locator('.leaderboard__rank').boundingBox();
+        expect(nameAfter!.x).toBeCloseTo(nameBefore!.x, 0);
+        expect(rankAfter!.x).toBeCloseTo(rankBefore!.x, 0);
+        const formBox = await row.locator('.leaderboard__results').boundingBox();
+        const wrapBox = await tableWrap.boundingBox();
+        expect(formBox!.x).toBeGreaterThanOrEqual(nameAfter!.x + nameAfter!.width);
+        expect(formBox!.x + formBox!.width).toBeLessThanOrEqual(wrapBox!.x + wrapBox!.width);
+        await page.screenshot({ path: `output/playwright/h5-stats/demo-scrolled-${width}.png`, fullPage: true });
+      }
       const lastRow = page.locator('tbody tr').last();
       await page.locator('ion-content').last().evaluate(async element => {
         await (element as HTMLElement & { scrollToBottom: (duration?: number) => Promise<void> }).scrollToBottom(0);

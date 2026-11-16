@@ -4,14 +4,15 @@
     <h3>{{ title }}</h3>
   </header>
 
-  <div class="leaderboard__table-wrap" *ngIf="rows.length > 0">
+  <p *ngIf="rows.length > 0" class="leaderboard__scroll-hint">Desliza para ver goles, MVP y últimos 5 →</p>
+  <div class="leaderboard__table-wrap" *ngIf="rows.length > 0" tabindex="0" role="region" aria-label="Estadísticas de jugadores, desplazamiento horizontal">
     <table class="leaderboard__table" role="table" [attr.aria-label]="title">
       <thead>
         <tr>
           <th class="leaderboard__rank-heading">#</th>
           <th>Jugador</th>
-          <th *ngIf="showRole" class="leaderboard__role-heading">Posición</th>
           <th class="leaderboard__score-heading">OVR</th>
+          <th *ngIf="showRole" class="leaderboard__role-heading">Posición</th>
           <th class="leaderboard__matches-heading">PJ</th>
           <th>Goles</th>
           <th><abbr title="Partidos como jugador más valioso">MVP</abbr></th>
@@ -30,16 +31,13 @@
           <td class="leaderboard__player">
             <p class="leaderboard__alias">{{ row.alias }}</p>
             <p *ngIf="row.metaText" class="leaderboard__row-meta">{{ row.metaText }}</p>
-            <p *ngIf="showRole && row.roleText" class="leaderboard__mobile-role">{{ row.roleText }}</p>
-            <p *ngIf="row.matchesPlayed !== null && row.matchesPlayed !== undefined && row.metaText !== row.matchesPlayed + ' partidos'" class="leaderboard__mobile-matches">{{ row.matchesPlayed }} partidos</p>
           </td>
-          <td *ngIf="showRole" class="leaderboard__role">{{ row.roleText || '—' }}</td>
           <td class="leaderboard__score">{{ row.scoreText }}</td>
+          <td *ngIf="showRole" class="leaderboard__role">{{ row.roleText || '—' }}</td>
           <td class="leaderboard__matches">{{ row.matchesPlayed ?? '—' }}</td>
-          <td class="leaderboard__goals"><span class="leaderboard__mobile-label">Goles</span>{{ row.goalsScored ?? '—' }}</td>
-          <td class="leaderboard__mvp"><span class="leaderboard__mobile-label">MVP</span>{{ row.mvpCount ?? '—' }}</td>
+          <td class="leaderboard__goals">{{ row.goalsScored ?? '—' }}</td>
+          <td class="leaderboard__mvp">{{ row.mvpCount ?? '—' }}</td>
           <td class="leaderboard__form">
-            <span class="leaderboard__mobile-label">Últimos 5</span>
             <div class="leaderboard__results" *ngIf="row.recentResults?.length; else noResults" role="group" aria-label="Últimos resultados, más reciente a la derecha">
               <span *ngFor="let result of row.recentResults | slice:-5"
                 class="leaderboard__result"
