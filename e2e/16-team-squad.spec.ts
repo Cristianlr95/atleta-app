@@ -55,6 +55,9 @@ for (const width of [390, 1440]) {
     await expect(dialog.locator('.player-dialog__ovr')).toHaveText('OVR68.1');
     await expect(dialog.locator('.player-dialog__ratings')).toContainText('Mediocampo0');
     await expect(dialog.locator('.player-dialog__ratings')).toContainText('DefensaSin valoración');
+    const valuesBox = await dialog.locator('.player-dialog__ratings').boundingBox();
+    expect(valuesBox!.width).toBeLessThanOrEqual(1);
+    expect(valuesBox!.height).toBeLessThanOrEqual(1);
     await expect(page).toHaveURL(/\/teams\/10$/);
     const ovrBox = await dialog.locator('.player-dialog__ovr').boundingBox();
     const chart = dialog.getByRole('img', { name: 'Rendimiento de Ana' });

@@ -60,7 +60,7 @@
       </div>
       <p class="team-status" *ngIf="member.roleStats.length === 0">{{ member.ratingUnavailable ? 'No pudimos cargar las valoraciones.' : 'Aún no hay valoraciones por posición.' }}</p>
       <dl class="player-dialog__details"><div><dt>Posición principal</dt><dd>{{ member.primaryPositionName || 'Sin posición' }}</dd></div><div><dt>PJ totales</dt><dd>{{ member.matchesPlayed ?? 'Sin datos' }}</dd></div><div><dt>Goles</dt><dd>Sin datos</dd></div><div><dt>Asistencias</dt><dd>Sin datos</dd></div></dl>
-      <dl class="player-dialog__ratings" *ngIf="member.roleStats.length > 0" aria-label="Valores por posición"><div *ngFor="let role of roles"><dt>{{ role === 'DT' ? 'DT' : (role | titlecase) }}</dt><dd>{{ playerRoleRating(member, role) !== null ? (playerRoleRating(member, role) | number:'1.0-1') : 'Sin valoración' }}</dd></div></dl>
+      <dl class="player-dialog__ratings visually-hidden" *ngIf="member.roleStats.length > 0" aria-label="Valores por posición"><div *ngFor="let role of roles"><dt>{{ role === 'DT' ? 'DT' : (role | titlecase) }}</dt><dd>{{ playerRoleRating(member, role) !== null ? (playerRoleRating(member, role) | number:'1.0-1') : 'Sin valoración' }}</dd></div></dl>
     </section>
   </ng-template>
 </ion-modal>

@@ -60,10 +60,11 @@ for (const width of [390, 1440]) {
     });
     expect(labelSize).toBeGreaterThanOrEqual(11);
     await capture(page, 'chart', width, fixture.requests);
-    await values.scrollIntoViewIfNeeded();
     await expect(values.getByText('Sin valoración', { exact: true })).toHaveCount(4);
-    await expect(values).toBeVisible();
-    await capture(page, 'text-values', width, fixture.requests);
+    const valuesBox = await values.boundingBox();
+    expect(valuesBox!.width).toBeLessThanOrEqual(1);
+    expect(valuesBox!.height).toBeLessThanOrEqual(1);
+    await capture(page, 'accessible-values', width, fixture.requests);
     await page.getByRole('heading', { name: 'Trofeos y metas', exact: true }).scrollIntoViewIfNeeded();
     await expect(page.locator('.achievement-card')).toContainText('Partidos jugados');
     const team = page.getByRole('button', { name: 'Ver integrantes de Atleta Prueba FC' });
