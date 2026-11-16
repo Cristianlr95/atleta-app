@@ -41,6 +41,14 @@
           </ol>
         </div>
 
+
+        <section class="player-command-center__stats" aria-label="Estadísticas por rol">
+          <p *ngIf="!errorMessage && !hasStatistics" class="profile-message" role="status">Aún no hay estadísticas</p>
+          <div class="stats-layout" *ngIf="roleStats.length > 0 && !errorMessage">
+            <app-metallic-role-hexagon [stats]="roleStats" [compact]="false" [showSummary]="false" [showClassification]="false" [overallValue]="overallHybridOvr" [overallClassificationLabel]="overallText" [versatilityValue]="overallVersatilityPercent" [bestRoleOverride]="overallBestRole" [bestRoleRatingOverride]="overallBestRoleRating" [subtitle]="'Perfil por posición'"></app-metallic-role-hexagon>
+          </div>
+        </section>
+
         <section class="player-command-center__competition" aria-label="Competición">
           <div *ngIf="!historyUnavailable && !errorMessage && hasStatistics" class="competition-metrics">
             <div><span>PARTIDOS</span><strong>{{ competition.matches }}</strong></div>
@@ -50,23 +58,16 @@
           </div>
         </section>
 
-        <section class="player-command-center__stats" aria-label="Estadísticas por rol">
-          <p *ngIf="!errorMessage && !hasStatistics" class="profile-message" role="status">Aún no hay estadísticas</p>
-          <details *ngIf="roleStats.length > 0 && !errorMessage" class="performance-details">
-            <summary><h2>Rendimiento por posición</h2><span>{{ roleDisplay(overallBestRole) }} {{ overallBestRoleRating | number:'1.0-0' }} · Ver gráfico y valores</span></summary>
-            <div class="stats-layout" *ngIf="roleStats.length > 0 && !errorMessage">
-              <app-metallic-role-hexagon [stats]="roleStats" [compact]="false" [showSummary]="false" [showClassification]="false" [overallValue]="overallHybridOvr" [overallClassificationLabel]="overallText" [versatilityValue]="overallVersatilityPercent" [bestRoleOverride]="overallBestRole" [bestRoleRatingOverride]="overallBestRoleRating" [subtitle]="'Perfil por posición'"></app-metallic-role-hexagon>
-              <aside class="stats-insights" aria-label="Resumen de habilidades">
-                <p>RESUMEN</p>
-                <div><span>ROL DESTACADO</span><strong>{{ roleDisplay(overallBestRole) }}</strong><small *ngIf="overallBestRoleRating !== null">{{ overallBestRoleRating | number:'1.0-0' }}</small></div>
-                <div><span>VERSATILIDAD</span><strong>{{ overallVersatilityPercent ?? '--' }}%</strong></div>
-              </aside>
-            </div>
-            <dl *ngIf="roleStats.length > 0 && !errorMessage" class="role-stat-values" aria-label="Valores por posición">
-              <div *ngFor="let stat of roleStatValues"><dt>{{ roleDisplay(stat.role) }}</dt><dd>{{ stat.rating !== null ? (stat.rating | number:'1.0-0') : 'Sin valoración' }}</dd></div>
-            </dl>
-          </details>
-        </section>
+        <div *ngIf="roleStats.length > 0 && !errorMessage" class="profile-position-details">
+          <aside class="stats-insights" aria-label="Resumen de habilidades">
+            <p>RESUMEN</p>
+            <div><span>ROL DESTACADO</span><strong>{{ roleDisplay(overallBestRole) }}</strong><small *ngIf="overallBestRoleRating !== null">{{ overallBestRoleRating | number:'1.0-0' }}</small></div>
+            <div><span>VERSATILIDAD</span><strong>{{ overallVersatilityPercent ?? '--' }}%</strong></div>
+          </aside>
+          <dl class="role-stat-values" aria-label="Valores por posición">
+            <div *ngFor="let stat of roleStatValues"><dt>{{ roleDisplay(stat.role) }}</dt><dd>{{ stat.rating !== null ? (stat.rating | number:'1.0-0') : 'Sin valoración' }}</dd></div>
+          </dl>
+        </div>
 
       </section>
 

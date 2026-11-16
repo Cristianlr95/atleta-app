@@ -7,11 +7,11 @@ h1, h2 { display: flex; align-items: center; gap: 10px; color: var(--text-primar
 h1 { font-size: 24px; line-height: 1.15; letter-spacing: .04em; }
 h2 { font-size: 20px; line-height: 1.25; }
 .profile-settings-link, .profile-retry { display: inline-flex; align-items: center; justify-content: center; gap: 7px; min-height: 44px; padding: 8px 12px; border: 1px solid var(--tactical-visit); border-radius: 8px; background: #071e27; color: var(--text-primary); font: 600 15px var(--font-family-body); }
-button:focus-visible, summary:focus-visible { outline: 2px solid var(--tactical-visit); outline-offset: 3px; }
+button:focus-visible { outline: 2px solid var(--tactical-visit); outline-offset: 3px; }
 .profile-message { margin: 14px 0; color: var(--text-secondary); font: 500 16px/1.4 var(--font-family-body); }
 .profile-message--warning { color: #ffd98a; }
 .profile-message--info { color: #9fc0f6; }
-.player-command-center { display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "identity ovr" "roles roles" "competition competition" "stats stats"; align-items: center; gap: 18px 16px; padding-top: 20px; }
+.player-command-center { display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "identity ovr" "roles roles" "stats stats" "competition competition" "values values"; align-items: center; gap: 18px 16px; padding-top: 20px; }
 .player-command-center__identity { grid-area: identity; display: flex; align-items: center; gap: 16px; min-width: 0; }
 .player-photo { position: relative; flex: 0 0 auto; width: 76px; height: 76px; border: 1px solid var(--tactical-visit); border-radius: 10px; overflow: hidden; background: #123343; }
 .player-photo > img { width: 100%; height: 100%; object-fit: cover; }
@@ -42,10 +42,7 @@ button:focus-visible, summary:focus-visible { outline: 2px solid var(--tactical-
 .competition-metrics .competition-record { grid-column: 1 / -1; flex-direction: row; justify-content: center; gap: 14px; border: 0; }
 .competition-record strong { font-size: 18px; }
 .player-command-center__stats { grid-area: stats; min-width: 0; }
-.performance-details summary { cursor: pointer; min-height: 44px; padding: 4px 0 8px; list-style-position: inside; }
-.performance-details summary h2 { display: inline; font-size: 19px; }
-.performance-details summary > span { display: block; margin-top: 5px; color: #b6c2c6; font: 14px/1.4 var(--font-family-body); }
-.stats-layout { display: grid; grid-template-columns: minmax(0, 1fr) 180px; align-items: center; gap: 18px; margin-top: 18px; }
+.stats-layout { display: block; }
 .stats-layout app-metallic-role-hexagon { display: block; min-width: 0; }
 .stats-insights { display: grid; gap: 14px; color: var(--text-primary); font-family: var(--font-family-body); }
 .stats-insights > p { color: var(--tactical-visit); font-size: 13px; }
@@ -62,10 +59,9 @@ button:focus-visible, summary:focus-visible { outline: 2px solid var(--tactical-
 .profile-footer { --background: #0f121c; border-top: 1px solid var(--tactical-line); }
 .profile-footer ion-toolbar { --background: transparent; --min-height: 72px; padding: 8px 10px 12px; }
 @media (min-width: 900px) {
-  .profile-sheet { display: grid; grid-template-columns: minmax(0, 1.45fr) minmax(0, 1fr); gap: 0 32px; }
+  .profile-sheet { display: grid; align-items: start; grid-template-rows: auto min-content 1fr; grid-template-columns: minmax(0, 1.45fr) minmax(0, 1fr); gap: 0 32px; }
   .profile-header, .profile-message, .profile-retry { grid-column: 1 / -1; }
   .player-command-center { grid-column: 1; grid-row: span 2; align-content: start; }
-  .stats-layout { grid-template-columns: minmax(0, 1fr); }
   .stats-insights { grid-template-columns: repeat(2, 1fr); }
   .stats-insights > p { grid-column: 1 / -1; }
 }
@@ -82,8 +78,10 @@ button:focus-visible, summary:focus-visible { outline: 2px solid var(--tactical-
   .profile-alias { font-size: 16px; }
   .ovr-block { padding: 8px; gap: 4px; }
   .ovr-block strong { font-size: 32px; }
-  .stats-layout { grid-template-columns: minmax(0, 1fr); }
   .stats-insights { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .stats-insights > p { grid-column: 1 / -1; }
   .role-stat-values { grid-template-columns: 1fr; }
 }
+.profile-position-details { grid-area: values; min-width: 0; }
+.stats-insights { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.stats-insights > p { grid-column: 1 / -1; }

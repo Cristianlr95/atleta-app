@@ -5,7 +5,7 @@ import { join } from 'node:path';
 import { installSquad } from './helpers/team-squad-fixture';
 
 async function capture(page: Page, state: string, width: number) {
-  const directory = join(process.cwd(), 'docs/team-list-2026-11-16/after');
+  const directory = join(process.cwd(), 'docs/profile-visible-radar-2026-11-16/team-states');
   mkdirSync(directory, { recursive: true });
   const name = `${state}-${width}`;
   if (await page.getByRole('dialog').count() === 0) await expect(page.getByRole('navigation', { name: 'Navegación inferior' })).toHaveCount(1);
@@ -28,6 +28,7 @@ for (const width of [390, 1440]) {
     await page.getByRole('button', { name: 'Ver integrantes de Atleta Prueba FC' }).click();
     await expect(page).toHaveURL(/\/teams\/10$/);
     await expect(page.locator('.team-member')).toHaveCount(3);
+    await expect(page.getByText('Ver promedios por posición', { exact: true })).toHaveCount(0);
     const ana = page.locator('.team-member').filter({ hasText: 'Ana' });
     const leo = page.locator('.team-member').filter({ hasText: 'Leo' });
     const camila = page.locator('.team-member').filter({ hasText: 'Camila' });

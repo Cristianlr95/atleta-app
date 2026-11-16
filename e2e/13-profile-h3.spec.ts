@@ -4,7 +4,7 @@ import { mkdirSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { installH0H3Fixture } from './helpers/h0-h3-fixture';
 
-const evidenceDir = join(process.cwd(), 'docs/team-list-2026-11-16/profile-states');
+const evidenceDir = join(process.cwd(), 'docs/profile-visible-radar-2026-11-16/profile-states');
 
 async function capture(page: Page, state: string, width: number, responses: unknown[] = []) {
   mkdirSync(evidenceDir, { recursive: true });
@@ -30,8 +30,8 @@ for (const width of [390, 1440]) {
     await expect(page.locator('.ovr-block')).toContainText('68');
     await expect(page.getByText('NIVEL GENERAL', { exact: true })).toHaveCount(0);
     await expect(page.getByText('Aún no hay estadísticas', { exact: true })).toHaveCount(0);
-    const details = page.locator('.performance-details');
-    await expect(details).not.toHaveAttribute('open');
+    await expect(page.locator('.player-command-center__stats details')).toHaveCount(0);
+    await expect(page.locator('app-metallic-role-hexagon')).toBeVisible();
     const values = page.locator('.role-stat-values');
     await expect(values.locator('div')).toHaveCount(6);
     await expect(values.locator('div').filter({ hasText: 'Mediocampo' })).toHaveText('Mediocampo0');
@@ -45,13 +45,10 @@ for (const width of [390, 1440]) {
     await capture(page, 'ovr-explanation', width, fixture.requests);
     await page.keyboard.press('Escape');
     await expect(page.locator('.ovr-popover-content')).toHaveCount(0);
-    const teamActionBox = await page.getByRole('button', { name: 'Ver integrantes de Atleta Prueba FC' }).boundingBox();
-    const initialFooterBox = await page.locator('.profile-footer').boundingBox();
-    expect(teamActionBox!.y + teamActionBox!.height).toBeLessThanOrEqual(initialFooterBox!.y);
+    const visibleChartBox = await page.getByRole('img', { name: 'Hexagono de habilidades' }).boundingBox();
+    const metricsBox = await page.locator('.competition-metrics').boundingBox();
+    expect(metricsBox!.y).toBeGreaterThanOrEqual(visibleChartBox!.y + visibleChartBox!.height);
     await capture(page, 'data', width, fixture.requests);
-    await details.locator('summary').focus();
-    await page.keyboard.press('Enter');
-    await expect(details).toHaveAttribute('open');
     const chart = page.getByRole('img', { name: 'Hexagono de habilidades' });
     await page.locator('app-metallic-role-hexagon').evaluate(el => el.scrollIntoView({ block: 'start' }));
     const chartBox = await chart.boundingBox();

@@ -21,11 +21,10 @@ h2 { font-size: 21px; }
 .team-overall p, .team-overall small { margin: 8px 0 0; color: var(--text-secondary); font: 14px/1.4 var(--font-family-body); }
 .team-overall small { display: block; }
 .team-performance__radar { min-width: 0; }
-.rating-values summary { min-height: 44px; padding-block: 10px; color: var(--tactical-visit); cursor: pointer; font: 600 14px var(--font-family-body); }
-.rating-values dl, .player-dialog__ratings { display: grid; gap: 8px; font: 14px/1.4 var(--font-family-body); }
-.rating-values dl div, .player-dialog__ratings div { display: flex; justify-content: space-between; gap: 10px; }
-.rating-values dt, .player-dialog__ratings dt { color: var(--text-secondary); }
-.rating-values dd, .player-dialog__ratings dd { margin: 0; color: var(--tactical-local); }
+.player-dialog__ratings { display: grid; gap: 8px; font: 14px/1.4 var(--font-family-body); }
+.player-dialog__ratings div { display: flex; justify-content: space-between; gap: 10px; }
+.player-dialog__ratings dt { color: var(--text-secondary); }
+.player-dialog__ratings dd { margin: 0; color: var(--tactical-local); }
 .team-members__heading { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 8px; margin-bottom: 10px; }
 .team-members__heading > span { color: var(--text-secondary); font: 15px var(--font-family-body); }
 .team-data-note { margin-bottom: 12px; font-size: 14px; }
@@ -59,7 +58,7 @@ h2 { font-size: 21px; }
 .player-dialog__ovr span { color: var(--text-secondary); font: 700 14px var(--font-family-display); }
 .player-dialog__ovr strong { display: block; margin-top: 6px; color: var(--tactical-local); font: 700 42px/1 var(--font-family-display); }
 .player-dialog__ovr strong.is-unavailable { font-size: 17px; line-height: 1.3; }
-.player-dialog__details { display: flex; justify-content: space-between; gap: 16px; padding-block: 14px; border-block: 1px solid var(--tactical-line); font: 15px var(--font-family-body); }
+.player-dialog__details { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; padding-block: 14px; border-block: 1px solid var(--tactical-line); font: 15px var(--font-family-body); }
 .player-dialog__details dt { color: var(--text-secondary); }
 .player-dialog__details dd { margin: 4px 0 0; }
 @media (max-width: 520px) {

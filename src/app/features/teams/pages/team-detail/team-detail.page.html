@@ -20,7 +20,7 @@
           <div class="team-overall"><span>OVR DEL EQUIPO</span><strong>{{ teamOvr !== null ? (teamOvr | number:'1.1-1') : 'Sin valoración' }}</strong><p>{{ ratedMembers.length }} de {{ members.length }} jugadores valorados</p><small>Promedio de los OVR disponibles. El cero sí cuenta.</small></div>
           <div *ngIf="teamRoleStats.length > 0; else noTeamRatings" class="team-performance__radar">
             <app-metallic-role-hexagon #teamRadar [stats]="teamRoleStats" [embedded]="true" [showSummary]="false" [showClassification]="false" title="Hexágono del equipo" subtitle="Promedio por posición"></app-metallic-role-hexagon>
-            <details class="rating-values"><summary>Ver promedios por posición</summary><dl><div *ngFor="let point of teamRadar.points"><dt>{{ point.role === 'DT' ? 'DT' : (teamRadar.roleLabel(point.role) | titlecase) }}</dt><dd>{{ point.hasRating ? (point.rating | number:'1.0-1') : 'Sin valoración' }}</dd></div></dl></details>
+            <dl class="visually-hidden" aria-label="Promedios por posición del equipo"><div *ngFor="let point of teamRadar.points"><dt>{{ point.role === 'DT' ? 'DT' : (teamRadar.roleLabel(point.role) | titlecase) }}</dt><dd>{{ point.hasRating ? (point.rating | number:'1.0-1') : 'Sin valoración' }}</dd></div></dl>
           </div>
           <ng-template #noTeamRatings><p class="team-status">Aún no hay valoraciones por posición para el equipo.</p></ng-template>
         </section>
@@ -59,7 +59,7 @@
         <app-metallic-role-hexagon *ngIf="member.roleStats.length > 0" #playerRadar [stats]="member.roleStats" [embedded]="true" [showSummary]="false" [showClassification]="false" [title]="'Rendimiento de ' + member.alias" subtitle=""></app-metallic-role-hexagon>
       </div>
       <p class="team-status" *ngIf="member.roleStats.length === 0">{{ member.ratingUnavailable ? 'No pudimos cargar las valoraciones.' : 'Aún no hay valoraciones por posición.' }}</p>
-      <dl class="player-dialog__details"><div><dt>Posición principal</dt><dd>{{ member.primaryPositionName || 'Sin posición' }}</dd></div><div><dt>PJ totales</dt><dd>{{ member.matchesPlayed ?? 'Sin datos' }}</dd></div></dl>
+      <dl class="player-dialog__details"><div><dt>Posición principal</dt><dd>{{ member.primaryPositionName || 'Sin posición' }}</dd></div><div><dt>PJ totales</dt><dd>{{ member.matchesPlayed ?? 'Sin datos' }}</dd></div><div><dt>Goles</dt><dd>Sin datos</dd></div><div><dt>Asistencias</dt><dd>Sin datos</dd></div></dl>
       <dl class="player-dialog__ratings" *ngIf="member.roleStats.length > 0" aria-label="Valores por posición"><div *ngFor="let role of roles"><dt>{{ role === 'DT' ? 'DT' : (role | titlecase) }}</dt><dd>{{ playerRoleRating(member, role) !== null ? (playerRoleRating(member, role) | number:'1.0-1') : 'Sin valoración' }}</dd></div></dl>
     </section>
   </ng-template>
