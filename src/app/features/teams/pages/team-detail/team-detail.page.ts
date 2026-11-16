@@ -21,6 +21,7 @@ interface TeamRosterMember extends TeamActiveMember {
   ovr: number | null;
   roleStats: HexagonRoleStat[];
   ratingUnavailable: boolean;
+  matchesPlayed: number | null;
 }
 
 @Component({
@@ -44,12 +45,36 @@ export class TeamDetailPage implements OnDestroy {
   isLoading = false;
   errorMessage: string | null = null;
   notFound = false;
+  selectedMember: TeamRosterMember | null = null;
+  readonly roles: HexagonRole[] = ['ATAQUE', 'MEDIOCAMPO', 'CARRILERO', 'DEFENSA', 'ARQUERO', 'DT'];
+
+  get ratedMembers(): TeamRosterMember[] {
+    return this.members.filter(member => !member.ratingUnavailable && member.ovr !== null && Number.isFinite(member.ovr));
+  }
+
+  get teamOvr(): number | null {
+    const rated = this.ratedMembers;
+    return rated.length ? rated.reduce((sum, member) => sum + member.ovr!, 0) / rated.length : null;
+  }
+
+  get teamRoleStats(): HexagonRoleStat[] {
+    return this.roles.reduce<HexagonRoleStat[]>((stats, role) => {
+      const values = this.members.map(member => member.roleStats.find(stat => stat.role === role)?.rating)
+        .filter((value): value is number => typeof value === 'number' && Number.isFinite(value));
+      if (values.length) stats.push({ role, rating: values.reduce((sum, value) => sum + value, 0) / values.length });
+      return stats;
+    }, []);
+  }
 
   ionViewWillEnter(): void { this.loadTeam(); }
   ngOnDestroy(): void { this.destroy$.next(); this.destroy$.complete(); }
   onRetry(): void { this.loadTeam(); }
   onBackToSocial(): void { void this.navigationService.safeNavigate(['/social'], { queryParams: { tab: 'teams' } }); }
-  onOpenPlayer(playerUuid: string): void { void this.navigationService.safeNavigate(['/players', playerUuid]); }
+  openPlayer(member: TeamRosterMember): void { this.selectedMember = member; }
+  playerRoleRating(member: TeamRosterMember, role: HexagonRole): number | null {
+    return member.roleStats.find(stat => stat.role === role)?.rating ?? null;
+  }
+  ionViewWillLeave(): void { this.selectedMember = null; }
   onBack(): void { void this.navigationService.goBackOrProfile(); }
   onNavItemSelected(itemId: string): void { void this.navigationService.goToMainBottomSection(itemId); }
 
@@ -64,6 +89,7 @@ export class TeamDetailPage implements OnDestroy {
       return;
     }
     this.isLoading = true;
+    this.selectedMember = null;
     this.team = null;
     this.members = [];
     this.errorMessage = null;
@@ -85,7 +111,8 @@ export class TeamDetailPage implements OnDestroy {
                   pictureUrl: profile?.pictureUrl ?? null,
                   ovr: overall.value?.hybridOVR ?? null,
                   ratingUnavailable: overall.unavailable,
-                  roleStats: (['ATAQUE', 'MEDIOCAMPO', 'CARRILERO', 'DEFENSA', 'ARQUERO', 'DT'] as HexagonRole[]).reduce<HexagonRoleStat[]>((stats, role) => {
+                  matchesPlayed: typeof overall.value?.totalMatchesPlayed === 'number' && Number.isSafeInteger(overall.value.totalMatchesPlayed) && overall.value.totalMatchesPlayed >= 0 ? overall.value.totalMatchesPlayed : null,
+                  roleStats: this.roles.reduce<HexagonRoleStat[]>((stats, role) => {
                     const value = overall.value?.roleBreakdown?.[role];
                     if (typeof value === 'number' && Number.isFinite(value)) stats.push({ role, rating: value });
                     return stats;

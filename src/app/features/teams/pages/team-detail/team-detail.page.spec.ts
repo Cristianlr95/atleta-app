@@ -48,16 +48,17 @@ describe('TeamDetailPage', () => {
     component = fixture.componentInstance;
   });
 
-  it('loads the exact team and opens the selected member profile', () => {
+  it('loads the exact team and selects a player without navigating away', () => {
     component.ionViewWillEnter();
     fixture.detectChanges();
-    component.onOpenPlayer('player-uuid');
+    component.openPlayer(component.members[0]);
 
     expect(teamApiService.getById).toHaveBeenCalledOnceWith(77);
     expect(teamApiService.getActiveMembers).toHaveBeenCalledOnceWith(77);
     expect(fixture.nativeElement.textContent).toContain('Atleta FC');
     expect(fixture.nativeElement.textContent).toContain('Demo10');
-    expect(navigationService.safeNavigate).toHaveBeenCalledWith(['/players', 'player-uuid']);
+    expect(component.selectedMember?.alias).toBe('Demo10');
+    expect(navigationService.safeNavigate).not.toHaveBeenCalled();
   });
 
   it('offers a recoverable Social exit when the team is missing', () => {
@@ -106,10 +107,28 @@ describe('TeamDetailPage', () => {
     ratingsApiService.getOverall.and.returnValue(of({ hybridOVR: 0, roleBreakdown: { ATAQUE: 79, MEDIOCAMPO: 0 } } as any));
     component.ionViewWillEnter();
     fixture.detectChanges();
-    const values = fixture.nativeElement.querySelector('.team-member__ratings');
-    expect(values.textContent).toContain('Mediocampo0');
-    expect(values.textContent).toContain('DefensaSin valoración');
+    expect(component.members[0].roleStats).toEqual([{ role: 'ATAQUE', rating: 79 }, { role: 'MEDIOCAMPO', rating: 0 }]);
     expect(fixture.nativeElement.querySelector('.team-member__ovr').textContent).toContain('0');
     expect(ratingsApiService.getOverall).toHaveBeenCalledOnceWith('player-uuid');
+  });
+
+  it('averages rated players including zero and excludes missing values', () => {
+    teamApiService.getActiveMembers.and.returnValue(of(['a', 'b', 'c'].map(playerUuid => ({ playerUuid, alias: playerUuid, rol: 'JUGADOR' as const, primaryPositionId: null, primaryPositionName: null }))));
+    ratingsApiService.getOverall.and.returnValues(
+      of({ hybridOVR: 80, roleBreakdown: { ATAQUE: 80, MEDIOCAMPO: 0 } } as any),
+      of({ hybridOVR: 0, roleBreakdown: { ATAQUE: 60 } } as any),
+      throwError(() => ({ status: 404 })),
+    );
+    component.ionViewWillEnter();
+    expect(component.teamOvr).toBe(40);
+    expect(component.ratedMembers.length).toBe(2);
+    expect(component.teamRoleStats).toEqual([{ role: 'ATAQUE', rating: 70 }, { role: 'MEDIOCAMPO', rating: 0 }]);
+  });
+
+  it('leaves the team unvalued when no player has a rating', () => {
+    ratingsApiService.getOverall.and.returnValue(throwError(() => ({ status: 404 })));
+    component.ionViewWillEnter();
+    expect(component.teamOvr).toBeNull();
+    expect(component.teamRoleStats).toEqual([]);
   });
 });
