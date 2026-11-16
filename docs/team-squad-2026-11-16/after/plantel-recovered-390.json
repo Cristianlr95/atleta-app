@@ -1,0 +1,11 @@
+{
+  "route": "/teams/10",
+  "viewport": {
+    "width": 390,
+    "height": 844
+  },
+  "state": "plantel-recovered",
+  "environment": "local, API simulada, sesión de prueba, sin demo",
+  "commit": "fd33395f94fa879b99854d3399cd2c164454205e",
+  "sourceChanges": ""
+}

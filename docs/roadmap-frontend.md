@@ -2,6 +2,8 @@
 
 ## Completado
 
+- [x] **Inicio, Perfil y Plantel sin repetición de ficha**: Inicio muestra jornada/actividad; Perfil concentra datos personales y un único acceso al plantel. Fichas de equipo inspiradas en Squad Data con datos del contrato, cero/ausencia/error diferenciados, teclado y radar accesible. 263 unitarias y 29 E2E seleccionadas correctas; build/lint correctos. [Evidencias y mapa](home-profile-2026-11-16/verificacion.md), [plantel](team-squad-2026-11-16/verificacion.md). Beta pendiente.
+
 - [x] **H3 · Perfil por secciones y navegación**, opción 3 seleccionada: identidad/OVR compactos, rendimiento desplegable y trofeos/equipos planos. Perfil y Ranking desde barra inferior. 262 unitarias, 10 E2E a 390/1440 px, build/lint correctos. [Verificación](profile-sections-2026-11-16/verificacion.md) y [mapa de accesos](profile-sections-2026-11-16/navigation/mapa.md). Beta pendiente de cuenta.
 
 - [x] **H0 · Línea base de Inicio, Partidos, Ranking y Perfil**, completada antes de editar H3: 32 estados a 390/1440 px con captura o reutilización identificada y metadatos de ruta, entorno, revisión y estado. [Inventario](h0-h3-2026-11-16/linea-base.md).

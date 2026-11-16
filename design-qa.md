@@ -1,5 +1,27 @@
 # Design QA
 
+## Inicio, Perfil y plantel deportivo — 2026-11-16
+
+Fuentes visuales preservadas: [referencia de plantel](docs/team-squad-2026-11-16/referencia.png), [Inicio anterior](docs/home-profile-2026-11-16/inicio-antes.png) y [Perfil anterior](docs/home-profile-2026-11-16/perfil-antes.png).
+
+Referencia de plantel aportada: `C:/Users/Crist/AppData/Local/Temp/codex-clipboard-ccac2eac-66a0-4d3d-aadc-ba7180a276b7.png` (670×371 px). Capturas del usuario de Inicio/Perfil: `codex-clipboard-b9b77b2b-34d7-4ea4-9765-892d8e456ce7.png` y `codex-clipboard-6519d9ec-ee36-46d4-8696-6fab7b792397.png`, en su directorio temporal de adjuntos.
+
+El usuario pide adaptar la referencia a ATLETA, no copiar el marco de PES. Se compara estructura y jerarquía, sin reescalar la imagen de consola como si fuera una pantalla CSS. Implementación real a 390×844 y 1440×844, densidad 1: [plantel móvil](docs/team-squad-2026-11-16/after/plantel-data-390.png), [plantel escritorio](docs/team-squad-2026-11-16/after/plantel-data-1440.png), [valores](docs/team-squad-2026-11-16/after/plantel-values-390.png), [Inicio](docs/home-profile-2026-11-16/after/inicio-data-390.png), [Perfil](docs/home-profile-2026-11-16/after/perfil-data-390.png).
+
+Revisión completa y por región: identidad/OVR del jugador, posición/rol, radar y alternativa textual; encabezado de equipo y barra inferior; separación de responsabilidades Inicio/Perfil. Se conservan las fuentes, fotos/iniciales y paleta de ATLETA. No se generaron retratos ni se copiaron logos, contratos o estadísticas de PES.
+
+Historial de correcciones de esta iteración:
+
+- P1: OVR, identidad y equipo repetidos en Inicio; retirados de Inicio, conservados en Perfil. Equipo duplicado en la cabecera de Perfil también retirado.
+- P2: capturas durante transición Ionic mostraban la pantalla anterior por transparencia; la captura espera un único menú accesible y se verificó nuevamente.
+- P2: marcos/encabezados anidados en el radar de las fichas; modo integrado conserva el gráfico y reduce marcos. El título general redundante se retiró.
+- P2: el nombre del equipo y «Ver integrantes» llevaban a vistas distintas del mismo plantel; ahora solo «Ver integrantes» abre las fichas. Administrar queda restringido al creador.
+- P2: texto de OVR ausente/error demasiado grande; estado textual a 16 px y valor numérico separado. Radar ≥11 px efectivos en ambos viewports.
+
+Interacciones comprobadas: Inicio/Perfil/Ranking, Ver integrantes, Crear equipo, reintentos de equipos y estadísticas, OVR y rendimiento por teclado, Ver jugador. Carga, vacío, 500 y recuperación; cero y ausencia diferenciados. Sin hallazgos P0/P1/P2 pendientes. No hay mapa táctico inventado; falta contrato espacial. [Resultados y límites](docs/team-squad-2026-11-16/verificacion.md).
+
+final result: passed
+
 ## Perfil por secciones — 2026-11-16
 
 Referencia elegida (opción 3): `C:/Users/Crist/.codex/generated_images/01a1e4a2-b285-7451-bc23-142c1c6ba68c/exec-dedc9677-094d-4927-94b9-90d145b46b92.png`.

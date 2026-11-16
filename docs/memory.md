@@ -1,5 +1,13 @@
 # Memory Vivo - Atleta Frontend
 
+## Inicio sin ficha duplicada y plantel deportivo · 16/11/2026
+
+- Base `a53ff9d`, misma rama/worktree aislados `codex/profile-sections-navigation-20261116`; commit final de fuente `fd33395f94fa879b99854d3399cd2c164454205e`. Raíz y checkout original preservados.
+- Inicio se centra en jornada, invitaciones, progreso y actividad: se retiraron identidad/OVR/equipo y tarjeta XP repetida, junto con las llamadas directas de overall/equipos. Perfil muestra el equipo una vez.
+- «Ver integrantes» abre `/teams/:id`, único plantel para jugadores normales. Crear equipo pasa al Perfil vacío. Administración e invitaciones siguen limitadas al creador; fallos de equipo permiten reintentar sin fingir un vacío.
+- Referencia Squad Data/PES adaptada a fichas con identidad, OVR, posición, rol, radar reutilizado y valores textuales. Sin nuevas peticiones ni datos ficticios. Corregido plantel vacío y diferenciado 500 de valoración frente a ausencia/0.
+- 263 unitarias y 29 E2E seleccionadas correctas; build/lint correctos. Beta pendiente de cuenta; dispositivo físico y lector de pantalla sin verificar. [Inicio/Perfil](home-profile-2026-11-16/verificacion.md) · [Plantel](team-squad-2026-11-16/verificacion.md).
+
 ## Perfil por secciones y accesos · 16/11/2026
 
 - Opción visual 3 seleccionada. Implementación `0b47f3ac0aac6a583317cd19e2cbf51b89237d08`, rama `codex/profile-sections-navigation-20261116`, base H0/H3 `6f9e0053345445b0add2d259528edd7dd97f663b`, mismo worktree aislado. Sin cambios en los checkouts originales.
