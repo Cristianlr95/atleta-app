@@ -435,7 +435,7 @@ test.describe('Flujo visual integral de partidos', () => {
     await page.setViewportSize({ width: 390, height: 844 });
     await installFlowFixture(page);
     await page.goto('/player/profile');
-    await expect(page.getByText('No hay estadísticas por posición disponibles.')).toBeVisible();
+    await expect(page.getByText('Aún no hay estadísticas', { exact: true })).toBeVisible();
     await expect(page.getByText('No hay trofeos disponibles.')).toBeVisible();
     await expect(page.locator('.achievement-card')).toHaveCount(0);
     await expect(page.locator('app-metallic-role-hexagon')).toHaveCount(0);
@@ -455,7 +455,7 @@ test.describe('Flujo visual integral de partidos', () => {
     await installFlowFixture(page);
     await page.route('**/api/v1/matches/by-player*/ath-flow', route => route.fulfill({ status: 500, contentType: 'application/json', body: '{}' }));
     await page.goto('/player/profile');
-    await expect(page.getByText('No se pudieron cargar las estadísticas de competición.')).toBeVisible();
+    await expect(page.getByRole('alert')).toHaveText('No pudimos cargar las estadísticas.');
     await expect(page.locator('.competition-metrics')).toHaveCount(0);
   });
   test('social distingue acciones y áreas táctiles con invitaciones en móvil', async ({ page }) => {
@@ -554,6 +554,9 @@ test.describe('Flujo visual integral de partidos', () => {
 
 async function installFlowFixture(page: Page): Promise<{ setStatus: (status: string) => void }> {
   let matchStatus = 'CREADO';
+  await page.route('**/assets/app-config.json', route => json(route, {
+    apiBaseUrl: 'http://localhost:8080/api/v1', storagePrefix: 'atleta.dev', environmentName: 'development',
+  }));
   await page.addInitScript(() => {
     const session = {
       user: { atletaUuid: 'ath-flow', email: 'flow@atleta.local', nombre: 'CapitanDev' },
