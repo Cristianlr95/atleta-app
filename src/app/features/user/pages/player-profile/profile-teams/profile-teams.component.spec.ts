@@ -16,7 +16,7 @@ describe('ProfileTeamsComponent', () => {
     spyOn(component.invite, 'emit');
     spyOn(component.queryChange, 'emit');
     fixture.nativeElement.querySelector('.profile-team__btn--icon').click();
-    fixture.nativeElement.querySelector('.profile-team__name').click();
+    fixture.nativeElement.querySelector('.profile-team__btn--admin').click();
     fixture.nativeElement.querySelector('.profile-team__btn--danger').click();
     fixture.nativeElement.querySelector('.profile-team-invite__item button').click();
     const search: HTMLInputElement = fixture.nativeElement.querySelector('.profile-team-invite__input');

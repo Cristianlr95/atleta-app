@@ -25,7 +25,7 @@ for (const width of [390, 1440]) {
     const runtimeErrors: string[] = [];
     page.on('pageerror', error => runtimeErrors.push(error.message));
     await page.goto('/player/profile');
-    await page.getByRole('button', { name: 'Ver equipo Atleta Prueba FC' }).click();
+    await page.getByRole('button', { name: 'Ver integrantes de Atleta Prueba FC' }).click();
     await expect(page).toHaveURL(/\/teams\/10$/);
     await expect(page.locator('.team-member')).toHaveCount(3);
     const ana = page.getByRole('article', { name: 'Ficha de Ana', exact: true });

@@ -39,6 +39,10 @@ export async function installH0H3Fixture(page: Page, initial: ProfileScenario) {
         metricLabel: 'partidos', currentValue: 1, nextThreshold: 5, progressPercent: 20, tier: null, unlocked: false }];
     } else if (path.endsWith('/teams/by-player/ath-h3')) {
       body = empty ? [] : [{ id: 10, nombre: 'Atleta Prueba FC', anioFundacion: 2026 }];
+    } else if (path.endsWith('/teams/10')) {
+      body = { id: 10, nombre: 'Atleta Prueba FC', anioFundacion: 2026 };
+    } else if (path.endsWith('/player-profiles/ath-h3/public')) {
+      body = { alias: 'Ana', nombre: 'Ana Torres', pictureUrl: null };
     } else if (path.endsWith('/teams/10/members/active')) {
       body = [{ playerUuid: 'ath-h3', alias: 'Ana', rol: 'JUGADOR', primaryPositionName: 'Delantero' }];
     } else if (path.endsWith('/teams/10/leaderboard')) {

@@ -52,7 +52,7 @@ test.describe('Flujo visual integral de partidos', () => {
     await expect(team).toBeVisible();
     await page.unroute(pattern);
     await team.click();
-    await expect(page.getByRole('button', { name: 'Ver equipo Atleta Dev FC' })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Ver integrantes de Atleta Dev FC' })).toBeVisible();
   });
 
   test('Inicio permite recuperar las invitaciones si su carga falla', async ({ page }) => {
@@ -443,10 +443,10 @@ test.describe('Flujo visual integral de partidos', () => {
     await installFlowFixture(page);
     await page.goto('/player/profile');
     const team = page.getByRole('button', { name: 'Ver integrantes de Atleta Dev FC' });
-    await expect(team).toHaveAttribute('aria-expanded', 'false');
     await team.click();
-    await expect(page.getByRole('button', { name: 'Ocultar integrantes de Atleta Dev FC' })).toHaveAttribute('aria-expanded', 'true');
-    await expect(page.getByText('Participantes y nivel del equipo')).toBeVisible();
+    await expect(page).toHaveURL(/\/teams\/10$/);
+    await expect(page.getByRole('heading', { name: 'Plantel activo' })).toBeVisible();
+    await expect(page.locator('.team-member').first()).toBeVisible();
   });
   test('perfil indica cuando no puede cargar el historial', async ({ page }) => {
     await installFlowFixture(page);
@@ -588,6 +588,10 @@ async function installFlowFixture(page: Page): Promise<{ setStatus: (status: str
     }
     if (path.endsWith('/teams/by-player/ath-flow')) {
       await json(route, [{ id: 10, nombre: 'Atleta Dev FC', anioFundacion: 2026 }]);
+      return;
+    }
+    if (path.endsWith('/teams/10')) {
+      await json(route, { id: 10, nombre: 'Atleta Dev FC', anioFundacion: 2026 });
       return;
     }
     if (path.endsWith('/teams/10/members/active')) {

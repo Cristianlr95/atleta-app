@@ -25,7 +25,7 @@
                   <i *ngIf="!member.pictureUrl" aria-hidden="true">{{ member.alias.charAt(0) }}</i>
                 </div>
                 <div class="team-member__identity"><p>Jugador</p><h3>{{ member.alias }}</h3></div>
-                <div class="team-member__ovr"><span>OVR</span><strong>{{ member.ratingUnavailable ? 'No disponible' : member.ovr !== null ? (member.ovr | number:'1.0-0') : 'Sin valoración' }}</strong></div>
+                <div class="team-member__ovr" [class.team-member__ovr--unavailable]="member.ovr === null || member.ratingUnavailable"><span>OVR</span><strong>{{ member.ratingUnavailable ? 'No disponible' : member.ovr !== null ? (member.ovr | number:'1.0-0') : 'Sin valoración' }}</strong></div>
               </header>
               <dl class="team-member__info">
                 <div><dt>Posición principal</dt><dd>{{ member.primaryPositionName || 'Sin posición' }}</dd></div>
@@ -34,7 +34,7 @@
               <div class="team-member__analysis" *ngIf="member.roleStats.length > 0; else noRoleRatings">
                 <app-metallic-role-hexagon #radar [stats]="member.roleStats" [embedded]="true" [showSummary]="false" [showClassification]="false" [title]="'Rendimiento de ' + member.alias" subtitle=""></app-metallic-role-hexagon>
                 <dl class="team-member__ratings" [attr.aria-label]="'Valores por posición de ' + member.alias">
-                  <div *ngFor="let point of radar.points"><dt>{{ radar.roleLabel(point.role) | titlecase }}</dt><dd>{{ point.hasRating ? (point.rating | number:'1.0-0') : 'Sin valoración' }}</dd></div>
+                  <div *ngFor="let point of radar.points"><dt>{{ point.role === 'DT' ? 'DT' : (radar.roleLabel(point.role) | titlecase) }}</dt><dd>{{ point.hasRating ? (point.rating | number:'1.0-0') : 'Sin valoración' }}</dd></div>
                 </dl>
               </div>
               <ng-template #noRoleRatings>

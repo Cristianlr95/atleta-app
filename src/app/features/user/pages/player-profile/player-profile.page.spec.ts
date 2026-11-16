@@ -129,15 +129,14 @@ describe('PlayerProfilePage', () => {
     expect(fixture.nativeElement.textContent).toContain('Aún no hay estadísticas');
     expect(fixture.nativeElement.textContent).toContain('No hay trofeos disponibles');
   });
-  it('identifica el equipo y el estado del panel de integrantes', () => {
+  it('opens the team roster from its single member action', () => {
+    const navigate = spyOn(TestBed.inject(Router), 'navigate').and.resolveTo(true);
     component.memberTeams = [{ id: 7, nombre: 'Azul' } as any];
     fixture.detectChanges();
     const button: HTMLButtonElement = fixture.nativeElement.querySelector('.profile-team__btn--icon');
-    expect(button.getAttribute('aria-expanded')).toBe('false');
-    expect(button.getAttribute('aria-label')).toContain('Azul');
-    component.expandedTeamId = 7;
-    fixture.detectChanges();
-    expect(button.getAttribute('aria-expanded')).toBe('true');
+    expect(button.getAttribute('aria-label')).toBe('Ver integrantes de Azul');
+    button.click();
+    expect(navigate).toHaveBeenCalledWith(['/teams', '7'], undefined);
   });
   it('should create', () => {
     expect(component).toBeTruthy();
