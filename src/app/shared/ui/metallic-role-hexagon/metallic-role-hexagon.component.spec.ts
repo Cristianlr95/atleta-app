@@ -30,4 +30,13 @@ describe('MetallicRoleHexagonComponent', () => {
   it('should compute classification from best role', () => {
     expect(component.overallClassification).toBe('Elite');
   });
+
+  it('labels an absent rating without confusing it with a real zero', () => {
+    component.stats = [{ role: 'ATAQUE', rating: 0 }];
+    fixture.detectChanges();
+    const values: HTMLElement[] = Array.from(fixture.nativeElement.querySelectorAll('.metallic-role-hexagon__value'));
+    expect(values[0].textContent?.trim()).toBe('0');
+    expect(values[1].textContent?.trim()).toBe('S/V');
+    expect(fixture.nativeElement.textContent).toContain('Sin valoración');
+  });
 });

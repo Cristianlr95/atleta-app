@@ -8,8 +8,9 @@
           Ajustes
         </button>
       </div>
-      <p *ngIf="isLoading" class="profile-message profile-message--info">Actualizando estadísticas...</p>
-      <p *ngIf="errorMessage" class="profile-message profile-message--warning">{{ errorMessage }}</p>
+      <p *ngIf="isLoading" class="profile-message profile-message--info" role="status">Actualizando estadísticas...</p>
+      <p *ngIf="errorMessage" class="profile-message profile-message--warning" role="alert">{{ errorMessage }}</p>
+      <button *ngIf="errorMessage && currentPlayerUuid && !isLoading" type="button" class="profile-retry" (click)="retryStatistics()">Reintentar estadísticas</button>
 
       <section *ngIf="!isLoading" class="player-command-center" aria-label="Resumen competitivo del jugador">
         <div class="player-command-center__identity">
@@ -48,25 +49,23 @@
 
         <section class="player-command-center__stats" aria-label="Estadísticas por rol">
           <p class="section-kicker">STATS</p>
-          <p *ngIf="!isLoading && roleStats.length === 0" class="profile-message">No hay estadísticas por posición disponibles.</p>
-          <div class="stats-layout" *ngIf="roleStats.length > 0">
-            <app-metallic-role-hexagon [stats]="roleStats" [compact]="true" [showSummary]="false" [showClassification]="false" [overallValue]="overallHybridOvr" [overallClassificationLabel]="overallText" [versatilityValue]="overallVersatilityPercent" [bestRoleOverride]="overallBestRole" [bestRoleRatingOverride]="overallBestRoleRating" [subtitle]="'Perfil por posición'"></app-metallic-role-hexagon>
+          <p *ngIf="!errorMessage && !hasStatistics" class="profile-message" role="status">Aún no hay estadísticas</p>
+          <div class="stats-layout" *ngIf="roleStats.length > 0 && !errorMessage">
+            <app-metallic-role-hexagon [stats]="roleStats" [compact]="false" [showSummary]="false" [showClassification]="false" [overallValue]="overallHybridOvr" [overallClassificationLabel]="overallText" [versatilityValue]="overallVersatilityPercent" [bestRoleOverride]="overallBestRole" [bestRoleRatingOverride]="overallBestRoleRating" [subtitle]="'Perfil por posición'"></app-metallic-role-hexagon>
             <aside class="stats-insights" aria-label="Resumen de habilidades">
               <p>RESUMEN</p>
-              <div><span>ROL DESTACADO</span><strong>{{ roleDisplay(overallBestRole) }}</strong><small *ngIf="overallBestRoleRating">{{ overallBestRoleRating | number:'1.0-0' }}</small></div>
+              <div><span>ROL DESTACADO</span><strong>{{ roleDisplay(overallBestRole) }}</strong><small *ngIf="overallBestRoleRating !== null">{{ overallBestRoleRating | number:'1.0-0' }}</small></div>
               <div><span>VERSATILIDAD</span><strong>{{ overallVersatilityPercent ?? '--' }}%</strong></div>
-              <div><span>NIVEL GENERAL</span><strong>{{ overallHybridOvr !== null ? (overallHybridOvr | number:'1.0-0') : '--' }}</strong></div>
             </aside>
           </div>
-          <dl class="role-stat-values" aria-label="Valores por posición">
-            <div *ngFor="let stat of roleStats"><dt>{{ roleDisplay(stat.role) }}</dt><dd>{{ stat.rating | number:'1.0-0' }}</dd></div>
+          <dl *ngIf="roleStats.length > 0 && !errorMessage" class="role-stat-values" aria-label="Valores por posición">
+            <div *ngFor="let stat of roleStatValues"><dt>{{ roleDisplay(stat.role) }}</dt><dd>{{ stat.rating !== null ? (stat.rating | number:'1.0-0') : 'Sin valoración' }}</dd></div>
           </dl>
         </section>
 
         <section class="player-command-center__competition" aria-label="Competición">
           <p class="section-kicker">COMPETICIÓN</p>
-          <p *ngIf="historyUnavailable" class="profile-message profile-message--warning" role="status">No se pudieron cargar las estadísticas de competición.</p>
-          <div *ngIf="!historyUnavailable" class="competition-metrics">
+          <div *ngIf="!historyUnavailable && !errorMessage && hasStatistics" class="competition-metrics">
             <div><span>PARTIDOS</span><strong>{{ competition.matches }}</strong></div>
             <div><span>GOLES</span><strong>{{ competition.goals }}</strong></div>
             <div><span>ASISTENCIAS</span><strong>{{ competition.assists }}</strong></div>

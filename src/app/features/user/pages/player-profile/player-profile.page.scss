@@ -65,6 +65,23 @@
   font-size: 13px;
 }
 
+.profile-retry {
+  display: block;
+  margin: 10px auto;
+  padding: 8px 14px;
+  border: 1px solid var(--tactical-visit);
+  border-radius: 8px;
+  background: #071e27;
+  color: var(--text-primary);
+  font: 700 15px var(--font-family-body);
+}
+
+.profile-settings-link, .profile-retry, .competition-actions button { min-height: 44px; }
+.profile-settings-link:focus-visible, .profile-retry:focus-visible, .competition-actions button:focus-visible {
+  outline: 2px solid var(--tactical-visit);
+  outline-offset: 3px;
+}
+
 .profile-header__eyebrow,
 .section-kicker {
   margin: 0;
@@ -75,10 +92,11 @@
 
 .player-command-center {
   display: grid;
-  grid-template-columns: 160px minmax(210px, .95fr) minmax(255px, 1.15fr);
+  grid-template-columns: 160px minmax(0, 1fr);
   grid-template-areas:
-    "identity roles stats"
-    "identity competition stats";
+    "identity roles"
+    "identity competition"
+    "stats stats";
   gap: 10px;
   margin: 8px 0 16px;
   padding: 4px 0;
@@ -94,7 +112,7 @@
 
 .player-command-center__identity { grid-area: identity; }
 .player-command-center__roles { grid-area: roles; border-left: 1px solid rgba(0, 215, 245, .2); }
-.player-command-center__stats { grid-area: stats; border-left: 1px solid rgba(0, 215, 245, .2); }
+.player-command-center__stats { grid-area: stats; margin-top: 8px; padding-top: 15px; border-top: 1px solid rgba(0, 215, 245, .34); }
 .player-command-center__competition { grid-area: competition; border-top: 1px solid rgba(0, 215, 245, .2); }
 
 .player-command-center__identity { display: grid; align-content: start; justify-items: center; text-align: center; gap: 8px; }
@@ -143,13 +161,8 @@
 .competition-metrics span { color: var(--text-muted); font: 700 11px var(--font-family-display); letter-spacing: .06em; }
 .competition-metrics strong { color: var(--text-primary); font: 700 17px var(--font-family-display); white-space: nowrap; }
 .competition-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; margin-top: auto; }
-.competition-actions button { min-height: 36px; border: 1px solid rgba(0, 215, 245, .48); border-radius: 8px; background: rgba(7, 30, 39, .72); color: var(--text-primary); font: 700 11px var(--font-family-display); padding: 6px; }
+.competition-actions button { min-height: 44px; border: 1px solid rgba(0, 215, 245, .48); border-radius: 8px; background: rgba(7, 30, 39, .72); color: var(--text-primary); font: 700 13px var(--font-family-display); padding: 6px; }
 .competition-actions button:first-child { border-color: rgba(215, 255, 0, .56); background: rgba(64, 87, 6, .34); }
-
-@media (max-width: 1080px) {
-  .player-command-center { grid-template-columns: 155px minmax(0, 1fr); grid-template-areas: "identity roles" "identity competition" "stats stats"; }
-  .player-command-center__stats { margin-top: 8px; padding-top: 15px; border-top: 1px solid rgba(0, 215, 245, .34); border-left: 0; }
-}
 
 @media (max-width: 520px) {
   .player-command-center { grid-template-columns: minmax(0, 1fr); grid-template-areas: "identity" "roles" "stats" "competition"; gap: 8px; padding: 4px 0; }
@@ -200,3 +213,7 @@
 .role-stat-values div { display: flex; justify-content: space-between; gap: 6px; }
 .role-stat-values dt { color: var(--text-secondary); }
 .role-stat-values dd { margin: 0; color: var(--tactical-local); font-weight: 700; }
+
+@media (max-width: 520px) {
+  .role-stat-values { grid-template-columns: 1fr; }
+}

@@ -35,4 +35,3 @@ const { installH0H3Fixture } = require(path.resolve('.tmp/h0-h3-fixture.cjs'));
  await browser.close(); fs.writeFileSync(path.join(dir,'manifest.json'),JSON.stringify(records,null,2)+'\n');
  if(records.length !== 32) throw new Error("Incomplete H0 matrix"); if(records.some(r=>r.blocked)) process.exitCode=1;
 })();
-

@@ -1,5 +1,5 @@
 import { TestBed } from '@angular/core/testing';
-import { of } from 'rxjs';
+import { of, throwError } from 'rxjs';
 import { AuthSessionService } from 'src/app/core/services/auth-session.service';
 import { RatingHistoryEntry } from '../../ratings/models/rating.models';
 import { RatingsApiService } from '../../ratings/services/ratings-api.service';
@@ -51,6 +51,21 @@ describe('MatchHistoryService', () => {
     });
 
     service = TestBed.inject(MatchHistoryService);
+  });
+
+  it('propagates a failed ratings history when profile statistics require it', (done) => {
+    matchesApiService.getByPlayerOrCreator.and.returnValue(of([]));
+    ratingsApiService.getHistory.and.returnValue(throwError(() => ({ status: 500 })));
+    service.getPlayerHistory('ath-1', { requireRatings: true }).subscribe({
+      next: () => done.fail('A statistics failure must not become an empty history'),
+      error: error => { expect(error.status).toBe(500); done(); },
+    });
+  });
+
+  it('preserves the existing optional ratings fallback for other callers', (done) => {
+    matchesApiService.getByPlayerOrCreator.and.returnValue(of([]));
+    ratingsApiService.getHistory.and.returnValue(throwError(() => ({ status: 500 })));
+    service.getPlayerHistory('ath-1').subscribe(history => { expect(history).toEqual([]); done(); });
   });
 
   it('does not count invalid matches as outcomes even if they have result data', (done) => {
