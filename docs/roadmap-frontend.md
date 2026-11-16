@@ -2,17 +2,9 @@
 
 ## Completado
 
-- [x] **Perfil con gráfico visible y sin desgloses repetidos**: se elimina el acordeón, las métricas pasan debajo y las listas de valores del Perfil/modal y promedios del plantel dejan de ocupar espacio visual. Alternativas accesibles conservadas. Build/lint, 265 unitarias y 14 E2E correctos. [Evidencia](profile-visible-radar-2026-11-16/verificacion.md); beta pendiente.
-
-- [x] **Equipo: resumen, listado y modal**, nueva organización solicitada: media OVR con cobertura, hexágono por posición, lista lateral en móvil y detalle de jugador sin salir del equipo. 265 unitarias, 17 E2E seleccionadas y build/lint correctos. [Evidencia](team-list-2026-11-16/verificacion.md). [Datos backend pendientes](team-list-2026-11-16/backend-pendientes.md): goles/asistencias y PJ del equipo; beta pendiente de cuenta.
-
-- [x] **Inicio, Perfil y Plantel sin repetición de ficha**: Inicio muestra jornada/actividad; Perfil concentra datos personales y un único acceso al plantel. Fichas de equipo inspiradas en Squad Data con datos del contrato, cero/ausencia/error diferenciados, teclado y radar accesible. 263 unitarias y 29 E2E seleccionadas correctas; build/lint correctos. [Evidencias y mapa](home-profile-2026-11-16/verificacion.md), [plantel](team-squad-2026-11-16/verificacion.md). Beta pendiente.
-
-- [x] **H3 · Perfil por secciones y navegación**, opción 3 seleccionada: identidad/OVR compactos, rendimiento desplegable y trofeos/equipos planos. Perfil y Ranking desde barra inferior. 262 unitarias, 10 E2E a 390/1440 px, build/lint correctos. [Verificación](profile-sections-2026-11-16/verificacion.md) y [mapa de accesos](profile-sections-2026-11-16/navigation/mapa.md). Beta pendiente de cuenta.
+- [x] **H3 · Perfil y Plantel, parte visual cerrada y aprobada por el usuario el 16/11/2026.** Revisión de fuente `9bb209f31a34f754615010ad9a8a2e2e12ed297a`, rama `codex/profile-sections-navigation-20261116`. Perfil con OVR único y explicación, hexágono siempre visible con datos y métricas debajo; sin listas visibles repetidas, con alternativa textual accesible. Plantel con OVR promedio y cobertura, hexágono agregado, lista de jugadores y ficha modal sin salir de la sección. Inicio no repite la ficha personal; accesos y permisos conservados. **Última verificación local:** 265 unitarias, 14 E2E a 390/1440 px, build/lint correctos. [Evidencia final](profile-visible-radar-2026-11-16/verificacion.md), [lista y modal](team-list-2026-11-16/verificacion.md), [mapa de navegación](home-profile-2026-11-16/verificacion.md). Este cierre visual no acredita datos reales, integración o despliegue.
 
 - [x] **H0 · Línea base de Inicio, Partidos, Ranking y Perfil**, completada antes de editar H3: 32 estados a 390/1440 px con captura o reutilización identificada y metadatos de ruta, entorno, revisión y estado. [Inventario](h0-h3-2026-11-16/linea-base.md).
-- [x] **H3 · Perfil normal**, implementado y verificado localmente: OVR único con explicación; «Sin valoración» distinto de cero; vacío y error 500 con reintento; gráfico ampliado, alternativa textual y accesos con teclado. 262 unitarias y 13 E2E pertinentes correctos, build/lint correctos. [Evidencia y límites](h0-h3-2026-11-16/verificacion.md).
-
 - [x] **H5 · Ranking visual**, finalizado y aprobado el 16/11/2026: ancho móvil, vacíos, búsqueda/reintento, goles/MVP/forma de ejemplo y tabla lateral con puesto/jugador fijos. Acabado de la barra aprobado. Evidencia y límites en [h5-ranking-2026-11-16.md](h5-ranking-2026-11-16.md).
 
 - [x] Inicio adaptable, actividad, navegación, estados de error y XP por posición principal.
@@ -27,6 +19,27 @@
 - [x] Compilación correcta y Perfil dentro del presupuesto de estilos; equipos y logros tienen componentes y estilos propios. La revisión H0/H3 todavía observa el aviso preexistente `empty-glob` de Stencil.
 
 ## Pendiente
+
+### Backend de Perfil y Plantel
+
+- [ ] **BE-PLANTEL-01:** entregar goles y asistencias por integrante en un DTO agregado; acordar si son totales de trayectoria o exclusivos del equipo. La interfaz mantiene «Sin datos» hasta disponer de datos reales.
+- [ ] **BE-PLANTEL-02:** proporcionar PJ del equipo si se requiere ese alcance. Actualmente «PJ totales» procede de la trayectoria completa; no atribuirlo al equipo.
+- [ ] **BE-PLANTEL-03:** definir partidos/participaciones válidos, autorización y contrato compatible; distinguir cero, ausencia y error de carga.
+- [ ] **BE-PLANTEL-04:** confirmar con datos reales los integrantes activos y el promedio OVR con cobertura. El promedio actual es de presentación; persistencia oficial/histórica solo si se requiere, no implementada.
+
+[Detalle y criterios](team-list-2026-11-16/backend-pendientes.md). No se implementó backend en este cierre.
+
+### Validación en beta de Perfil y Plantel
+
+**Estado: pendiente; sin cuenta de prueba confirmada.** Antes de comenzar, registrar URL/entorno y SHA frontend/backend, y comprobar que la versión desplegada corresponde al cambio aprobado. Usar credenciales por un canal privado.
+
+- [ ] Cuenta activa y datos representativos: perfil con historial y perfil nuevo; equipo con varios integrantes, sin integrantes y con valoraciones ausentes y cero válido.
+- [ ] Contrastar OVR, cobertura y medias por posición con la API real; verificar origen/alcance de PJ, goles y asistencias cuando se entreguen.
+- [ ] Carga, vacío, error HTTP 500 y reintento exitoso en un entorno de prueba controlado; conservar evidencia de los estados no reproducibles y su motivo.
+- [ ] A 390 y 1440 px: gráfico de Perfil sin desplegar, métricas debajo, tabla lateral, selección de jugador en modal, cierre/Escape y retorno del foco; rutas sin accesos duplicados y controles de equipo según permisos.
+- [ ] Guardar capturas y metadatos de ruta, viewport, estado, entorno y revisión exacta probada. Pruebas de teléfono físico y lector de pantalla siguen pendientes y se registran por separado.
+
+### Otros pendientes del roadmap
 
 La finalización de H5 corresponde a la interfaz local aprobada. Conectar goles, MVP y últimos cinco resultados a la API sigue pendiente en `BE-RANK-01` a `BE-RANK-05` (`atleta-server/docs/backlog-ranking-h5.md`, rama `codex/h5-ranking-backlog-20261116`). Incluye adaptación de modelos/servicio frontend, cuenta de prueba y validación móvil/escritorio en beta.
 

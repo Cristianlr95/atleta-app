@@ -1,5 +1,11 @@
 # Memory Vivo - Atleta Frontend
 
+## Aprobación visual de Perfil y Plantel · 16/11/2026
+
+- El usuario aprueba el diseño final y da por lista la parte visual. Fuente aprobada/probada `9bb209f31a34f754615010ad9a8a2e2e12ed297a`, rama `codex/profile-sections-navigation-20261116`; evidencia final: 265 unitarias, 14 E2E a 390/1440, build/lint correctos. No se reejecutan por esta actualización exclusivamente documental.
+- Se consolida el estado vigente en [roadmap-frontend.md](roadmap-frontend.md), manteniendo la evidencia histórica. Backend abierto como BE-PLANTEL-01..04: goles/asistencias, alcance de PJ, contrato/autorización y criterio de promedio con datos reales; persistencia oficial solo si se requiere.
+- Beta pendiente de cuenta y revisión desplegada identificada, datos representativos, contraste API, estados y reintento, navegación/modal/permisos y capturas. Teléfono físico y lector de pantalla pendientes. La aprobación visual no autoriza ni acredita merge, push o despliegue.
+
 ## Perfil con hexágono visible; sin listas repetidas · 16/11/2026
 
 - Ajuste solicitado: gráfico de Perfil visible sin acordeón; partidos/goles/asistencias/balance debajo. Se retiran los promedios desplegables del plantel y las listas visibles de posiciones de Perfil/modal; se conserva su alternativa accesible sin ocupar espacio.
