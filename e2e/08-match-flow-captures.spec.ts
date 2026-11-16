@@ -261,6 +261,9 @@ test.describe('Flujo visual integral de partidos', () => {
       const lastBox = await lastRow.boundingBox();
       const footerBox = await page.locator('.leaderboard-footer').boundingBox();
       expect(lastBox!.y + lastBox!.height).toBeLessThanOrEqual(footerBox!.y);
+      if (width <= 800) {
+        await page.screenshot({ path: `output/playwright/h5-stats/scrollbar-${width}.png`, fullPage: true });
+      }
       await page.getByLabel('Clasificar por').selectOption('ROLE');
       await expect(page.locator('tbody tr').first().locator('.leaderboard__goals')).toContainText('16');
       await page.getByLabel('Mostrar').selectOption('TEAM');
