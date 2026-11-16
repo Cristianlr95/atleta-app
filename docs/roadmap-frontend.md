@@ -2,6 +2,9 @@
 
 ## Completado
 
+- [x] **H0 · Línea base de Inicio, Partidos, Ranking y Perfil**, completada antes de editar H3: 32 estados a 390/1440 px con captura o reutilización identificada y metadatos de ruta, entorno, revisión y estado. [Inventario](h0-h3-2026-11-16/linea-base.md).
+- [x] **H3 · Perfil normal**, implementado y verificado localmente: OVR único con explicación; «Sin valoración» distinto de cero; vacío y error 500 con reintento; gráfico ampliado, alternativa textual y accesos con teclado. 262 unitarias y 13 E2E pertinentes correctos, build/lint correctos. [Evidencia y límites](h0-h3-2026-11-16/verificacion.md).
+
 - [x] **H5 · Ranking visual**, finalizado y aprobado el 16/11/2026: ancho móvil, vacíos, búsqueda/reintento, goles/MVP/forma de ejemplo y tabla lateral con puesto/jugador fijos. Acabado de la barra aprobado. Evidencia y límites en [h5-ranking-2026-11-16.md](h5-ranking-2026-11-16.md).
 
 - [x] Inicio adaptable, actividad, navegación, estados de error y XP por posición principal.
@@ -13,7 +16,7 @@
 - [x] Correcciones de estados de perfil, ranking, cierre y votación MVP cubiertas por pruebas simuladas.
 - [x] Estadísticas informa errores y permite reintentar sin mostrar datos vacíos como reales.
 - [x] Angular 20.3.35 elimina los avisos de seguridad de las dependencias de producción en la auditoría actual.
-- [x] Compilación sin las advertencias de Stencil ni del presupuesto de estilos de Perfil; equipos y logros tienen componentes y estilos propios.
+- [x] Compilación correcta y Perfil dentro del presupuesto de estilos; equipos y logros tienen componentes y estilos propios. La revisión H0/H3 todavía observa el aviso preexistente `empty-glob` de Stencil.
 
 ## Pendiente
 
@@ -21,7 +24,7 @@ La finalización de H5 corresponde a la interfaz local aprobada. Conectar goles,
 
 1. Validar flujos completos con datos reales de beta, incluidos cierre, voto MVP y notificaciones.
 2. Revisar accesibilidad con lectores de pantalla y dispositivos físicos, además de contrastes sobre imágenes.
-3. Completar la revisión visual y de errores para todas las combinaciones de perfil, equipos, agenda y ranking.
+3. Ampliar la revisión visual y de errores a las combinaciones de perfil, equipos, agenda y ranking fuera de los escenarios documentados en H0/H3 y H5.
 4. Ajustar el balance de progresión con datos reales de partidas y revisar el motor XPService independiente antes de conectarlo al cierre.
 5. Revisar los avisos restantes de las dependencias de desarrollo y validar la aplicación Android en dispositivos reales. La versión de Piscina se fija temporalmente a 5.3.2 para corregir un aviso crítico; retirar esta excepción cuando Angular incorpore una versión corregida y verificar la compilación.
 

@@ -1,5 +1,12 @@
 # Memory Vivo - Atleta Frontend
 
+## H0 y H3 · 16/11/2026
+
+- Worktree aislado `C:/Users/Crist/Proyectos/Atleta/.worktrees/h0-h3-profile`, rama `codex/h0-h3-profile-20261116`, base H5 aprobada `6fcd35b00356ed26bbb303f024ce6d82aa779176`. Checkouts originales y sus cambios pendientes preservados.
+- H0 guardado antes de modificar aplicación en `6f0d44b`: 32 estados de Inicio/Partidos/Ranking/Perfil en 390/1440 px; 31 capturas nuevas y una reutilizada identificada. [Inventario](h0-h3-2026-11-16/linea-base.md).
+- H3 corrige el flujo normal sin demo: OVR único, posiciones ausentes como «Sin valoración», cero válido conservado y vacío distinguido de error HTTP con reintento en pantalla. Perfil exige el historial de ratings, manteniendo el fallback previo para los otros consumidores. Gráfico ampliado y alternativa textual legible; Ajustes, trofeos e integrantes comprobados con teclado.
+- Revisión probada `3030247`: 16 unitarias focalizadas, 262 unitarias totales y 13 E2E pertinentes correctos; build/lint correctos. [Verificación y capturas](h0-h3-2026-11-16/verificacion.md). API de beta, dispositivo físico, lector de pantalla real y auditoría integral pendientes. Sin push, merge ni despliegue.
+
 ## H5 · Ranking — 16/11/2026
 
 - **Estado final: LISTO y aprobado en su alcance visual local.** El usuario pidió cerrar esta implementación y registrar las incorporaciones backend. Roadmap y backlog actualizados; `BE-RANK-01` a `BE-RANK-05` quedan pendientes en el repositorio backend (rama `codex/h5-ranking-backlog-20261116`). No se ha implementado ni validado esa integración real.

@@ -68,4 +68,4 @@ Estados: data = actuaciones, equipo y trofeo representativos; empty = cuenta con
 
 Los 32 estados solicitados pudieron reproducirse localmente con respuestas controladas. No hay acceso ni cuenta de beta confirmados: no se acredita API real ni revisión desplegada. La falta de cuenta de beta no impide esta línea base simulada. Dispositivo físico y lector de pantalla real no disponibles; quedan pendientes. El inventario de rutas ajenas a las cuatro solicitadas sigue fuera de esta entrega.
 
-H0 queda documentado antes del cambio de aplicación; H3 se implementará después de guardar este punto de control.
+H0 se guardó en `6f0d44b24478ba918c47d11041fc22faf3a74719`, antes del primer cambio de aplicación de H3. Para repetir la captura, usar ese punto de control, cuyo `src` coincide con la base `6fcd35b`; el script rechaza ejecutarse sobre el código de H3 para conservar esta evidencia histórica.
