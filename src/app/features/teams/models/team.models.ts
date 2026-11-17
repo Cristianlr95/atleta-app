@@ -30,6 +30,8 @@ export interface CreateTeamRequest {
 }
 
 export interface TeamActiveMember {
+  teamGoals?: number | null;
+  totalGoals?: number | null;
   playerUuid: string;
   alias: string;
   rol: 'JUGADOR' | 'CAPITAN' | 'DT';

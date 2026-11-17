@@ -24,7 +24,7 @@ Integración con main validada el 16/11/2026 para el push solicitado: 271 unitar
 
 ### Backend de Perfil y Plantel
 
-- [ ] **BE-PLANTEL-01:** entregar goles y asistencias por integrante en un DTO agregado; acordar si son totales de trayectoria o exclusivos del equipo. La interfaz mantiene «Sin datos» hasta disponer de datos reales.
+- [ ] **BE-PLANTEL-01 (parcial, 17/11):** por decisión del usuario se entregan ambos goles: con el equipo y totales de trayectoria, desde el historial de partidos finalizados. Tabla y ficha conectadas a `teamGoals`/`totalGoals` del DTO agregado; cero registrado se conserva y ausencia de historial es «Sin datos». Asistencias y validación en beta siguen pendientes. [Contrato y verificación](team-goals-2026-11-17/verificacion.md).
 - [ ] **BE-PLANTEL-02:** proporcionar PJ del equipo si se requiere ese alcance. Actualmente «PJ totales» procede de la trayectoria completa; no atribuirlo al equipo.
 - [ ] **BE-PLANTEL-03:** definir partidos/participaciones válidos, autorización y contrato compatible; distinguir cero, ausencia y error de carga.
 - [ ] **BE-PLANTEL-04:** confirmar con datos reales los integrantes activos y el promedio OVR con cobertura. El promedio actual es de presentación; persistencia oficial/histórica solo si se requiere, no implementada.

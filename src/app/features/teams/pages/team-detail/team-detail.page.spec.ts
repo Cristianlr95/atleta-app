@@ -71,6 +71,28 @@ describe('TeamDetailPage', () => {
     expect(fixture.nativeElement.textContent).toContain('No hay integrantes activos.');
   });
 
+  it('shows team goals and career goals separately, preserving zero and missing data', () => {
+    teamApiService.getActiveMembers.and.returnValue(of([{
+      playerUuid: 'player-uuid', alias: 'Demo10', rol: 'CAPITAN', primaryPositionId: null,
+      primaryPositionName: null, teamGoals: 0, totalGoals: 12,
+    }]));
+    component.ionViewWillEnter();
+    fixture.detectChanges();
+    const cells = fixture.nativeElement.querySelectorAll('.team-member td');
+    expect(cells[3].textContent.trim()).toBe('0');
+    expect(cells[4].textContent.trim()).toBe('12');
+    expect(fixture.nativeElement.textContent).toContain('Goles con el equipo');
+    expect(fixture.nativeElement.textContent).toContain('Goles totales');
+    teamApiService.getActiveMembers.and.returnValue(of([{
+      playerUuid: 'player-uuid', alias: 'Demo10', rol: 'CAPITAN', primaryPositionId: null,
+      primaryPositionName: null,
+    }]));
+    component.ionViewWillEnter();
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelectorAll('.team-member td')[3].textContent.trim()).toBe('Sin datos');
+    expect(fixture.nativeElement.querySelectorAll('.team-member td')[4].textContent.trim()).toBe('Sin datos');
+  });
+
   it('offers a recoverable Social exit when the team is missing', () => {
     teamApiService.getById.and.returnValue(throwError(() => new HttpErrorResponse({ status: 404 })));
     component.ionViewWillEnter();

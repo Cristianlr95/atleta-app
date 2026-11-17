@@ -1,5 +1,11 @@
 # Memory Vivo - Atleta Frontend
 
+## Plantel: goles por equipo y totales · 17/11/2026
+
+- El usuario eligió ambos valores: tabla y ficha muestran goles con el equipo y de trayectoria manteniendo el diseño del 16/11. `TeamActiveMember` acepta `teamGoals`/`totalGoals` del endpoint existente, sin peticiones adicionales. Cero registrado se conserva; ausencia/null muestra «Sin datos». Asistencias sigue pendiente; BE-PLANTEL-01 queda parcial.
+- 272 unitarias, lint y build correctos; dos E2E nuevos a 390/1440 aprobados. La prueba detectó intencionalmente una regresión que ocultaba cero y pasó al restaurar el código. Modal móvil y tabla escritorio inspeccionados. [Contrato y evidencia](team-goals-2026-11-17/verificacion.md).
+- Rama `feature/team-goal-totals-20261117`, derivada de 1e1ddd8, en `.worktrees/publish-main-app-20261116`. Backend en rama homónima. Sin merge, push ni despliegue; navegador con API simulada. Beta, PostgreSQL y hardware no comprobados en esta tarea.
+
 ## Integración solicitada con main · 16/11/2026
 
 - Worktree aislado `codex/publish-main-app-20261116`, integra la revisión aprobada `f0d4209` con main `fb31693`. Conserva configuración beta y correcciones funcionales de main junto al diseño final aprobado.
