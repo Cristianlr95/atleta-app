@@ -25,17 +25,17 @@
           <ng-template #noTeamRatings><p class="team-status">Aún no hay valoraciones por posición para el equipo.</p></ng-template>
         </section>
         <section class="team-members"><div class="team-members__heading"><h2>Plantel activo</h2><span>{{ members.length }} jugadores</span></div>
-          <p class="team-data-note">Goles y asistencias con el equipo corresponden a este equipo; los totales y PJ totales abarcan toda la trayectoria. Sin historial registrado se muestra «Sin datos».</p>
+          <p class="team-data-note">PJ, goles y asistencias con el equipo corresponden a este equipo; los totales abarcan toda la trayectoria. Sin historial registrado se muestra «Sin datos».</p>
           <p class="team-scroll-hint">Desliza para ver partidos, goles y asistencias.</p>
           <div class="team-table-scroll" tabindex="0" role="region" aria-label="Lista de jugadores, desplazamiento horizontal">
             <table class="team-table">
               <caption class="visually-hidden">Jugadores del plantel. Selecciona un nombre para abrir su ficha sin salir del equipo.</caption>
-              <thead><tr><th scope="col">Jugador</th><th scope="col">Posición</th><th scope="col">OVR</th><th scope="col">PJ totales</th><th scope="col">Goles con el equipo</th><th scope="col">Goles totales</th><th scope="col">Asistencias con el equipo</th><th scope="col">Asistencias totales</th><th scope="col">Rol</th></tr></thead>
+              <thead><tr><th scope="col">Jugador</th><th scope="col">Posición</th><th scope="col">OVR</th><th scope="col">PJ totales</th><th scope="col">PJ con el equipo</th><th scope="col">Goles con el equipo</th><th scope="col">Goles totales</th><th scope="col">Asistencias con el equipo</th><th scope="col">Asistencias totales</th><th scope="col">Rol</th></tr></thead>
               <tbody><tr class="team-member" *ngFor="let member of members">
                 <th scope="row"><button type="button" class="team-player-button" [attr.aria-label]="'Ver ficha de ' + member.alias" (click)="openPlayer(member)"><span class="team-member__player"><img *ngIf="member.pictureUrl" [src]="member.pictureUrl" alt="" (error)="member.pictureUrl = null"><i *ngIf="!member.pictureUrl" aria-hidden="true">{{ member.alias.charAt(0) }}</i></span>{{ member.alias }}</button></th>
                 <td>{{ member.primaryPositionName || 'Sin posición' }}</td>
                 <td class="team-member__ovr">{{ member.ratingUnavailable ? 'No disponible' : member.ovr !== null ? (member.ovr | number:'1.0-1') : 'Sin valoración' }}<span *ngIf="member.ratingUnavailable" class="team-rating-error" role="alert">No pudimos cargar las valoraciones.</span><button *ngIf="member.ratingUnavailable" type="button" class="team-rating-retry" [attr.aria-label]="'Reintentar valoraciones de ' + member.alias" (click)="onRetry()">Reintentar</button></td>
-                <td>{{ member.matchesPlayed ?? 'Sin datos' }}</td><td>{{ member.teamGoals ?? 'Sin datos' }}</td><td>{{ member.totalGoals ?? 'Sin datos' }}</td><td>{{ member.teamAssists ?? 'Sin datos' }}</td><td>{{ member.totalAssists ?? 'Sin datos' }}</td><td>{{ member.rol === 'CAPITAN' ? 'Capitán' : member.rol === 'DT' ? 'DT' : 'Jugador' }}</td>
+                <td>{{ member.matchesPlayed ?? 'Sin datos' }}</td><td>{{ member.teamMatches ?? 'Sin datos' }}</td><td>{{ member.teamGoals ?? 'Sin datos' }}</td><td>{{ member.totalGoals ?? 'Sin datos' }}</td><td>{{ member.teamAssists ?? 'Sin datos' }}</td><td>{{ member.totalAssists ?? 'Sin datos' }}</td><td>{{ member.rol === 'CAPITAN' ? 'Capitán' : member.rol === 'DT' ? 'DT' : 'Jugador' }}</td>
               </tr></tbody>
             </table>
           </div>
@@ -59,7 +59,7 @@
         <app-metallic-role-hexagon *ngIf="member.roleStats.length > 0" #playerRadar [stats]="member.roleStats" [embedded]="true" [showSummary]="false" [showClassification]="false" [title]="'Rendimiento de ' + member.alias" subtitle=""></app-metallic-role-hexagon>
       </div>
       <p class="team-status" *ngIf="member.roleStats.length === 0">{{ member.ratingUnavailable ? 'No pudimos cargar las valoraciones.' : 'Aún no hay valoraciones por posición.' }}</p>
-      <dl class="player-dialog__details"><div><dt>Posición principal</dt><dd>{{ member.primaryPositionName || 'Sin posición' }}</dd></div><div><dt>PJ totales</dt><dd>{{ member.matchesPlayed ?? 'Sin datos' }}</dd></div><div><dt>Goles con el equipo</dt><dd>{{ member.teamGoals ?? 'Sin datos' }}</dd></div><div><dt>Goles totales</dt><dd>{{ member.totalGoals ?? 'Sin datos' }}</dd></div><div><dt>Asistencias con el equipo</dt><dd>{{ member.teamAssists ?? 'Sin datos' }}</dd></div><div><dt>Asistencias totales</dt><dd>{{ member.totalAssists ?? 'Sin datos' }}</dd></div></dl>
+      <dl class="player-dialog__details"><div><dt>Posición principal</dt><dd>{{ member.primaryPositionName || 'Sin posición' }}</dd></div><div><dt>PJ totales</dt><dd>{{ member.matchesPlayed ?? 'Sin datos' }}</dd></div><div><dt>PJ con el equipo</dt><dd>{{ member.teamMatches ?? 'Sin datos' }}</dd></div><div><dt>Goles con el equipo</dt><dd>{{ member.teamGoals ?? 'Sin datos' }}</dd></div><div><dt>Goles totales</dt><dd>{{ member.totalGoals ?? 'Sin datos' }}</dd></div><div><dt>Asistencias con el equipo</dt><dd>{{ member.teamAssists ?? 'Sin datos' }}</dd></div><div><dt>Asistencias totales</dt><dd>{{ member.totalAssists ?? 'Sin datos' }}</dd></div></dl>
       <dl class="player-dialog__ratings visually-hidden" *ngIf="member.roleStats.length > 0" aria-label="Valores por posición"><div *ngFor="let role of roles"><dt>{{ role === 'DT' ? 'DT' : (role | titlecase) }}</dt><dd>{{ playerRoleRating(member, role) !== null ? (playerRoleRating(member, role) | number:'1.0-1') : 'Sin valoración' }}</dd></div></dl>
     </section>
   </ng-template>

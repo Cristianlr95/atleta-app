@@ -1,5 +1,10 @@
 # Memory Vivo - Atleta Frontend
 
+## PJ con el equipo · 17/11/2026
+
+- Tabla y ficha muestran PJ con el equipo junto a PJ totales. El campo opcional `teamMatches` proviene del historial de partidos finalizados y cuenta encuentros distintos; sin historial del equipo se muestra «Sin datos». PJ totales conserva su fuente de rating y puede tener cobertura distinta. Pruebas simuladas y validación beta pendiente.
+- Verificación: 54 pruebas backend dirigidas en H2, 10 unitarias frontend, 2 E2E a 390/1440 con API simulada, lint y build correctos. Capturas en `docs/team-matches-2026-11-17/`. Sin PostgreSQL ni beta.
+
 ## Asistencias del plantel · 17/11/2026
 
 - Se muestran asistencias con el equipo y totales, siguiendo el alcance acordado para goles; cero se conserva y ausencia aparece como «Sin datos». La lectura usa el mismo agregado del plantel. Validación beta pendiente.

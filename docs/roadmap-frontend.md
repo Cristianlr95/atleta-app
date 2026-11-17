@@ -25,7 +25,7 @@ Integración con main validada el 16/11/2026 para el push solicitado: 271 unitar
 ### Backend de Perfil y Plantel
 
 - [ ] **BE-PLANTEL-01 (local):** goles y asistencias con el equipo y totales de trayectoria desde historial de partidos finalizados, mostrados en tabla y ficha. Se conserva cero y se distingue la ausencia de historial. Pendiente verificar en beta. [Goles: contrato y verificación](team-goals-2026-11-17/verificacion.md).
-- [ ] **BE-PLANTEL-02:** proporcionar PJ del equipo si se requiere ese alcance. Actualmente «PJ totales» procede de la trayectoria completa; no atribuirlo al equipo.
+- [ ] **BE-PLANTEL-02 (local):** «PJ con el equipo» cuenta partidos finalizados distintos con historial de ese equipo; «PJ totales» conserva su fuente de trayectoria. Tabla y ficha muestran ambos. Pendiente validación con datos reales y beta.
 - [ ] **BE-PLANTEL-03:** definir partidos/participaciones válidos, autorización y contrato compatible; distinguir cero, ausencia y error de carga.
 - [ ] **BE-PLANTEL-04:** confirmar con datos reales los integrantes activos y el promedio OVR con cobertura. El promedio actual es de presentación; persistencia oficial/histórica solo si se requiere, no implementada.
 
