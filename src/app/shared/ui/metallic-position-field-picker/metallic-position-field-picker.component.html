@@ -21,7 +21,7 @@
         <div class="field-picker__goal field-picker__goal--bottom"></div>
 
         <button
-          *ngFor="let node of pitchNodes"
+          *ngFor="let node of pitchNodes; trackBy: trackPosition"
           type="button"
           class="field-picker__position"
           [class.field-picker__position--active]="isSelected(node.value)"
@@ -63,7 +63,7 @@
           <h3 class="field-picker__role-title">Dirección técnica</h3>
         </div>
         <button
-          *ngFor="let node of specialRoleNodes"
+          *ngFor="let node of specialRoleNodes; trackBy: trackPosition"
           type="button"
           class="field-picker__role-card"
           [class.field-picker__role-card--active]="isSelected(node.value)"

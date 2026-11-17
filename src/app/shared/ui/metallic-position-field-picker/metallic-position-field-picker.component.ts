@@ -72,6 +72,10 @@ export class MetallicPositionFieldPickerComponent {
     return this.nodes.filter((node) => node.role === 'COACH');
   }
 
+  trackPosition(_index: number, node: FieldPositionNode): string {
+    return node.value;
+  }
+
   get selectedLabel(): string {
     return this.nodes.find((node) => node.value === this.selectedValue)?.label ?? '';
   }

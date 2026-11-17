@@ -63,7 +63,7 @@
         <p *ngIf="isLoading" class="matches-state" role="status">Cargando agenda...</p>
         <p *ngIf="errorMessage" class="matches-state matches-state--error" role="alert">{{ errorMessage }}</p>
         <div *ngIf="!isLoading && !errorMessage && upcomingMatches.length === 0 && pendingInvitationGroups().length === 0" class="matches-state matches-state--empty" role="status">
-          <p>No tienes partidos activos, recientes ni próximos. Crea uno para activar la competencia.</p>
+          <p>Sin partidos todavía.</p>
           <button type="button" class="matches-create-quick matches-state__action" (click)="onGoToCreate()">
             Crear primer partido
           </button>

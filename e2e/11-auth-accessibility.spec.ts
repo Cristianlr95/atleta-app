@@ -22,7 +22,7 @@ test.describe('Acceso y recuperación accesibles', () => {
         boxShadow: getComputedStyle(element).boxShadow,
       }));
       expect(invalidFieldStyles.borderColor).toBe('rgb(239, 71, 111)');
-      expect(invalidFieldStyles.boxShadow).toContain('239, 71, 111');
+      await expect(email).toHaveCSS('box-shadow', /239, 71, 111/);
       await expect(page.locator('#login-email-error')).toBeVisible();
       await expect(page.locator('#login-password-error')).toBeVisible();
       const submit = page.getByRole('button', { name: 'Iniciar sesión' });

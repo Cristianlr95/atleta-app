@@ -1,10 +1,10 @@
 import { Component, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { IonicModule } from '@ionic/angular';
 import { firstValueFrom } from 'rxjs';
-import { finalize } from 'rxjs/operators';
 import { ApiError } from 'src/app/core/models/api-error.model';
 import { NavigationService } from 'src/app/core/services/navigation.service';
 import { UserFeedbackService } from 'src/app/core/services/user-feedback.service';
@@ -33,6 +33,7 @@ export class LoginPage {
   private readonly authService = inject(AuthService);
   private readonly googleIdentityService = inject(GoogleIdentityService);
   private readonly navigationService = inject(NavigationService);
+  private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
   private readonly userFeedbackService = inject(UserFeedbackService);
 
@@ -43,8 +44,8 @@ export class LoginPage {
   }
   isSubmitting = false;
   authError: string | null = null;
-  readonly authNotice: string | null;
-  private readonly redirectUrl: string | null;
+  authNotice: string | null = null;
+  private redirectUrl: string | null = null;
 
   readonly loginForm = this.formBuilder.nonNullable.group({
     email: ['', [Validators.required, Validators.email]],
@@ -52,20 +53,23 @@ export class LoginPage {
   });
 
   constructor() {
-    const next = this.route.snapshot.queryParamMap.get('next');
-    const email = this.route.snapshot.queryParamMap.get('email');
-    this.authNotice = this.route.snapshot.queryParamMap.get('reset') === 'success'
-      ? 'Contrasena actualizada. Inicia sesion con tu nueva clave.'
-      : null;
-
-    this.redirectUrl = this.sanitizeRedirectUrl(next);
-
-    if (email) {
-      this.loginForm.patchValue({ email });
-    }
+    this.route.queryParamMap.pipe(takeUntilDestroyed()).subscribe((params) => {
+      this.authNotice = params.get('reset') === 'success'
+        ? 'Contrasena actualizada. Inicia sesion con tu nueva clave.'
+        : null;
+      this.redirectUrl = this.sanitizeRedirectUrl(params.get('next'));
+      const email = params.get('email');
+      if (email) {
+        this.loginForm.patchValue({ email });
+      }
+    });
   }
 
-  onLogin(): void {
+  async onLogin(): Promise<void> {
+    if (this.isSubmitting) {
+      return;
+    }
+
     if (this.loginForm.invalid) {
       this.loginForm.markAllAsTouched();
       return;
@@ -74,17 +78,14 @@ export class LoginPage {
     this.authError = null;
     this.isSubmitting = true;
 
-    this.authService
-      .login(this.loginForm.getRawValue())
-      .pipe(finalize(() => (this.isSubmitting = false)))
-      .subscribe({
-        next: () => {
-          this.navigateAfterLogin();
-        },
-        error: (error: ApiError) => {
-          this.authError = this.userFeedbackService.loginError(error);
-        },
-      });
+    try {
+      await firstValueFrom(this.authService.login(this.loginForm.getRawValue()));
+      await this.navigateAfterLogin();
+    } catch (error) {
+      this.authError = this.userFeedbackService.loginError(error as ApiError);
+    } finally {
+      this.isSubmitting = false;
+    }
   }
 
   onForgotPassword(): void {
@@ -102,7 +103,7 @@ export class LoginPage {
     try {
       const idToken = await this.googleIdentityService.requestIdToken();
       await firstValueFrom(this.authService.loginWithGoogleIdToken(idToken));
-      this.navigateAfterLogin();
+      await this.navigateAfterLogin();
     } catch (error) {
       this.authError = error instanceof Error
         ? error.message
@@ -125,15 +126,16 @@ export class LoginPage {
       return '/player/onboarding';
     }
 
-    return next.startsWith('/') ? next : null;
+    return next.startsWith('/') && !next.startsWith('//') && !/^\/login(?:[/?#;]|$)/.test(next)
+      ? next
+      : null;
   }
 
-  private navigateAfterLogin(): void {
-    if (this.redirectUrl) {
-      void this.navigationService.safeNavigateByUrl(this.redirectUrl);
-      return;
+  private async navigateAfterLogin(): Promise<void> {
+    // An auth transition must run even during the debounce for ordinary navigation.
+    const navigated = await this.router.navigateByUrl(this.redirectUrl ?? '/home').catch(() => false);
+    if (!navigated) {
+      this.authError = 'No se pudo abrir la aplicación. Intenta nuevamente.';
     }
-
-    void this.navigationService.safeNavigate(['/home']);
   }
 }

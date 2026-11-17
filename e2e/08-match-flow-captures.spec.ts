@@ -604,7 +604,7 @@ test.describe('Flujo visual integral de partidos', () => {
     ]) {
       await page.setViewportSize(viewport);
       await page.goto('/matches');
-      await expect(page.getByRole('status')).toContainText('No tienes partidos activos, recientes ni próximos');
+      await expect(page.getByRole('status')).toContainText('Sin partidos todavía');
       const createFirstMatch = page.getByRole('button', { name: 'Crear primer partido' });
       await expect(createFirstMatch).toBeVisible();
       expect((await createFirstMatch.boundingBox())!.height).toBeGreaterThanOrEqual(44);

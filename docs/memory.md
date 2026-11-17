@@ -3,6 +3,7 @@
 ## Asistencias del plantel · 17/11/2026
 
 - Se muestran asistencias con el equipo y totales, siguiendo el alcance acordado para goles; cero se conserva y ausencia aparece como «Sin datos». La lectura usa el mismo agregado del plantel. Validación beta pendiente.
+- Integración local con la rama principal anterior: se conservó el diseño de Perfil aprobado del 16/11 y se integraron los cambios previos de acceso y partidos. 275 unitarias, lint, build y 4 E2E de acceso/plantel aprobados. La comprobación de sombra espera el fin de la transición; datos de navegador simulados.
 
 ## Plantel: goles por equipo y totales · 17/11/2026
 
