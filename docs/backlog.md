@@ -18,6 +18,21 @@ Fecha: 2026-03-02
 | IMP-03 | Contratos FE?BE smoke automatizados | Calidad | P2 | parcial | FE: `src/app/core/contracts/api-contracts.smoke.spec.ts`; BE: `ApiContractSmokeTest`; CI FE `.github/workflows/ci.yml`; falta smoke E2E opcional con servicios levantados | Suite valida auth, profile, matches, teams, ratings y mvp contra backend |
 
 ## Prioridad operativa P1
+
+### Incorporaciones de Ranking H5 · 16/11/2026
+
+La interfaz visual está finalizada y aprobada; las estadísticas añadidas todavía usan ejemplos. Se registran como **pendientes**, sin confundirlas con `BLK-01`, que acredita el ranking básico existente:
+
+- `BE-RANK-01`: goles por jugador, sin duplicar actuaciones del mismo partido.
+- `BE-RANK-02`: cantidad de partidos como ganador oficial MVP, sin contar votos ni duplicados por rol.
+- `BE-RANK-03`: últimos cinco resultados válidos y cronológicos, según participación y lado del marcador.
+- `BE-RANK-04`: contrato compatible y agregación en los rankings global, por posición y por equipo; conservar autorización y fórmulas.
+- `BE-RANK-05`: adaptar el consumidor frontend y validar con una cuenta y datos reales de beta, guardando evidencia móvil/escritorio.
+
+Detalle y criterios de aceptación: `atleta-server/docs/backlog-ranking-h5.md`, rama `codex/h5-ranking-backlog-20261116`. Cierre visual: [h5-ranking-2026-11-16.md](h5-ranking-2026-11-16.md).
+
+### Pendientes operativos existentes
+
 1. Validar envio push remoto con proveedor/dispositivo real.
 2. Avanzar con smoke contracts (`IMP-03`) para prevenir regresiones FE?BE.
 3. Completar autorizacion de dominio restante en social/perfil (`IMP-01`).

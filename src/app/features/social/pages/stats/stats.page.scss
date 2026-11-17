@@ -35,8 +35,7 @@
   color: #ffb8a8;
 }
 
-.stats-retry,
-.stats-leaderboard {
+.stats-retry {
   min-height: 44px;
   border: 1px solid rgba(215, 185, 109, 0.46);
   border-radius: 999px;
@@ -64,10 +63,7 @@
   margin-top: 8px;
 }
 
-.stats-leaderboard {
-  margin-top: 12px;
-  width: 100%;
-}
+
 
 .stats-insight {
   display: grid;

@@ -1,0 +1,11 @@
+{
+  "route": "/player/profile",
+  "viewport": {
+    "width": 390,
+    "height": 844
+  },
+  "state": "perfil-empty-390",
+  "environment": "local, API simulada, sesión de prueba, sin demo",
+  "commit": "fd33395f94fa879b99854d3399cd2c164454205e",
+  "sourceChanges": ""
+}

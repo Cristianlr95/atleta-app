@@ -19,8 +19,6 @@ import {
   MetallicBottomNavComponent,
   MetallicBottomNavItem,
 } from 'src/app/shared/ui/metallic-bottom-nav/metallic-bottom-nav.component';
-import { MetallicCardComponent } from 'src/app/shared/ui/metallic-card/metallic-card.component';
-import { MetallicFormSectionComponent } from 'src/app/shared/ui/metallic-form-section/metallic-form-section.component';
 import { PlayerPositionDisplay } from 'src/app/shared/ui/metallic-player-positions/metallic-player-positions.component';
 import {
   HexagonRole,
@@ -62,8 +60,6 @@ interface CompetitionSummary extends OutcomeSummary {
   imports: [
     CommonModule,
     IonicModule,
-    MetallicCardComponent,
-    MetallicFormSectionComponent,
     ProfileTeamsComponent,
     ProfileAchievementsComponent,
     MetallicRoleHexagonComponent,
@@ -107,6 +103,7 @@ export class PlayerProfilePage implements OnDestroy {
 
   isLoading = false;
   historyUnavailable = false;
+  teamsUnavailable = false;
   errorMessage: string | null = null;
 
   displayName = 'Jugador';
@@ -122,6 +119,13 @@ export class PlayerProfilePage implements OnDestroy {
   competition: CompetitionSummary = { matches: 0, goals: 0, assists: 0, wins: 0, draws: 0, losses: 0, total: 0 };
 
   roleStats: HexagonRoleStat[] = [];
+  get roleStatValues() {
+    return this.orderedRoles().map(role => ({ role, rating: this.roleStats.find(stat => stat.role === role)?.rating ?? null }));
+  }
+
+  get hasStatistics(): boolean {
+    return this.roleStats.length > 0 || this.overallHybridOvr !== null || this.competition.matches > 0;
+  }
   achievements: PlayerAchievement[] = [];
   playerPositions: PlayerPositionDisplay[] = [];
   memberTeams: TeamSummary[] = [];
@@ -172,12 +176,16 @@ export class PlayerProfilePage implements OnDestroy {
     void this.navigationService.safeNavigate(['/player/settings']);
   }
 
-  openMatchHistory(): void {
-    void this.navigationService.safeNavigate(['/matches/history']);
+  openTeamCreation(): void {
+    void this.navigationService.safeNavigate(['/sessions/create']);
   }
 
-  openMatches(): void {
-    void this.navigationService.safeNavigate(['/matches']);
+  openTeam(teamId: number): void {
+    void this.navigationService.safeNavigate(['/teams', String(teamId)]);
+  }
+
+  retryStatistics(): void {
+    this.loadProfile();
   }
 
   async onPictureSelected(event: Event): Promise<void> {
@@ -314,17 +322,26 @@ export class PlayerProfilePage implements OnDestroy {
 
     if (!isBackgroundRefresh) {
       this.isLoading = true;
-      this.errorMessage = null;
     }
 
+    this.errorMessage = null;
     this.historyUnavailable = false;
+    this.teamsUnavailable = false;
+    const failStatistics = () => { this.errorMessage = 'No pudimos cargar las estadísticas.'; };
     forkJoin({
-      profile: this.userApiService.getPlayerProfile(atletaUuid).pipe(catchError(() => of(null))),
+      profile: this.userApiService.getPlayerProfile(atletaUuid).pipe(catchError(() => { failStatistics(); return of(null); })),
       achievements: this.userApiService.getPlayerAchievements(atletaUuid).pipe(catchError(() => of([] as PlayerAchievement[]))),
-      overall: this.ratingsApiService.getOverall(atletaUuid).pipe(catchError(() => of(null))),
-      ratings: this.ratingsApiService.getByRole(atletaUuid).pipe(catchError(() => of([]))),
-      history: this.matchHistoryService.getPlayerHistory(atletaUuid).pipe(catchError(() => { this.historyUnavailable = true; return of([]); })),
-      teams: this.teamApiService.getByPlayer(atletaUuid).pipe(catchError(() => of([] as TeamSummary[]))),
+      overall: this.ratingsApiService.getOverall(atletaUuid).pipe(catchError(error => {
+        if (error.status !== 404) failStatistics();
+        return of(null);
+      })),
+      ratings: this.ratingsApiService.getByRole(atletaUuid).pipe(catchError(() => { failStatistics(); return of([]); })),
+      history: this.matchHistoryService.getPlayerHistory(atletaUuid, { requireRatings: true }).pipe(catchError(() => {
+        this.historyUnavailable = true;
+        failStatistics();
+        return of([]);
+      })),
+      teams: this.teamApiService.getByPlayer(atletaUuid).pipe(catchError(() => { this.teamsUnavailable = true; return of([] as TeamSummary[]); })),
       positions: this.userApiService
         .getPlayerPositions(atletaUuid)
         .pipe(catchError(() => of(this.playerPositionStateService.getByPlayer(atletaUuid)))),
@@ -563,16 +580,19 @@ export class PlayerProfilePage implements OnDestroy {
 
     const byRole = new Map<RoleType, number>();
     for (const rating of ratings) {
+      if (!Number.isFinite(rating.currentRating)) continue;
       const previous = byRole.get(rating.roleType);
       if (previous === undefined || rating.currentRating > previous) {
         byRole.set(rating.roleType, rating.currentRating);
       }
     }
 
-    return this.orderedRoles().map((role) => ({
-      role,
-      rating: Math.round((byRole.get(role) ?? 0) * 10) / 10,
-    }));
+    const stats: HexagonRoleStat[] = [];
+    for (const role of this.orderedRoles()) {
+      const value = byRole.get(role);
+      if (value !== undefined) stats.push({ role, rating: Math.round(value * 10) / 10 });
+    }
+    return stats;
   }
 
   private mapFromRoleBreakdown(
@@ -582,10 +602,12 @@ export class PlayerProfilePage implements OnDestroy {
       return [];
     }
 
-    return this.orderedRoles().map((role) => ({
-      role,
-      rating: Math.round((roleBreakdown[role] ?? 0) * 10) / 10,
-    }));
+    const stats: HexagonRoleStat[] = [];
+    for (const role of this.orderedRoles()) {
+      const value = roleBreakdown[role];
+      if (typeof value === 'number' && Number.isFinite(value)) stats.push({ role, rating: Math.round(value * 10) / 10 });
+    }
+    return stats;
   }
 
   private orderedRoles(): RoleType[] {

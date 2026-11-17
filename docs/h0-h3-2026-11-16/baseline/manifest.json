@@ -1,0 +1,1826 @@
+[
+  {
+    "screen": "inicio",
+    "route": "/home",
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "state": "data",
+    "commit": "6fcd35b00356ed26bbb303f024ce6d82aa779176",
+    "environment": "local 8101, API interceptada, environmentName=test, sin demo",
+    "screenshot": "inicio-data-390.png",
+    "requests": [
+      {
+        "path": "/api/v1/athletes/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/player-profiles/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/player-profiles/ath-h3/positions",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/social/match-invites/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/player-profiles/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/ratings/player/ath-h3/overall",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/matches/by-player-or-creator/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/social/match-invites/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/ratings/player/ath-h3/history",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/teams/by-player/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/social/match-invites/ath-h3",
+        "status": 200
+      }
+    ],
+    "observed": "ATLETA INICIO COMPETITIVO A ANA TORRES Jugador de Atleta 1 partidos consecutivos MI EQUIPO Atleta Prueba FC › OVR 68 INVITACIONES 0 XP POSICIÓN PRINCIPAL -- EN CANCHA PROXIMO PARTIDO: 5 VS 5 17/11/2026, 12:56 · Creado VER PARTIDOS XP y nivel no disponibles. ACTIVIDAD RECIENTE VER HISTORIAL Partido creado (5 vs 5). Tu equipo ganó 2 - 1 y sumó momentum competitivo. INICIO PARTIDOS RANKING PERFIL"
+  },
+  {
+    "screen": "inicio",
+    "route": "/home",
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "state": "empty",
+    "commit": "6fcd35b00356ed26bbb303f024ce6d82aa779176",
+    "environment": "local 8101, API interceptada, environmentName=test, sin demo",
+    "screenshot": "inicio-empty-390.png",
+    "requests": [
+      {
+        "path": "/api/v1/athletes/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/player-profiles/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/player-profiles/ath-h3/positions",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/social/match-invites/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/player-profiles/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/ratings/player/ath-h3/overall",
+        "status": 404
+      },
+      {
+        "path": "/api/v1/matches/by-player-or-creator/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/social/match-invites/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/ratings/player/ath-h3/history",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/teams/by-player/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/social/match-invites/ath-h3",
+        "status": 200
+      }
+    ],
+    "observed": "ATLETA INICIO COMPETITIVO A ANA TORRES Jugador de Atleta 0 partidos consecutivos MI EQUIPO Sin equipo · Crear equipo › OVR -- INVITACIONES 0 XP POSICIÓN PRINCIPAL -- EN CANCHA SIN PARTIDO AGENDADO Crea o acepta una invitación para entrar en competencia. VER PARTIDOS XP y nivel no disponibles. ACTIVIDAD RECIENTE VER HISTORIAL Completa tu primer partido para desbloquear actividad reciente. INICIO PARTIDOS RANKING PERFIL"
+  },
+  {
+    "screen": "inicio",
+    "route": "/home",
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "state": "error",
+    "commit": "6fcd35b00356ed26bbb303f024ce6d82aa779176",
+    "environment": "local 8101, API interceptada, environmentName=test, sin demo",
+    "screenshot": "inicio-error-390.png",
+    "requests": [
+      {
+        "path": "/api/v1/athletes/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/player-profiles/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/player-profiles/ath-h3/positions",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/social/match-invites/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/player-profiles/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/ratings/player/ath-h3/overall",
+        "status": 500
+      },
+      {
+        "path": "/api/v1/matches/by-player-or-creator/ath-h3",
+        "status": 500
+      },
+      {
+        "path": "/api/v1/social/match-invites/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/ratings/player/ath-h3/history",
+        "status": 500
+      },
+      {
+        "path": "/api/v1/teams/by-player/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/matches/by-player/ath-h3",
+        "status": 500
+      },
+      {
+        "path": "/api/v1/social/match-invites/ath-h3",
+        "status": 200
+      }
+    ],
+    "observed": "ATLETA INICIO COMPETITIVO A ANA TORRES Jugador de Atleta MI EQUIPO Atleta Prueba FC › OVR -- INVITACIONES 0 XP POSICIÓN PRINCIPAL -- EN CANCHA NO SE PUDIERON CARGAR LOS PARTIDOS Vuelve a intentarlo para consultar tu actividad. VER PARTIDOS XP y nivel no disponibles. ACTIVIDAD RECIENTE VER HISTORIAL No se pudo cargar la actividad reciente. Reintentar INICIO PARTIDOS RANKING PERFIL"
+  },
+  {
+    "screen": "inicio",
+    "route": "/home",
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "state": "loading",
+    "commit": "6fcd35b00356ed26bbb303f024ce6d82aa779176",
+    "environment": "local 8101, API interceptada, environmentName=test, sin demo",
+    "screenshot": "inicio-loading-390.png",
+    "requests": [
+      {
+        "path": "/api/v1/athletes/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/player-profiles/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/player-profiles/ath-h3/positions",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/social/match-invites/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/player-profiles/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/social/match-invites/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/teams/by-player/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/ratings/player/ath-h3/overall",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/matches/by-player-or-creator/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/ratings/player/ath-h3/history",
+        "status": 200
+      }
+    ],
+    "observed": "ATLETA INICIO COMPETITIVO A ANA TORRES Jugador de Atleta MI EQUIPO Sin equipo · Crear equipo › OVR -- INVITACIONES -- XP POSICIÓN PRINCIPAL -- EN CANCHA SIN PARTIDO AGENDADO Crea o acepta una invitación para entrar en competencia. VER PARTIDOS XP y nivel no disponibles. ACTIVIDAD RECIENTE VER HISTORIAL Actualizando actividad... INICIO PARTIDOS RANKING PERFIL"
+  },
+  {
+    "screen": "partidos",
+    "route": "/matches",
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "state": "data",
+    "commit": "6fcd35b00356ed26bbb303f024ce6d82aa779176",
+    "environment": "local 8101, API interceptada, environmentName=test, sin demo",
+    "screenshot": "partidos-data-390.png",
+    "requests": [
+      {
+        "path": "/api/v1/athletes/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/player-profiles/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/player-profiles/ath-h3/positions",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/social/match-invites/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/social/match-invites/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/matches/by-player-or-creator/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/social/match-invites/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/matches/by-player-or-creator/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/social/match-invites/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/ratings/player/ath-h3/history",
+        "status": 200
+      }
+    ],
+    "observed": "PARTIDOS Tu agenda, convocatorias e historial competitivo. CREAR PARTIDO PRÓXIMOS HISTORIAL MI AGENDA Partidos activos, próximos y tus respuestas pendientes. 1 activos Atleta Prueba FC vs Rival FC En armado mar, 17-11, 12:56 p. m. Cupos confirmados: 1/10 Equipo: Atleta Prueba FC VER ESTADO INICIO PARTIDOS RANKING PERFIL"
+  },
+  {
+    "screen": "partidos",
+    "route": "/matches",
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "state": "empty",
+    "commit": "6fcd35b00356ed26bbb303f024ce6d82aa779176",
+    "environment": "local 8101, API interceptada, environmentName=test, sin demo",
+    "screenshot": "partidos-empty-390.png",
+    "requests": [
+      {
+        "path": "/api/v1/athletes/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/player-profiles/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/player-profiles/ath-h3/positions",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/social/match-invites/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/social/match-invites/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/matches/by-player-or-creator/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/social/match-invites/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/matches/by-player-or-creator/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/social/match-invites/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/ratings/player/ath-h3/history",
+        "status": 200
+      }
+    ],
+    "observed": "PARTIDOS Tu agenda, convocatorias e historial competitivo. CREAR PARTIDO PRÓXIMOS HISTORIAL MI AGENDA Partidos activos, próximos y tus respuestas pendientes. 0 activos No tienes partidos activos, recientes ni próximos. Crea uno para activar la competencia. INICIO PARTIDOS RANKING PERFIL"
+  },
+  {
+    "screen": "partidos",
+    "route": "/matches",
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "state": "error",
+    "commit": "6fcd35b00356ed26bbb303f024ce6d82aa779176",
+    "environment": "local 8101, API interceptada, environmentName=test, sin demo",
+    "screenshot": "partidos-error-390.png",
+    "requests": [
+      {
+        "path": "/api/v1/athletes/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/player-profiles/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/player-profiles/ath-h3/positions",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/social/match-invites/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/social/match-invites/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/matches/by-player-or-creator/ath-h3",
+        "status": 500
+      },
+      {
+        "path": "/api/v1/social/match-invites/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/matches/by-player-or-creator/ath-h3",
+        "status": 500
+      },
+      {
+        "path": "/api/v1/social/match-invites/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/ratings/player/ath-h3/history",
+        "status": 500
+      },
+      {
+        "path": "/api/v1/matches/by-player/ath-h3",
+        "status": 500
+      },
+      {
+        "path": "/api/v1/matches/by-player/ath-h3",
+        "status": 500
+      }
+    ],
+    "observed": "PARTIDOS Tu agenda, convocatorias e historial competitivo. CREAR PARTIDO PRÓXIMOS HISTORIAL MI AGENDA Partidos activos, próximos y tus respuestas pendientes. 0 activos No se pudo cargar la agenda e historial de partidos. REINTENTAR CARGA INICIO PARTIDOS RANKING PERFIL"
+  },
+  {
+    "screen": "partidos",
+    "route": "/matches",
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "state": "loading",
+    "commit": "6fcd35b00356ed26bbb303f024ce6d82aa779176",
+    "environment": "local 8101, API interceptada, environmentName=test, sin demo",
+    "screenshot": "partidos-loading-390.png",
+    "requests": [
+      {
+        "path": "/api/v1/athletes/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/player-profiles/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/player-profiles/ath-h3/positions",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/social/match-invites/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/social/match-invites/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/social/match-invites/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/social/match-invites/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/matches/by-player-or-creator/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/matches/by-player-or-creator/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/ratings/player/ath-h3/history",
+        "status": 200
+      }
+    ],
+    "observed": "PARTIDOS Tu agenda, convocatorias e historial competitivo. CREAR PARTIDO PRÓXIMOS HISTORIAL MI AGENDA Partidos activos, próximos y tus respuestas pendientes. 0 activos Cargando agenda... INICIO PARTIDOS RANKING PERFIL"
+  },
+  {
+    "screen": "ranking",
+    "route": "/leaderboard",
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "state": "data",
+    "commit": "f6e2a64028aa22753acf200f1f853c15a872afba",
+    "environment": "local, development, datos demo identificados",
+    "screenshot": "../../../output/playwright/h5-stats/demo-390.png",
+    "reused": true
+  },
+  {
+    "screen": "ranking",
+    "route": "/leaderboard",
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "state": "empty",
+    "commit": "6fcd35b00356ed26bbb303f024ce6d82aa779176",
+    "environment": "local 8101, API interceptada, environmentName=test, sin demo",
+    "screenshot": "ranking-empty-390.png",
+    "requests": [
+      {
+        "path": "/api/v1/athletes/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/player-profiles/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/player-profiles/ath-h3/positions",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/social/match-invites/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/ratings/leaderboard",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/ratings/leaderboard",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/teams/by-player/ath-h3",
+        "status": 200
+      }
+    ],
+    "observed": "RANKING COMPETITIVO Compara el rendimiento global y el de tu equipo. MOSTRAR Global Mi equipo CLASIFICAR POR OVR global Posición Buscar y ordenar RANKING OVR GLOBAL Todavía no hay jugadores clasificados en el ranking global. Puedes consultar otra posición o volver más adelante. INICIO PARTIDOS RANKING PERFIL"
+  },
+  {
+    "screen": "ranking",
+    "route": "/leaderboard",
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "state": "error",
+    "commit": "6fcd35b00356ed26bbb303f024ce6d82aa779176",
+    "environment": "local 8101, API interceptada, environmentName=test, sin demo",
+    "screenshot": "ranking-error-390.png",
+    "requests": [
+      {
+        "path": "/api/v1/athletes/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/player-profiles/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/player-profiles/ath-h3/positions",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/social/match-invites/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/ratings/leaderboard",
+        "status": 500
+      },
+      {
+        "path": "/api/v1/ratings/leaderboard",
+        "status": 500
+      },
+      {
+        "path": "/api/v1/teams/by-player/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/teams/10/leaderboard",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/teams/10/external-record",
+        "status": 200
+      }
+    ],
+    "observed": "RANKING COMPETITIVO Compara el rendimiento global y el de tu equipo. MOSTRAR Global Mi equipo CLASIFICAR POR OVR global Posición Buscar y ordenar No se pudo cargar el ranking general. Reintentar INICIO PARTIDOS RANKING PERFIL"
+  },
+  {
+    "screen": "ranking",
+    "route": "/leaderboard",
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "state": "loading",
+    "commit": "6fcd35b00356ed26bbb303f024ce6d82aa779176",
+    "environment": "local 8101, API interceptada, environmentName=test, sin demo",
+    "screenshot": "ranking-loading-390.png",
+    "requests": [
+      {
+        "path": "/api/v1/athletes/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/player-profiles/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/player-profiles/ath-h3/positions",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/social/match-invites/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/teams/by-player/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/teams/10/leaderboard",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/teams/10/external-record",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/ratings/leaderboard",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/ratings/leaderboard",
+        "status": 200
+      }
+    ],
+    "observed": "RANKING COMPETITIVO Compara el rendimiento global y el de tu equipo. MOSTRAR Global Mi equipo CLASIFICAR POR OVR global Posición Buscar y ordenar Actualizando ranking... INICIO PARTIDOS RANKING PERFIL"
+  },
+  {
+    "screen": "perfil",
+    "route": "/player/profile",
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "state": "data",
+    "commit": "6fcd35b00356ed26bbb303f024ce6d82aa779176",
+    "environment": "local 8101, API interceptada, environmentName=test, sin demo",
+    "screenshot": "perfil-data-390.png",
+    "requests": [
+      {
+        "path": "/api/v1/athletes/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/player-profiles/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/player-profiles/ath-h3/positions",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/social/match-invites/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/player-profiles/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/player-profiles/ath-h3/achievements",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/ratings/player/ath-h3/overall",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/ratings/player/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/matches/by-player-or-creator/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/social/match-invites/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/ratings/player/ath-h3/history",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/teams/by-player/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/player-profiles/ath-h3/positions",
+        "status": 200
+      }
+    ],
+    "observed": "PERFIL DEL JUGADOR CENTRO DE RENDIMIENTO Ajustes A Ana Torres Ana POSICIONES 1º Delantero 2º Mediocampo 3º Defensa OVR 68 EQUIPO ACTUAL Atleta Prueba FC STATS HEXAGONO DE HABILIDADES Perfil por posición ATAQUE 79 MEDIOCAMPO 0 CARRILERO 0 DEFENSA 0 ARQUERO 0 DT 0 RESUMEN ROL DESTACADO Ataque 79 VERSATILIDAD 50% NIVEL GENERAL 68 Ataque 79 Mediocampo 0 Carrilero 0 Defensa 0 Arquero 0 DT 0 COMPETICIÓN PARTIDOS 1 GOLES 1 ASISTENCIAS 0 V / E / D 1 / 0 / 0 Ver partidos Próximos TROFEOS Y METAS Tus medallas activas y el próximo objetivo competitivo. PARTIDOS JUGADOS Próximo: 5 Compite en partidos finalizados. 1 / 5 partidos GESTIONAR EQUIPOS Consulta integrantes, invitaciones y administración de tus equipos. Atleta Prueba FC Fundado: 2026 Ver integrantes INICIO PARTIDOS RANKING PERFIL",
+    "detailScreenshot": "perfil-stats-390.png"
+  },
+  {
+    "screen": "perfil",
+    "route": "/player/profile",
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "state": "empty",
+    "commit": "6fcd35b00356ed26bbb303f024ce6d82aa779176",
+    "environment": "local 8101, API interceptada, environmentName=test, sin demo",
+    "screenshot": "perfil-empty-390.png",
+    "requests": [
+      {
+        "path": "/api/v1/athletes/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/player-profiles/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/player-profiles/ath-h3/positions",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/social/match-invites/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/player-profiles/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/player-profiles/ath-h3/achievements",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/ratings/player/ath-h3/overall",
+        "status": 404
+      },
+      {
+        "path": "/api/v1/ratings/player/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/matches/by-player-or-creator/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/social/match-invites/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/ratings/player/ath-h3/history",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/teams/by-player/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/player-profiles/ath-h3/positions",
+        "status": 200
+      }
+    ],
+    "observed": "PERFIL DEL JUGADOR CENTRO DE RENDIMIENTO Ajustes A Ana Torres Jugadora nueva POSICIONES 1º Delantero 2º Mediocampo 3º Defensa OVR -- EQUIPO ACTUAL Sin equipo STATS No hay estadísticas por posición disponibles. COMPETICIÓN PARTIDOS 0 GOLES 0 ASISTENCIAS 0 V / E / D 0 / 0 / 0 Ver partidos Próximos TROFEOS Y METAS Tus medallas activas y el próximo objetivo competitivo. No hay trofeos disponibles. GESTIONAR EQUIPOS Consulta integrantes, invitaciones y administración de tus equipos. Aun no perteneces a ningun equipo. INICIO PARTIDOS RANKING PERFIL"
+  },
+  {
+    "screen": "perfil",
+    "route": "/player/profile",
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "state": "error",
+    "commit": "6fcd35b00356ed26bbb303f024ce6d82aa779176",
+    "environment": "local 8101, API interceptada, environmentName=test, sin demo",
+    "screenshot": "perfil-error-390.png",
+    "requests": [
+      {
+        "path": "/api/v1/athletes/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/player-profiles/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/player-profiles/ath-h3/positions",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/social/match-invites/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/player-profiles/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/player-profiles/ath-h3/achievements",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/ratings/player/ath-h3/overall",
+        "status": 500
+      },
+      {
+        "path": "/api/v1/ratings/player/ath-h3",
+        "status": 500
+      },
+      {
+        "path": "/api/v1/matches/by-player-or-creator/ath-h3",
+        "status": 500
+      },
+      {
+        "path": "/api/v1/social/match-invites/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/ratings/player/ath-h3/history",
+        "status": 500
+      },
+      {
+        "path": "/api/v1/teams/by-player/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/player-profiles/ath-h3/positions",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/matches/by-player/ath-h3",
+        "status": 500
+      }
+    ],
+    "observed": "PERFIL DEL JUGADOR CENTRO DE RENDIMIENTO Ajustes A Ana Torres Ana POSICIONES 1º Delantero 2º Mediocampo 3º Defensa OVR -- EQUIPO ACTUAL Atleta Prueba FC STATS No hay estadísticas por posición disponibles. COMPETICIÓN No se pudieron cargar las estadísticas de competición. Ver partidos Próximos TROFEOS Y METAS Tus medallas activas y el próximo objetivo competitivo. PARTIDOS JUGADOS Próximo: 5 Compite en partidos finalizados. 1 / 5 partidos GESTIONAR EQUIPOS Consulta integrantes, invitaciones y administración de tus equipos. Atleta Prueba FC Fundado: 2026 Ver integrantes INICIO PARTIDOS RANKING PERFIL"
+  },
+  {
+    "screen": "perfil",
+    "route": "/player/profile",
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "state": "loading",
+    "commit": "6fcd35b00356ed26bbb303f024ce6d82aa779176",
+    "environment": "local 8101, API interceptada, environmentName=test, sin demo",
+    "screenshot": "perfil-loading-390.png",
+    "requests": [
+      {
+        "path": "/api/v1/athletes/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/player-profiles/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/player-profiles/ath-h3/positions",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/social/match-invites/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/player-profiles/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/player-profiles/ath-h3/achievements",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/social/match-invites/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/teams/by-player/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/player-profiles/ath-h3/positions",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/ratings/player/ath-h3/overall",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/ratings/player/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/matches/by-player-or-creator/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/ratings/player/ath-h3/history",
+        "status": 200
+      }
+    ],
+    "observed": "PERFIL DEL JUGADOR CENTRO DE RENDIMIENTO Ajustes Actualizando estadísticas... INICIO PARTIDOS RANKING PERFIL"
+  },
+  {
+    "screen": "inicio",
+    "route": "/home",
+    "viewport": {
+      "width": 1440,
+      "height": 844
+    },
+    "state": "data",
+    "commit": "6fcd35b00356ed26bbb303f024ce6d82aa779176",
+    "environment": "local 8101, API interceptada, environmentName=test, sin demo",
+    "screenshot": "inicio-data-1440.png",
+    "requests": [
+      {
+        "path": "/api/v1/athletes/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/player-profiles/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/player-profiles/ath-h3/positions",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/social/match-invites/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/player-profiles/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/ratings/player/ath-h3/overall",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/matches/by-player-or-creator/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/social/match-invites/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/ratings/player/ath-h3/history",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/teams/by-player/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/social/match-invites/ath-h3",
+        "status": 200
+      }
+    ],
+    "observed": "ATLETA INICIO COMPETITIVO A ANA TORRES Jugador de Atleta 1 partidos consecutivos MI EQUIPO Atleta Prueba FC › OVR 68 INVITACIONES 0 XP POSICIÓN PRINCIPAL -- EN CANCHA PROXIMO PARTIDO: 5 VS 5 17/11/2026, 12:56 · Creado VER PARTIDOS XP y nivel no disponibles. ACTIVIDAD RECIENTE VER HISTORIAL Partido creado (5 vs 5). Tu equipo ganó 2 - 1 y sumó momentum competitivo. INICIO PARTIDOS RANKING PERFIL"
+  },
+  {
+    "screen": "inicio",
+    "route": "/home",
+    "viewport": {
+      "width": 1440,
+      "height": 844
+    },
+    "state": "empty",
+    "commit": "6fcd35b00356ed26bbb303f024ce6d82aa779176",
+    "environment": "local 8101, API interceptada, environmentName=test, sin demo",
+    "screenshot": "inicio-empty-1440.png",
+    "requests": [
+      {
+        "path": "/api/v1/athletes/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/player-profiles/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/player-profiles/ath-h3/positions",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/social/match-invites/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/player-profiles/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/ratings/player/ath-h3/overall",
+        "status": 404
+      },
+      {
+        "path": "/api/v1/matches/by-player-or-creator/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/social/match-invites/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/ratings/player/ath-h3/history",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/teams/by-player/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/social/match-invites/ath-h3",
+        "status": 200
+      }
+    ],
+    "observed": "ATLETA INICIO COMPETITIVO A ANA TORRES Jugador de Atleta 0 partidos consecutivos MI EQUIPO Sin equipo · Crear equipo › OVR -- INVITACIONES 0 XP POSICIÓN PRINCIPAL -- EN CANCHA SIN PARTIDO AGENDADO Crea o acepta una invitación para entrar en competencia. VER PARTIDOS XP y nivel no disponibles. ACTIVIDAD RECIENTE VER HISTORIAL Completa tu primer partido para desbloquear actividad reciente. INICIO PARTIDOS RANKING PERFIL"
+  },
+  {
+    "screen": "inicio",
+    "route": "/home",
+    "viewport": {
+      "width": 1440,
+      "height": 844
+    },
+    "state": "error",
+    "commit": "6fcd35b00356ed26bbb303f024ce6d82aa779176",
+    "environment": "local 8101, API interceptada, environmentName=test, sin demo",
+    "screenshot": "inicio-error-1440.png",
+    "requests": [
+      {
+        "path": "/api/v1/athletes/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/player-profiles/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/player-profiles/ath-h3/positions",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/social/match-invites/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/player-profiles/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/ratings/player/ath-h3/overall",
+        "status": 500
+      },
+      {
+        "path": "/api/v1/matches/by-player-or-creator/ath-h3",
+        "status": 500
+      },
+      {
+        "path": "/api/v1/social/match-invites/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/ratings/player/ath-h3/history",
+        "status": 500
+      },
+      {
+        "path": "/api/v1/teams/by-player/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/matches/by-player/ath-h3",
+        "status": 500
+      },
+      {
+        "path": "/api/v1/social/match-invites/ath-h3",
+        "status": 200
+      }
+    ],
+    "observed": "ATLETA INICIO COMPETITIVO A ANA TORRES Jugador de Atleta MI EQUIPO Atleta Prueba FC › OVR -- INVITACIONES 0 XP POSICIÓN PRINCIPAL -- EN CANCHA NO SE PUDIERON CARGAR LOS PARTIDOS Vuelve a intentarlo para consultar tu actividad. VER PARTIDOS XP y nivel no disponibles. ACTIVIDAD RECIENTE VER HISTORIAL No se pudo cargar la actividad reciente. Reintentar INICIO PARTIDOS RANKING PERFIL"
+  },
+  {
+    "screen": "inicio",
+    "route": "/home",
+    "viewport": {
+      "width": 1440,
+      "height": 844
+    },
+    "state": "loading",
+    "commit": "6fcd35b00356ed26bbb303f024ce6d82aa779176",
+    "environment": "local 8101, API interceptada, environmentName=test, sin demo",
+    "screenshot": "inicio-loading-1440.png",
+    "requests": [
+      {
+        "path": "/api/v1/athletes/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/player-profiles/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/player-profiles/ath-h3/positions",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/social/match-invites/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/player-profiles/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/social/match-invites/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/teams/by-player/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/ratings/player/ath-h3/overall",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/matches/by-player-or-creator/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/ratings/player/ath-h3/history",
+        "status": 200
+      }
+    ],
+    "observed": "ATLETA INICIO COMPETITIVO A ANA TORRES Jugador de Atleta MI EQUIPO Sin equipo · Crear equipo › OVR -- INVITACIONES -- XP POSICIÓN PRINCIPAL -- EN CANCHA SIN PARTIDO AGENDADO Crea o acepta una invitación para entrar en competencia. VER PARTIDOS XP y nivel no disponibles. ACTIVIDAD RECIENTE VER HISTORIAL Actualizando actividad... INICIO PARTIDOS RANKING PERFIL"
+  },
+  {
+    "screen": "partidos",
+    "route": "/matches",
+    "viewport": {
+      "width": 1440,
+      "height": 844
+    },
+    "state": "data",
+    "commit": "6fcd35b00356ed26bbb303f024ce6d82aa779176",
+    "environment": "local 8101, API interceptada, environmentName=test, sin demo",
+    "screenshot": "partidos-data-1440.png",
+    "requests": [
+      {
+        "path": "/api/v1/athletes/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/player-profiles/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/player-profiles/ath-h3/positions",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/social/match-invites/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/social/match-invites/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/matches/by-player-or-creator/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/social/match-invites/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/matches/by-player-or-creator/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/social/match-invites/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/ratings/player/ath-h3/history",
+        "status": 200
+      }
+    ],
+    "observed": "PARTIDOS Tu agenda, convocatorias e historial competitivo. CREAR PARTIDO PRÓXIMOS HISTORIAL MI AGENDA Partidos activos, próximos y tus respuestas pendientes. 1 activos Atleta Prueba FC vs Rival FC En armado mar, 17-11, 12:56 p. m. Cupos confirmados: 1/10 Equipo: Atleta Prueba FC VER ESTADO INICIO PARTIDOS RANKING PERFIL"
+  },
+  {
+    "screen": "partidos",
+    "route": "/matches",
+    "viewport": {
+      "width": 1440,
+      "height": 844
+    },
+    "state": "empty",
+    "commit": "6fcd35b00356ed26bbb303f024ce6d82aa779176",
+    "environment": "local 8101, API interceptada, environmentName=test, sin demo",
+    "screenshot": "partidos-empty-1440.png",
+    "requests": [
+      {
+        "path": "/api/v1/athletes/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/player-profiles/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/player-profiles/ath-h3/positions",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/social/match-invites/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/social/match-invites/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/matches/by-player-or-creator/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/social/match-invites/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/matches/by-player-or-creator/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/social/match-invites/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/ratings/player/ath-h3/history",
+        "status": 200
+      }
+    ],
+    "observed": "PARTIDOS Tu agenda, convocatorias e historial competitivo. CREAR PARTIDO PRÓXIMOS HISTORIAL MI AGENDA Partidos activos, próximos y tus respuestas pendientes. 0 activos No tienes partidos activos, recientes ni próximos. Crea uno para activar la competencia. INICIO PARTIDOS RANKING PERFIL"
+  },
+  {
+    "screen": "partidos",
+    "route": "/matches",
+    "viewport": {
+      "width": 1440,
+      "height": 844
+    },
+    "state": "error",
+    "commit": "6fcd35b00356ed26bbb303f024ce6d82aa779176",
+    "environment": "local 8101, API interceptada, environmentName=test, sin demo",
+    "screenshot": "partidos-error-1440.png",
+    "requests": [
+      {
+        "path": "/api/v1/athletes/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/player-profiles/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/player-profiles/ath-h3/positions",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/social/match-invites/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/social/match-invites/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/matches/by-player-or-creator/ath-h3",
+        "status": 500
+      },
+      {
+        "path": "/api/v1/social/match-invites/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/matches/by-player-or-creator/ath-h3",
+        "status": 500
+      },
+      {
+        "path": "/api/v1/social/match-invites/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/ratings/player/ath-h3/history",
+        "status": 500
+      },
+      {
+        "path": "/api/v1/matches/by-player/ath-h3",
+        "status": 500
+      }
+    ],
+    "observed": "PARTIDOS Tu agenda, convocatorias e historial competitivo. CREAR PARTIDO PRÓXIMOS HISTORIAL MI AGENDA Partidos activos, próximos y tus respuestas pendientes. 0 activos No se pudo cargar la agenda e historial de partidos. REINTENTAR CARGA INICIO PARTIDOS RANKING PERFIL"
+  },
+  {
+    "screen": "partidos",
+    "route": "/matches",
+    "viewport": {
+      "width": 1440,
+      "height": 844
+    },
+    "state": "loading",
+    "commit": "6fcd35b00356ed26bbb303f024ce6d82aa779176",
+    "environment": "local 8101, API interceptada, environmentName=test, sin demo",
+    "screenshot": "partidos-loading-1440.png",
+    "requests": [
+      {
+        "path": "/api/v1/athletes/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/player-profiles/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/player-profiles/ath-h3/positions",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/social/match-invites/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/social/match-invites/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/social/match-invites/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/social/match-invites/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/matches/by-player-or-creator/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/matches/by-player-or-creator/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/ratings/player/ath-h3/history",
+        "status": 200
+      }
+    ],
+    "observed": "PARTIDOS Tu agenda, convocatorias e historial competitivo. CREAR PARTIDO PRÓXIMOS HISTORIAL MI AGENDA Partidos activos, próximos y tus respuestas pendientes. 0 activos Cargando agenda... INICIO PARTIDOS RANKING PERFIL"
+  },
+  {
+    "screen": "ranking",
+    "route": "/leaderboard",
+    "viewport": {
+      "width": 1440,
+      "height": 844
+    },
+    "state": "data",
+    "commit": "6fcd35b00356ed26bbb303f024ce6d82aa779176",
+    "environment": "local 8101, API interceptada, environmentName=test, sin demo",
+    "screenshot": "ranking-data-1440.png",
+    "requests": [
+      {
+        "path": "/api/v1/athletes/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/player-profiles/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/player-profiles/ath-h3/positions",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/social/match-invites/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/ratings/leaderboard",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/ratings/leaderboard",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/teams/by-player/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/teams/10/leaderboard",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/teams/10/external-record",
+        "status": 200
+      }
+    ],
+    "observed": "RANKING COMPETITIVO CLASIFICACIÓN Compara el rendimiento global y el de tu equipo. MOSTRAR Global Mi equipo CLASIFICAR POR OVR global Posición Tu posicion actual: #1 (68.1 OVR) Buscar y ordenar RANKING OVR GLOBAL # JUGADOR OVR POSICIÓN PJ GOLES MVP ÚLTIMOS 5 1 Ana 1 partidos 68.1 OVR Ataque 1 — — Sin datos G: ganado · E: empatado · P: perdido Más reciente a la derecha → —: estadística no disponible INICIO PARTIDOS RANKING PERFIL"
+  },
+  {
+    "screen": "ranking",
+    "route": "/leaderboard",
+    "viewport": {
+      "width": 1440,
+      "height": 844
+    },
+    "state": "empty",
+    "commit": "6fcd35b00356ed26bbb303f024ce6d82aa779176",
+    "environment": "local 8101, API interceptada, environmentName=test, sin demo",
+    "screenshot": "ranking-empty-1440.png",
+    "requests": [
+      {
+        "path": "/api/v1/athletes/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/player-profiles/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/player-profiles/ath-h3/positions",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/social/match-invites/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/ratings/leaderboard",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/ratings/leaderboard",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/teams/by-player/ath-h3",
+        "status": 200
+      }
+    ],
+    "observed": "RANKING COMPETITIVO CLASIFICACIÓN Compara el rendimiento global y el de tu equipo. MOSTRAR Global Mi equipo CLASIFICAR POR OVR global Posición Buscar y ordenar RANKING OVR GLOBAL Todavía no hay jugadores clasificados en el ranking global. Puedes consultar otra posición o volver más adelante. INICIO PARTIDOS RANKING PERFIL"
+  },
+  {
+    "screen": "ranking",
+    "route": "/leaderboard",
+    "viewport": {
+      "width": 1440,
+      "height": 844
+    },
+    "state": "error",
+    "commit": "6fcd35b00356ed26bbb303f024ce6d82aa779176",
+    "environment": "local 8101, API interceptada, environmentName=test, sin demo",
+    "screenshot": "ranking-error-1440.png",
+    "requests": [
+      {
+        "path": "/api/v1/athletes/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/player-profiles/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/player-profiles/ath-h3/positions",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/social/match-invites/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/ratings/leaderboard",
+        "status": 500
+      },
+      {
+        "path": "/api/v1/ratings/leaderboard",
+        "status": 500
+      },
+      {
+        "path": "/api/v1/teams/by-player/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/teams/10/leaderboard",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/teams/10/external-record",
+        "status": 200
+      }
+    ],
+    "observed": "RANKING COMPETITIVO CLASIFICACIÓN Compara el rendimiento global y el de tu equipo. MOSTRAR Global Mi equipo CLASIFICAR POR OVR global Posición Buscar y ordenar No se pudo cargar el ranking general. Reintentar INICIO PARTIDOS RANKING PERFIL"
+  },
+  {
+    "screen": "ranking",
+    "route": "/leaderboard",
+    "viewport": {
+      "width": 1440,
+      "height": 844
+    },
+    "state": "loading",
+    "commit": "6fcd35b00356ed26bbb303f024ce6d82aa779176",
+    "environment": "local 8101, API interceptada, environmentName=test, sin demo",
+    "screenshot": "ranking-loading-1440.png",
+    "requests": [
+      {
+        "path": "/api/v1/athletes/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/player-profiles/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/player-profiles/ath-h3/positions",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/social/match-invites/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/teams/by-player/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/teams/10/leaderboard",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/teams/10/external-record",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/ratings/leaderboard",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/ratings/leaderboard",
+        "status": 200
+      }
+    ],
+    "observed": "RANKING COMPETITIVO CLASIFICACIÓN Compara el rendimiento global y el de tu equipo. MOSTRAR Global Mi equipo CLASIFICAR POR OVR global Posición Buscar y ordenar Actualizando ranking... INICIO PARTIDOS RANKING PERFIL"
+  },
+  {
+    "screen": "perfil",
+    "route": "/player/profile",
+    "viewport": {
+      "width": 1440,
+      "height": 844
+    },
+    "state": "data",
+    "commit": "6fcd35b00356ed26bbb303f024ce6d82aa779176",
+    "environment": "local 8101, API interceptada, environmentName=test, sin demo",
+    "screenshot": "perfil-data-1440.png",
+    "requests": [
+      {
+        "path": "/api/v1/athletes/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/player-profiles/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/player-profiles/ath-h3/positions",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/social/match-invites/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/player-profiles/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/player-profiles/ath-h3/achievements",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/ratings/player/ath-h3/overall",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/ratings/player/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/matches/by-player-or-creator/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/social/match-invites/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/ratings/player/ath-h3/history",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/teams/by-player/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/player-profiles/ath-h3/positions",
+        "status": 200
+      }
+    ],
+    "observed": "PERFIL DEL JUGADOR CENTRO DE RENDIMIENTO Ajustes A Ana Torres Ana POSICIONES 1º Delantero 2º Mediocampo 3º Defensa OVR 68 EQUIPO ACTUAL Atleta Prueba FC STATS HEXAGONO DE HABILIDADES Perfil por posición ATAQUE 79 MEDIOCAMPO 0 CARRILERO 0 DEFENSA 0 ARQUERO 0 DT 0 RESUMEN ROL DESTACADO Ataque 79 VERSATILIDAD 50% NIVEL GENERAL 68 Ataque 79 Mediocampo 0 Carrilero 0 Defensa 0 Arquero 0 DT 0 COMPETICIÓN PARTIDOS 1 GOLES 1 ASISTENCIAS 0 V / E / D 1 / 0 / 0 Ver partidos Próximos TROFEOS Y METAS Tus medallas activas y el próximo objetivo competitivo. PARTIDOS JUGADOS Próximo: 5 Compite en partidos finalizados. 1 / 5 partidos GESTIONAR EQUIPOS Consulta integrantes, invitaciones y administración de tus equipos. Atleta Prueba FC Fundado: 2026 Ver integrantes INICIO PARTIDOS RANKING PERFIL",
+    "detailScreenshot": "perfil-stats-1440.png"
+  },
+  {
+    "screen": "perfil",
+    "route": "/player/profile",
+    "viewport": {
+      "width": 1440,
+      "height": 844
+    },
+    "state": "empty",
+    "commit": "6fcd35b00356ed26bbb303f024ce6d82aa779176",
+    "environment": "local 8101, API interceptada, environmentName=test, sin demo",
+    "screenshot": "perfil-empty-1440.png",
+    "requests": [
+      {
+        "path": "/api/v1/athletes/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/player-profiles/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/player-profiles/ath-h3/positions",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/social/match-invites/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/player-profiles/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/player-profiles/ath-h3/achievements",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/ratings/player/ath-h3/overall",
+        "status": 404
+      },
+      {
+        "path": "/api/v1/ratings/player/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/matches/by-player-or-creator/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/social/match-invites/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/ratings/player/ath-h3/history",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/teams/by-player/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/player-profiles/ath-h3/positions",
+        "status": 200
+      }
+    ],
+    "observed": "PERFIL DEL JUGADOR CENTRO DE RENDIMIENTO Ajustes A Ana Torres Jugadora nueva POSICIONES 1º Delantero 2º Mediocampo 3º Defensa OVR -- EQUIPO ACTUAL Sin equipo STATS No hay estadísticas por posición disponibles. COMPETICIÓN PARTIDOS 0 GOLES 0 ASISTENCIAS 0 V / E / D 0 / 0 / 0 Ver partidos Próximos TROFEOS Y METAS Tus medallas activas y el próximo objetivo competitivo. No hay trofeos disponibles. GESTIONAR EQUIPOS Consulta integrantes, invitaciones y administración de tus equipos. Aun no perteneces a ningun equipo. INICIO PARTIDOS RANKING PERFIL"
+  },
+  {
+    "screen": "perfil",
+    "route": "/player/profile",
+    "viewport": {
+      "width": 1440,
+      "height": 844
+    },
+    "state": "error",
+    "commit": "6fcd35b00356ed26bbb303f024ce6d82aa779176",
+    "environment": "local 8101, API interceptada, environmentName=test, sin demo",
+    "screenshot": "perfil-error-1440.png",
+    "requests": [
+      {
+        "path": "/api/v1/athletes/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/player-profiles/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/player-profiles/ath-h3/positions",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/social/match-invites/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/player-profiles/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/player-profiles/ath-h3/achievements",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/ratings/player/ath-h3/overall",
+        "status": 500
+      },
+      {
+        "path": "/api/v1/ratings/player/ath-h3",
+        "status": 500
+      },
+      {
+        "path": "/api/v1/matches/by-player-or-creator/ath-h3",
+        "status": 500
+      },
+      {
+        "path": "/api/v1/social/match-invites/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/ratings/player/ath-h3/history",
+        "status": 500
+      },
+      {
+        "path": "/api/v1/teams/by-player/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/player-profiles/ath-h3/positions",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/matches/by-player/ath-h3",
+        "status": 500
+      }
+    ],
+    "observed": "PERFIL DEL JUGADOR CENTRO DE RENDIMIENTO Ajustes A Ana Torres Ana POSICIONES 1º Delantero 2º Mediocampo 3º Defensa OVR -- EQUIPO ACTUAL Atleta Prueba FC STATS No hay estadísticas por posición disponibles. COMPETICIÓN No se pudieron cargar las estadísticas de competición. Ver partidos Próximos TROFEOS Y METAS Tus medallas activas y el próximo objetivo competitivo. PARTIDOS JUGADOS Próximo: 5 Compite en partidos finalizados. 1 / 5 partidos GESTIONAR EQUIPOS Consulta integrantes, invitaciones y administración de tus equipos. Atleta Prueba FC Fundado: 2026 Ver integrantes INICIO PARTIDOS RANKING PERFIL"
+  },
+  {
+    "screen": "perfil",
+    "route": "/player/profile",
+    "viewport": {
+      "width": 1440,
+      "height": 844
+    },
+    "state": "loading",
+    "commit": "6fcd35b00356ed26bbb303f024ce6d82aa779176",
+    "environment": "local 8101, API interceptada, environmentName=test, sin demo",
+    "screenshot": "perfil-loading-1440.png",
+    "requests": [
+      {
+        "path": "/api/v1/athletes/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/player-profiles/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/player-profiles/ath-h3/positions",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/social/match-invites/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/player-profiles/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/player-profiles/ath-h3/achievements",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/social/match-invites/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/teams/by-player/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/player-profiles/ath-h3/positions",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/ratings/player/ath-h3/overall",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/ratings/player/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/matches/by-player-or-creator/ath-h3",
+        "status": 200
+      },
+      {
+        "path": "/api/v1/ratings/player/ath-h3/history",
+        "status": 200
+      }
+    ],
+    "observed": "PERFIL DEL JUGADOR CENTRO DE RENDIMIENTO Ajustes Actualizando estadísticas... INICIO PARTIDOS RANKING PERFIL"
+  }
+]

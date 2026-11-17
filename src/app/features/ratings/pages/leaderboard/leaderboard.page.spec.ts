@@ -47,12 +47,13 @@ describe('LeaderboardPage', () => {
   it('no duplica el número de partidos cuando el texto ya lo incluye', () => {
     component.overallRows = [{ rank: 1, alias: 'Ana', scoreText: '63', matchesPlayed: 8, metaText: '8 partidos' }];
     fixture.detectChanges();
-    expect(fixture.nativeElement.querySelector('.leaderboard__mobile-matches')).toBeNull();
+    const playerText: string = fixture.nativeElement.querySelector('.leaderboard__player').textContent;
+    expect(playerText.match(/8 partidos/g)?.length).toBe(1);
   });
   it('mantiene los partidos jugados disponibles en móvil', () => {
     component.overallRows = [{ rank: 1, alias: 'Ana', scoreText: '63', matchesPlayed: 8 }];
     fixture.detectChanges();
-    expect(fixture.nativeElement.querySelector('.leaderboard__mobile-matches')?.textContent).toContain('8 partidos');
+    expect(fixture.nativeElement.querySelector('.leaderboard__matches')?.textContent).toContain('8');
   });
   it('should create', () => {
     expect(component).toBeTruthy();
@@ -80,7 +81,40 @@ describe('LeaderboardPage', () => {
     component.searchTerm = 'Ana';
     fixture.detectChanges();
     expect(fixture.nativeElement.querySelector('.leaderboard__empty')?.textContent)
-      .toContain('Todavía no hay datos para este ranking.');
+      .toContain('Todavía no hay jugadores clasificados en el ranking global.');
+  });
+
+  it('explains a missing team and offers the global ranking', () => {
+    component.selectedScope = 'TEAM';
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelector('.leaderboard__empty')?.textContent)
+      .toContain('Todavía no perteneces a un equipo.');
+    const globalButton = Array.from<HTMLButtonElement>(fixture.nativeElement.querySelectorAll('button'))
+      .find(button => button.textContent?.trim() === 'Ver ranking global');
+    expect(globalButton).toBeDefined();
+    globalButton?.click();
+    expect(component.selectedScope).toBe('PLATFORM');
+    expect(component.selectedMode).toBe('OVERALL');
+  });
+
+  it('does not announce an empty team ranking while teams are loading', () => {
+    component.selectedScope = 'TEAM';
+    component.isLoadingTeams = true;
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelector('.leaderboard__empty')).toBeNull();
+    expect(fixture.nativeElement.textContent).toContain('Actualizando ranking');
+  });
+
+  it('explains empty role and team classifications separately', () => {
+    component.selectedMode = 'ROLE';
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelector('.leaderboard__empty')?.textContent)
+      .toContain('Todavía no hay jugadores clasificados en Ataque.');
+    component.selectedScope = 'TEAM';
+    component.selectedTeamId = 10;
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelector('.leaderboard__empty')?.textContent)
+      .toContain('Todavía no hay jugadores clasificados en este equipo.');
   });
 
   it('labels the example currently displayed, not a different ranking', () => {

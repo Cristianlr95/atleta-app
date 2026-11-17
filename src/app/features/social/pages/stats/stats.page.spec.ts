@@ -168,10 +168,12 @@ describe('StatsPage', () => {
     expect(component.recentMatches).toEqual([]);
   });
 
-  it('routes leaderboard CTA through NavigationService', () => {
-    component.onOpenLeaderboard();
-
-    expect(navigationService.safeNavigate).toHaveBeenCalledWith(['/leaderboard']);
+  it('leaves Perfil and Ranking only in the bottom navigation', () => {
+    fixture.detectChanges();
+    const buttons = Array.from(fixture.nativeElement.querySelectorAll('button')) as HTMLButtonElement[];
+    expect(buttons.filter(button => button.textContent?.trim() === 'Perfil').length).toBe(1);
+    expect(buttons.filter(button => button.textContent?.trim() === 'Ranking').length).toBe(1);
+    expect(fixture.nativeElement.textContent).not.toContain('Ver ranking completo');
   });
 
   it('keeps bottom nav badge from notification service', () => {

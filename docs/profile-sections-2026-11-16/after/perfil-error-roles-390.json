@@ -1,0 +1,153 @@
+{
+  "route": "/player/profile",
+  "environment": "local, API interceptada, environmentName=test, sin demo",
+  "commit": "0b47f3ac0aac6a583317cd19e2cbf51b89237d08",
+  "sourceChanges": "",
+  "viewport": {
+    "width": 390,
+    "height": 844
+  },
+  "state": "error-roles",
+  "responses": [
+    {
+      "path": "/api/v1/athletes/ath-h3",
+      "status": 200
+    },
+    {
+      "path": "/api/v1/player-profiles/ath-h3",
+      "status": 200
+    },
+    {
+      "path": "/api/v1/player-profiles/ath-h3/positions",
+      "status": 200
+    },
+    {
+      "path": "/api/v1/social/match-invites/ath-h3",
+      "status": 200
+    },
+    {
+      "path": "/api/v1/player-profiles/ath-h3",
+      "status": 200
+    },
+    {
+      "path": "/api/v1/player-profiles/ath-h3/achievements",
+      "status": 200
+    },
+    {
+      "path": "/api/v1/ratings/player/ath-h3/overall",
+      "status": 500
+    },
+    {
+      "path": "/api/v1/ratings/player/ath-h3",
+      "status": 200
+    },
+    {
+      "path": "/api/v1/matches/by-player-or-creator/ath-h3",
+      "status": 200
+    },
+    {
+      "path": "/api/v1/social/match-invites/ath-h3",
+      "status": 200
+    },
+    {
+      "path": "/api/v1/ratings/player/ath-h3/history",
+      "status": 200
+    },
+    {
+      "path": "/api/v1/teams/by-player/ath-h3",
+      "status": 200
+    },
+    {
+      "path": "/api/v1/player-profiles/ath-h3/positions",
+      "status": 200
+    },
+    {
+      "path": "/api/v1/player-profiles/ath-h3",
+      "status": 200
+    },
+    {
+      "path": "/api/v1/player-profiles/ath-h3/achievements",
+      "status": 200
+    },
+    {
+      "path": "/api/v1/ratings/player/ath-h3/overall",
+      "status": 200
+    },
+    {
+      "path": "/api/v1/ratings/player/ath-h3",
+      "status": 200
+    },
+    {
+      "path": "/api/v1/matches/by-player-or-creator/ath-h3",
+      "status": 200
+    },
+    {
+      "path": "/api/v1/social/match-invites/ath-h3",
+      "status": 200
+    },
+    {
+      "path": "/api/v1/ratings/player/ath-h3/history",
+      "status": 200
+    },
+    {
+      "path": "/api/v1/teams/by-player/ath-h3",
+      "status": 200
+    },
+    {
+      "path": "/api/v1/player-profiles/ath-h3/positions",
+      "status": 200
+    },
+    {
+      "path": "/api/v1/athletes/ath-h3",
+      "status": 200
+    },
+    {
+      "path": "/api/v1/player-profiles/ath-h3",
+      "status": 200
+    },
+    {
+      "path": "/api/v1/player-profiles/ath-h3/positions",
+      "status": 200
+    },
+    {
+      "path": "/api/v1/social/match-invites/ath-h3",
+      "status": 200
+    },
+    {
+      "path": "/api/v1/player-profiles/ath-h3",
+      "status": 200
+    },
+    {
+      "path": "/api/v1/player-profiles/ath-h3/achievements",
+      "status": 200
+    },
+    {
+      "path": "/api/v1/ratings/player/ath-h3/overall",
+      "status": 200
+    },
+    {
+      "path": "/api/v1/ratings/player/ath-h3",
+      "status": 500
+    },
+    {
+      "path": "/api/v1/matches/by-player-or-creator/ath-h3",
+      "status": 200
+    },
+    {
+      "path": "/api/v1/social/match-invites/ath-h3",
+      "status": 200
+    },
+    {
+      "path": "/api/v1/ratings/player/ath-h3/history",
+      "status": 200
+    },
+    {
+      "path": "/api/v1/teams/by-player/ath-h3",
+      "status": 200
+    },
+    {
+      "path": "/api/v1/player-profiles/ath-h3/positions",
+      "status": 200
+    }
+  ]
+}

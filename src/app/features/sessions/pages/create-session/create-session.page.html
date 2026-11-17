@@ -1,6 +1,6 @@
 <ion-content class="session-bg">
   <div class="session-container">
-    <app-page-nav></app-page-nav>
+    <app-page-nav [showProfile]="false"></app-page-nav>
 
     <app-metallic-card title="Jugar" [titleIconAsset]="sessionTitleIconAsset">
       <div class="session-start" *ngIf="playMode === 'none'">

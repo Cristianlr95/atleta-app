@@ -1,0 +1,73 @@
+{
+  "route": "/player/profile",
+  "environment": "local, API interceptada, environmentName=test, sin demo",
+  "commit": "30302471c603fd819a0a9c1c0ab4f4bb9b21ac6f",
+  "sourceChanges": "",
+  "viewport": {
+    "width": 1440,
+    "height": 844
+  },
+  "state": "teams-trophies",
+  "responses": [
+    {
+      "path": "/api/v1/athletes/ath-h3",
+      "status": 200
+    },
+    {
+      "path": "/api/v1/player-profiles/ath-h3",
+      "status": 200
+    },
+    {
+      "path": "/api/v1/player-profiles/ath-h3/positions",
+      "status": 200
+    },
+    {
+      "path": "/api/v1/social/match-invites/ath-h3",
+      "status": 200
+    },
+    {
+      "path": "/api/v1/player-profiles/ath-h3",
+      "status": 200
+    },
+    {
+      "path": "/api/v1/player-profiles/ath-h3/achievements",
+      "status": 200
+    },
+    {
+      "path": "/api/v1/ratings/player/ath-h3/overall",
+      "status": 200
+    },
+    {
+      "path": "/api/v1/ratings/player/ath-h3",
+      "status": 200
+    },
+    {
+      "path": "/api/v1/matches/by-player-or-creator/ath-h3",
+      "status": 200
+    },
+    {
+      "path": "/api/v1/social/match-invites/ath-h3",
+      "status": 200
+    },
+    {
+      "path": "/api/v1/ratings/player/ath-h3/history",
+      "status": 200
+    },
+    {
+      "path": "/api/v1/teams/by-player/ath-h3",
+      "status": 200
+    },
+    {
+      "path": "/api/v1/player-profiles/ath-h3/positions",
+      "status": 200
+    },
+    {
+      "path": "/api/v1/teams/10/members/active",
+      "status": 200
+    },
+    {
+      "path": "/api/v1/ratings/player/ath-h3/overall",
+      "status": 200
+    }
+  ]
+}

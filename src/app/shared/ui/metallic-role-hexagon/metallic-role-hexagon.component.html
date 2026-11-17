@@ -1,7 +1,7 @@
-﻿<div class="metallic-role-hexagon" [class.metallic-role-hexagon--compact]="compact">
+﻿<div class="metallic-role-hexagon" [class.metallic-role-hexagon--compact]="compact" [class.metallic-role-hexagon--embedded]="embedded">
   <div class="metallic-role-hexagon__header">
     <h3 class="metallic-role-hexagon__title">{{ title }}</h3>
-    <p class="metallic-role-hexagon__subtitle">{{ subtitle }}</p>
+    <p *ngIf="subtitle" class="metallic-role-hexagon__subtitle">{{ subtitle }}</p>
   </div>
 
   <div class="metallic-role-hexagon__chart-wrap">
@@ -28,16 +28,18 @@
       <polygon class="metallic-role-hexagon__shape" [attr.points]="shapePoints"></polygon>
 
       <g *ngFor="let point of points" class="metallic-role-hexagon__point-group">
-        <circle class="metallic-role-hexagon__point" [attr.cx]="point.x" [attr.cy]="point.y" r="4"></circle>
+        <title>{{ roleLabel(point.role) }}: {{ point.hasRating ? point.rating : 'Sin valoración' }}</title>
+        <circle *ngIf="point.hasRating" class="metallic-role-hexagon__point" [attr.cx]="point.x" [attr.cy]="point.y" r="4"></circle>
         <text class="metallic-role-hexagon__label" [attr.x]="point.labelX" [attr.y]="point.labelY">
           {{ roleLabel(point.role) }}
         </text>
-        <text class="metallic-role-hexagon__value" [attr.x]="point.labelX" [attr.y]="point.labelY + 12">
-          {{ point.rating }}
+        <text class="metallic-role-hexagon__value" [attr.x]="point.labelX" [attr.y]="point.labelY + 16">
+          {{ point.hasRating ? point.rating : 'S/V' }}
         </text>
       </g>
     </svg>
   </div>
+  <p class="metallic-role-hexagon__subtitle">S/V: Sin valoración.</p>
 
   <div *ngIf="showSummary" class="metallic-role-hexagon__summary">
     <button type="button" class="metallic-role-hexagon__chip" (click)="showSummaryInfo('overall')">

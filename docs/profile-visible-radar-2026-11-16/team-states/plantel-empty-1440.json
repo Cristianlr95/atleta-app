@@ -1,0 +1,11 @@
+{
+  "route": "/teams/10",
+  "viewport": {
+    "width": 1440,
+    "height": 844
+  },
+  "state": "plantel-empty",
+  "environment": "local, API simulada, sesión de prueba, sin demo",
+  "commit": "9bb209f31a34f754615010ad9a8a2e2e12ed297a",
+  "sourceChanges": ""
+}

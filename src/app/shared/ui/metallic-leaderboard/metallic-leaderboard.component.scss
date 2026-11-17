@@ -25,14 +25,33 @@
 }
 
 .leaderboard__table-wrap {
+  --scrollbar-thumb: #4fa7b5;
   overflow-x: auto;
   border: 1px solid rgba(112, 159, 166, 0.35);
   border-radius: 5px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--scrollbar-thumb) #10242d;
+}
+
+.leaderboard__table-wrap:hover,
+.leaderboard__table-wrap:focus-within { --scrollbar-thumb: #82d7e2; }
+
+.leaderboard__table-wrap:focus-visible { outline: 2px solid var(--tactical-visit); outline-offset: 2px; }
+
+@supports selector(::-webkit-scrollbar) {
+  .leaderboard__table-wrap { scrollbar-width: auto; scrollbar-color: auto; }
+  .leaderboard__table-wrap::-webkit-scrollbar { height: 10px; }
+  .leaderboard__table-wrap::-webkit-scrollbar-track { background: #10242d; border-radius: 999px; }
+  .leaderboard__table-wrap::-webkit-scrollbar-thumb {
+    background: var(--scrollbar-thumb);
+    border: 2px solid #10242d;
+    border-radius: 999px;
+  }
 }
 
 .leaderboard__table {
   width: 100%;
-  min-width: 510px;
+  min-width: 720px;
   border-collapse: collapse;
   background: #071219;
 }
@@ -153,18 +172,96 @@
   text-align: center;
 }
 
-.leaderboard__mobile-role, .leaderboard__mobile-matches { display: none; }
+.leaderboard__goals,
+.leaderboard__mvp {
+  color: var(--text-primary);
+  font: 700 15px var(--font-family-body);
+  font-variant-numeric: tabular-nums;
+}
 
-@media (max-width: 600px) {
-  .leaderboard__table { min-width: 0; table-layout: fixed; }
-  .leaderboard__rank-heading { width: 38px; }
-  .leaderboard__score { width: 86px; }
-  .leaderboard__table th:nth-last-child(2) { width: 86px; }
-  .leaderboard__role-heading, .leaderboard__role,
-  .leaderboard__matches-heading, .leaderboard__matches { display: none; }
-  .leaderboard__table th, .leaderboard__table td { padding: 10px 6px; }
-  .leaderboard__mobile-matches { display: block; margin: 3px 0 0; color: var(--text-muted); font-size: 14px; }
-  .leaderboard__mobile-role { display: block; margin: 3px 0 0; color: var(--text-muted); font-size: 14px; }
-  .leaderboard__row-meta { font-size: 14px; }
-  .leaderboard__score { font-size: 15px; }
+.leaderboard__mvp { color: #d3bcff; }
+.leaderboard__form-heading { width: 164px; }
+.leaderboard__table abbr { text-decoration: none; }
+
+.leaderboard__results {
+  display: flex;
+  gap: 4px;
+}
+
+.leaderboard__result {
+  display: inline-grid;
+  place-items: center;
+  width: 24px;
+  height: 25px;
+  border: 1px solid currentColor;
+  border-radius: 4px;
+  font: 700 12px var(--font-family-body);
+}
+
+.leaderboard__result--win { color: #9ae6b2; background: #123d2b; }
+.leaderboard__result--draw { color: #d1d9e0; background: #29353f; }
+.leaderboard__result--loss { color: #ffb4b9; background: #4b252d; }
+
+.leaderboard__unavailable,
+.leaderboard__legend {
+  color: var(--text-muted);
+  font: 12px/1.5 var(--font-family-body);
+}
+
+.leaderboard__legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 18px;
+  padding: 10px 0 0;
+}
+
+.leaderboard__scroll-hint { display: none; }
+
+@media (max-width: 800px) {
+  .leaderboard__scroll-hint {
+    display: block;
+    margin: 0 0 8px;
+    color: var(--text-muted);
+    font: 12px/1.4 var(--font-family-body);
+  }
+  .leaderboard__table-wrap { overscroll-behavior-x: contain; }
+  .leaderboard__table {
+    width: 760px;
+    min-width: 760px;
+    table-layout: fixed;
+    border-collapse: separate;
+    border-spacing: 0;
+  }
+  .leaderboard__table th,
+  .leaderboard__table td { box-sizing: border-box; padding: 10px 8px; }
+  .leaderboard__rank-heading { width: 32px; }
+  .leaderboard__table th:nth-child(2) { width: 98px; }
+  .leaderboard__table td.leaderboard__rank { padding-inline: 3px; }
+  .leaderboard__form-heading { width: 128px; }
+  .leaderboard__results { gap: 3px; }
+  .leaderboard__result { width: 20px; }
+  .leaderboard__table th:first-child,
+  .leaderboard__rank {
+    position: sticky;
+    left: 0;
+    z-index: 1;
+    background: #071219;
+  }
+  .leaderboard__table th:nth-child(2),
+  .leaderboard__player {
+    position: sticky;
+    left: 32px;
+    z-index: 1;
+    background: #071219;
+    box-shadow: 3px 0 0 rgba(112, 159, 166, 0.25);
+    overflow-wrap: anywhere;
+  }
+  .leaderboard__table tbody tr:nth-child(even) {
+    .leaderboard__rank, .leaderboard__player { background: #0b1a21; }
+  }
+  .leaderboard__table tbody tr.leaderboard__row--current {
+    .leaderboard__rank, .leaderboard__player { background: #0a2933; }
+  }
+  .leaderboard__table thead th { z-index: 2; }
+  .leaderboard__legend { display: grid; gap: 2px; font-size: 12px; }
 }

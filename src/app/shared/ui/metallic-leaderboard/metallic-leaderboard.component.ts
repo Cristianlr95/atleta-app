@@ -9,6 +9,9 @@ export interface LeaderboardDisplayRow {
   metaText?: string;
   roleText?: string;
   matchesPlayed?: number;
+  goalsScored?: number;
+  mvpCount?: number;
+  recentResults?: ReadonlyArray<'G' | 'E' | 'P'>;
 }
 
 @Component({
@@ -30,6 +33,7 @@ export class MetallicLeaderboardComponent {
   readonly podiumIconAsset = `${this.iconBase}/ic_nav_ranking_96.png`;
   readonly medalIconAsset = `${this.iconBase}/ic_comp_medal_96.png`;
   readonly trophyIconAsset = `${this.iconBase}/ic_comp_trophy_96.png`;
+  readonly resultLabels = { G: 'Ganado', E: 'Empatado', P: 'Perdido' };
 
   isCurrent(row: LeaderboardDisplayRow): boolean {
     return !!this.currentPlayerId && !!row.playerProfileId && row.playerProfileId === this.currentPlayerId;

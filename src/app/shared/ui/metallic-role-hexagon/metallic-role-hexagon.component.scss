@@ -85,7 +85,7 @@
   stroke: #06141b;
   stroke-width: 2px;
   paint-order: stroke;
-  font-size: 9.5px;
+  font-size: 12px;
   letter-spacing: 0.04em;
   text-transform: uppercase;
 }
@@ -95,7 +95,7 @@
   stroke: #06141b;
   stroke-width: 2px;
   paint-order: stroke;
-  font-size: 10px;
+  font-size: 12px;
 }
 
 .metallic-role-hexagon__summary {
@@ -152,4 +152,13 @@
   .metallic-role-hexagon__summary { gap: 6px; margin-top: 8px; }
   .metallic-role-hexagon__chip { padding: 6px 8px; font-size: 11px; }
   .metallic-role-hexagon__classification { margin-top: 8px; font-size: 10px; }
+}
+
+.metallic-role-hexagon--embedded {
+  border: 0;
+  padding: 0;
+  background: transparent;
+  .metallic-role-hexagon__chart-wrap { border: 0; background: transparent; }
+  .metallic-role-hexagon__header { margin-bottom: 4px; }
+  .metallic-role-hexagon__chart { max-width: 260px; }
 }

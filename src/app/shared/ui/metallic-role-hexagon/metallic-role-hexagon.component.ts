@@ -12,6 +12,7 @@ export interface HexagonRoleStat {
 interface RolePoint {
   role: HexagonRole;
   rating: number;
+  hasRating: boolean;
   x: number;
   y: number;
   labelX: number;
@@ -45,6 +46,7 @@ export class MetallicRoleHexagonComponent {
   @Input() title = 'Hexagono de habilidades';
   @Input() subtitle = 'Perfil por rol (0-100)';
   @Input() compact = false;
+  @Input() embedded = false;
   @Input() showSummary = true;
   @Input() showClassification = true;
   @Input() overallValue: number | null = null;
@@ -87,6 +89,7 @@ export class MetallicRoleHexagonComponent {
       return {
         role,
         rating,
+        hasRating: this.internalStats.some(stat => stat.role === role && Number.isFinite(stat.rating)),
         x: this.center + pointRadius * Math.cos(angle),
         y: this.center + pointRadius * Math.sin(angle),
         labelX: this.center + labelRadius * Math.cos(angle),
@@ -106,7 +109,7 @@ export class MetallicRoleHexagonComponent {
   }
 
   get shapePoints(): string {
-    return this.points.map((point) => `${point.x},${point.y}`).join(' ');
+    return this.points.filter(point => point.hasRating).map((point) => `${point.x},${point.y}`).join(' ');
   }
 
   get average(): number {

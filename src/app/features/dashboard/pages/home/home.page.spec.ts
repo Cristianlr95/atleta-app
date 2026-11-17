@@ -10,18 +10,14 @@ import { TeamApiService } from 'src/app/features/teams/services/team-api.service
 import { UserApiService } from 'src/app/features/user/services/user-api.service';
 import { HomePage } from './home.page';
 
-describe('HomePage OVR', () => {
+describe('HomePage agenda', () => {
   let fixture: ComponentFixture<HomePage>;
-  let rating: number | null;
   let historyFails: boolean;
-  let teamsFail: boolean;
   let invitationsFail: boolean;
   let profile: unknown;
 
   beforeEach(async () => {
-    rating = 63.4;
     historyFails = false;
-    teamsFail = false;
     invitationsFail = false;
     profile = null;
     await TestBed.configureTestingModule({
@@ -30,9 +26,9 @@ describe('HomePage OVR', () => {
         { provide: AuthSessionService, useValue: { currentSession: { user: { atletaUuid: 'player-1', nombre: 'Ana' } } } },
         { provide: NavigationService, useValue: { safeNavigate: jasmine.createSpy('safeNavigate') } },
         { provide: UserApiService, useValue: { getPlayerProfile: () => of(profile) } },
-        { provide: RatingsApiService, useValue: { getOverall: () => of(rating === null ? null : { hybridOVR: rating }) } },
+        { provide: RatingsApiService, useValue: { getOverall: jasmine.createSpy('getOverall') } },
         { provide: MatchHistoryService, useValue: { getPlayerHistory: () => historyFails ? throwError(() => new Error('offline')) : of([]) } },
-        { provide: TeamApiService, useValue: { getByPlayer: () => teamsFail ? throwError(() => new Error('offline')) : of([]) } },
+        { provide: TeamApiService, useValue: { getByPlayer: jasmine.createSpy('getByPlayer') } },
         { provide: InvitationsStore, useValue: { loadPendingInvitations: async () => !invitationsFail, pendingInvitations: () => [] } },
         { provide: NotificationBadgeService, useValue: { refresh: async () => {}, totalPending: () => 0 } },
       ],
@@ -54,10 +50,6 @@ describe('HomePage OVR', () => {
     fixture.componentInstance.ionViewWillEnter();
     await fixture.whenStable();
     fixture.detectChanges();
-    const xp = fixture.nativeElement.querySelectorAll('.home-metric')[2].textContent;
-    expect(xp).toContain('XP posición principal');
-    expect(xp).toContain('120');
-    expect(xp).not.toContain('170');
     expect(fixture.nativeElement.textContent).toContain('Nivel de posición 2');
     expect(fixture.nativeElement.querySelector('[role=progressbar]').getAttribute('aria-valuetext')).toBe('20 de 125 XP');
   });
@@ -67,7 +59,8 @@ describe('HomePage OVR', () => {
     fixture.componentInstance.ionViewWillEnter();
     await fixture.whenStable();
     fixture.detectChanges();
-    expect(fixture.nativeElement.querySelectorAll('.home-metric strong')[2].textContent.trim()).toBe('--');
+    expect(fixture.nativeElement.querySelector('[role=progressbar]')).toBeNull();
+    expect(fixture.nativeElement.textContent).toContain('XP y nivel no disponibles.');
   });
 
   it('permite reintentar la actividad si falla el historial', async () => {
@@ -87,26 +80,15 @@ describe('HomePage OVR', () => {
     expect(fixture.nativeElement.querySelector('.home-retry')).toBeNull();
   });
 
-  it('ofrece crear equipo cuando el jugador no tiene uno', () => {
-    fixture.detectChanges();
-    fixture.nativeElement.querySelector('.home-team').click();
-    expect(TestBed.inject(NavigationService).safeNavigate).toHaveBeenCalledWith(['/sessions/create']);
-    expect(fixture.nativeElement.querySelector('.home-team').textContent).toContain('Crear equipo');
-  });
-
-  it('no afirma que no hay equipo si falla su carga y permite reintentar', async () => {
-    teamsFail = true;
+  it('reserva identidad, OVR y equipo al Perfil sin pedir sus APIs en Inicio', async () => {
     fixture.componentInstance.ionViewWillEnter();
     await fixture.whenStable();
     fixture.detectChanges();
-    expect(fixture.nativeElement.querySelector('.home-team').textContent).toContain('Reintentar');
-    expect(fixture.nativeElement.querySelector('.home-team').textContent).not.toContain('Sin equipo');
-    teamsFail = false;
-    fixture.nativeElement.querySelector('.home-team').click();
-    await fixture.whenStable();
-    fixture.detectChanges();
-    expect(fixture.nativeElement.querySelector('.home-team').textContent).toContain('Sin equipo');
-    expect(TestBed.inject(NavigationService).safeNavigate).not.toHaveBeenCalled();
+    expect(fixture.nativeElement.querySelector('.home-team')).toBeNull();
+    expect(fixture.nativeElement.querySelector('.home-identity')).toBeNull();
+    expect(fixture.nativeElement.textContent).not.toContain('OVR');
+    expect(TestBed.inject(RatingsApiService).getOverall).not.toHaveBeenCalled();
+    expect(TestBed.inject(TeamApiService).getByPlayer).not.toHaveBeenCalled();
   });
 
   it('no muestra cero invitaciones si no se pudieron cargar', async () => {
@@ -114,7 +96,7 @@ describe('HomePage OVR', () => {
     fixture.componentInstance.ionViewWillEnter();
     await fixture.whenStable();
     fixture.detectChanges();
-    expect(fixture.nativeElement.querySelectorAll('.home-metric strong')[1].textContent.trim()).toBe('--');
+    expect(fixture.nativeElement.querySelector('.home-invitations strong').textContent.trim()).toBe('--');
     expect(fixture.nativeElement.textContent).toContain('No se pudieron cargar las invitaciones');
   });
 
@@ -124,17 +106,4 @@ describe('HomePage OVR', () => {
     expect(TestBed.inject(NavigationService).safeNavigate).toHaveBeenCalledWith(['/matches/history']);
   });
 
-  for (const scenario of [
-    { value: 63.4, expected: '63' },
-    { value: 0, expected: '0' },
-    { value: null, expected: '--' },
-  ]) {
-    it(`shows ${scenario.expected} for API OVR ${scenario.value}`, async () => {
-      rating = scenario.value;
-      fixture.componentInstance.ionViewWillEnter();
-      await fixture.whenStable();
-      fixture.detectChanges();
-      expect(fixture.nativeElement.querySelector('.home-metric strong').textContent.trim()).toBe(scenario.expected);
-    });
-  }
 });

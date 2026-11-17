@@ -1,5 +1,5 @@
 import { Injectable, inject } from '@angular/core';
-import { catchError, forkJoin, map, Observable, of, switchMap } from 'rxjs';
+import { catchError, forkJoin, map, Observable, of, switchMap, throwError } from 'rxjs';
 import { AuthSessionService } from 'src/app/core/services/auth-session.service';
 import {
   MatchEventSummary,
@@ -45,7 +45,7 @@ export class MatchHistoryService {
   private readonly socialApiService = inject(SocialApiService);
   private readonly authSessionService = inject(AuthSessionService);
 
-  getPlayerHistory(playerUuid: string): Observable<MatchHistoryViewItem[]> {
+  getPlayerHistory(playerUuid: string, options: { requireRatings?: boolean } = {}): Observable<MatchHistoryViewItem[]> {
     return forkJoin({
       matches: this.matchesApiService.getByPlayerOrCreator(playerUuid).pipe(
         catchError(() => this.matchesApiService.getByPlayer(playerUuid)),
@@ -55,7 +55,7 @@ export class MatchHistoryService {
         .getHistory(playerUuid)
         .pipe(
           map((items) => items ?? []),
-          catchError(() => of([] as RatingHistoryEntry[])),
+          catchError(error => options.requireRatings ? throwError(() => error) : of([] as RatingHistoryEntry[])),
         ),
     }).pipe(
       switchMap(({ matches, socialInvites, ratingHistory }) => {

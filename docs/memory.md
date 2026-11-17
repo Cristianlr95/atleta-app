@@ -1,5 +1,64 @@
 # Memory Vivo - Atleta Frontend
 
+## Integración solicitada con main · 16/11/2026
+
+- Worktree aislado `codex/publish-main-app-20261116`, integra la revisión aprobada `f0d4209` con main `fb31693`. Conserva configuración beta y correcciones funcionales de main junto al diseño final aprobado.
+- 271 unitarias, 73 escenarios E2E de 76 seleccionados correctos; tres smoke omiten por credenciales A/B ausentes. Build/lint y audit runtime correctos. [Registro](main-integration-2026-11-16.md).
+- El usuario autoriza el push a main; no se modifica backend ni se declara beta validada. Se preservan los checkouts originales y sus cambios pendientes.
+
+## Aprobación visual de Perfil y Plantel · 16/11/2026
+
+- El usuario aprueba el diseño final y da por lista la parte visual. Fuente aprobada/probada `9bb209f31a34f754615010ad9a8a2e2e12ed297a`, rama `codex/profile-sections-navigation-20261116`; evidencia final: 265 unitarias, 14 E2E a 390/1440, build/lint correctos. No se reejecutan por esta actualización exclusivamente documental.
+- Se consolida el estado vigente en [roadmap-frontend.md](roadmap-frontend.md), manteniendo la evidencia histórica. Backend abierto como BE-PLANTEL-01..04: goles/asistencias, alcance de PJ, contrato/autorización y criterio de promedio con datos reales; persistencia oficial solo si se requiere.
+- Beta pendiente de cuenta y revisión desplegada identificada, datos representativos, contraste API, estados y reintento, navegación/modal/permisos y capturas. Teléfono físico y lector de pantalla pendientes. La aprobación visual no autoriza ni acredita merge, push o despliegue.
+
+## Perfil con hexágono visible; sin listas repetidas · 16/11/2026
+
+- Ajuste solicitado: gráfico de Perfil visible sin acordeón; partidos/goles/asistencias/balance debajo. Se retiran los promedios desplegables del plantel y las listas visibles de posiciones de Perfil/modal; se conserva su alternativa accesible sin ocupar espacio.
+- Base `b2502a1`, misma rama/worktree. Commit probado `9bb209f31a34f754615010ad9a8a2e2e12ed297a`. Build/lint, 265 unitarias y 14 E2E a 390/1440 correctos. [Evidencias](profile-visible-radar-2026-11-16/verificacion.md).
+- Datos ausentes y fallos conservan sus estados; no se generan valoraciones ficticias. Goles/asistencias del plantel y beta siguen pendientes de API/cuenta; sin publicación.
+
+## Equipo con media y lista; detalle en modal · 16/11/2026
+
+- Nueva organización solicitada: OVR agregado/hexágono arriba, lista del plantel debajo, selección de jugador en modal sin cambiar de ruta. Sustituye las fichas permanentes anteriores. Commit probado `c00b1b3d677b3b394ee7679f24f2e0e02028ccc1`, base `dee6916`, misma rama y worktree aislados.
+- OVR = media de OVR disponibles de integrantes activos; cero válido incluido y cobertura visible. Cada eje del hexágono promedia esa posición sin rellenar ausentes. Modal con OVR junto al hexágono, teclado, cierre/Escape y retorno del foco al jugador.
+- PJ son totales de trayectoria por el contrato actual; goles/asistencias quedan «Sin datos», pendientes de API. No se consulta historial privado para inventar acumulados del equipo. [Pendientes backend](team-list-2026-11-16/backend-pendientes.md).
+- 265 unitarias, 17 E2E seleccionadas y build/lint correctos; evidencia móvil/escritorio. Beta, dispositivo físico y lector de pantalla pendientes. [Verificación](team-list-2026-11-16/verificacion.md).
+
+## Inicio sin ficha duplicada y plantel deportivo · 16/11/2026
+
+- Base `a53ff9d`, misma rama/worktree aislados `codex/profile-sections-navigation-20261116`; commit final de fuente `fd33395f94fa879b99854d3399cd2c164454205e`. Raíz y checkout original preservados.
+- Inicio se centra en jornada, invitaciones, progreso y actividad: se retiraron identidad/OVR/equipo y tarjeta XP repetida, junto con las llamadas directas de overall/equipos. Perfil muestra el equipo una vez.
+- «Ver integrantes» abre `/teams/:id`, único plantel para jugadores normales. Crear equipo pasa al Perfil vacío. Administración e invitaciones siguen limitadas al creador; fallos de equipo permiten reintentar sin fingir un vacío.
+- Referencia Squad Data/PES adaptada a fichas con identidad, OVR, posición, rol, radar reutilizado y valores textuales. Sin nuevas peticiones ni datos ficticios. Corregido plantel vacío y diferenciado 500 de valoración frente a ausencia/0.
+- 263 unitarias y 29 E2E seleccionadas correctas; build/lint correctos. Beta pendiente de cuenta; dispositivo físico y lector de pantalla sin verificar. [Inicio/Perfil](home-profile-2026-11-16/verificacion.md) · [Plantel](team-squad-2026-11-16/verificacion.md).
+
+## Perfil por secciones y accesos · 16/11/2026
+
+- Opción visual 3 seleccionada. Implementación `0b47f3ac0aac6a583317cd19e2cbf51b89237d08`, rama `codex/profile-sections-navigation-20261116`, base H0/H3 `6f9e0053345445b0add2d259528edd7dd97f663b`, mismo worktree aislado. Sin cambios en los checkouts originales.
+- Perfil compacto, rendimiento desplegable con teclado y secciones planas de trofeos/equipo. OVR único, cero frente a ausente, carga/vacío/error y reintento conservados.
+- Perfil y Ranking desde barra inferior: ocultado Perfil de PageNav en Estadísticas, Social, Crear sesión y Crear cancha; quitado CTA adicional a Ranking en Estadísticas y atajos duplicados a Partidos en Perfil. Crear cancha conserva Atrás. `/ranking` conserva la redirección a `/leaderboard` para enlaces antiguos. Onboarding y recuperación no son accesos de menú duplicados.
+- 262 unitarias, 10 E2E a 390/1440 px, build/lint correctos. Beta pendiente de cuenta; sin dispositivo físico ni lector de pantalla. [Evidencia](profile-sections-2026-11-16/verificacion.md), [mapa](profile-sections-2026-11-16/navigation/mapa.md).
+
+## H0 y H3 · 16/11/2026
+
+- Worktree aislado `C:/Users/Crist/Proyectos/Atleta/.worktrees/h0-h3-profile`, rama `codex/h0-h3-profile-20261116`, base H5 aprobada `6fcd35b00356ed26bbb303f024ce6d82aa779176`. Checkouts originales y sus cambios pendientes preservados.
+- H0 guardado antes de modificar aplicación en `6f0d44b`: 32 estados de Inicio/Partidos/Ranking/Perfil en 390/1440 px; 31 capturas nuevas y una reutilizada identificada. [Inventario](h0-h3-2026-11-16/linea-base.md).
+- H3 corrige el flujo normal sin demo: OVR único, posiciones ausentes como «Sin valoración», cero válido conservado y vacío distinguido de error HTTP con reintento en pantalla. Perfil exige el historial de ratings, manteniendo el fallback previo para los otros consumidores. Gráfico ampliado y alternativa textual legible; Ajustes, trofeos e integrantes comprobados con teclado.
+- Revisión probada `3030247`: 16 unitarias focalizadas, 262 unitarias totales y 13 E2E pertinentes correctos; build/lint correctos. [Verificación y capturas](h0-h3-2026-11-16/verificacion.md). API de beta, dispositivo físico, lector de pantalla real y auditoría integral pendientes. Sin push, merge ni despliegue.
+
+## H5 · Ranking — 16/11/2026
+
+- **Estado final: LISTO y aprobado en su alcance visual local.** El usuario pidió cerrar esta implementación y registrar las incorporaciones backend. Roadmap y backlog actualizados; `BE-RANK-01` a `BE-RANK-05` quedan pendientes en el repositorio backend (rama `codex/h5-ranking-backlog-20261116`). No se ha implementado ni validado esa integración real.
+
+- Rama local `codex/h5-ranking-review-20261116`, basada en `origin/develop` `d85e0402a5484af98c77a5609acedeccf444fbaf`, confirmado mediante fetch. Worktree aislado para conservar los cambios pendientes de `main`.
+- PR #23 conservado. Sin parche proporcionado; se revisó la implementación existente. Vacíos diferenciados (global, posición, equipo, sin equipo), retorno al global y carga de equipos sin anunciar vacíos prematuros. Búsqueda y limpieza existentes conservadas.
+- Build y lint correctos; 13 pruebas unitarias de Ranking, 254 unitarias totales y 6 E2E de Ranking correctos. Ancho disponible y recorridos simulados verificados en 320/390/1366/1440 px.
+- API de beta pendiente por falta de cuenta de prueba confirmada; no cerrar H5 como validado en beta. Evidencia, comandos y escenarios pendientes en [h5-ranking-2026-11-16.md](h5-ranking-2026-11-16.md). Sin push, integración ni despliegue.
+- Ampliación visual solicitada después: goles, veces MVP y últimos cinco resultados G/E/P, con cifras únicamente en el dataset de ejemplo. El usuario eligió propuesta visual primero; backend y beta siguen pendientes. Teléfono con filas apiladas, filtros compactos y sin desplazamiento horizontal; desktop conserva tabla. Build/lint correctos, 15 unitarias de Ranking, 256 unitarias totales y 7 E2E correctos. Nuevas capturas en `output/playwright/h5-stats/` (320/390/768/1366 px).
+- Revisión posterior del usuario: se sustituyeron las filas apiladas por tabla con scroll horizontal interno en teléfono/tablet; puesto y nombre fijos, OVR visible al inicio y los cinco resultados completos al extremo incluso a 320 px. Se conserva el encabezado compacto. Verificación focalizada: 15 unitarias y 7 E2E; se prueba desplazamiento con teclado, identidad fija, tabla sin desbordar la página y llegada al último jugador. Las capturas `h5-stats/` reflejan esta versión e incluyen `demo-scrolled-*`.
+- Ajuste final pedido antes de aprobar: barra horizontal oscura, fina y redondeada, control cian con foco/hover. El usuario dio su aprobación condicionada a ese ajuste. Recorrido con Chrome visible correcto a 320/390/768/1366 px; se reservó espacio para las barras nativas del navegador y se capturó `scrollbar-*`. La aprobación corresponde a esta propuesta visual local, sin validar beta ni autorizar por sí sola push/merge/despliegue.
+
 ## Seguimiento visual — 3 de noviembre de 2026
 - 06/11/2026: tarea 12 y punto final completados con verificación automatizada: equipo, perfil público y Jugar revisados en 320/1366 px; Social conserva navegación, invitaciones, estados vacíos y reintento. El roster vacío del equipo ahora muestra su mensaje en vez de dejar la pantalla sin contenido (causa: `forkJoin([])` no emite). Filas/acciones principales cumplen 44 px y foco visible; roles del roster ya no se ocultan en móvil. Lint/build pasan, 37 unitarias dirigidas y 43 E2E pasan. Punto B continúa pendiente por falta de recorrido con API/datos locales reales; lector de pantalla y dispositivo físico también quedan fuera.
 - 06/11/2026: cierre/MVP y ranking/estadísticas revisados. E2E valida bloqueo antes del inicio, permisos del creador y consistencia entre marcador y goles asignados; pruebas unitarias cubren ventana, roster confirmado y estados de voto. El cierre real contra API queda pendiente. Ranking y estadísticas pasan filtros/estados vacíos en 320/1366 px; los botones de filtros y reintento tienen mínimo de 44 px. La página de estadísticas distingue 404 sin datos de fallos de servidor y permite reintentar. Las fuentes de OVR no son equivalentes en interfaz (ratings `hybridOVR` vs `score` de leaderboard/agregado de equipo), por lo que no se alteraron fórmulas. Punto B sigue pendiente de recorrido con datos locales no simulados.

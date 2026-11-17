@@ -43,7 +43,7 @@ export interface OverallRating {
   bestRoleRating: number;
   totalRatings: number;
   totalMatchesPlayed: number;
-  roleBreakdown: Record<RoleType, number>;
+  roleBreakdown: Partial<Record<RoleType, number>>;
 }
 
 export interface LeaderboardEntry {

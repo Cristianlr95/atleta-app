@@ -48,16 +48,17 @@ describe('TeamDetailPage', () => {
     component = fixture.componentInstance;
   });
 
-  it('loads the exact team and opens the selected member profile', () => {
+  it('loads the exact team and selects a player without navigating away', () => {
     component.ionViewWillEnter();
     fixture.detectChanges();
-    component.onOpenPlayer('player-uuid');
+    component.openPlayer(component.members[0]);
 
     expect(teamApiService.getById).toHaveBeenCalledOnceWith(77);
     expect(teamApiService.getActiveMembers).toHaveBeenCalledOnceWith(77);
     expect(fixture.nativeElement.textContent).toContain('Atleta FC');
     expect(fixture.nativeElement.textContent).toContain('Demo10');
-    expect(navigationService.safeNavigate).toHaveBeenCalledWith(['/players', 'player-uuid']);
+    expect(component.selectedMember?.alias).toBe('Demo10');
+    expect(navigationService.safeNavigate).not.toHaveBeenCalled();
   });
 
   it('renders the team and its empty roster when there are no active members', () => {
@@ -89,5 +90,55 @@ describe('TeamDetailPage', () => {
     expect(fixture.nativeElement.querySelector('.team-hero img')).toBeNull();
     expect(fixture.nativeElement.querySelector('.team-shield')?.textContent).toBe('A');
     expect(fixture.nativeElement.querySelector('.team-member__player i')?.textContent).toBe('D');
+  });
+
+  it('keeps a team with an empty roster visible', () => {
+    teamApiService.getActiveMembers.and.returnValue(of([]));
+    component.ionViewWillEnter();
+    fixture.detectChanges();
+    expect(fixture.nativeElement.textContent).toContain('Atleta FC');
+    expect(fixture.nativeElement.textContent).toContain('No hay integrantes activos.');
+  });
+
+  it('distinguishes a rating failure from an unrated player and retries', () => {
+    ratingsApiService.getOverall.and.returnValue(throwError(() => ({ status: 500 })));
+    component.ionViewWillEnter();
+    fixture.detectChanges();
+    expect(fixture.nativeElement.textContent).toContain('No pudimos cargar las valoraciones.');
+    expect(fixture.nativeElement.querySelector('.team-member__ovr').textContent).not.toContain('Sin valoración');
+    ratingsApiService.getOverall.and.returnValue(of({ hybridOVR: 74 } as any));
+    fixture.nativeElement.querySelector('[aria-label="Reintentar valoraciones de Demo10"]').click();
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelector('[role="alert"]')).toBeNull();
+    expect(fixture.nativeElement.querySelector('.team-member__ovr').textContent).toContain('74');
+  });
+
+  it('renders real position values, preserving zero and missing ratings', () => {
+    ratingsApiService.getOverall.and.returnValue(of({ hybridOVR: 0, roleBreakdown: { ATAQUE: 79, MEDIOCAMPO: 0 } } as any));
+    component.ionViewWillEnter();
+    fixture.detectChanges();
+    expect(component.members[0].roleStats).toEqual([{ role: 'ATAQUE', rating: 79 }, { role: 'MEDIOCAMPO', rating: 0 }]);
+    expect(fixture.nativeElement.querySelector('.team-member__ovr').textContent).toContain('0');
+    expect(ratingsApiService.getOverall).toHaveBeenCalledOnceWith('player-uuid');
+  });
+
+  it('averages rated players including zero and excludes missing values', () => {
+    teamApiService.getActiveMembers.and.returnValue(of(['a', 'b', 'c'].map(playerUuid => ({ playerUuid, alias: playerUuid, rol: 'JUGADOR' as const, primaryPositionId: null, primaryPositionName: null }))));
+    ratingsApiService.getOverall.and.returnValues(
+      of({ hybridOVR: 80, roleBreakdown: { ATAQUE: 80, MEDIOCAMPO: 0 } } as any),
+      of({ hybridOVR: 0, roleBreakdown: { ATAQUE: 60 } } as any),
+      throwError(() => ({ status: 404 })),
+    );
+    component.ionViewWillEnter();
+    expect(component.teamOvr).toBe(40);
+    expect(component.ratedMembers.length).toBe(2);
+    expect(component.teamRoleStats).toEqual([{ role: 'ATAQUE', rating: 70 }, { role: 'MEDIOCAMPO', rating: 0 }]);
+  });
+
+  it('leaves the team unvalued when no player has a rating', () => {
+    ratingsApiService.getOverall.and.returnValue(throwError(() => ({ status: 404 })));
+    component.ionViewWillEnter();
+    expect(component.teamOvr).toBeNull();
+    expect(component.teamRoleStats).toEqual([]);
   });
 });

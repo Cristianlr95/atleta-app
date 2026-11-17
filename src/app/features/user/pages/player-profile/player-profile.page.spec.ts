@@ -1,6 +1,9 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ActivatedRoute, Router } from '@angular/router';
-import { of } from 'rxjs';
+import { of, throwError } from 'rxjs';
+import { RatingByRole } from 'src/app/features/ratings/models/rating.models';
+import { TeamApiService } from 'src/app/features/teams/services/team-api.service';
+import { NotificationBadgeService } from 'src/app/features/matches/services/notification-badge.service';
 import { AppToastService } from 'src/app/core/services/app-toast.service';
 import { AuthSessionService } from 'src/app/core/services/auth-session.service';
 import { MatchHistoryViewItem } from 'src/app/features/matches/services/match-history.service';
@@ -19,6 +22,7 @@ describe('PlayerProfilePage', () => {
   let authSessionService: { currentSession: unknown };
   let userApiService: jasmine.SpyObj<UserApiService>;
   let appToastService: jasmine.SpyObj<AppToastService>;
+  let ratingsApiService: jasmine.SpyObj<RatingsApiService>;
 
   beforeEach(async () => {
     authSessionService = {
@@ -27,9 +31,16 @@ describe('PlayerProfilePage', () => {
     userApiService = jasmine.createSpyObj<UserApiService>('UserApiService', [
       'getPlayerProfile',
       'changePassword',
+      'getPlayerAchievements',
+      'getPlayerPositions',
     ]);
     userApiService.getPlayerProfile.and.returnValue(of({} as PlayerProfile));
     userApiService.changePassword.and.returnValue(of(void 0));
+    userApiService.getPlayerAchievements.and.returnValue(of([]));
+    userApiService.getPlayerPositions.and.returnValue(of([]));
+    ratingsApiService = jasmine.createSpyObj<RatingsApiService>('RatingsApiService', ['getOverall', 'getByRole']);
+    ratingsApiService.getOverall.and.returnValue(throwError(() => ({ status: 404 })));
+    ratingsApiService.getByRole.and.returnValue(of([]));
     appToastService = jasmine.createSpyObj<AppToastService>('AppToastService', ['success', 'error', 'info']);
     appToastService.success.and.resolveTo();
     appToastService.error.and.resolveTo();
@@ -54,11 +65,10 @@ describe('PlayerProfilePage', () => {
         },
         {
           provide: RatingsApiService,
-          useValue: {
-            getOverall: () => of(null),
-            getByRole: () => of([]),
-          },
+          useValue: ratingsApiService,
         },
+        { provide: TeamApiService, useValue: { getByPlayer: () => of([]) } },
+        { provide: NotificationBadgeService, useValue: { totalPending: () => 0, refresh: async () => undefined } },
         {
           provide: MatchHistoryService,
           useValue: {
@@ -102,10 +112,13 @@ describe('PlayerProfilePage', () => {
     expect(fixture.nativeElement.textContent).toContain('Actualizando estadísticas');
   });
   it('no muestra ceros como estadísticas cuando falla el historial', () => {
-    component.historyUnavailable = true;
+    authSessionService.currentSession = { user: { atletaUuid: 'ath-1', nombre: 'Ana' } };
+    spyOn(TestBed.inject(MatchHistoryService), 'getPlayerHistory').and.returnValue(throwError(() => ({ status: 500 })));
+    component.ionViewWillEnter();
     fixture.detectChanges();
     expect(fixture.nativeElement.querySelector('.competition-metrics')).toBeNull();
-    expect(fixture.nativeElement.textContent).toContain('No se pudieron cargar las estadísticas de competición');
+    expect(fixture.nativeElement.textContent).toContain('No pudimos cargar las estadísticas');
+    component.ionViewWillLeave();
   });
   it('no muestra estadísticas de ejemplo en un perfil sin datos', () => {
     expect(component.roleStats).toEqual([]);
@@ -113,21 +126,83 @@ describe('PlayerProfilePage', () => {
     (component as any).applyProfileData('Jugador', 'jugador@atleta.test', null, null, [], [], [], []);
     expect(component.roleStats).toEqual([]);
     fixture.detectChanges();
-    expect(fixture.nativeElement.textContent).toContain('No hay estadísticas por posición disponibles');
+    expect(fixture.nativeElement.textContent).toContain('Aún no hay estadísticas');
     expect(fixture.nativeElement.textContent).toContain('No hay trofeos disponibles');
   });
-  it('identifica el equipo y el estado del panel de integrantes', () => {
+  it('opens the team roster from its single member action', () => {
+    const navigate = spyOn(TestBed.inject(Router), 'navigate').and.resolveTo(true);
     component.memberTeams = [{ id: 7, nombre: 'Azul' } as any];
     fixture.detectChanges();
     const button: HTMLButtonElement = fixture.nativeElement.querySelector('.profile-team__btn--icon');
-    expect(button.getAttribute('aria-expanded')).toBe('false');
-    expect(button.getAttribute('aria-label')).toContain('Azul');
-    component.expandedTeamId = 7;
-    fixture.detectChanges();
-    expect(button.getAttribute('aria-expanded')).toBe('true');
+    expect(button.getAttribute('aria-label')).toBe('Ver integrantes de Azul');
+    button.click();
+    expect(navigate).toHaveBeenCalledWith(['/teams', '7'], undefined);
   });
   it('should create', () => {
     expect(component).toBeTruthy();
+  });
+
+  it('keeps team creation in the empty profile', () => {
+    const navigate = spyOn(TestBed.inject(Router), 'navigate').and.resolveTo(true);
+    fixture.detectChanges();
+    fixture.nativeElement.querySelector('.profile-create-team').click();
+    expect(navigate).toHaveBeenCalledWith(['/sessions/create'], undefined);
+  });
+
+  it('does not offer team creation on a team API failure and retries', () => {
+    authSessionService.currentSession = { user: { atletaUuid: 'ath-1', nombre: 'Ana' } };
+    const teams = spyOn(TestBed.inject(TeamApiService), 'getByPlayer').and.returnValue(throwError(() => ({ status: 500 })));
+    component.ionViewWillEnter();
+    fixture.detectChanges();
+    expect(fixture.nativeElement.textContent).toContain('No pudimos cargar los equipos.');
+    expect(fixture.nativeElement.querySelector('.profile-create-team')).toBeNull();
+    teams.and.returnValue(of([]));
+    fixture.nativeElement.querySelector('.profile-teams-retry').click();
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelector('.profile-teams-retry')).toBeNull();
+    expect(fixture.nativeElement.querySelector('.profile-create-team')).not.toBeNull();
+  });
+
+  it('does not repeat OVR as a general level', () => {
+    component.overallHybridOvr = 68;
+    component.roleStats = [{ role: 'ATAQUE', rating: 79 }];
+    fixture.detectChanges();
+    expect(fixture.nativeElement.textContent).not.toContain('NIVEL GENERAL');
+    expect(fixture.nativeElement.querySelector('.ovr-block')?.textContent).toContain('68');
+  });
+
+  it('distinguishes an absent role from a valid zero in the normal API flow', () => {
+    authSessionService.currentSession = { user: { atletaUuid: 'ath-1', nombre: 'Ana' } };
+    ratingsApiService.getByRole.and.returnValue(of([
+      { roleType: 'ATAQUE', currentRating: 79 } as RatingByRole,
+      { roleType: 'MEDIOCAMPO', currentRating: 0 } as RatingByRole,
+    ]));
+    component.ionViewWillEnter();
+    fixture.detectChanges();
+    const values: HTMLElement[] = Array.from(fixture.nativeElement.querySelectorAll('.role-stat-values div'));
+    expect(values.find(row => row.textContent?.includes('Mediocampo'))?.textContent).toContain('0');
+    expect(values.find(row => row.textContent?.includes('Defensa'))?.textContent).toContain('Sin valoración');
+    expect(values.filter(row => row.textContent?.includes('Sin valoración')).length).toBe(4);
+    component.ionViewWillLeave();
+  });
+
+  it('offers an in-screen retry after HTTP 500 and restores real statistics', async () => {
+    authSessionService.currentSession = { user: { atletaUuid: 'ath-1', nombre: 'Ana' } };
+    ratingsApiService.getByRole.and.returnValue(throwError(() => ({ status: 500 })));
+    component.ionViewWillEnter();
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelector('[role="alert"]')?.textContent).toContain('No pudimos cargar las estadísticas');
+    expect(fixture.nativeElement.textContent).not.toContain('Aún no hay estadísticas');
+    ratingsApiService.getByRole.and.returnValue(of([{ roleType: 'ATAQUE', currentRating: 79 } as RatingByRole]));
+    const retry = Array.from<HTMLButtonElement>(fixture.nativeElement.querySelectorAll('button'))
+      .find(button => button.textContent?.trim() === 'Reintentar estadísticas');
+    expect(retry).toBeDefined();
+    retry?.click();
+    await fixture.whenStable();
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelector('[role="alert"]')).toBeNull();
+    expect(fixture.nativeElement.querySelector('.role-stat-values')?.textContent).toContain('79');
+    component.ionViewWillLeave();
   });
 
   it('keeps the competition summary aligned with victories, draws and losses', () => {
