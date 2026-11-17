@@ -1,5 +1,9 @@
 # Memory Vivo - Atleta Frontend
 
+## Ranking: MVP y resultados · 17/11/2026
+
+- Implementación local BE-RANK-01 a 05: goles, MVP oficiales y últimos cinco resultados en rankings global, por posición y por equipo; para posición se muestran trayectoria y posición, y los resultados se ordenan del más antiguo al más reciente. Dos consultas agrupadas por ranking; sin nuevas solicitudes frontend por jugador. Validado con datos sintéticos, no beta ni datos reales. `docs/ranking-stats-2026-11-17/verificacion.md`.
+
 ## Ranking: goles · 17/11/2026
 
 - Avance BE-RANK-01 en rama `feature/ranking-stats-20261117`: API de ranking entrega goles de trayectoria/posición o del equipo, calculados en lote desde historiales finalizados. La interfaz distingue ambos alcances y conserva cero/ausencia. 66 pruebas backend dirigidas, 7 frontend, lint/build y 2 E2E simulados correctos. MVP, resultados, PostgreSQL y beta pendientes; sin publicación.

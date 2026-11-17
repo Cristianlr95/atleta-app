@@ -11,8 +11,10 @@ export interface LeaderboardDisplayRow {
   matchesPlayed?: number;
   goalsScored?: number | null;
   goalsForRole?: number | null;
-  mvpCount?: number;
-  recentResults?: ReadonlyArray<'G' | 'E' | 'P'>;
+  mvpCount?: number | null;
+  mvpForRole?: number | null;
+  recentResults?: ReadonlyArray<'G' | 'E' | 'P'> | null;
+  resultsForRole?: ReadonlyArray<'G' | 'E' | 'P'> | null;
 }
 
 @Component({
@@ -29,12 +31,17 @@ export class MetallicLeaderboardComponent {
   @Input() rows: ReadonlyArray<LeaderboardDisplayRow> = [];
   @Input() currentPlayerId: string | null = null;
   @Input() showRole = false;
+  @Input() resultsScopeLabel = 'de trayectoria';
   @Input() emptyMessage = 'Todavía no hay datos para este ranking.';
 
   readonly podiumIconAsset = `${this.iconBase}/ic_nav_ranking_96.png`;
   readonly medalIconAsset = `${this.iconBase}/ic_comp_medal_96.png`;
   readonly trophyIconAsset = `${this.iconBase}/ic_comp_trophy_96.png`;
   readonly resultLabels = { G: 'Ganado', E: 'Empatado', P: 'Perdido' };
+
+  resultLabel(result: unknown): string {
+    return result === 'G' || result === 'E' || result === 'P' ? this.resultLabels[result] : '';
+  }
 
   isCurrent(row: LeaderboardDisplayRow): boolean {
     return !!this.currentPlayerId && !!row.playerProfileId && row.playerProfileId === this.currentPlayerId;

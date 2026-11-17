@@ -43,11 +43,11 @@ Integración con main validada el 16/11/2026 para el push solicitado: 271 unitar
 
 ### Otros pendientes del roadmap
 
-La finalización de H5 corresponde a la interfaz local aprobada. Conectar goles, MVP y últimos cinco resultados a la API sigue pendiente en `BE-RANK-01` a `BE-RANK-05` (`atleta-server/docs/backlog-ranking-h5.md`, rama `codex/h5-ranking-backlog-20261116`). Incluye adaptación de modelos/servicio frontend, cuenta de prueba y validación móvil/escritorio en beta.
+La finalización de H5 corresponde a la interfaz local aprobada. Las estadísticas BE-RANK-01 a BE-RANK-05 están implementadas localmente; falta integrarlas y validarlas en beta con datos reales. El backlog original está en `atleta-server` rama `codex/h5-ranking-backlog-20261116`.
 
-Decisión del usuario del 17/11: al filtrar por posición se deben mostrar ambos alcances para goles, MVP y resultados: partidos jugados en la posición filtrada y trayectoria completa, claramente identificados. En ranking de equipo, conservar además el alcance del equipo. Usar la posición registrada en cada participación y distinguir datos ausentes de cero. La implementación y verificación siguen pendientes.
+Decisión del usuario del 17/11: al filtrar por posición se muestran ambos alcances para goles, MVP y resultados: partidos jugados en la posición filtrada y trayectoria completa, claramente identificados. El ranking de equipo usa partidos de ese equipo. Se usa la posición registrada en cada participación y se distinguen datos ausentes de cero.
 
-Avance local BE-RANK-01: Ranking global y de equipo reciben goles agregados desde historial de partidos finalizados; al filtrar por posición se muestran trayectoria y posición. Una posición histórica no clasificable deja el dato por posición como desconocido. 66 pruebas backend dirigidas, 7 frontend, lint/build y 2 recorridos Chromium simulados aprobados. Pendientes MVP, últimos resultados, PostgreSQL y datos reales/beta; no desplegado.
+Avance local BE-RANK-01 a 05: goles, MVP oficiales resueltos y hasta cinco resultados de historial finalizado, agregados en lote para ranking global, posición y equipo. Posiciones históricas no clasificables dejan el alcance por posición como desconocido. 738 pruebas backend H2, 2 pruebas sintéticas PostgreSQL 18, 279 frontend, lint/build y 2 recorridos Chromium simulados aprobados. Pendientes integración, revisión de datos reales y beta; no desplegado. [Detalle y límites](ranking-stats-2026-11-17/verificacion.md).
 
 1. Validar flujos completos con datos reales de beta, incluidos cierre, voto MVP y notificaciones.
 2. Revisar accesibilidad con lectores de pantalla y dispositivos físicos, además de contrastes sobre imágenes.

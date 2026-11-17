@@ -8,6 +8,10 @@ import { RatingsApiService } from './ratings-api.service';
 export interface LeaderboardViewEntry {
   goalsScored?: number | null;
   goalsForRole?: number | null;
+  mvpCount?: number | null;
+  mvpForRole?: number | null;
+  recentResults?: ReadonlyArray<'G' | 'E' | 'P'> | null;
+  resultsForRole?: ReadonlyArray<'G' | 'E' | 'P'> | null;
   rank: number;
   playerProfileId?: string;
   alias: string;
@@ -46,6 +50,8 @@ export class LeaderboardService {
         metaText: entry.rated ? `${entry.matchesPlayed} partidos` : 'Aun sin partidos puntuados',
         matchesPlayed: entry.matchesPlayed,
         ...(entry.goalsScored !== undefined ? { goalsScored: entry.goalsScored } : {}),
+        ...(entry.mvpCount !== undefined ? { mvpCount: entry.mvpCount } : {}),
+        ...(entry.recentResults !== undefined ? { recentResults: this.mapResults(entry.recentResults) } : {}),
       }))),
     );
   }
@@ -63,7 +69,16 @@ export class LeaderboardService {
         matchesPlayed: entry.matchesPlayed,
         ...(entry.goalsScored !== undefined ? { goalsScored: entry.goalsScored } : {}),
         ...(entry.goalsForRole !== undefined && label !== 'OVR' ? { goalsForRole: entry.goalsForRole } : {}),
+        ...(entry.mvpCount !== undefined ? { mvpCount: entry.mvpCount } : {}),
+        ...(entry.mvpForRole !== undefined && label !== 'OVR' ? { mvpForRole: entry.mvpForRole } : {}),
+        ...(entry.recentResults !== undefined ? { recentResults: this.mapResults(entry.recentResults) } : {}),
+        ...(entry.resultsForRole !== undefined && label !== 'OVR' ? { resultsForRole: this.mapResults(entry.resultsForRole) } : {}),
       }));
+  }
+
+  private mapResults(results: ReadonlyArray<'VICTORIA' | 'EMPATE' | 'DERROTA'> | null): Array<'G' | 'E' | 'P'> | null {
+    if (!results || !results.every(result => result === 'VICTORIA' || result === 'EMPATE' || result === 'DERROTA')) return null;
+    return results.map(result => ({ VICTORIA: 'G', EMPATE: 'E', DERROTA: 'P' })[result] as 'G' | 'E' | 'P');
   }
 
   private roleLabel(role: RoleType): string {

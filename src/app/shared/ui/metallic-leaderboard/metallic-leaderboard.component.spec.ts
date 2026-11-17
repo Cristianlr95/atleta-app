@@ -57,10 +57,16 @@ describe('MetallicLeaderboardComponent', () => {
   });
 
   it('labels career and position goals and preserves a position zero', () => {
-    component.rows = [{ rank: 1, alias: 'Ana', scoreText: '80 OVR', goalsScored: 5, goalsForRole: 0 }];
+    component.rows = [{ rank: 1, alias: 'Ana', scoreText: '80 OVR', goalsScored: 5, goalsForRole: 0, recentResults: ['G', 'P'], resultsForRole: ['E'] }];
     fixture.detectChanges();
     const goals = fixture.nativeElement.querySelector('.leaderboard__goals').textContent;
     expect(goals).toContain('Total: 5');
     expect(goals).toContain('Posición: 0');
+    const results = fixture.nativeElement.querySelector('.leaderboard__form');
+    expect(results.textContent).toContain('Total:');
+    expect(results.textContent).toContain('Posición:');
+    expect(Array.from(results.querySelectorAll('.leaderboard__result') as NodeListOf<HTMLElement>).map(node => node.textContent?.trim())).toEqual(['G', 'P', 'E']);
+    expect(results.querySelector('[aria-label="Últimos resultados de trayectoria, más reciente a la derecha"]')).not.toBeNull();
+    expect(results.querySelector('[aria-label="Últimos resultados en la posición, más reciente a la derecha"]')).not.toBeNull();
   });
 });

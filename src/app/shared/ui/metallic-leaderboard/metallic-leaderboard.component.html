@@ -15,7 +15,7 @@
           <th *ngIf="showRole" class="leaderboard__role-heading">Posición</th>
           <th class="leaderboard__matches-heading">PJ</th>
           <th>Goles</th>
-          <th><abbr title="Partidos como jugador más valioso">MVP</abbr></th>
+          <th><abbr title="Premios MVP resueltos">MVP</abbr></th>
           <th class="leaderboard__form-heading">Últimos 5</th>
         </tr>
       </thead>
@@ -36,17 +36,18 @@
           <td *ngIf="showRole" class="leaderboard__role">{{ row.roleText || '—' }}</td>
           <td class="leaderboard__matches">{{ row.matchesPlayed ?? '—' }}</td>
           <td class="leaderboard__goals"><ng-container *ngIf="row.goalsForRole !== undefined; else singleGoals">Total: {{ row.goalsScored ?? '—' }} · Posición: {{ row.goalsForRole ?? '—' }}</ng-container><ng-template #singleGoals>{{ row.goalsScored ?? '—' }}</ng-template></td>
-          <td class="leaderboard__mvp">{{ row.mvpCount ?? '—' }}</td>
+          <td class="leaderboard__mvp"><ng-container *ngIf="row.mvpForRole !== undefined; else singleMvp">Total: {{ row.mvpCount ?? '—' }} · Posición: {{ row.mvpForRole ?? '—' }}</ng-container><ng-template #singleMvp>{{ row.mvpCount ?? '—' }}</ng-template></td>
           <td class="leaderboard__form">
-            <div class="leaderboard__results" *ngIf="row.recentResults?.length; else noResults" role="group" aria-label="Últimos resultados, más reciente a la derecha">
-              <span *ngFor="let result of row.recentResults | slice:-5"
-                class="leaderboard__result"
-                [class.leaderboard__result--win]="result === 'G'"
-                [class.leaderboard__result--draw]="result === 'E'"
-                [class.leaderboard__result--loss]="result === 'P'"
-                [attr.aria-label]="resultLabels[result]" [title]="resultLabels[result]">{{ result }}</span>
-            </div>
-            <ng-template #noResults><span class="leaderboard__unavailable">{{ row.recentResults ? 'Sin partidos' : 'Sin datos' }}</span></ng-template>
+            <span *ngIf="row.resultsForRole !== undefined">Total: </span><ng-container *ngTemplateOutlet="resultList; context: { $implicit: row.recentResults, label: 'Últimos resultados ' + resultsScopeLabel }"></ng-container>
+            <ng-container *ngIf="row.resultsForRole !== undefined"><br><span>Posición: </span><ng-container *ngTemplateOutlet="resultList; context: { $implicit: row.resultsForRole, label: 'Últimos resultados en la posición' }"></ng-container></ng-container>
+            <ng-template #resultList let-results let-label="label">
+              <div class="leaderboard__results" *ngIf="results?.length; else noResults" role="group" [attr.aria-label]="label + ', más reciente a la derecha'">
+                <span *ngFor="let result of results | slice:-5" class="leaderboard__result"
+                  [class.leaderboard__result--win]="result === 'G'" [class.leaderboard__result--draw]="result === 'E'"
+                  [class.leaderboard__result--loss]="result === 'P'" [attr.aria-label]="resultLabel(result)" [title]="resultLabel(result)">{{ result }}</span>
+              </div>
+              <ng-template #noResults><span class="leaderboard__unavailable">{{ results ? 'Sin partidos' : 'Sin datos' }}</span></ng-template>
+            </ng-template>
           </td>
         </tr>
       </tbody>

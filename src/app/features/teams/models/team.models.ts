@@ -45,6 +45,8 @@ export interface TeamActiveMember {
 
 export interface TeamLeaderboardEntry {
   goalsScored?: number | null;
+  mvpCount?: number | null;
+  recentResults?: ReadonlyArray<'VICTORIA' | 'EMPATE' | 'DERROTA'> | null;
   rank: number;
   playerProfileId: string;
   alias: string;

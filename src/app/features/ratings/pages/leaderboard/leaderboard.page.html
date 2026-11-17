@@ -100,6 +100,7 @@
           [rows]="filteredRows"
           [emptyMessage]="emptyMessage"
           [showRole]="selectedScope === 'PLATFORM'"
+            [resultsScopeLabel]="selectedScope === 'TEAM' ? 'del equipo' : 'de trayectoria'"
           [currentPlayerId]="currentUserId">
         </app-metallic-leaderboard>
         <button

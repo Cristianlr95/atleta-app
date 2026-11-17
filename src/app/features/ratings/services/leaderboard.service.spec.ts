@@ -49,11 +49,15 @@ describe('LeaderboardService', () => {
 
   it('keeps career, position and team goals from the respective endpoints', () => {
     ratingsApiService.getLeaderboardByRole.and.returnValue(of([
-      { playerProfileId: 'a', alias: 'Ana', score: 80, goalsScored: 5, goalsForRole: 0 },
+      { playerProfileId: 'a', alias: 'Ana', score: 80, goalsScored: 5, goalsForRole: 0, mvpCount: 2, mvpForRole: 1, recentResults: ['VICTORIA', 'EMPATE', 'DERROTA'], resultsForRole: ['EMPATE'] },
     ]));
     service.getRoleLeaderboard('ATAQUE').subscribe(rows => {
       expect(rows[0].goalsScored).toBe(5);
       expect(rows[0].goalsForRole).toBe(0);
+      expect(rows[0].mvpCount).toBe(2);
+      expect(rows[0].mvpForRole).toBe(1);
+      expect(rows[0].recentResults).toEqual(['G', 'E', 'P']);
+      expect(rows[0].resultsForRole).toEqual(['E']);
     });
     teamApiService.getLeaderboard.and.returnValue(of([
       { rank: 1, playerProfileId: 'a', alias: 'Ana', score: 80, matchesPlayed: 2, rated: true, goalsScored: 2 },

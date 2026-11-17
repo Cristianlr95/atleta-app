@@ -49,6 +49,10 @@ export interface OverallRating {
 export interface LeaderboardEntry {
   goalsScored?: number | null;
   goalsForRole?: number | null;
+  mvpCount?: number | null;
+  mvpForRole?: number | null;
+  recentResults?: ReadonlyArray<'VICTORIA' | 'EMPATE' | 'DERROTA'> | null;
+  resultsForRole?: ReadonlyArray<'VICTORIA' | 'EMPATE' | 'DERROTA'> | null;
   playerProfileId: string;
   playerId?: string;
   alias: string;
