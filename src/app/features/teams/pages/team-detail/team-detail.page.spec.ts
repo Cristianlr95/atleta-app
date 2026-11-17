@@ -74,13 +74,15 @@ describe('TeamDetailPage', () => {
   it('shows team goals and career goals separately, preserving zero and missing data', () => {
     teamApiService.getActiveMembers.and.returnValue(of([{
       playerUuid: 'player-uuid', alias: 'Demo10', rol: 'CAPITAN', primaryPositionId: null,
-      primaryPositionName: null, teamGoals: 0, totalGoals: 12,
+      primaryPositionName: null, teamGoals: 0, totalGoals: 12, teamAssists: 0, totalAssists: 5,
     }]));
     component.ionViewWillEnter();
     fixture.detectChanges();
     const cells = fixture.nativeElement.querySelectorAll('.team-member td');
     expect(cells[3].textContent.trim()).toBe('0');
     expect(cells[4].textContent.trim()).toBe('12');
+    expect(cells[5].textContent.trim()).toBe('0');
+    expect(cells[6].textContent.trim()).toBe('5');
     expect(fixture.nativeElement.textContent).toContain('Goles con el equipo');
     expect(fixture.nativeElement.textContent).toContain('Goles totales');
     teamApiService.getActiveMembers.and.returnValue(of([{

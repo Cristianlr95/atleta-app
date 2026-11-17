@@ -1,5 +1,9 @@
 # Memory Vivo - Atleta Frontend
 
+## Asistencias del plantel · 17/11/2026
+
+- Se muestran asistencias con el equipo y totales, siguiendo el alcance acordado para goles; cero se conserva y ausencia aparece como «Sin datos». La lectura usa el mismo agregado del plantel. Validación beta pendiente.
+
 ## Plantel: goles por equipo y totales · 17/11/2026
 
 - El usuario eligió ambos valores: tabla y ficha muestran goles con el equipo y de trayectoria manteniendo el diseño del 16/11. `TeamActiveMember` acepta `teamGoals`/`totalGoals` del endpoint existente, sin peticiones adicionales. Cero registrado se conserva; ausencia/null muestra «Sin datos». Asistencias sigue pendiente; BE-PLANTEL-01 queda parcial.

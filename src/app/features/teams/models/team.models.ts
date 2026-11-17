@@ -30,6 +30,8 @@ export interface CreateTeamRequest {
 }
 
 export interface TeamActiveMember {
+  teamAssists?: number | null;
+  totalAssists?: number | null;
   teamGoals?: number | null;
   totalGoals?: number | null;
   playerUuid: string;
