@@ -26,10 +26,10 @@ Integración con main validada el 16/11/2026 para el push solicitado: 271 unitar
 
 - [ ] **BE-PLANTEL-01 (local):** goles y asistencias con el equipo y totales de trayectoria desde historial de partidos finalizados, mostrados en tabla y ficha. Se conserva cero y se distingue la ausencia de historial. Pendiente verificar en beta. [Goles: contrato y verificación](team-goals-2026-11-17/verificacion.md).
 - [ ] **BE-PLANTEL-02 (local):** «PJ con el equipo» cuenta partidos finalizados distintos con historial de ese equipo; «PJ totales» conserva su fuente de trayectoria. Tabla y ficha muestran ambos. Pendiente validación con datos reales y beta.
-- [ ] **BE-PLANTEL-03:** definir partidos/participaciones válidos, autorización y contrato compatible; distinguir cero, ausencia y error de carga.
+- [x] **BE-PLANTEL-03 (verificado localmente):** el agregado usa historiales de partidos finalizados; el cierre genera registros para participantes confirmados y cuenta eventos confirmados. La lectura del plantel requiere JWT, conserva el contrato y diferencia cero, ausencia y fallo con reintento. Los historiales antiguos no se auditaron individualmente. [Evidencia](plantel-03-2026-11-17.md).
 - [ ] **BE-PLANTEL-04:** confirmar con datos reales los integrantes activos y el promedio OVR con cobertura. El promedio actual es de presentación; persistencia oficial/histórica solo si se requiere, no implementada.
 
-[Detalle y criterios](team-list-2026-11-16/backend-pendientes.md). No se implementó backend en este cierre.
+[Detalle y criterios](team-list-2026-11-16/backend-pendientes.md). Los cambios descritos como locales requieren validación en beta.
 
 ### Validación en beta de Perfil y Plantel
 

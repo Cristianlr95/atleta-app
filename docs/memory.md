@@ -1,5 +1,9 @@
 # Memory Vivo - Atleta Frontend
 
+## BE-PLANTEL-03 · 17/11/2026
+
+- Reglas y contrato documentados en `plantel-03-2026-11-17.md`; la lectura requiere JWT y no restringe por membresía. Prueba frontend distingue fallo de plantel y lista vacía, y comprueba reintento. El historial previo no se auditó individualmente; beta pendiente.
+
 ## PJ con el equipo · 17/11/2026
 
 - Tabla y ficha muestran PJ con el equipo junto a PJ totales. El campo opcional `teamMatches` proviene del historial de partidos finalizados y cuenta encuentros distintos; sin historial del equipo se muestra «Sin datos». PJ totales conserva su fuente de rating y puede tener cobertura distinta. Pruebas simuladas y validación beta pendiente.

@@ -71,6 +71,18 @@ describe('TeamDetailPage', () => {
     expect(fixture.nativeElement.textContent).toContain('No hay integrantes activos.');
   });
 
+  it('shows an error and retries when the roster endpoint fails', () => {
+    teamApiService.getActiveMembers.and.returnValue(throwError(() => new HttpErrorResponse({ status: 500 })));
+    component.ionViewWillEnter();
+    fixture.detectChanges();
+    expect(fixture.nativeElement.textContent).toContain('No pudimos cargar el equipo');
+    expect(fixture.nativeElement.textContent).not.toContain('No hay integrantes activos');
+    teamApiService.getActiveMembers.and.returnValue(of([]));
+    fixture.nativeElement.querySelector('.team-error button').click();
+    fixture.detectChanges();
+    expect(fixture.nativeElement.textContent).toContain('No hay integrantes activos');
+  });
+
   it('shows team goals and career goals separately, preserving zero and missing data', () => {
     teamApiService.getActiveMembers.and.returnValue(of([{
       playerUuid: 'player-uuid', alias: 'Demo10', rol: 'CAPITAN', primaryPositionId: null,
