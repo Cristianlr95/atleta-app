@@ -47,13 +47,13 @@ La finalización de H5 corresponde a la interfaz local aprobada. Las estadístic
 
 Decisión del usuario del 17/11: al filtrar por posición se muestran ambos alcances para goles, MVP y resultados: partidos jugados en la posición filtrada y trayectoria completa, claramente identificados. El ranking de equipo usa partidos de ese equipo. Se usa la posición registrada en cada participación y se distinguen datos ausentes de cero.
 
-Avance local BE-RANK-01 a 05: goles, MVP oficiales resueltos y hasta cinco resultados de historial finalizado, agregados en lote para ranking global, posición y equipo. Posiciones históricas no clasificables dejan el alcance por posición como desconocido. 738 pruebas backend H2, 2 pruebas sintéticas PostgreSQL 18, 279 frontend, lint/build y 2 recorridos Chromium simulados aprobados. Pendientes integración, revisión de datos reales y beta; no desplegado. [Detalle y límites](ranking-stats-2026-11-17/verificacion.md).
+Avance local BE-RANK-01 a 05: goles, MVP oficiales resueltos y hasta cinco resultados de historial finalizado, agregados en lote para ranking global, posición y equipo. Posiciones históricas no clasificables dejan el alcance por posición como desconocido. 739 pruebas backend H2, 2 pruebas sintéticas PostgreSQL 18, 279 frontend, lint/build y 2 recorridos Chromium simulados aprobados. Pendientes integración, revisión de datos reales y beta; no desplegado. [Detalle y límites](ranking-stats-2026-11-17/verificacion.md).
 
 1. Validar flujos completos con datos reales de beta, incluidos cierre, voto MVP y notificaciones.
 2. Revisar accesibilidad con lectores de pantalla y dispositivos físicos, además de contrastes sobre imágenes.
 3. Ampliar la revisión visual y de errores a las combinaciones de perfil, equipos, agenda y ranking fuera de los escenarios documentados en H0/H3 y H5.
-4. Ajustar el balance de progresión con datos reales de partidas y revisar el motor XPService independiente antes de conectarlo al cierre.
-5. Revisar los avisos restantes de las dependencias de desarrollo y validar la aplicación Android en dispositivos reales. La versión de Piscina se fija temporalmente a 5.3.2 para corregir un aviso crítico; retirar esta excepción cuando Angular incorpore una versión corregida y verificar la compilación.
+4. El motor XPService independiente fue revisado localmente: usa reglas distintas al cierre, carece del límite actual y necesita validar límites/posiciones antes de cualquier conexión. [Revisión](../../../atleta-server/docs/revision-xp-independiente-2026-11-17.md). Siguen pendientes decisión de reglas y balance con datos reales.
+5. Auditoría npm del 17/11: producción sin avisos; dependencias totales 1 bajo, 30 moderados y 39 altos. Revisar actualizaciones de desarrollo en una entrega específica y validar Android en dispositivo real. Piscina sigue fijada temporalmente a 5.3.2; revisar al actualizar Angular.
 
 ## Progresión de posición
 

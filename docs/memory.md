@@ -1,5 +1,10 @@
 # Memory Vivo - Atleta Frontend
 
+## Auditoría de dependencias · 17/11/2026
+
+- `npm audit` informó 1 aviso bajo, 30 moderados, 39 altos y cero críticos (70 totales); `npm audit --omit=dev` informó cero. Son datos del lockfile y del registro consultado en esa fecha; no se actualizaron dependencias ni se supone que cada aviso sea explotable en el despliegue. Revisar la actualización de herramientas en una entrega específica.
+- La simulación `npm audit fix --dry-run --ignore-scripts` propuso 42 adiciones, 33 retiradas y 226 cambios; no se aplicó una actualización masiva. Angular CLI/build tienen avisos transitivos altos; la revisión debe acotar versiones y repetir lint, build, pruebas y auditoría. El detalle de la consulta y simulación quedó en `.tmp` del proyecto.
+
 ## Ranking: MVP y resultados · 17/11/2026
 
 - Implementación local BE-RANK-01 a 05: goles, MVP oficiales y últimos cinco resultados en rankings global, por posición y por equipo; para posición se muestran trayectoria y posición, y los resultados se ordenan del más antiguo al más reciente. Dos consultas agrupadas por ranking; sin nuevas solicitudes frontend por jugador. Validado con datos sintéticos, no beta ni datos reales. `docs/ranking-stats-2026-11-17/verificacion.md`.
