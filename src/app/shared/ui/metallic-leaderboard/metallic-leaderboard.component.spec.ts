@@ -55,4 +55,12 @@ describe('MetallicLeaderboardComponent', () => {
     expect(rows[1].querySelector('.leaderboard__mvp')?.textContent).toContain('0');
     expect(rows[1].querySelector('.leaderboard__form')?.textContent).toContain('Sin partidos');
   });
+
+  it('labels career and position goals and preserves a position zero', () => {
+    component.rows = [{ rank: 1, alias: 'Ana', scoreText: '80 OVR', goalsScored: 5, goalsForRole: 0 }];
+    fixture.detectChanges();
+    const goals = fixture.nativeElement.querySelector('.leaderboard__goals').textContent;
+    expect(goals).toContain('Total: 5');
+    expect(goals).toContain('Posición: 0');
+  });
 });

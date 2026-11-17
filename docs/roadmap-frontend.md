@@ -45,6 +45,10 @@ Integración con main validada el 16/11/2026 para el push solicitado: 271 unitar
 
 La finalización de H5 corresponde a la interfaz local aprobada. Conectar goles, MVP y últimos cinco resultados a la API sigue pendiente en `BE-RANK-01` a `BE-RANK-05` (`atleta-server/docs/backlog-ranking-h5.md`, rama `codex/h5-ranking-backlog-20261116`). Incluye adaptación de modelos/servicio frontend, cuenta de prueba y validación móvil/escritorio en beta.
 
+Decisión del usuario del 17/11: al filtrar por posición se deben mostrar ambos alcances para goles, MVP y resultados: partidos jugados en la posición filtrada y trayectoria completa, claramente identificados. En ranking de equipo, conservar además el alcance del equipo. Usar la posición registrada en cada participación y distinguir datos ausentes de cero. La implementación y verificación siguen pendientes.
+
+Avance local BE-RANK-01: Ranking global y de equipo reciben goles agregados desde historial de partidos finalizados; al filtrar por posición se muestran trayectoria y posición. Una posición histórica no clasificable deja el dato por posición como desconocido. 66 pruebas backend dirigidas, 7 frontend, lint/build y 2 recorridos Chromium simulados aprobados. Pendientes MVP, últimos resultados, PostgreSQL y datos reales/beta; no desplegado.
+
 1. Validar flujos completos con datos reales de beta, incluidos cierre, voto MVP y notificaciones.
 2. Revisar accesibilidad con lectores de pantalla y dispositivos físicos, además de contrastes sobre imágenes.
 3. Ampliar la revisión visual y de errores a las combinaciones de perfil, equipos, agenda y ranking fuera de los escenarios documentados en H0/H3 y H5.

@@ -47,6 +47,8 @@ export interface OverallRating {
 }
 
 export interface LeaderboardEntry {
+  goalsScored?: number | null;
+  goalsForRole?: number | null;
   playerProfileId: string;
   playerId?: string;
   alias: string;

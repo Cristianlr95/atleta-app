@@ -6,6 +6,8 @@ import { LeaderboardEntry, RoleType } from '../models/rating.models';
 import { RatingsApiService } from './ratings-api.service';
 
 export interface LeaderboardViewEntry {
+  goalsScored?: number | null;
+  goalsForRole?: number | null;
   rank: number;
   playerProfileId?: string;
   alias: string;
@@ -43,6 +45,7 @@ export class LeaderboardService {
           : 'Sin rating',
         metaText: entry.rated ? `${entry.matchesPlayed} partidos` : 'Aun sin partidos puntuados',
         matchesPlayed: entry.matchesPlayed,
+        ...(entry.goalsScored !== undefined ? { goalsScored: entry.goalsScored } : {}),
       }))),
     );
   }
@@ -58,6 +61,8 @@ export class LeaderboardService {
         metaText: entry.matchesPlayed !== undefined ? `${entry.matchesPlayed} partidos` : undefined,
         roleText: entry.roleType ? this.roleLabel(entry.roleType) : undefined,
         matchesPlayed: entry.matchesPlayed,
+        ...(entry.goalsScored !== undefined ? { goalsScored: entry.goalsScored } : {}),
+        ...(entry.goalsForRole !== undefined && label !== 'OVR' ? { goalsForRole: entry.goalsForRole } : {}),
       }));
   }
 

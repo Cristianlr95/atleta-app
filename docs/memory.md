@@ -1,5 +1,9 @@
 # Memory Vivo - Atleta Frontend
 
+## Ranking: goles · 17/11/2026
+
+- Avance BE-RANK-01 en rama `feature/ranking-stats-20261117`: API de ranking entrega goles de trayectoria/posición o del equipo, calculados en lote desde historiales finalizados. La interfaz distingue ambos alcances y conserva cero/ausencia. 66 pruebas backend dirigidas, 7 frontend, lint/build y 2 E2E simulados correctos. MVP, resultados, PostgreSQL y beta pendientes; sin publicación.
+
 ## BE-PLANTEL-04 · 17/11/2026
 
 - Comprobación local: promedio incluye cero y excluye error 500, con cobertura 2/3 y aviso; 12 pruebas dirigidas aprobadas. El endpoint de miembros tiene fallback 65 que la vista no utiliza para el promedio. La cuenta de prueba existe pero no tiene sesión abierta; por indicación del usuario el contraste con datos reales queda pendiente. Detalle: `plantel-04-2026-11-17.md`.

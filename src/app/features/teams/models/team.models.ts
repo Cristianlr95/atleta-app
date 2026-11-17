@@ -44,6 +44,7 @@ export interface TeamActiveMember {
 }
 
 export interface TeamLeaderboardEntry {
+  goalsScored?: number | null;
   rank: number;
   playerProfileId: string;
   alias: string;

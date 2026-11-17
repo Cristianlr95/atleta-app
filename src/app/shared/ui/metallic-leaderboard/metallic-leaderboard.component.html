@@ -35,7 +35,7 @@
           <td class="leaderboard__score">{{ row.scoreText }}</td>
           <td *ngIf="showRole" class="leaderboard__role">{{ row.roleText || '—' }}</td>
           <td class="leaderboard__matches">{{ row.matchesPlayed ?? '—' }}</td>
-          <td class="leaderboard__goals">{{ row.goalsScored ?? '—' }}</td>
+          <td class="leaderboard__goals"><ng-container *ngIf="row.goalsForRole !== undefined; else singleGoals">Total: {{ row.goalsScored ?? '—' }} · Posición: {{ row.goalsForRole ?? '—' }}</ng-container><ng-template #singleGoals>{{ row.goalsScored ?? '—' }}</ng-template></td>
           <td class="leaderboard__mvp">{{ row.mvpCount ?? '—' }}</td>
           <td class="leaderboard__form">
             <div class="leaderboard__results" *ngIf="row.recentResults?.length; else noResults" role="group" aria-label="Últimos resultados, más reciente a la derecha">

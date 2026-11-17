@@ -9,7 +9,8 @@ export interface LeaderboardDisplayRow {
   metaText?: string;
   roleText?: string;
   matchesPlayed?: number;
-  goalsScored?: number;
+  goalsScored?: number | null;
+  goalsForRole?: number | null;
   mvpCount?: number;
   recentResults?: ReadonlyArray<'G' | 'E' | 'P'>;
 }
