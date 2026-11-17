@@ -16,6 +16,7 @@ for (const width of [390, 1440]) {
     await page.goto('/leaderboard');
     await expect(page.locator('.leaderboard__goals').first()).toHaveText('5');
     await page.getByLabel('Clasificar por').selectOption('ROLE');
+    await expect(page.getByText('Posición: la registrada para cada partido.')).toBeVisible();
     await expect(page.locator('.leaderboard__goals').first()).toContainText('Total: 5');
     await expect(page.locator('.leaderboard__goals').first()).toContainText('Posición: 0');
     await expect(page.locator('.leaderboard__mvp').first()).toContainText('Total: 2');
@@ -29,6 +30,11 @@ for (const width of [390, 1440]) {
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
     const table = page.getByRole('region', { name: 'Estadísticas de jugadores, desplazamiento horizontal' });
     await table.scrollIntoViewIfNeeded();
+    if (width === 390) {
+      await table.focus();
+      await page.keyboard.press('ArrowRight');
+      await expect.poll(() => table.evaluate(element => element.scrollLeft)).toBeGreaterThan(0);
+    }
     await table.evaluate(element => { element.scrollLeft = element.scrollWidth; });
     const directory = join(process.cwd(), 'docs', 'ranking-stats-2026-11-17');
     mkdirSync(directory, { recursive: true });

@@ -54,6 +54,7 @@
     </table>
   </div>
   <div *ngIf="rows.length > 0" class="leaderboard__legend">
+    <span *ngIf="showPositionScope">Posición: la registrada para cada partido.</span>
     <span>G: ganado · E: empatado · P: perdido</span>
     <span>Más reciente a la derecha →</span>
     <span>—: estadística no disponible</span>

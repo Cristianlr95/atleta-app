@@ -32,6 +32,7 @@ export class MetallicLeaderboardComponent {
   @Input() currentPlayerId: string | null = null;
   @Input() showRole = false;
   @Input() resultsScopeLabel = 'de trayectoria';
+  @Input() showPositionScope = false;
   @Input() emptyMessage = 'Todavía no hay datos para este ranking.';
 
   readonly podiumIconAsset = `${this.iconBase}/ic_nav_ranking_96.png`;
