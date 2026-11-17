@@ -33,7 +33,7 @@ Integración con main validada el 16/11/2026 para el push solicitado: 271 unitar
 
 ### Validación en beta de Perfil y Plantel
 
-**Estado: pendiente; sin cuenta de prueba confirmada.** Antes de comenzar, registrar URL/entorno y SHA frontend/backend, y comprobar que la versión desplegada corresponde al cambio aprobado. Usar credenciales por un canal privado.
+**Estado: pendiente.** El usuario confirmó que existe una cuenta de prueba, pero no hay sesión abierta. El navegador bloqueó la apertura de la beta por falta de autorización de acceso al origen. Antes de comenzar, registrar URL/entorno y SHA frontend/backend, y comprobar que la versión desplegada corresponde al cambio aprobado. Usar credenciales por un canal privado.
 
 - [ ] Cuenta activa y datos representativos: perfil con historial y perfil nuevo; equipo con varios integrantes, sin integrantes y con valoraciones ausentes y cero válido.
 - [ ] Contrastar OVR, cobertura y medias por posición con la API real; verificar origen/alcance de PJ, goles y asistencias cuando se entreguen.
@@ -43,11 +43,13 @@ Integración con main validada el 16/11/2026 para el push solicitado: 271 unitar
 
 ### Otros pendientes del roadmap
 
-La finalización de H5 corresponde a la interfaz local aprobada. Las estadísticas BE-RANK-01 a BE-RANK-05 están implementadas localmente; falta integrarlas y validarlas en beta con datos reales. El backlog original está en `atleta-server` rama `codex/h5-ranking-backlog-20261116`.
+La finalización de H5 corresponde a la interfaz local aprobada. Las estadísticas BE-RANK-01 a BE-RANK-05 están integradas en ambos `main` locales; falta validarlas en beta con datos reales. El backlog original está en `atleta-server` rama `codex/h5-ranking-backlog-20261116`.
 
 Decisión del usuario del 17/11: al filtrar por posición se muestran ambos alcances para goles, MVP y resultados: partidos jugados en la posición filtrada y trayectoria completa, claramente identificados. El ranking de equipo usa partidos de ese equipo. Se usa la posición registrada en cada participación y se distinguen datos ausentes de cero.
 
-Avance local BE-RANK-01 a 05: goles, MVP oficiales resueltos y hasta cinco resultados de historial finalizado, agregados en lote para ranking global, posición y equipo. Posiciones históricas no clasificables dejan el alcance por posición como desconocido. 739 pruebas backend H2, 2 pruebas sintéticas PostgreSQL 18, 279 frontend, lint/build y 2 recorridos Chromium simulados aprobados. Pendientes integración, revisión de datos reales y beta; no desplegado. [Detalle y límites](ranking-stats-2026-11-17/verificacion.md).
+Avance local BE-RANK-01 a 05: goles, MVP oficiales resueltos y hasta cinco resultados de historial finalizado, agregados en lote para ranking global, posición y equipo. Posiciones históricas no clasificables dejan el alcance por posición como desconocido. 739 pruebas backend H2, 2 pruebas sintéticas PostgreSQL 18, 279 frontend, lint/build y 2 recorridos Chromium simulados aprobados. Pendientes revisión de datos reales y beta; no desplegado. [Detalle y límites](ranking-stats-2026-11-17/verificacion.md).
+
+La rama frontend `fix/plantel-ovr-null-20261117` corrige la conversión de OVR nulo a cero en la convocatoria, manteniendo el respaldo 65 y el cero válido. Probada localmente; integración pendiente. La creación de partidos consume el OVR del endpoint de plantel, por lo que un cambio del respaldo de la API requiere revisar ese flujo y la compatibilidad de otros clientes.
 
 1. Validar flujos completos con datos reales de beta, incluidos cierre, voto MVP y notificaciones.
 2. Revisar accesibilidad con lectores de pantalla y dispositivos físicos, además de contrastes sobre imágenes.

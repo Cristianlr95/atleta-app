@@ -14,4 +14,4 @@ Verificación: 739 pruebas backend completas en H2 sin fallos ni omisiones, incl
 
 La prueba que conecta consulta y servicio detectó que H2 devolvía el identificador de la consulta nativa como bytes. La consulta ahora lo proyecta como texto UUID; el escenario completo de goles, MVP y resultados pasó después en H2 y PostgreSQL 18 sintéticos. La suite backend completa se repitió tras el ajuste.
 
-Pendientes: integrar ambas ramas en `main`, verificar con datos reales y beta, lector de pantalla y teléfono físico. El cluster temporal PostgreSQL con datos sintéticos quedó detenido en `.tmp/ranking-pg-20261117`; no contiene datos reales. No se modificaron históricos ni se desplegó.
+Integración local: ambas ramas se incorporaron por avance directo a `main` el 17/11; frontend `cd37cd2` y backend `9a913c5` al integrar. Después se verificaron 36 pruebas backend dirigidas y 7 frontend de Ranking. Pendientes datos reales y beta, lector de pantalla y teléfono físico. El cluster temporal PostgreSQL con datos sintéticos quedó detenido en `.tmp/ranking-pg-20261117`; no contiene datos reales. No se modificaron históricos ni se desplegó.

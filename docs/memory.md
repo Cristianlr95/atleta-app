@@ -1,5 +1,10 @@
 # Memory Vivo - Atleta Frontend
 
+## Integración local de Ranking y OVR de convocatoria · 17/11/2026
+
+- Ranking integrado por avance directo en `main` local frontend (`cd37cd2`) y backend (`9a913c5`); 36 pruebas backend y 7 frontend dirigidas pasaron después. Sin push ni despliegue. La beta documentada no pudo abrirse por el control de acceso del navegador; la cuenta de prueba no tiene sesión abierta.
+- Rama `fix/plantel-ovr-null-20261117` (`9b97769`): al preparar la convocatoria, OVR nulo usa el respaldo 65 y cero válido permanece cero. La prueba reprodujo primero el fallo; 280 pruebas frontend, lint y build pasaron. La rama no está integrada en main. El endpoint de plantel también es consumido para crear partidos; no modificar su respaldo sin contemplar ese flujo y otros clientes.
+
 ## Auditoría de dependencias · 17/11/2026
 
 - `npm audit` informó 1 aviso bajo, 30 moderados, 39 altos y cero críticos (70 totales); `npm audit --omit=dev` informó cero. Son datos del lockfile y del registro consultado en esa fecha; no se actualizaron dependencias ni se supone que cada aviso sea explotable en el despliegue. Revisar la actualización de herramientas en una entrega específica.
