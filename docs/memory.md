@@ -1,5 +1,9 @@
 # Memory Vivo - Atleta Frontend
 
+## BE-PLANTEL-04 · 17/11/2026
+
+- Comprobación local: promedio incluye cero y excluye error 500, con cobertura 2/3 y aviso; 12 pruebas dirigidas aprobadas. El endpoint de miembros tiene fallback 65 que la vista no utiliza para el promedio. La cuenta de prueba existe pero no tiene sesión abierta; por indicación del usuario el contraste con datos reales queda pendiente. Detalle: `plantel-04-2026-11-17.md`.
+
 ## BE-PLANTEL-03 · 17/11/2026
 
 - Reglas y contrato documentados en `plantel-03-2026-11-17.md`; la lectura requiere JWT y no restringe por membresía. Prueba frontend distingue fallo de plantel y lista vacía, y comprueba reintento. El historial previo no se auditó individualmente; beta pendiente.

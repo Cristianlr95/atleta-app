@@ -178,4 +178,19 @@ describe('TeamDetailPage', () => {
     expect(component.teamOvr).toBeNull();
     expect(component.teamRoleStats).toEqual([]);
   });
+
+  it('reports coverage and excludes failed ratings while retaining valid zero', () => {
+    teamApiService.getActiveMembers.and.returnValue(of(['a', 'b', 'c'].map(playerUuid => ({ playerUuid, alias: playerUuid, rol: 'JUGADOR' as const, primaryPositionId: null, primaryPositionName: null }))));
+    ratingsApiService.getOverall.and.returnValues(
+      of({ hybridOVR: 80, roleBreakdown: { ATAQUE: 80 } } as any),
+      of({ hybridOVR: 0, roleBreakdown: { ATAQUE: 0 } } as any),
+      throwError(() => new HttpErrorResponse({ status: 500 })),
+    );
+    component.ionViewWillEnter();
+    fixture.detectChanges();
+    expect(component.teamOvr).toBe(40);
+    expect(component.teamRoleStats).toEqual([{ role: 'ATAQUE', rating: 40 }]);
+    expect(fixture.nativeElement.querySelector('.team-overall').textContent).toContain('2 de 3 jugadores valorados');
+    expect(fixture.nativeElement.textContent).toContain('No pudimos cargar las valoraciones');
+  });
 });
