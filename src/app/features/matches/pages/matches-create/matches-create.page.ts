@@ -420,7 +420,7 @@ export class MatchesCreatePage {
         name: member.alias,
         position: member.primaryPositionName ?? 'Sin posición',
         role: member.rol,
-        ovr: Number.isFinite(Number(member.ovr)) ? Math.round(Number(member.ovr)) : 65,
+        ovr: member.ovr != null && Number.isFinite(member.ovr) ? member.ovr : 65,
       } as Player));
       this.teamPlayers.set(players);
     } catch (error) {

@@ -72,6 +72,19 @@ describe('MatchesCreatePage convocatoria', () => {
     expect(page.teamPlayers().map(player => player.uuid)).toEqual(['player-1']);
   });
 
+  it('uses 65 for null or absent ratings and preserves numeric ratings', async () => {
+    const member = { rol: 'JUGADOR' as const, primaryPositionId: null, primaryPositionName: null };
+    spyOn(TestBed.inject(TeamApiService), 'getActiveMembers').and.returnValue(of([
+      { ...member, playerUuid: 'unrated', alias: 'Sin valoración', ovr: null },
+      { ...member, playerUuid: 'absent', alias: 'Sin dato' },
+      { ...member, playerUuid: 'zero', alias: 'Cero', ovr: 0 },
+      { ...member, playerUuid: 'rated', alias: 'Valorado', ovr: 74.6 },
+    ]));
+    page.schedule.update(value => ({ ...value, teamId: 1 }));
+    await page.onRetryLoadPlayers();
+    expect(page.teamPlayers().map(player => player.ovr)).toEqual([65, 65, 0, 74.6]);
+  });
+
   it('sends exactly the unique invitees shown by the selection', async () => {
     page.teams.set([{ id: 1, nombre: 'Equipo' }]);
     page.schedule.update(value => ({ ...value, teamId: 1 }));
