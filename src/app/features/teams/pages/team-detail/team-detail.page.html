@@ -32,7 +32,15 @@
               <caption class="visually-hidden">Jugadores del plantel. Selecciona un nombre para abrir su ficha sin salir del equipo.</caption>
               <thead><tr><th scope="col">Jugador</th><th scope="col">Posición</th><th scope="col">OVR</th><th scope="col">PJ totales</th><th scope="col">PJ con el equipo</th><th scope="col">Goles con el equipo</th><th scope="col">Goles totales</th><th scope="col">Asistencias con el equipo</th><th scope="col">Asistencias totales</th><th scope="col">Rol</th></tr></thead>
               <tbody><tr class="team-member" *ngFor="let member of members">
-                <th scope="row"><button type="button" class="team-player-button" [attr.aria-label]="'Ver ficha de ' + member.alias" (click)="openPlayer(member)"><span class="team-member__player"><img *ngIf="member.pictureUrl" [src]="member.pictureUrl" alt="" (error)="member.pictureUrl = null"><i *ngIf="!member.pictureUrl" aria-hidden="true">{{ member.alias.charAt(0) }}</i></span>{{ member.alias }}</button></th>
+                <th scope="row">
+                  <button type="button" class="team-player-button" [attr.aria-label]="'Ver ficha de ' + member.alias"
+                    [attr.aria-describedby]="member.rol === 'CAPITAN' ? 'captain-armband-' + member.playerUuid : null"
+                    (click)="openPlayer(member)">
+                    <span class="team-member__player"><img *ngIf="member.pictureUrl" [src]="member.pictureUrl" alt="" (error)="member.pictureUrl = null"><i *ngIf="!member.pictureUrl" aria-hidden="true">{{ member.alias.charAt(0) }}</i></span>
+                    <span>{{ member.alias }} <span *ngIf="member.rol === 'CAPITAN'" class="captain-armband"
+                      [id]="'captain-armband-' + member.playerUuid" role="img" aria-label="Capitán del equipo">C</span></span>
+                  </button>
+                </th>
                 <td>{{ member.primaryPositionName || 'Sin posición' }}</td>
                 <td class="team-member__ovr">{{ member.ratingUnavailable ? 'No disponible' : member.ovr !== null ? (member.ovr | number:'1.0-1') : 'Sin valoración' }}<span *ngIf="member.ratingUnavailable" class="team-rating-error" role="alert">No pudimos cargar las valoraciones.</span><button *ngIf="member.ratingUnavailable" type="button" class="team-rating-retry" [attr.aria-label]="'Reintentar valoraciones de ' + member.alias" (click)="onRetry()">Reintentar</button></td>
                 <td>{{ member.matchesPlayed ?? 'Sin datos' }}</td><td>{{ member.teamMatches ?? 'Sin datos' }}</td><td>{{ member.teamGoals ?? 'Sin datos' }}</td><td>{{ member.totalGoals ?? 'Sin datos' }}</td><td>{{ member.teamAssists ?? 'Sin datos' }}</td><td>{{ member.totalAssists ?? 'Sin datos' }}</td><td>{{ member.rol === 'CAPITAN' ? 'Capitán' : member.rol === 'DT' ? 'DT' : 'Jugador' }}</td>
@@ -53,7 +61,13 @@
 <ion-modal class="player-modal" [isOpen]="selectedMember !== null" aria-label="Ficha del jugador" (didDismiss)="selectedMember = null">
   <ng-template>
     <section *ngIf="selectedMember as member" class="player-dialog">
-      <header class="player-dialog__header"><div><p>Ficha del jugador</p><h2>{{ member.alias }}</h2></div><button type="button" class="player-dialog__close" (click)="selectedMember = null">Cerrar ficha</button></header>
+      <header class="player-dialog__header">
+        <div>
+          <p>Ficha del jugador</p>
+          <h2>{{ member.alias }} <span *ngIf="member.rol === 'CAPITAN'" class="captain-armband" role="img" aria-label="Capitán del equipo">C</span></h2>
+        </div>
+        <button type="button" class="player-dialog__close" (click)="selectedMember = null">Cerrar ficha</button>
+      </header>
       <div class="player-dialog__performance">
         <div class="player-dialog__ovr"><span>OVR</span><strong [class.is-unavailable]="member.ovr === null || member.ratingUnavailable">{{ member.ratingUnavailable ? 'No disponible' : member.ovr !== null ? (member.ovr | number:'1.0-1') : 'Sin valoración' }}</strong></div>
         <app-metallic-role-hexagon *ngIf="member.roleStats.length > 0" #playerRadar [stats]="member.roleStats" [embedded]="true" [showSummary]="false" [showClassification]="false" [title]="'Rendimiento de ' + member.alias" subtitle=""></app-metallic-role-hexagon>

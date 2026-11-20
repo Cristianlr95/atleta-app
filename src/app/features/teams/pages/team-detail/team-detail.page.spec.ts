@@ -1,6 +1,8 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { By } from '@angular/platform-browser';
 import { ActivatedRoute } from '@angular/router';
+import { IonModal } from '@ionic/angular';
 import { of, throwError } from 'rxjs';
 import { NavigationService } from 'src/app/core/services/navigation.service';
 import { NotificationBadgeService } from 'src/app/features/matches/services/notification-badge.service';
@@ -59,6 +61,33 @@ describe('TeamDetailPage', () => {
     expect(fixture.nativeElement.textContent).toContain('Demo10');
     expect(component.selectedMember?.alias).toBe('Demo10');
     expect(navigationService.safeNavigate).not.toHaveBeenCalled();
+  });
+
+  it('shows an accessible captain armband in the roster and the player card only for the team captain', () => {
+    teamApiService.getActiveMembers.and.returnValue(of([
+      { playerUuid: 'captain', alias: 'Demo10', rol: 'CAPITAN', primaryPositionId: 9, primaryPositionName: 'Delantero' },
+      { playerUuid: 'player', alias: 'Demo11', rol: 'JUGADOR', primaryPositionId: null, primaryPositionName: null },
+    ]));
+    component.ionViewWillEnter();
+    fixture.detectChanges();
+
+    const badgeSelector = '[role="img"][aria-label="Capitán del equipo"]';
+    const [captain, player] = fixture.nativeElement.querySelectorAll('.team-player-button');
+    const badge = captain.querySelector(badgeSelector);
+    expect(badge?.textContent.trim()).toBe('C');
+    expect(captain.getAttribute('aria-describedby')).toBe(badge?.id);
+    expect(player.querySelector(badgeSelector)).toBeNull();
+    expect(player.hasAttribute('aria-describedby')).toBeFalse();
+
+    const modal = fixture.debugElement.query(By.directive(IonModal)).injector.get(IonModal);
+    for (const [trigger, expectedBadge] of [[captain, 'C'], [player, undefined]]) {
+      trigger.click();
+      const view = modal.template.createEmbeddedView({});
+      view.detectChanges();
+      const card = view.rootNodes.find(node => node.nodeType === Node.ELEMENT_NODE);
+      expect(card.querySelector(badgeSelector)?.textContent.trim()).toBe(expectedBadge);
+      view.destroy();
+    }
   });
 
   it('renders the team and its empty roster when there are no active members', () => {

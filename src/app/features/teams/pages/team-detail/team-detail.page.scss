@@ -37,6 +37,18 @@ h2 { font-size: 21px; }
 .team-table tr:last-child > * { border-bottom: 0; }
 .team-player-button { display: flex; align-items: center; gap: 8px; width: 100%; min-height: 44px; padding: 0; border: 0; background: transparent; color: var(--text-primary); text-align: left; font: 700 16px var(--font-family-body); }
 .team-player-button:hover { color: var(--tactical-visit); }
+.captain-armband {
+  display: inline-block;
+  min-width: 1.75rem;
+  padding: 2px 4px;
+  border-block: 2px solid var(--tactical-visit);
+  border-radius: 3px;
+  background: #123343;
+  color: var(--text-primary);
+  font: 700 13px/1 var(--font-family-display);
+  text-align: center;
+  vertical-align: middle;
+}
 .team-member__player img, .team-member__player i { display: block; width: 28px; height: 32px; object-fit: cover; border-radius: 4px; }
 .team-member__player i { display: grid; place-items: center; color: var(--tactical-visit); background: #123343; font: 700 20px var(--font-family-display); }
 .team-member__ovr { color: var(--tactical-local); font-weight: 700; }
