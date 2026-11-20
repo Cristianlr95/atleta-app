@@ -29,6 +29,11 @@ export interface CreateTeamRequest {
   anioFundacion?: number;
 }
 
+export interface TeamCaptainResponse {
+  teamId: number;
+  captainPlayerUuid: string;
+}
+
 export interface TeamActiveMember {
   teamMatches?: number | null;
   teamAssists?: number | null;

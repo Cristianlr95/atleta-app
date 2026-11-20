@@ -4,6 +4,7 @@ import { ApiService } from 'src/app/core/services/api.service';
 import {
   CreateTeamRequest,
   TeamActiveMember,
+  TeamCaptainResponse,
   TeamExternalRecord,
   TeamLeaderboardEntry,
   TeamSummary,
@@ -35,6 +36,12 @@ export class TeamApiService extends ApiService {
 
   getActiveMembers(teamId: number) {
     return this.get<TeamActiveMember[]>(`${API_ENDPOINTS.teams.base}/${teamId}/members/active`);
+  }
+
+  transferCaptain(teamId: number, targetPlayerUuid: string) {
+    return this.put<TeamCaptainResponse, { targetPlayerUuid: string }>(
+      `${API_ENDPOINTS.teams.base}/${teamId}/captain`, { targetPlayerUuid },
+    );
   }
 
   getLeaderboard(teamId: number) {

@@ -2,6 +2,7 @@
   <main class="team-container">
     <button type="button" class="team-back" (click)="onBack()">‹ Volver</button>
     <app-metallic-card>
+      <p #captainFeedback class="captain-feedback" role="status" tabindex="-1">{{ captainFeedbackText }}</p>
       <p class="team-status" role="status" *ngIf="isLoading">Cargando equipo...</p>
       <section class="team-error" role="alert" *ngIf="errorMessage">
         <h2>{{ notFound ? 'Equipo no encontrado' : 'No se pudo cargar' }}</h2><p>{{ errorMessage }}</p>
@@ -25,6 +26,16 @@
           <ng-template #noTeamRatings><p class="team-status">Aún no hay valoraciones por posición para el equipo.</p></ng-template>
         </section>
         <section class="team-members"><div class="team-members__heading"><h2>Plantel activo</h2><span>{{ members.length }} jugadores</span></div>
+          <form *ngIf="canTransferCaptain && captainCandidates.length" class="captain-transfer team-actions"
+            (submit)="$event.preventDefault(); transferCaptain()">
+            <label for="captain-target">Nuevo capitán</label>
+            <select id="captain-target" #captainSelect [value]="captainTarget" [disabled]="isTransferringCaptain"
+              (change)="captainTarget = captainSelect.value">
+              <option value="">Selecciona un integrante activo</option>
+              <option *ngFor="let member of captainCandidates" [value]="member.playerUuid">{{ member.alias }}</option>
+            </select>
+            <button type="submit" [disabled]="!captainTarget || isTransferringCaptain">Transferir capitanía</button>
+          </form>
           <p class="team-data-note">PJ, goles y asistencias con el equipo corresponden a este equipo; los totales abarcan toda la trayectoria. Sin historial registrado se muestra «Sin datos».</p>
           <p class="team-scroll-hint">Desliza para ver partidos, goles y asistencias.</p>
           <div class="team-table-scroll" tabindex="0" role="region" aria-label="Lista de jugadores, desplazamiento horizontal">

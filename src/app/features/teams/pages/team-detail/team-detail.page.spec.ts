@@ -3,11 +3,13 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { ActivatedRoute } from '@angular/router';
 import { IonModal } from '@ionic/angular';
-import { of, throwError } from 'rxjs';
+import { Subject, of, throwError } from 'rxjs';
+import { AuthSessionService } from 'src/app/core/services/auth-session.service';
 import { NavigationService } from 'src/app/core/services/navigation.service';
 import { NotificationBadgeService } from 'src/app/features/matches/services/notification-badge.service';
 import { RatingsApiService } from 'src/app/features/ratings/services/ratings-api.service';
 import { UserApiService } from 'src/app/features/user/services/user-api.service';
+import { TeamActiveMember, TeamCaptainResponse } from '../../models/team.models';
 import { TeamApiService } from '../../services/team-api.service';
 import { TeamDetailPage } from './team-detail.page';
 
@@ -18,9 +20,17 @@ describe('TeamDetailPage', () => {
   let navigationService: jasmine.SpyObj<NavigationService>;
   let userApiService: jasmine.SpyObj<UserApiService>;
   let ratingsApiService: jasmine.SpyObj<RatingsApiService>;
+  let session: { currentSession: { user: { atletaUuid: string } } };
+  const captain: TeamActiveMember = {
+    playerUuid: 'player-uuid', alias: 'Demo10', rol: 'CAPITAN', primaryPositionId: 9, primaryPositionName: 'Delantero',
+  };
+  const successor: TeamActiveMember = {
+    playerUuid: 'successor', alias: 'Demo11', rol: 'JUGADOR', primaryPositionId: 3, primaryPositionName: 'Defensa',
+  };
 
   beforeEach(async () => {
-    teamApiService = jasmine.createSpyObj<TeamApiService>('TeamApiService', ['getById', 'getActiveMembers']);
+    session = { currentSession: { user: { atletaUuid: captain.playerUuid } } };
+    teamApiService = jasmine.createSpyObj<TeamApiService>('TeamApiService', ['getById', 'getActiveMembers', 'transferCaptain']);
     navigationService = jasmine.createSpyObj<NavigationService>('NavigationService', [
       'safeNavigate', 'goBackOrProfile', 'goToProfile',
     ]);
@@ -39,6 +49,7 @@ describe('TeamDetailPage', () => {
       imports: [TeamDetailPage],
       providers: [
         { provide: TeamApiService, useValue: teamApiService },
+        { provide: AuthSessionService, useValue: session },
         { provide: NavigationService, useValue: navigationService },
         { provide: UserApiService, useValue: userApiService },
         { provide: RatingsApiService, useValue: ratingsApiService },
@@ -48,6 +59,96 @@ describe('TeamDetailPage', () => {
     }).compileComponents();
     fixture = TestBed.createComponent(TeamDetailPage);
     component = fixture.componentInstance;
+  });
+
+  function loadCaptainRoster(): void {
+    teamApiService.getActiveMembers.and.returnValue(of([captain, successor]));
+    component.ionViewWillEnter();
+    fixture.detectChanges();
+  }
+
+  function selectSuccessor(): HTMLButtonElement {
+    const select: HTMLSelectElement = fixture.nativeElement.querySelector('#captain-target');
+    select.value = successor.playerUuid;
+    select.dispatchEvent(new Event('change'));
+    fixture.detectChanges();
+    return fixture.nativeElement.querySelector('.captain-transfer button');
+  }
+
+  it('confirms the transfer and moves the armband using the refreshed roster', () => {
+    loadCaptainRoster();
+    const select: HTMLSelectElement = fixture.nativeElement.querySelector('#captain-target');
+    expect(Array.from(select.options).map(option => option.value)).toEqual(['', successor.playerUuid]);
+    const confirm = spyOn(window, 'confirm').and.returnValue(true);
+    teamApiService.transferCaptain.and.returnValue(of({ teamId: 77, captainPlayerUuid: successor.playerUuid }));
+    teamApiService.getActiveMembers.and.returnValue(of([{ ...captain, rol: 'JUGADOR' }, { ...successor, rol: 'CAPITAN' }]));
+
+    selectSuccessor().click();
+    fixture.detectChanges();
+
+    expect(confirm).toHaveBeenCalledWith(jasmine.stringMatching(successor.alias));
+    expect(teamApiService.transferCaptain).toHaveBeenCalledOnceWith(77, successor.playerUuid);
+    expect(teamApiService.getActiveMembers.calls.allArgs()).toEqual([[77], [77]]);
+    const badge: HTMLElement = fixture.nativeElement.querySelector('.captain-armband');
+    expect(badge.closest('button')?.getAttribute('aria-label')).toBe('Ver ficha de Demo11');
+    expect(fixture.nativeElement.querySelector('.captain-transfer')).toBeNull();
+    expect(fixture.nativeElement.querySelector('.captain-feedback').textContent).toContain('Plantel actualizado');
+  });
+
+  it('hides the transfer from a regular member', () => {
+    session.currentSession.user.atletaUuid = successor.playerUuid;
+    loadCaptainRoster();
+    expect(fixture.nativeElement.querySelector('.captain-transfer')).toBeNull();
+    component.captainTarget = captain.playerUuid;
+    component.transferCaptain();
+    expect(teamApiService.transferCaptain).not.toHaveBeenCalled();
+  });
+
+  it('rejects self and non-member targets and lets the captain cancel confirmation', () => {
+    loadCaptainRoster();
+    const confirm = spyOn(window, 'confirm').and.returnValue(false);
+    for (const target of [captain.playerUuid, 'non-member']) {
+      component.captainTarget = target;
+      component.transferCaptain();
+    }
+    expect(confirm).not.toHaveBeenCalled();
+    expect(component.captainFeedbackText).toContain('otro integrante activo');
+    selectSuccessor().click();
+    expect(confirm).toHaveBeenCalledTimes(1);
+    expect(teamApiService.transferCaptain).not.toHaveBeenCalled();
+  });
+
+  it('blocks repeated submissions and allows a retry after a conflict', () => {
+    loadCaptainRoster();
+    const confirm = spyOn(window, 'confirm').and.returnValue(true);
+    const pending = new Subject<TeamCaptainResponse>();
+    teamApiService.transferCaptain.and.returnValue(pending);
+    const button = selectSuccessor();
+    button.click();
+    fixture.detectChanges();
+    expect(button.disabled).toBeTrue();
+    expect(fixture.nativeElement.querySelector('#captain-target').disabled).toBeTrue();
+    component.transferCaptain();
+    expect(confirm).toHaveBeenCalledTimes(1);
+    expect(teamApiService.transferCaptain).toHaveBeenCalledTimes(1);
+    pending.error(new HttpErrorResponse({ status: 409 }));
+    fixture.detectChanges();
+    expect(button.disabled).toBeFalse();
+    expect(component.captainFeedbackText).toContain('volver a intentarlo');
+    teamApiService.transferCaptain.and.returnValue(new Subject<TeamCaptainResponse>());
+    button.click();
+    expect(teamApiService.transferCaptain).toHaveBeenCalledTimes(2);
+  });
+
+  it('refreshes stale permissions when the API rejects the transfer with 403', () => {
+    loadCaptainRoster();
+    spyOn(window, 'confirm').and.returnValue(true);
+    teamApiService.transferCaptain.and.returnValue(throwError(() => new HttpErrorResponse({ status: 403 })));
+    teamApiService.getActiveMembers.and.returnValue(of([{ ...captain, rol: 'JUGADOR' }, { ...successor, rol: 'CAPITAN' }]));
+    selectSuccessor().click();
+    fixture.detectChanges();
+    expect(component.captainFeedbackText).toContain('Ya no tienes permiso');
+    expect(fixture.nativeElement.querySelector('.captain-transfer')).toBeNull();
   });
 
   it('loads the exact team and selects a player without navigating away', () => {

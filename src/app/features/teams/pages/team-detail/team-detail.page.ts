@@ -1,11 +1,12 @@
 import { CommonModule } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, OnDestroy, inject } from '@angular/core';
+import { Component, ElementRef, OnDestroy, ViewChild, inject } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { IonicModule } from '@ionic/angular';
-import { Subject, forkJoin, of } from 'rxjs';
+import { Subject, Subscription, forkJoin, of } from 'rxjs';
 import { catchError, finalize, map, switchMap, takeUntil } from 'rxjs/operators';
 import { NavigationService } from 'src/app/core/services/navigation.service';
+import { AuthSessionService } from 'src/app/core/services/auth-session.service';
 import { buildMainBottomNav } from 'src/app/shared/navigation/main-bottom-nav';
 import { MetallicBottomNavComponent, MetallicBottomNavItem } from 'src/app/shared/ui/metallic-bottom-nav/metallic-bottom-nav.component';
 import { MetallicCardComponent } from 'src/app/shared/ui/metallic-card/metallic-card.component';
@@ -32,6 +33,8 @@ interface TeamRosterMember extends TeamActiveMember {
   styleUrls: ['./team-detail.page.scss'],
 })
 export class TeamDetailPage implements OnDestroy {
+  @ViewChild('captainFeedback') private captainFeedback?: ElementRef<HTMLElement>;
+  private readonly authSessionService = inject(AuthSessionService);
   private readonly route = inject(ActivatedRoute);
   private readonly teamApiService = inject(TeamApiService);
   private readonly navigationService = inject(NavigationService);
@@ -39,7 +42,12 @@ export class TeamDetailPage implements OnDestroy {
   private readonly ratingsApiService = inject(RatingsApiService);
   private readonly notificationBadgeService = inject(NotificationBadgeService);
   private readonly destroy$ = new Subject<void>();
+  private teamLoad?: Subscription;
+  private viewActive = false;
 
+  captainTarget = '';
+  captainFeedbackText = '';
+  isTransferringCaptain = false;
   team: TeamSummary | null = null;
   members: TeamRosterMember[] = [];
   isLoading = false;
@@ -66,15 +74,74 @@ export class TeamDetailPage implements OnDestroy {
     }, []);
   }
 
-  ionViewWillEnter(): void { this.loadTeam(); }
+  get canTransferCaptain(): boolean {
+    const uuid = this.authSessionService.currentSession?.user.atletaUuid;
+    return !!this.team && !!uuid && this.members.some(member => member.playerUuid === uuid && member.rol === 'CAPITAN');
+  }
+
+  get captainCandidates(): TeamRosterMember[] {
+    const uuid = this.authSessionService.currentSession?.user.atletaUuid;
+    return this.members.filter(member => member.playerUuid !== uuid);
+  }
+
+  transferCaptain(): void {
+    if (this.isTransferringCaptain || !this.team || !this.canTransferCaptain) return;
+    const target = this.captainCandidates.find(member => member.playerUuid === this.captainTarget);
+    if (!target) {
+      this.showCaptainFeedback('Selecciona a otro integrante activo del equipo.');
+      return;
+    }
+    if (!window.confirm(`¿Confirmas la transferencia de capitanía a ${target.alias}?`)) return;
+
+    this.isTransferringCaptain = true;
+    this.captainFeedbackText = 'Transfiriendo capitanía…';
+    this.teamApiService.transferCaptain(this.team.id, target.playerUuid)
+      .pipe(takeUntil(this.destroy$), finalize(() => (this.isTransferringCaptain = false)))
+      .subscribe({
+        next: () => {
+          this.showCaptainFeedback('Capitanía transferida. Actualizando el plantel…');
+          this.loadTeam(true);
+        },
+        error: (error: HttpErrorResponse) => {
+          if (error.status === 403 || error.status === 404) {
+            this.showCaptainFeedback(error.status === 403
+              ? 'Ya no tienes permiso para transferir la capitanía.'
+              : 'El equipo ya no está disponible.');
+            this.loadTeam();
+            return;
+          }
+          this.showCaptainFeedback(error.status === 400
+            ? 'El destino ya no es válido. Actualiza el plantel antes de volver a intentarlo.'
+            : 'No se pudo transferir la capitanía. Puedes volver a intentarlo.');
+          if (error.status === 400) this.loadTeam();
+        },
+      });
+  }
+
+  private showCaptainFeedback(message: string): void {
+    this.captainFeedbackText = message;
+    if (this.viewActive) this.captainFeedback?.nativeElement.focus();
+  }
+
+  ionViewWillEnter(): void {
+    this.viewActive = true;
+    this.loadTeam();
+  }
   ngOnDestroy(): void { this.destroy$.next(); this.destroy$.complete(); }
-  onRetry(): void { this.loadTeam(); }
+  onRetry(): void {
+    this.captainFeedbackText = '';
+    this.loadTeam();
+  }
   onBackToSocial(): void { void this.navigationService.safeNavigate(['/social'], { queryParams: { tab: 'teams' } }); }
   openPlayer(member: TeamRosterMember): void { this.selectedMember = member; }
   playerRoleRating(member: TeamRosterMember, role: HexagonRole): number | null {
     return member.roleStats.find(stat => stat.role === role)?.rating ?? null;
   }
-  ionViewWillLeave(): void { this.selectedMember = null; }
+  ionViewWillLeave(): void {
+    this.viewActive = false;
+    this.selectedMember = null;
+    this.captainFeedbackText = '';
+  }
   onBack(): void { void this.navigationService.goBackOrProfile(); }
   onNavItemSelected(itemId: string): void { void this.navigationService.goToMainBottomSection(itemId); }
 
@@ -82,19 +149,21 @@ export class TeamDetailPage implements OnDestroy {
     return buildMainBottomNav('profile', this.notificationBadgeService.totalPending());
   }
 
-  private loadTeam(): void {
+  private loadTeam(afterTransfer = false): void {
     const teamId = Number(this.route.snapshot.paramMap.get('id'));
     if (!Number.isSafeInteger(teamId) || teamId <= 0) {
       this.showError('El equipo solicitado no es válido.', true);
       return;
     }
+    this.teamLoad?.unsubscribe();
     this.isLoading = true;
+    this.captainTarget = '';
     this.selectedMember = null;
     this.team = null;
     this.members = [];
     this.errorMessage = null;
     this.notFound = false;
-    forkJoin({ team: this.teamApiService.getById(teamId), members: this.teamApiService.getActiveMembers(teamId) })
+    this.teamLoad = forkJoin({ team: this.teamApiService.getById(teamId), members: this.teamApiService.getActiveMembers(teamId) })
       .pipe(
         switchMap(({ team, members }) =>
           (members.length === 0 ? of([] as TeamRosterMember[]) : forkJoin(
@@ -125,11 +194,18 @@ export class TeamDetailPage implements OnDestroy {
       )
       .pipe(takeUntil(this.destroy$), finalize(() => (this.isLoading = false)))
       .subscribe({
-        next: ({ team, members }) => { this.team = team; this.members = members; },
-        error: (error: HttpErrorResponse) => this.showError(
-          error.status === 404 ? 'Este equipo ya no está disponible.' : 'No pudimos cargar el equipo. Intenta nuevamente.',
-          error.status === 404,
-        ),
+        next: ({ team, members }) => {
+          this.team = team;
+          this.members = members;
+          if (afterTransfer) this.captainFeedbackText = 'Capitanía transferida. Plantel actualizado.';
+        },
+        error: (error: HttpErrorResponse) => {
+          if (afterTransfer) this.captainFeedbackText = 'Capitanía transferida. Queda pendiente actualizar el plantel.';
+          this.showError(
+            error.status === 404 ? 'Este equipo ya no está disponible.' : 'No pudimos cargar el equipo. Intenta nuevamente.',
+            error.status === 404,
+          );
+        },
       });
   }
 
