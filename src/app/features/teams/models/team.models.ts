@@ -43,9 +43,16 @@ export interface TeamActiveMember {
   playerUuid: string;
   alias: string;
   rol: 'JUGADOR' | 'CAPITAN' | 'DT';
+  esDt?: boolean;
   primaryPositionId: number | null;
   primaryPositionName: string | null;
   ovr?: number | null;
+}
+
+export function teamMemberRoleLabel(member: TeamActiveMember): string {
+  if (member.rol === 'DT') return 'DT';
+  const role = member.rol === 'CAPITAN' ? 'Capitán' : 'Jugador';
+  return member.esDt ? `${role} y DT` : role;
 }
 
 export interface TeamLeaderboardEntry {

@@ -15,7 +15,7 @@ import { HexagonRole, HexagonRoleStat, MetallicRoleHexagonComponent } from 'src/
 import { NotificationBadgeService } from 'src/app/features/matches/services/notification-badge.service';
 import { RatingsApiService } from 'src/app/features/ratings/services/ratings-api.service';
 import { UserApiService } from 'src/app/features/user/services/user-api.service';
-import { TeamActiveMember, TeamSummary } from '../../models/team.models';
+import { TeamActiveMember, TeamSummary, teamMemberRoleLabel } from '../../models/team.models';
 import { TeamApiService } from '../../services/team-api.service';
 
 interface TeamRosterMember extends TeamActiveMember {
@@ -49,13 +49,14 @@ export class TeamDetailPage implements OnDestroy {
   captainTarget = '';
   captainFeedbackText = '';
   isTransferringCaptain = false;
-  private isRemovingMember = false;
+  private isChangingMembership = false;
   team: TeamSummary | null = null;
   members: TeamRosterMember[] = [];
   isLoading = false;
   errorMessage: string | null = null;
   notFound = false;
   selectedMember: TeamRosterMember | null = null;
+  readonly memberRoleLabel = teamMemberRoleLabel;
   readonly roles: HexagonRole[] = ['ATAQUE', 'MEDIOCAMPO', 'CARRILERO', 'DEFENSA', 'ARQUERO', 'DT'];
 
   get ratedMembers(): TeamRosterMember[] {
@@ -87,11 +88,44 @@ export class TeamDetailPage implements OnDestroy {
   }
 
   get rosterActionPending(): boolean {
-    return this.isTransferringCaptain || this.isRemovingMember;
+    return this.isTransferringCaptain || this.isChangingMembership;
+  }
+
+  get canLeaveTeam(): boolean {
+    const uuid = this.authSessionService.currentSession?.user.atletaUuid;
+    return !!this.team && !!uuid && !this.canTransferCaptain && this.members.some(member => member.playerUuid === uuid);
+  }
+
+  leaveTeam(): void {
+    const team = this.team;
+    if (!team || this.rosterActionPending || !this.canLeaveTeam) return;
+    if (!window.confirm(`¿Abandonar el equipo ${team.nombre}?`)) return;
+
+    this.isChangingMembership = true;
+    this.captainFeedbackText = 'Abandonando el equipo…';
+    this.teamApiService.leaveTeam(team.id)
+      .pipe(takeUntil(this.destroy$), finalize(() => (this.isChangingMembership = false)))
+      .subscribe({
+        next: () => {
+          this.showCaptainFeedback(`Abandonaste el equipo ${team.nombre}.`);
+          this.loadTeam();
+        },
+        error: (error: ApiError) => {
+          if (error.status === 409) {
+            this.showCaptainFeedback('Transfiere la capitanía antes de abandonar el equipo.');
+            this.loadTeam();
+          } else if (error.status === 404) {
+            this.showCaptainFeedback('Tu membresía o el equipo ya no están disponibles.');
+            this.loadTeam();
+          } else {
+            this.showCaptainFeedback('No se pudo abandonar el equipo. Puedes volver a intentarlo.');
+          }
+        },
+      });
   }
 
   canRemoveMember(member: TeamActiveMember): boolean {
-    return this.canTransferCaptain && member.rol === 'JUGADOR'
+    return this.canTransferCaptain && member.rol === 'JUGADOR' && !member.esDt
       && member.playerUuid !== this.authSessionService.currentSession?.user.atletaUuid;
   }
 
@@ -101,10 +135,10 @@ export class TeamDetailPage implements OnDestroy {
     if (!target || !this.canRemoveMember(target)) return;
     if (!window.confirm(`¿Retirar a ${target.alias} del equipo?`)) return;
 
-    this.isRemovingMember = true;
+    this.isChangingMembership = true;
     this.captainFeedbackText = 'Retirando integrante…';
     this.teamApiService.removeMember(this.team.id, target.playerUuid)
-      .pipe(takeUntil(this.destroy$), finalize(() => (this.isRemovingMember = false)))
+      .pipe(takeUntil(this.destroy$), finalize(() => (this.isChangingMembership = false)))
       .subscribe({
         next: () => {
           this.showCaptainFeedback(`Retiraste a ${target.alias} del equipo.`);

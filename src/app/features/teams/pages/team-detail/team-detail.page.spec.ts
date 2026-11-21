@@ -30,7 +30,9 @@ describe('TeamDetailPage', () => {
 
   beforeEach(async () => {
     session = { currentSession: { user: { atletaUuid: captain.playerUuid } } };
-    teamApiService = jasmine.createSpyObj<TeamApiService>('TeamApiService', ['getById', 'getActiveMembers', 'transferCaptain', 'removeMember']);
+    teamApiService = jasmine.createSpyObj<TeamApiService>('TeamApiService', [
+      'getById', 'getActiveMembers', 'transferCaptain', 'removeMember', 'leaveTeam',
+    ]);
     navigationService = jasmine.createSpyObj<NavigationService>('NavigationService', [
       'safeNavigate', 'goBackOrProfile', 'goToProfile',
     ]);
@@ -74,6 +76,70 @@ describe('TeamDetailPage', () => {
     fixture.detectChanges();
     return fixture.nativeElement.querySelector('.captain-transfer button');
   }
+
+  it('shows a player who also coaches and keeps the removal action unavailable for that member', () => {
+    const coach = { ...successor, esDt: true };
+    teamApiService.getActiveMembers.and.returnValue(of([captain, coach]));
+    component.ionViewWillEnter();
+    fixture.detectChanges();
+
+    const playerRow = fixture.nativeElement.querySelector('[aria-label="Ver ficha de Demo11"]').closest('tr');
+    expect(playerRow.textContent).toContain('Jugador y DT');
+    expect(playerRow.querySelector('.team-remove-member')).toBeNull();
+  });
+
+  it('offers leave to an active member and hides it once that member becomes captain', () => {
+    session.currentSession.user.atletaUuid = successor.playerUuid;
+    loadCaptainRoster();
+    const button = () => fixture.nativeElement.querySelector('.team-leave');
+    expect(button()).not.toBeNull();
+    teamApiService.getActiveMembers.and.returnValue(of([{ ...captain, rol: 'JUGADOR' }, { ...successor, rol: 'CAPITAN' }]));
+    component.ionViewWillEnter();
+    fixture.detectChanges();
+    expect(button()).toBeNull();
+    component.leaveTeam();
+    expect(teamApiService.leaveTeam).not.toHaveBeenCalled();
+  });
+
+  it('asks before leaving and refreshes the roster after the member leaves', () => {
+    session.currentSession.user.atletaUuid = successor.playerUuid;
+    loadCaptainRoster();
+    const confirm = spyOn(window, 'confirm').and.returnValue(false);
+    const button: HTMLButtonElement = fixture.nativeElement.querySelector('.team-leave');
+    button.click();
+    expect(confirm).toHaveBeenCalledOnceWith('¿Abandonar el equipo Atleta FC?');
+    expect(teamApiService.leaveTeam).not.toHaveBeenCalled();
+
+    const pending = new Subject<void>();
+    confirm.and.returnValue(true);
+    teamApiService.leaveTeam.and.returnValue(pending);
+    button.click();
+    fixture.detectChanges();
+    expect(button.disabled).toBeTrue();
+    component.leaveTeam();
+    expect(teamApiService.leaveTeam).toHaveBeenCalledOnceWith(77);
+
+    teamApiService.getActiveMembers.and.returnValue(of([captain]));
+    pending.next();
+    pending.complete();
+    fixture.detectChanges();
+    expect(teamApiService.getActiveMembers.calls.allArgs()).toEqual([[77], [77]]);
+    expect(fixture.nativeElement.querySelector('.team-leave')).toBeNull();
+    expect(component.captainFeedbackText).toContain('Abandonaste el equipo');
+  });
+
+  it('refreshes the roster after a 409 and explains that the new captain must transfer first', () => {
+    session.currentSession.user.atletaUuid = successor.playerUuid;
+    loadCaptainRoster();
+    spyOn(window, 'confirm').and.returnValue(true);
+    teamApiService.leaveTeam.and.returnValue(throwError(() => ({ status: 409 })));
+    teamApiService.getActiveMembers.and.returnValue(of([{ ...captain, rol: 'JUGADOR' }, { ...successor, rol: 'CAPITAN' }]));
+    fixture.nativeElement.querySelector('.team-leave').click();
+    fixture.detectChanges();
+    expect(teamApiService.getActiveMembers.calls.allArgs()).toEqual([[77], [77]]);
+    expect(fixture.nativeElement.querySelector('.team-leave')).toBeNull();
+    expect(fixture.nativeElement.querySelector('.captain-feedback').textContent).toContain('Transfiere la capitanía');
+  });
 
   it('offers removal only for other active players when the current member is captain', () => {
     const coach: TeamActiveMember = { ...successor, playerUuid: 'coach', alias: 'Coach', rol: 'DT' };

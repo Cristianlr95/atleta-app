@@ -42,6 +42,10 @@ export class TeamApiService extends ApiService {
     return this.delete<void>(`${API_ENDPOINTS.teams.base}/${teamId}/members/${encodeURIComponent(playerUuid)}`);
   }
 
+  leaveTeam(teamId: number) {
+    return this.delete<void>(`${API_ENDPOINTS.teams.base}/${teamId}/members/me`);
+  }
+
   transferCaptain(teamId: number, targetPlayerUuid: string) {
     return this.put<TeamCaptainResponse, { targetPlayerUuid: string }>(
       `${API_ENDPOINTS.teams.base}/${teamId}/captain`, { targetPlayerUuid },

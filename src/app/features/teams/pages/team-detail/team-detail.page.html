@@ -26,6 +26,8 @@
           <ng-template #noTeamRatings><p class="team-status">Aún no hay valoraciones por posición para el equipo.</p></ng-template>
         </section>
         <section class="team-members"><div class="team-members__heading"><h2>Plantel activo</h2><span>{{ members.length }} jugadores</span></div>
+          <button *ngIf="canLeaveTeam" type="button" class="team-leave" [disabled]="rosterActionPending"
+            (click)="leaveTeam()">Abandonar equipo</button>
           <form *ngIf="canTransferCaptain && captainCandidates.length" class="captain-transfer team-actions"
             (submit)="$event.preventDefault(); transferCaptain()">
             <label for="captain-target">Nuevo capitán</label>
@@ -57,7 +59,7 @@
                 </th>
                 <td>{{ member.primaryPositionName || 'Sin posición' }}</td>
                 <td class="team-member__ovr">{{ member.ratingUnavailable ? 'No disponible' : member.ovr !== null ? (member.ovr | number:'1.0-1') : 'Sin valoración' }}<span *ngIf="member.ratingUnavailable" class="team-rating-error" role="alert">No pudimos cargar las valoraciones.</span><button *ngIf="member.ratingUnavailable" type="button" class="team-rating-retry" [attr.aria-label]="'Reintentar valoraciones de ' + member.alias" (click)="onRetry()">Reintentar</button></td>
-                <td>{{ member.matchesPlayed ?? 'Sin datos' }}</td><td>{{ member.teamMatches ?? 'Sin datos' }}</td><td>{{ member.teamGoals ?? 'Sin datos' }}</td><td>{{ member.totalGoals ?? 'Sin datos' }}</td><td>{{ member.teamAssists ?? 'Sin datos' }}</td><td>{{ member.totalAssists ?? 'Sin datos' }}</td><td>{{ member.rol === 'CAPITAN' ? 'Capitán' : member.rol === 'DT' ? 'DT' : 'Jugador' }}</td>
+                <td>{{ member.matchesPlayed ?? 'Sin datos' }}</td><td>{{ member.teamMatches ?? 'Sin datos' }}</td><td>{{ member.teamGoals ?? 'Sin datos' }}</td><td>{{ member.totalGoals ?? 'Sin datos' }}</td><td>{{ member.teamAssists ?? 'Sin datos' }}</td><td>{{ member.totalAssists ?? 'Sin datos' }}</td><td>{{ memberRoleLabel(member) }}</td>
               </tr></tbody>
             </table>
           </div>
@@ -79,6 +81,7 @@
         <div>
           <p>Ficha del jugador</p>
           <h2>{{ member.alias }} <span *ngIf="member.rol === 'CAPITAN'" class="captain-armband" role="img" aria-label="Capitán del equipo">C</span></h2>
+          <p *ngIf="member.esDt">{{ memberRoleLabel(member) }}</p>
         </div>
         <button type="button" class="player-dialog__close" (click)="selectedMember = null">Cerrar ficha</button>
       </header>

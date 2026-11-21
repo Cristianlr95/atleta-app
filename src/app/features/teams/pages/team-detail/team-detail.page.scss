@@ -3,8 +3,8 @@
 .team-container app-metallic-card { display: block; width: 100%; }
 button { cursor: pointer; }
 button:focus-visible, summary:focus-visible, .team-table-scroll:focus-visible { outline: 2px solid var(--tactical-visit); outline-offset: 3px; }
-.team-back, .team-rating-retry, .team-remove-member { min-height: 44px; border: 0; padding: 8px 0; background: transparent; color: var(--tactical-visit); font: 700 15px var(--font-family-body); }
-.team-remove-member { color: var(--atleta-red); }
+.team-back, .team-rating-retry, .team-remove-member, .team-leave { min-height: 44px; border: 0; padding: 8px 0; background: transparent; color: var(--tactical-visit); font: 700 15px var(--font-family-body); }
+.team-remove-member, .team-leave { color: var(--atleta-red); }
 .team-back { margin-bottom: 10px; }
 .team-hero { display: flex; align-items: center; gap: 14px; margin-bottom: 16px; }
 .team-hero img, .team-shield { width: 56px; height: 64px; flex: 0 0 auto; border-radius: 8px; object-fit: cover; border: 1px solid var(--tactical-visit); }
@@ -74,7 +74,7 @@ h2 { font-size: 21px; }
   outline: 2px solid var(--tactical-visit);
   outline-offset: 3px;
 }
-.captain-transfer :disabled, .team-remove-member:disabled { opacity: .65; }
+.captain-transfer :disabled, .team-remove-member:disabled, .team-leave:disabled { opacity: .65; }
 .captain-feedback:empty { margin: 0; }
 .team-actions button, .player-dialog__close { min-height: 44px; border: 1px solid var(--tactical-visit); border-radius: 6px; padding: 8px 12px; background: #071e27; color: var(--text-primary); font: 700 15px var(--font-family-body); }
 .team-footer ion-toolbar { --background: rgba(2,9,13,.96); --border-color: var(--tactical-line); padding: 6px 8px calc(env(safe-area-inset-bottom) + 8px); }

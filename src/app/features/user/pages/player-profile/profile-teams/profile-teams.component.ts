@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { SocialPlayerLookupItem } from 'src/app/features/social/models/social.models';
-import { TeamActiveMember, TeamSummary } from 'src/app/features/teams/models/team.models';
+import { TeamActiveMember, TeamSummary, teamMemberRoleLabel } from 'src/app/features/teams/models/team.models';
 
 @Component({
   selector: 'app-profile-teams',
@@ -36,6 +36,6 @@ export class ProfileTeamsComponent {
 
   isTeamExpanded(teamId: number): boolean { return this.expandedTeamId === teamId; }
   canManageInvites(teamId: number): boolean { return this.inviteTeamIds.includes(teamId); }
-  memberRoleLabel(role: TeamActiveMember['rol']): string { return role === 'CAPITAN' ? 'Capitan' : role === 'DT' ? 'DT' : 'Jugador'; }
+  readonly memberRoleLabel = teamMemberRoleLabel;
   memberOvrLabel(ovr: number | null): string { return ovr === null ? 'OVR N/D' : `OVR ${Math.round(ovr)}`; }
 }

@@ -1,5 +1,12 @@
 # Memory Vivo - Atleta Frontend
 
+## CAP-05 · Abandono de equipo y función de DT · 21/11/2026
+
+- Plantel permite abandonar el equipo a integrantes activos sin capitanía, pide confirmación y recarga los integrantes tras la salida o si el servidor informa de un conflicto de capitanía.
+- Plantel y la administración de equipos en Perfil muestran «Jugador y DT» o «Capitán y DT» según `rol` y `esDt`. La función de DT conserva la protección frente a la expulsión. La API anterior sigue mostrando «DT» cuando entrega el rol original sin el nuevo campo.
+- La validación integral en beta requiere el backend con V030 y V031 aplicadas.
+- Pasaron 66 pruebas dirigidas del paquete en jsdom.
+
 ## CAP-05 · Eliminación de cuenta del capitán · 21/11/2026
 
 - Ajustes explica antes de confirmar que un capitán debe transferir el cargo si quedan otras personas activas disponibles y que el equipo se archiva cuando no queda otro integrante disponible. El error `409 CAPTAIN_TRANSFER_REQUIRED` dirige al capitán a Plantel y conserva su sesión.
