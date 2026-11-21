@@ -42,6 +42,10 @@
         description="Eliminar cuenta cierra tu sesión y anonimiza tu identidad. El historial deportivo compartido se conserva para no alterar los resultados de otros jugadores."
       >
         <form class="settings-delete-form" (ngSubmit)="onDeleteAccount()">
+          <p class="settings-message settings-message--warning">
+            Si eres capitán, primero transfiere la capitanía en los equipos con otros integrantes.
+            Si no quedan otros integrantes activos con cuenta disponible, el equipo se archivará al eliminar tu cuenta.
+          </p>
           <label class="settings-password-field">
             <span>Contraseña actual (obligatoria en cuentas locales)</span>
             <input type="password" name="deleteCurrentPassword" autocomplete="current-password" [(ngModel)]="deleteCurrentPassword" [disabled]="deleteLoading" />

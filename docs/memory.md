@@ -1,5 +1,11 @@
 # Memory Vivo - Atleta Frontend
 
+## CAP-05 · Eliminación de cuenta del capitán · 21/11/2026
+
+- Ajustes explica antes de confirmar que un capitán debe transferir el cargo si quedan otras personas activas disponibles y que el equipo se archiva cuando no queda otro integrante disponible. El error `409 CAPTAIN_TRANSFER_REQUIRED` dirige al capitán a Plantel y conserva su sesión.
+- Pendiente validar el recorrido completo con la API actualizada en beta.
+- Pasaron las 3 pruebas dirigidas de Ajustes de jugador en jsdom.
+
 ## CAP-03: invitaciones de equipo · 21/11/2026
 
 - Ajuste frontend local sobre la beta con CAP-05 (`3f53e73`). Perfil y Social usan el plantel activo para permitir el envío al capitán del equipo, incluido un sucesor. Se vuelve a consultar al entrar y tras un `403`. Perfil reutiliza los integrantes en su panel de administración.

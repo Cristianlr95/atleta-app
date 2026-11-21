@@ -14,6 +14,10 @@ export class ErrorMapperService {
       return 'El partido no tiene equipo asociado. Pide al organizador que lo configure.';
     }
 
+    if (apiError?.code === 'CAPTAIN_TRANSFER_REQUIRED') {
+      return 'Transfiere la capitanía desde Plantel en tus equipos con otros integrantes antes de eliminar tu cuenta.';
+    }
+
     if (context === 'matches') {
       if (apiError?.code === 'MATCH_CREATION_FAILED' && apiError.message.trim()) {
         return apiError.message;

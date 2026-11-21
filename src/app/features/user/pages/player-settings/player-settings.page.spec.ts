@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
-import { of } from 'rxjs';
+import { of, throwError } from 'rxjs';
 import { AppToastService } from 'src/app/core/services/app-toast.service';
 import { AuthSessionService } from 'src/app/core/services/auth-session.service';
 import { provideAppConfigMock, provideHttpTesting } from 'src/test/testbed-providers';
@@ -9,12 +9,12 @@ import { PlayerSettingsPage } from './player-settings.page';
 
 describe('PlayerSettingsPage', () => {
   let component: PlayerSettingsPage;
-  let authSessionService: { currentSession: unknown };
+  let authSessionService: { currentSession: unknown; clearSession: jasmine.Spy };
   let userApiService: jasmine.SpyObj<UserApiService>;
 
   beforeEach(async () => {
-    authSessionService = { currentSession: null };
-    userApiService = jasmine.createSpyObj<UserApiService>('UserApiService', ['changePassword']);
+    authSessionService = { currentSession: null, clearSession: jasmine.createSpy('clearSession') };
+    userApiService = jasmine.createSpyObj<UserApiService>('UserApiService', ['changePassword', 'deleteAccount']);
     userApiService.changePassword.and.returnValue(of(void 0));
     const toast = jasmine.createSpyObj<AppToastService>('AppToastService', ['success']);
     toast.success.and.resolveTo();
@@ -62,5 +62,16 @@ describe('PlayerSettingsPage', () => {
 
     expect(userApiService.changePassword).not.toHaveBeenCalled();
     expect(component.passwordChangeError).toBe('La confirmacion no coincide con la nueva contrasena.');
+  });
+
+  it('explains the transfer requirement and keeps the session on a captain conflict', async () => {
+    authSessionService.currentSession = { user: { atletaUuid: 'ath-1' } };
+    component.deleteConfirmation = 'ELIMINAR';
+    userApiService.deleteAccount.and.returnValue(throwError(() => ({ status: 409, code: 'CAPTAIN_TRANSFER_REQUIRED' })));
+
+    await component.onDeleteAccount();
+
+    expect(component.deleteError).toContain('Transfiere la capitanía');
+    expect(authSessionService.clearSession).not.toHaveBeenCalled();
   });
 });
