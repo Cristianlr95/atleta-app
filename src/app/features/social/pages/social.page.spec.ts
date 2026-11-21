@@ -182,6 +182,8 @@ function buildSocialFacadeMock() {
     pendingTeamInvites: signal([]).asReadonly(),
     pendingMatchInvites: signal([]).asReadonly(),
     createdTeams: signal([]).asReadonly(),
+    inviteTeams: [],
+    loadTeamInvitePermissions: jasmine.createSpy('loadTeamInvitePermissions').and.resolveTo(),
     friendCandidates: signal([]).asReadonly(),
     inviteCandidates: signal([]).asReadonly(),
     searchLoading: signal(false).asReadonly(),

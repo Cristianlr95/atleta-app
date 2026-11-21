@@ -1,11 +1,13 @@
 import { signal } from '@angular/core';
-import { of } from 'rxjs';
+import { Subject, of } from 'rxjs';
 import { TestBed } from '@angular/core/testing';
 import { AuthSessionService } from 'src/app/core/services/auth-session.service';
 import { ErrorMapperService } from 'src/app/core/services/error-mapper.service';
 import { MatchStore } from 'src/app/features/matches/stores/match.store';
 import { PlayerMatchHistoryItem } from 'src/app/features/matches/models/match.models';
 import { MatchesApiService } from 'src/app/features/matches/services/matches-api.service';
+import { TeamActiveMember, TeamSummary } from 'src/app/features/teams/models/team.models';
+import { TeamApiService } from 'src/app/features/teams/services/team-api.service';
 import { ActivityService } from '../activity/services/activity.service';
 import { SocialFacadeService } from './social-facade.service';
 
@@ -14,9 +16,14 @@ describe('SocialFacadeService', () => {
   let facade: SocialFacadeService;
   let matchesApi: jasmine.SpyObj<MatchesApiService>;
   let matchStore: jasmine.SpyObj<MatchStore>;
+  let teams: ReturnType<typeof signal<TeamSummary[]>>;
+  let teamApi: jasmine.SpyObj<TeamApiService>;
 
   beforeEach(() => {
-    activityService = buildActivityServiceMock();
+    teams = signal<TeamSummary[]>([]);
+    activityService = buildActivityServiceMock(teams);
+    teamApi = jasmine.createSpyObj<TeamApiService>('TeamApiService', ['getActiveMembers']);
+    teamApi.getActiveMembers.and.returnValue(of([]));
     matchesApi = jasmine.createSpyObj<MatchesApiService>('MatchesApiService', ['getByPlayerOrCreator']);
     matchesApi.getByPlayerOrCreator.and.returnValue(of([]));
     matchStore = jasmine.createSpyObj<MatchStore>('MatchStore', ['optimisticPatchByBackendMatchId', 'refreshByBackendMatchId', 'refresh']);
@@ -25,6 +32,7 @@ describe('SocialFacadeService', () => {
       providers: [
         SocialFacadeService,
         { provide: ActivityService, useValue: activityService },
+        { provide: TeamApiService, useValue: teamApi },
         {
           provide: AuthSessionService,
           useValue: {
@@ -49,6 +57,55 @@ describe('SocialFacadeService', () => {
       ],
     });
     facade = TestBed.inject(SocialFacadeService);
+  });
+
+  for (const { label, creator, role, allowed } of [
+    { label: 'founding captain', creator: 'me', role: 'CAPITAN', allowed: true },
+    { label: 'successor captain', creator: 'founder', role: 'CAPITAN', allowed: true },
+    { label: 'former captain who founded the team', creator: 'me', role: 'JUGADOR', allowed: false },
+    { label: 'regular member', creator: 'founder', role: 'JUGADOR', allowed: false },
+    { label: 'outsider', creator: 'founder', role: undefined, allowed: false },
+  ] as const) {
+    it(`checks the active roster before sending for a ${label}`, async () => {
+      teams.set([{ id: 7, nombre: 'Azul', creadorUuid: creator }]);
+      const roster = allowed ? [member('me', 'CAPITAN')] : [member('other', 'CAPITAN'), ...(role ? [member('me', role)] : [])];
+      teamApi.getActiveMembers.and.returnValue(of(roster));
+      facade.setActiveTab('teams');
+      await facade.initialize();
+      expect(facade.inviteTeams.map(team => team.id)).toEqual(allowed ? [7] : []);
+      await facade.sendTeamInvite(7, 'target');
+      await facade.sendTeamInvite(99, 'target');
+      expect(activityService.sendTeamInvite.calls.allArgs()).toEqual(
+        allowed ? [[{ teamId: 7, requesterUuid: 'me', targetUuid: 'target' }]] : [],
+      );
+    });
+  }
+
+  it('refreshes the team permission after a rejected invitation and on reentry', async () => {
+    teams.set([{ id: 7, nombre: 'Azul', creadorUuid: 'me' }]);
+    teamApi.getActiveMembers.and.returnValue(of([member('me', 'CAPITAN')]));
+    facade.setActiveTab('teams');
+    await facade.initialize();
+
+    teamApi.getActiveMembers.and.returnValue(of([member('me', 'JUGADOR'), member('other', 'CAPITAN')]));
+    activityService.sendTeamInvite.and.rejectWith({ status: 403 });
+    await facade.sendTeamInvite(7, 'target');
+    expect(facade.errorMessage()).toContain('capitán activo');
+    await facade.sendTeamInvite(7, 'target');
+    expect(activityService.sendTeamInvite).toHaveBeenCalledTimes(1);
+
+    const roster = new Subject<TeamActiveMember[]>();
+    teamApi.getActiveMembers.and.returnValue(roster);
+    activityService.sendTeamInvite.and.resolveTo();
+    const entering = facade.initialize();
+    expect(facade.inviteTeams).toEqual([]);
+    await Promise.resolve();
+    roster.next([member('me', 'CAPITAN')]);
+    roster.complete();
+    await entering;
+    await facade.sendTeamInvite(7, 'target');
+    expect(activityService.sendTeamInvite).toHaveBeenCalledTimes(2);
+    expect(teamApi.getActiveMembers.calls.allArgs()).toEqual([[7], [7], [7]]);
   });
 
   it('shows full and live matches but not partial or finished matches', async () => {
@@ -99,14 +156,18 @@ describe('SocialFacadeService', () => {
   });
 });
 
-function buildActivityServiceMock(): jasmine.SpyObj<ActivityService> {
+function member(playerUuid: string, rol: 'CAPITAN' | 'JUGADOR') {
+  return { playerUuid, alias: playerUuid, rol, primaryPositionId: null, primaryPositionName: null };
+}
+
+function buildActivityServiceMock(teams: ReturnType<typeof signal<TeamSummary[]>>): jasmine.SpyObj<ActivityService> {
   const empty = signal([]);
   return {
     loading: signal(false).asReadonly(),
     error: signal<string | null>(null).asReadonly(),
     activity: empty.asReadonly(),
     unreadCount: signal(0).asReadonly(),
-    teams: empty.asReadonly(),
+    teams: teams.asReadonly(),
     friendships: empty.asReadonly(),
     teamInvites: empty.asReadonly(),
     matchInvites: empty.asReadonly(),

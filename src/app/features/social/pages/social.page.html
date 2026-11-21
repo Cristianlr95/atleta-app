@@ -10,7 +10,7 @@
         [pendingTeams]="pendingTeams().length"
         [pendingMatches]="pendingMatches().length"
         [unreadActivity]="facade.unreadCount()"
-        (tabChange)="facade.setActiveTab($event)">
+        (tabChange)="onTabSelected($event)">
       </app-social-tabs>
 
       <p class="social-message social-message--error" role="alert" *ngIf="facade.errorMessage()">{{ facade.errorMessage() }}</p>
@@ -54,6 +54,7 @@
         *ngIf="!facade.loadError() && !facade.isLoading() && facade.activeTab() === 'teams'"
         [principalTeam]="principalTeam()"
         [createdTeams]="facade.createdTeams()"
+        [inviteTeams]="facade.inviteTeams"
         [pendingInvites]="pendingTeams()"
         [inviteCandidates]="facade.inviteCandidates()"
         (openTeam)="onOpenTeam($event)"

@@ -14,6 +14,7 @@ import { TeamActiveMember, TeamSummary } from 'src/app/features/teams/models/tea
 export class ProfileTeamsComponent {
   @Input() teams: TeamSummary[] = [];
   @Input() currentPlayerUuid: string | null = null;
+  @Input() inviteTeamIds: number[] = [];
   @Input() expandedTeamId: number | null = null;
   @Input() teamMembers: Array<TeamActiveMember & { ovr: number | null }> = [];
   @Input() teamMembersLoading = false;
@@ -34,6 +35,7 @@ export class ProfileTeamsComponent {
   }
 
   isTeamExpanded(teamId: number): boolean { return this.expandedTeamId === teamId; }
+  canManageInvites(teamId: number): boolean { return this.inviteTeamIds.includes(teamId); }
   memberRoleLabel(role: TeamActiveMember['rol']): string { return role === 'CAPITAN' ? 'Capitan' : role === 'DT' ? 'DT' : 'Jugador'; }
   memberOvrLabel(ovr: number | null): string { return ovr === null ? 'OVR N/D' : `OVR ${Math.round(ovr)}`; }
 }

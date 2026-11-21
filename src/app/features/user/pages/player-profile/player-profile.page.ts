@@ -3,7 +3,8 @@ import { Component, OnDestroy, inject } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { IonicModule } from '@ionic/angular';
 import { Subject, Subscription, firstValueFrom, forkJoin, interval, of } from 'rxjs';
-import { catchError, finalize, takeUntil } from 'rxjs/operators';
+import { catchError, finalize, map, switchMap, takeUntil } from 'rxjs/operators';
+import { ApiError } from 'src/app/core/models/api-error.model';
 import { AuthSessionService } from 'src/app/core/services/auth-session.service';
 import { APP_CONFIG } from 'src/app/core/config/app-config.token';
 import { AppToastService } from 'src/app/core/services/app-toast.service';
@@ -27,6 +28,7 @@ import {
 } from 'src/app/shared/ui/metallic-role-hexagon/metallic-role-hexagon.component';
 import { TeamActiveMember, TeamSummary } from 'src/app/features/teams/models/team.models';
 import { TeamApiService } from 'src/app/features/teams/services/team-api.service';
+import { TEAM_INVITE_FORBIDDEN, TeamInvitationAccessService } from 'src/app/features/teams/services/team-invitation-access.service';
 import { buildMainBottomNav } from 'src/app/shared/navigation/main-bottom-nav';
 import { PlayerAssignedPosition } from '../../models/position.models';
 import { PlayerAchievement, PlayerProfile } from '../../models/user.models';
@@ -57,6 +59,7 @@ interface CompetitionSummary extends OutcomeSummary {
   standalone: true,
   templateUrl: './player-profile.page.html',
   styleUrls: ['./player-profile.page.scss'],
+  providers: [TeamInvitationAccessService],
   imports: [
     CommonModule,
     IonicModule,
@@ -74,6 +77,7 @@ export class PlayerProfilePage implements OnDestroy {
   private readonly ratingsApiService = inject(RatingsApiService);
   private readonly matchHistoryService = inject(MatchHistoryService);
   private readonly teamApiService = inject(TeamApiService);
+  private readonly teamInvitationAccess = inject(TeamInvitationAccessService);
   private readonly socialApiService = inject(SocialApiService);
   private readonly playerPositionStateService = inject(PlayerPositionStateService);
   private readonly route = inject(ActivatedRoute);
@@ -88,6 +92,7 @@ export class PlayerProfilePage implements OnDestroy {
   private readonly isDemoMode: boolean;
   private autoRefreshSub: Subscription | null = null;
   private inviteSearchTimer?: number;
+  private teamMembersLoad?: Subscription;
 
   readonly iconBase = 'assets/icons/atleta-raster-v1';
   readonly profileTitleIconAsset = `${this.iconBase}/ic_nav_profile_96.png`;
@@ -129,6 +134,9 @@ export class PlayerProfilePage implements OnDestroy {
   achievements: PlayerAchievement[] = [];
   playerPositions: PlayerPositionDisplay[] = [];
   memberTeams: TeamSummary[] = [];
+  get inviteTeamIds(): number[] {
+    return this.memberTeams.filter(team => this.teamInvitationAccess.canInvite(team.id)).map(team => team.id);
+  }
   expandedTeamId: number | null = null;
   inviteQuery = '';
   inviteLoading = false;
@@ -143,6 +151,7 @@ export class PlayerProfilePage implements OnDestroy {
   }
 
   ionViewWillEnter(): void {
+    this.teamInvitationAccess.clear();
     void this.notificationBadgeService.refresh();
     if (this.isDemoMode) {
       this.applyDemo('Jugador demo', 'demo@atleta.app');
@@ -226,22 +235,26 @@ export class PlayerProfilePage implements OnDestroy {
   }
 
   toggleTeamAccordion(teamId: number): void {
-    this.clearInviteSearchTimer();
-    if (this.expandedTeamId === teamId) {
-      this.expandedTeamId = null;
-      this.inviteQuery = '';
-      this.inviteCandidates = [];
-      this.teamMembers = [];
-      this.teamMembersError = null;
-      return;
-    }
+    const alreadyExpanded = this.expandedTeamId === teamId;
+    this.closeTeamAccordion();
+    if (alreadyExpanded) return;
     this.expandedTeamId = teamId;
+    this.loadTeamMembers(teamId);
+  }
+
+  private closeTeamAccordion(): void {
+    this.teamMembersLoad?.unsubscribe();
+    this.clearInviteSearchTimer();
+    this.expandedTeamId = null;
     this.inviteQuery = '';
     this.inviteCandidates = [];
-    void this.loadTeamMembers(teamId);
+    this.teamMembers = [];
+    this.teamMembersError = null;
   }
 
   onInviteQueryChange(value: string): void {
+    const teamId = this.expandedTeamId;
+    if (teamId === null || !this.canInviteTo(teamId)) return;
     this.inviteQuery = value;
     this.clearInviteSearchTimer();
     const query = value.trim();
@@ -250,28 +263,42 @@ export class PlayerProfilePage implements OnDestroy {
       return;
     }
     this.inviteSearchTimer = window.setTimeout(() => {
-      void this.searchInviteCandidates(query);
+      void this.searchInviteCandidates(teamId, query);
     }, 300);
   }
 
   async onSendTeamInvite(targetUuid: string): Promise<void> {
-    const requesterUuid = this.authSessionService.currentSession?.user.atletaUuid;
-    if (!requesterUuid || !this.expandedTeamId) {
+    const requesterUuid = this.currentPlayerUuid;
+    const teamId = this.expandedTeamId;
+    if (!requesterUuid || teamId === null || !this.canInviteTo(teamId)) {
       return;
     }
     try {
       this.inviteSendingUuid = targetUuid;
       await firstValueFrom(
         this.socialApiService.createTeamInvite({
-          teamId: this.expandedTeamId,
+          teamId,
           requesterUuid,
           targetUuid,
         }),
       );
       await this.appToastService.success('Invitacion enviada.');
-      this.inviteCandidates = this.inviteCandidates.filter((item) => item.atletaUuid !== targetUuid);
+      if (this.expandedTeamId === teamId) {
+        this.inviteCandidates = this.inviteCandidates.filter((item) => item.atletaUuid !== targetUuid);
+      }
     } catch (error) {
-      await this.appToastService.error(this.errorMapper.toUserMessage(error, 'social'));
+      if ((error as ApiError | null)?.status === 403 && this.currentPlayerUuid === requesterUuid) {
+        this.teamInvitationAccess.invalidate(teamId);
+        if (this.expandedTeamId === teamId) {
+          this.inviteCandidates = [];
+          this.loadTeamMembers(teamId);
+        } else if (this.memberTeams.some(team => team.id === teamId)) {
+          this.loadInviteRoster(teamId);
+        }
+        await this.appToastService.error(TEAM_INVITE_FORBIDDEN);
+      } else {
+        await this.appToastService.error(this.errorMapper.toUserMessage(error, 'social'));
+      }
     } finally {
       this.inviteSendingUuid = null;
     }
@@ -296,11 +323,7 @@ export class PlayerProfilePage implements OnDestroy {
       await firstValueFrom(this.teamApiService.deleteTeam(team.id, actorUuid));
       this.memberTeams = this.memberTeams.filter((item) => item.id !== team.id);
       if (this.expandedTeamId === team.id) {
-        this.expandedTeamId = null;
-        this.inviteQuery = '';
-        this.inviteCandidates = [];
-        this.teamMembers = [];
-        this.teamMembersError = null;
+        this.closeTeamAccordion();
       }
       await this.appToastService.success('Equipo eliminado.');
     } catch (error) {
@@ -362,12 +385,17 @@ export class PlayerProfilePage implements OnDestroy {
           positions,
         );
         this.achievements = achievements;
-        if (this.expandedTeamId && !teams.some((team) => team.id === this.expandedTeamId)) {
-          this.expandedTeamId = null;
-          this.inviteQuery = '';
-          this.inviteCandidates = [];
-          this.teamMembers = [];
-          this.teamMembersError = null;
+        if (this.expandedTeamId !== null && !teams.some(team => team.id === this.expandedTeamId)) {
+          this.closeTeamAccordion();
+        }
+        if (!isBackgroundRefresh) {
+          for (const team of teams) {
+            if (team.id === this.expandedTeamId) {
+              this.loadTeamMembers(team.id);
+            } else {
+              this.loadInviteRoster(team.id);
+            }
+          }
         }
       });
   }
@@ -390,15 +418,25 @@ export class PlayerProfilePage implements OnDestroy {
     this.autoRefreshSub = null;
   }
 
-  private async searchInviteCandidates(query: string): Promise<void> {
-    const currentUser = this.authSessionService.currentSession?.user.atletaUuid;
-    if (!currentUser) {
+  private canInviteTo(teamId: number): boolean {
+    return this.memberTeams.some(team => team.id === teamId) && this.teamInvitationAccess.canInvite(teamId);
+  }
+
+  private loadInviteRoster(teamId: number): void {
+    this.teamInvitationAccess.loadMembers(teamId).pipe(takeUntil(this.leave$)).subscribe({ error: () => undefined });
+  }
+
+  private async searchInviteCandidates(teamId: number, query: string): Promise<void> {
+    const currentUser = this.currentPlayerUuid;
+    if (!currentUser || this.expandedTeamId !== teamId || !this.canInviteTo(teamId)) {
       return;
     }
     try {
       this.inviteLoading = true;
       const candidates = await firstValueFrom(this.socialApiService.searchPlayers(query));
-      this.inviteCandidates = (candidates ?? []).filter((item) => item.atletaUuid !== currentUser);
+      if (this.expandedTeamId === teamId && this.inviteQuery.trim() === query && this.canInviteTo(teamId)) {
+        this.inviteCandidates = (candidates ?? []).filter((item) => item.atletaUuid !== currentUser);
+      }
     } catch (error) {
       this.inviteCandidates = [];
       await this.appToastService.error(this.errorMapper.toUserMessage(error, 'social'));
@@ -407,32 +445,26 @@ export class PlayerProfilePage implements OnDestroy {
     }
   }
 
-  private async loadTeamMembers(teamId: number): Promise<void> {
-    try {
-      this.teamMembersLoading = true;
-      this.teamMembersError = null;
-      const members = await firstValueFrom(this.teamApiService.getActiveMembers(teamId));
-      if (members.length === 0) {
-        this.teamMembers = [];
-        return;
-      }
-      const ovrs = await firstValueFrom(
-        forkJoin(
-          members.map((member) =>
-            this.ratingsApiService.getOverall(member.playerUuid).pipe(catchError(() => of(null))),
-          ),
+  private loadTeamMembers(teamId: number): void {
+    this.teamMembersLoad?.unsubscribe();
+    this.teamMembersLoading = true;
+    this.teamMembersError = null;
+    this.teamMembersLoad = this.teamInvitationAccess.loadMembers(teamId).pipe(
+      switchMap(members => members.length ? forkJoin(members.map(member =>
+        this.ratingsApiService.getOverall(member.playerUuid).pipe(
+          catchError(() => of(null)),
+          map(overall => ({ ...member, ovr: overall?.hybridOVR ?? null })),
         ),
-      );
-      this.teamMembers = members.map((member, index) => ({
-        ...member,
-        ovr: ovrs[index]?.hybridOVR ?? null,
-      }));
-    } catch (error) {
-      this.teamMembers = [];
-      this.teamMembersError = this.errorMapper.toUserMessage(error, 'social');
-    } finally {
-      this.teamMembersLoading = false;
-    }
+      )) : of([])),
+      takeUntil(this.leave$),
+      finalize(() => (this.teamMembersLoading = false)),
+    ).subscribe({
+      next: members => (this.teamMembers = members),
+      error: error => {
+        this.teamMembers = [];
+        this.teamMembersError = this.errorMapper.toUserMessage(error, 'social');
+      },
+    });
   }
 
   private clearInviteSearchTimer(): void {

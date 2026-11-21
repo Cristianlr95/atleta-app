@@ -1,11 +1,13 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
-import { firstValueFrom } from 'rxjs';
+import { firstValueFrom, lastValueFrom } from 'rxjs';
+import { ApiError } from 'src/app/core/models/api-error.model';
 import { AuthSessionService } from 'src/app/core/services/auth-session.service';
 import { ErrorMapperService } from 'src/app/core/services/error-mapper.service';
 import { PlayerInvitationStatus } from 'src/app/features/matches/models/progressive-match.models';
 import { MatchStore } from 'src/app/features/matches/stores/match.store';
 import { MatchesApiService } from 'src/app/features/matches/services/matches-api.service';
 import { PlayerMatchHistoryItem } from 'src/app/features/matches/models/match.models';
+import { TEAM_INVITE_FORBIDDEN, TeamInvitationAccessService } from 'src/app/features/teams/services/team-invitation-access.service';
 import { ActivityService } from '../activity/services/activity.service';
 import { SocialPlayerLookupItem } from '../models/social.models';
 
@@ -15,6 +17,7 @@ export type SocialTabId = 'activity' | 'friends' | 'teams' | 'matches';
 export class SocialFacadeService {
   private readonly activityService = inject(ActivityService);
   private readonly authSessionService = inject(AuthSessionService);
+  private readonly teamInvitationAccess = inject(TeamInvitationAccessService);
   private readonly matchStore = inject(MatchStore);
   private readonly matchesApi = inject(MatchesApiService);
   private readonly playerMatchesStore = signal<PlayerMatchHistoryItem[]>([]);
@@ -82,19 +85,24 @@ export class SocialFacadeService {
     this.activityService.teams().filter((team) => team.creadorUuid === this.playerUuid || team.creador?.atletaUuid === this.playerUuid),
   );
 
+  get inviteTeams() {
+    return this.teams().filter(team => this.teamInvitationAccess.canInvite(team.id));
+  }
+
   get playerUuid(): string | null {
     return this.authSessionService.currentSession?.user.atletaUuid ?? null;
   }
 
   async initialize(): Promise<void> {
     this.clearMessages();
+    this.teamInvitationAccess.clear();
     if (!this.playerUuid) {
       this.errorMessageStore.set('No se encontro una sesion valida.');
       return;
     }
     try {
       await this.activityService.fetchActivity(this.playerUuid);
-      await this.loadPlayerMatches(this.playerUuid);
+      await Promise.all([this.loadTeamInvitePermissions(), this.loadPlayerMatches(this.playerUuid)]);
     } catch (error) {
       this.errorMessageStore.set(this.errorMapper.toUserMessage(error, 'social'));
     }
@@ -110,10 +118,19 @@ export class SocialFacadeService {
     }
     try {
       await this.activityService.fetchActivity(this.playerUuid);
-      await this.loadPlayerMatches(this.playerUuid);
+      await Promise.all([this.loadTeamInvitePermissions(), this.loadPlayerMatches(this.playerUuid)]);
     } catch (error) {
       this.errorMessageStore.set(this.errorMapper.toUserMessage(error, 'social'));
     }
+  }
+
+  async loadTeamInvitePermissions(): Promise<void> {
+    if (!this.playerUuid || this.activeTab() !== 'teams' || this.isLoading() || this.loadError()) return;
+    await Promise.all(this.teams().map(team => this.loadTeamInvitePermission(team.id)));
+  }
+
+  private async loadTeamInvitePermission(teamId: number): Promise<void> {
+    await lastValueFrom(this.teamInvitationAccess.loadMembers(teamId)).catch(() => undefined);
   }
 
   private async loadPlayerMatches(playerUuid: string): Promise<void> {
@@ -171,16 +188,22 @@ export class SocialFacadeService {
   }
 
   async sendTeamInvite(teamId: number, targetUuid: string): Promise<void> {
+    const requesterUuid = this.playerUuid;
+    if (!requesterUuid || !this.inviteTeams.some(team => team.id === teamId)) return;
+
     await this.executeAction(
       async () => {
-        if (!this.playerUuid) {
+        try {
+          await this.activityService.sendTeamInvite({ teamId, requesterUuid, targetUuid });
+        } catch (error) {
+          if ((error as ApiError | null)?.status !== 403) throw error;
+          if (this.playerUuid === requesterUuid) {
+            this.teamInvitationAccess.invalidate(teamId);
+            this.errorMessageStore.set(TEAM_INVITE_FORBIDDEN);
+            await this.loadTeamInvitePermission(teamId);
+          }
           return;
         }
-        await this.activityService.sendTeamInvite({
-          teamId,
-          requesterUuid: this.playerUuid,
-          targetUuid,
-        });
         this.successMessageStore.set('Invitacion de equipo enviada.');
         await this.refresh();
       },
@@ -299,6 +322,7 @@ export class SocialFacadeService {
 
   clearSessionState(): void {
     this.activityService.clear();
+    this.teamInvitationAccess.clear();
     this.playerMatchesStore.set([]);
     this.activeTabStore.set('activity');
     this.friendCandidatesStore.set([]);

@@ -1,5 +1,11 @@
 # Memory Vivo - Atleta Frontend
 
+## CAP-03: invitaciones de equipo · 21/11/2026
+
+- Ajuste frontend local sobre la beta con CAP-05 (`3f53e73`). Perfil y Social usan el plantel activo para permitir el envío al capitán del equipo, incluido un sucesor. Se vuelve a consultar al entrar y tras un `403`. Perfil reutiliza los integrantes en su panel de administración.
+- Verificación local: 54 pruebas unitarias dirigidas en jsdom y `git diff --check` correctos.
+- Pendiente coordinar la publicación con el backend que restringe el envío al capitán activo mediante JWT y comprobar el flujo autenticado en beta.
+
 ## Integración local de Ranking y OVR de convocatoria · 17/11/2026
 
 - Ranking integrado por avance directo en `main` local frontend (`cd37cd2`) y backend (`9a913c5`); 36 pruebas backend y 7 frontend dirigidas pasaron después. Sin push ni despliegue. La beta documentada no pudo abrirse por el control de acceso del navegador; la cuenta de prueba no tiene sesión abierta.

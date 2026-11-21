@@ -17,6 +17,7 @@ import { SocialPlayerLookupItem, SocialRequestItem } from '../../models/social.m
 export class TeamsPanelComponent {
   @Input() principalTeam: TeamSummary | null = null;
   @Input() createdTeams: TeamSummary[] = [];
+  @Input() inviteTeams: TeamSummary[] = [];
   @Input() pendingInvites: SocialRequestItem[] = [];
   @Input() inviteCandidates: SocialPlayerLookupItem[] = [];
 
@@ -30,11 +31,15 @@ export class TeamsPanelComponent {
   inviteQuery = '';
 
   get teamOptions(): MetallicSelectOption[] {
-    return this.createdTeams.map((team) => ({ label: team.nombre, value: String(team.id) }));
+    return this.inviteTeams.map((team) => ({ label: team.nombre, value: String(team.id) }));
   }
 
   get canInvitePlayers(): boolean {
-    return this.teamOptions.length > 0 && this.inviteTeamId.trim().length > 0 && Number.isFinite(Number(this.inviteTeamId));
+    return this.inviteTeams.some(team => String(team.id) === this.inviteTeamId);
+  }
+
+  canInviteTo(teamId: number): boolean {
+    return this.inviteTeams.some(team => team.id === teamId);
   }
 
   onSendInvite(targetUuid: string): void {
@@ -45,6 +50,7 @@ export class TeamsPanelComponent {
   }
 
   onPickTeamForInvite(team: TeamSummary): void {
+    if (!this.canInviteTo(team.id)) return;
     this.inviteTeamId = String(team.id);
   }
 

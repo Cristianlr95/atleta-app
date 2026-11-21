@@ -10,6 +10,10 @@ describe('ProfileTeamsComponent', () => {
     component.expandedTeamId = 7;
     component.inviteCandidates = [{ atletaUuid: 'player-2', alias: 'Nueve' }];
     fixture.detectChanges();
+    expect(fixture.nativeElement.querySelector('.profile-team-invite__input')).toBeNull();
+    expect(fixture.nativeElement.querySelector('.profile-team__btn--danger')).not.toBeNull();
+    component.inviteTeamIds = [7];
+    fixture.detectChanges();
     spyOn(component.teamToggle, 'emit');
     spyOn(component.viewTeam, 'emit');
     spyOn(component.remove, 'emit');
@@ -30,5 +34,11 @@ describe('ProfileTeamsComponent', () => {
     component.currentPlayerUuid = 'other';
     fixture.detectChanges();
     expect(fixture.nativeElement.querySelector('.profile-team__btn--danger')).toBeNull();
+    expect(fixture.nativeElement.querySelector('.profile-team-invite__input')).not.toBeNull();
+
+    component.inviteTeamIds = [];
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelector('.profile-team-invite__input')).toBeNull();
+    expect(fixture.nativeElement.querySelector('.profile-team__btn--admin')).toBeNull();
   });
 });

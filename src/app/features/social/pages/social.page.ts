@@ -20,7 +20,7 @@ import {
 } from '../components/match-invitations-panel/match-invitations-panel.component';
 import { SocialTabsComponent } from '../components/social-tabs/social-tabs.component';
 import { TeamsPanelComponent } from '../components/teams-panel/teams-panel.component';
-import { SocialFacadeService } from '../services/social-facade.service';
+import { SocialFacadeService, SocialTabId } from '../services/social-facade.service';
 
 @Component({
   selector: 'app-social-page',
@@ -113,6 +113,11 @@ export class SocialPage implements OnDestroy {
 
   onNavItemSelected(itemId: string): void {
     void this.navigationService.goToMainBottomSection(itemId);
+  }
+
+  onTabSelected(tab: SocialTabId): void {
+    this.facade.setActiveTab(tab);
+    void this.facade.loadTeamInvitePermissions();
   }
 
   onActivityAction(event: { activityId: string; action: ActivityActionType }): void {
