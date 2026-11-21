@@ -5,6 +5,7 @@ import { ActivatedRoute } from '@angular/router';
 import { IonicModule } from '@ionic/angular';
 import { Subject, Subscription, forkJoin, of } from 'rxjs';
 import { catchError, finalize, map, switchMap, takeUntil } from 'rxjs/operators';
+import { ApiError } from 'src/app/core/models/api-error.model';
 import { NavigationService } from 'src/app/core/services/navigation.service';
 import { AuthSessionService } from 'src/app/core/services/auth-session.service';
 import { buildMainBottomNav } from 'src/app/shared/navigation/main-bottom-nav';
@@ -48,6 +49,7 @@ export class TeamDetailPage implements OnDestroy {
   captainTarget = '';
   captainFeedbackText = '';
   isTransferringCaptain = false;
+  private isRemovingMember = false;
   team: TeamSummary | null = null;
   members: TeamRosterMember[] = [];
   isLoading = false;
@@ -84,8 +86,43 @@ export class TeamDetailPage implements OnDestroy {
     return this.members.filter(member => member.playerUuid !== uuid);
   }
 
+  get rosterActionPending(): boolean {
+    return this.isTransferringCaptain || this.isRemovingMember;
+  }
+
+  canRemoveMember(member: TeamActiveMember): boolean {
+    return this.canTransferCaptain && member.rol === 'JUGADOR'
+      && member.playerUuid !== this.authSessionService.currentSession?.user.atletaUuid;
+  }
+
+  removeMember(playerUuid: string): void {
+    if (this.rosterActionPending || !this.team) return;
+    const target = this.members.find(member => member.playerUuid === playerUuid);
+    if (!target || !this.canRemoveMember(target)) return;
+    if (!window.confirm(`¿Retirar a ${target.alias} del equipo?`)) return;
+
+    this.isRemovingMember = true;
+    this.captainFeedbackText = 'Retirando integrante…';
+    this.teamApiService.removeMember(this.team.id, target.playerUuid)
+      .pipe(takeUntil(this.destroy$), finalize(() => (this.isRemovingMember = false)))
+      .subscribe({
+        next: () => {
+          this.showCaptainFeedback(`Retiraste a ${target.alias} del equipo.`);
+          this.loadTeam();
+        },
+        error: (error: ApiError) => {
+          if (error.status === 403) {
+            this.showCaptainFeedback('Ya no tienes permiso para retirar integrantes.');
+            this.loadTeam();
+            return;
+          }
+          this.showCaptainFeedback('No se pudo retirar al integrante. Puedes volver a intentarlo.');
+        },
+      });
+  }
+
   transferCaptain(): void {
-    if (this.isTransferringCaptain || !this.team || !this.canTransferCaptain) return;
+    if (this.rosterActionPending || !this.team || !this.canTransferCaptain) return;
     const target = this.captainCandidates.find(member => member.playerUuid === this.captainTarget);
     if (!target) {
       this.showCaptainFeedback('Selecciona a otro integrante activo del equipo.');

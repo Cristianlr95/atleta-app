@@ -29,12 +29,12 @@
           <form *ngIf="canTransferCaptain && captainCandidates.length" class="captain-transfer team-actions"
             (submit)="$event.preventDefault(); transferCaptain()">
             <label for="captain-target">Nuevo capitán</label>
-            <select id="captain-target" #captainSelect [value]="captainTarget" [disabled]="isTransferringCaptain"
+            <select id="captain-target" #captainSelect [value]="captainTarget" [disabled]="rosterActionPending"
               (change)="captainTarget = captainSelect.value">
               <option value="">Selecciona un integrante activo</option>
               <option *ngFor="let member of captainCandidates" [value]="member.playerUuid">{{ member.alias }}</option>
             </select>
-            <button type="submit" [disabled]="!captainTarget || isTransferringCaptain">Transferir capitanía</button>
+            <button type="submit" [disabled]="!captainTarget || rosterActionPending">Transferir capitanía</button>
           </form>
           <p class="team-data-note">PJ, goles y asistencias con el equipo corresponden a este equipo; los totales abarcan toda la trayectoria. Sin historial registrado se muestra «Sin datos».</p>
           <p class="team-scroll-hint">Desliza para ver partidos, goles y asistencias.</p>
@@ -51,6 +51,9 @@
                     <span>{{ member.alias }} <span *ngIf="member.rol === 'CAPITAN'" class="captain-armband"
                       [id]="'captain-armband-' + member.playerUuid" role="img" aria-label="Capitán del equipo">C</span></span>
                   </button>
+                  <button *ngIf="canRemoveMember(member)" type="button" class="team-remove-member"
+                    [attr.aria-label]="'Retirar a ' + member.alias + ' del equipo'" [disabled]="rosterActionPending"
+                    (click)="removeMember(member.playerUuid)">Retirar</button>
                 </th>
                 <td>{{ member.primaryPositionName || 'Sin posición' }}</td>
                 <td class="team-member__ovr">{{ member.ratingUnavailable ? 'No disponible' : member.ovr !== null ? (member.ovr | number:'1.0-1') : 'Sin valoración' }}<span *ngIf="member.ratingUnavailable" class="team-rating-error" role="alert">No pudimos cargar las valoraciones.</span><button *ngIf="member.ratingUnavailable" type="button" class="team-rating-retry" [attr.aria-label]="'Reintentar valoraciones de ' + member.alias" (click)="onRetry()">Reintentar</button></td>

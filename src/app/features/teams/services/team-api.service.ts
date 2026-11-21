@@ -38,6 +38,10 @@ export class TeamApiService extends ApiService {
     return this.get<TeamActiveMember[]>(`${API_ENDPOINTS.teams.base}/${teamId}/members/active`);
   }
 
+  removeMember(teamId: number, playerUuid: string) {
+    return this.delete<void>(`${API_ENDPOINTS.teams.base}/${teamId}/members/${encodeURIComponent(playerUuid)}`);
+  }
+
   transferCaptain(teamId: number, targetPlayerUuid: string) {
     return this.put<TeamCaptainResponse, { targetPlayerUuid: string }>(
       `${API_ENDPOINTS.teams.base}/${teamId}/captain`, { targetPlayerUuid },

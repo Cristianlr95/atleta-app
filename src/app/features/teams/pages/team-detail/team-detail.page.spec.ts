@@ -30,7 +30,7 @@ describe('TeamDetailPage', () => {
 
   beforeEach(async () => {
     session = { currentSession: { user: { atletaUuid: captain.playerUuid } } };
-    teamApiService = jasmine.createSpyObj<TeamApiService>('TeamApiService', ['getById', 'getActiveMembers', 'transferCaptain']);
+    teamApiService = jasmine.createSpyObj<TeamApiService>('TeamApiService', ['getById', 'getActiveMembers', 'transferCaptain', 'removeMember']);
     navigationService = jasmine.createSpyObj<NavigationService>('NavigationService', [
       'safeNavigate', 'goBackOrProfile', 'goToProfile',
     ]);
@@ -74,6 +74,67 @@ describe('TeamDetailPage', () => {
     fixture.detectChanges();
     return fixture.nativeElement.querySelector('.captain-transfer button');
   }
+
+  it('offers removal only for other active players when the current member is captain', () => {
+    const coach: TeamActiveMember = { ...successor, playerUuid: 'coach', alias: 'Coach', rol: 'DT' };
+    teamApiService.getActiveMembers.and.returnValue(of([captain, successor, coach]));
+    component.ionViewWillEnter();
+    fixture.detectChanges();
+    const buttons = (): HTMLButtonElement[] => Array.from(fixture.nativeElement.querySelectorAll('.team-remove-member'));
+    expect(buttons().map(button => button.getAttribute('aria-label'))).toEqual(['Retirar a Demo11 del equipo']);
+
+    session.currentSession.user.atletaUuid = successor.playerUuid;
+    fixture.detectChanges();
+    expect(buttons()).toEqual([]);
+    component.removeMember(captain.playerUuid);
+    expect(teamApiService.removeMember).not.toHaveBeenCalled();
+
+    teamApiService.getActiveMembers.and.returnValue(of([{ ...captain, rol: 'JUGADOR' }, { ...successor, rol: 'CAPITAN' }, coach]));
+    component.ionViewWillEnter();
+    fixture.detectChanges();
+    expect(buttons().map(button => button.getAttribute('aria-label'))).toEqual(['Retirar a Demo10 del equipo']);
+  });
+
+  it('confirms the removal, prevents duplicate submissions and reloads the active roster', () => {
+    loadCaptainRoster();
+    const confirm = spyOn(window, 'confirm').and.returnValue(false);
+    const button: HTMLButtonElement = fixture.nativeElement.querySelector('.team-remove-member');
+    component.removeMember(captain.playerUuid);
+    component.removeMember('non-member');
+    expect(confirm).not.toHaveBeenCalled();
+    button.click();
+    expect(confirm).toHaveBeenCalledOnceWith('¿Retirar a Demo11 del equipo?');
+    expect(teamApiService.removeMember).not.toHaveBeenCalled();
+
+    const pending = new Subject<void>();
+    confirm.and.returnValue(true);
+    teamApiService.removeMember.and.returnValue(pending);
+    button.click();
+    fixture.detectChanges();
+    expect(button.disabled).toBeTrue();
+    component.removeMember(successor.playerUuid);
+    expect(teamApiService.removeMember).toHaveBeenCalledOnceWith(77, successor.playerUuid);
+
+    teamApiService.getActiveMembers.and.returnValue(of([captain]));
+    pending.next();
+    pending.complete();
+    fixture.detectChanges();
+    expect(teamApiService.getActiveMembers.calls.allArgs()).toEqual([[77], [77]]);
+    expect(fixture.nativeElement.querySelector('[aria-label="Ver ficha de Demo11"]')).toBeNull();
+    expect(component.captainFeedbackText).toContain('Retiraste a Demo11');
+  });
+
+  it('rechecks permissions after a 403 and hides removal when the captain changed', () => {
+    loadCaptainRoster();
+    spyOn(window, 'confirm').and.returnValue(true);
+    teamApiService.removeMember.and.returnValue(throwError(() => ({ status: 403 })));
+    teamApiService.getActiveMembers.and.returnValue(of([{ ...captain, rol: 'JUGADOR' }, { ...successor, rol: 'CAPITAN' }]));
+    fixture.nativeElement.querySelector('.team-remove-member').click();
+    fixture.detectChanges();
+    expect(teamApiService.getActiveMembers.calls.allArgs()).toEqual([[77], [77]]);
+    expect(fixture.nativeElement.querySelector('.team-remove-member')).toBeNull();
+    expect(fixture.nativeElement.querySelector('.captain-feedback').textContent).toContain('Ya no tienes permiso');
+  });
 
   it('confirms the transfer and moves the armband using the refreshed roster', () => {
     loadCaptainRoster();
