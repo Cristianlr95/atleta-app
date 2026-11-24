@@ -4,6 +4,9 @@
     <app-metallic-card>
       <p #captainFeedback class="captain-feedback" role="status" tabindex="-1">{{ captainFeedbackText }}</p>
       <p class="team-status" role="status" *ngIf="isLoading">Cargando equipo...</p>
+      <div class="team-actions" *ngIf="archivedTeamName !== null">
+        <button type="button" (click)="onBackToSocial()">Volver a Social</button>
+      </div>
       <section class="team-error" role="alert" *ngIf="errorMessage">
         <h2>{{ notFound ? 'Equipo no encontrado' : 'No se pudo cargar' }}</h2><p>{{ errorMessage }}</p>
         <div class="team-actions"><button *ngIf="!notFound" type="button" (click)="onRetry()">Reintentar</button><button type="button" (click)="onBackToSocial()">Volver a Social</button></div>
@@ -14,6 +17,43 @@
           <div class="team-shield" *ngIf="!selectedTeam.logoUrl" aria-hidden="true">{{ selectedTeam.nombre.charAt(0) }}</div>
           <div><p>Plantel del equipo</p><h1>{{ selectedTeam.nombre }}</h1><span *ngIf="selectedTeam.anioFundacion">Fundado en {{ selectedTeam.anioFundacion }}</span></div>
         </header>
+        <section *ngIf="isActiveCaptain" class="team-admin" aria-labelledby="team-admin-title">
+          <h2 id="team-admin-title">Administración del equipo</h2>
+          <div class="team-actions">
+            <button #editName type="button" [attr.aria-expanded]="adminPanel === 'name'" [disabled]="rosterActionPending"
+              (click)="openTeamAdmin('name')">Editar nombre</button>
+            <button #archive type="button" [attr.aria-expanded]="adminPanel === 'archive'" [disabled]="rosterActionPending"
+              (click)="openTeamAdmin('archive')">Archivar equipo</button>
+          </div>
+          <form *ngIf="adminPanel === 'name'" class="team-name-form" aria-label="Editar nombre del equipo" novalidate
+            (submit)="$event.preventDefault(); saveTeamName(nameEditorInput)" (keydown.escape)="cancelTeamAdmin(editName)">
+            <label for="team-name">Nombre del equipo</label>
+            <input id="team-name" type="text" #nameEditorInput [value]="nameDraft" [readOnly]="adminPending"
+              required [attr.aria-invalid]="adminError?.invalidName ? 'true' : null"
+              [attr.aria-describedby]="adminError ? 'team-name-hint team-name-error' : 'team-name-hint'"
+              (input)="nameDraft = nameEditorInput.value; adminError = null">
+            <p id="team-name-hint">Máximo {{ teamNameLimit }} caracteres.</p>
+            <p *ngIf="adminError as error" id="team-name-error" class="team-admin-error" role="alert">{{ error.message }}</p>
+            <div class="team-actions">
+              <button type="submit" [disabled]="nameUnchanged || rosterActionPending">Guardar nombre</button>
+              <button type="button" [disabled]="adminPending" (click)="cancelTeamAdmin(editName)">Cancelar edición</button>
+            </div>
+          </form>
+          <form *ngIf="adminPanel === 'archive'" class="team-archive-form" aria-label="Confirmar archivado"
+            aria-describedby="team-archive-description" (submit)="$event.preventDefault(); archiveTeam()"
+            (keydown.escape)="cancelTeamAdmin(archive)">
+            <p id="team-archive-description">
+              ¿Archivar {{ selectedTeam.nombre }}? El equipo saldrá de la lista de equipos activos y se eliminarán sus invitaciones.
+              Se conserva el historial deportivo.
+            </p>
+            <p *ngIf="adminError as error" #archiveError class="team-admin-error" role="alert" tabindex="-1">{{ error.message }}</p>
+            <div class="team-actions">
+              <button #archiveCancel type="button" [disabled]="adminPending" (click)="cancelTeamAdmin(archive)">Cancelar archivado</button>
+              <button type="submit" class="team-archive-confirm" aria-describedby="team-archive-description"
+                [disabled]="rosterActionPending">Confirmar archivado</button>
+            </div>
+          </form>
+        </section>
         <dl class="team-stats" *ngIf="selectedTeam.stats as stats">
           <div><dt>PJ</dt><dd>{{ stats.partidosJugados }}</dd></div><div><dt>PG</dt><dd>{{ stats.partidosGanados }}</dd></div><div><dt>Pts</dt><dd>{{ stats.puntos }}</dd></div><div><dt>DG</dt><dd>{{ stats.diferenciagoles }}</dd></div>
         </dl>
@@ -28,7 +68,7 @@
         <section class="team-members"><div class="team-members__heading"><h2>Plantel activo</h2><span>{{ members.length }} jugadores</span></div>
           <button *ngIf="canLeaveTeam" type="button" class="team-leave" [disabled]="rosterActionPending"
             (click)="leaveTeam()">Abandonar equipo</button>
-          <form *ngIf="canTransferCaptain && captainCandidates.length" class="captain-transfer team-actions"
+          <form *ngIf="isActiveCaptain && captainCandidates.length" class="captain-transfer team-actions"
             (submit)="$event.preventDefault(); transferCaptain()">
             <label for="captain-target">Nuevo capitán</label>
             <select id="captain-target" #captainSelect [value]="captainTarget" [disabled]="rosterActionPending"

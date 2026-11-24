@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 import { authGuard } from './core/guards/auth.guard';
 import { onboardingCompletedGuard, onboardingPendingGuard } from './core/guards/onboarding.guard';
+import type { TeamDetailPage } from './features/teams/pages/team-detail/team-detail.page';
 
 export const routes: Routes = [
   {
@@ -48,6 +49,7 @@ export const routes: Routes = [
   {
     path: 'teams/:id',
     canActivate: [authGuard, onboardingCompletedGuard],
+    canDeactivate: [(page: TeamDetailPage | null) => page?.canDeactivate() ?? true],
     loadComponent: () =>
       import('./features/teams/pages/team-detail/team-detail.page').then(
         (m) => m.TeamDetailPage,

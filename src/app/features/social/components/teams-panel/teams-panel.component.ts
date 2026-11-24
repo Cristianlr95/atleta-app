@@ -16,13 +16,12 @@ import { SocialPlayerLookupItem, SocialRequestItem } from '../../models/social.m
 })
 export class TeamsPanelComponent {
   @Input() principalTeam: TeamSummary | null = null;
-  @Input() createdTeams: TeamSummary[] = [];
+  @Input() otherTeams: TeamSummary[] = [];
   @Input() inviteTeams: TeamSummary[] = [];
   @Input() pendingInvites: SocialRequestItem[] = [];
   @Input() inviteCandidates: SocialPlayerLookupItem[] = [];
 
   @Output() openTeam = new EventEmitter<number>();
-  @Output() deleteTeam = new EventEmitter<number>();
   @Output() respondInvite = new EventEmitter<{ inviteId: number; accept: boolean }>();
   @Output() searchInviteCandidate = new EventEmitter<string>();
   @Output() sendInvite = new EventEmitter<{ teamId: number; targetUuid: string }>();
@@ -52,13 +51,5 @@ export class TeamsPanelComponent {
   onPickTeamForInvite(team: TeamSummary): void {
     if (!this.canInviteTo(team.id)) return;
     this.inviteTeamId = String(team.id);
-  }
-
-  onDeleteTeam(team: TeamSummary): void {
-    const confirmed = window.confirm(`Eliminar el equipo "${team.nombre}"? Esta accion no se puede deshacer.`);
-    if (!confirmed) {
-      return;
-    }
-    this.deleteTeam.emit(team.id);
   }
 }

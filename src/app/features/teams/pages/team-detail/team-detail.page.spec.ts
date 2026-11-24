@@ -1,15 +1,15 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { ActivatedRoute } from '@angular/router';
-import { IonModal } from '@ionic/angular';
-import { Subject, of, throwError } from 'rxjs';
+import { AlertController, IonModal } from '@ionic/angular';
+import { NEVER, Subject, of, throwError } from 'rxjs';
 import { AuthSessionService } from 'src/app/core/services/auth-session.service';
 import { NavigationService } from 'src/app/core/services/navigation.service';
 import { NotificationBadgeService } from 'src/app/features/matches/services/notification-badge.service';
 import { RatingsApiService } from 'src/app/features/ratings/services/ratings-api.service';
 import { UserApiService } from 'src/app/features/user/services/user-api.service';
-import { TeamActiveMember, TeamCaptainResponse } from '../../models/team.models';
+import { TeamActiveMember, TeamCaptainResponse, TeamSummary } from '../../models/team.models';
 import { TeamApiService } from '../../services/team-api.service';
 import { TeamDetailPage } from './team-detail.page';
 
@@ -20,6 +20,7 @@ describe('TeamDetailPage', () => {
   let navigationService: jasmine.SpyObj<NavigationService>;
   let userApiService: jasmine.SpyObj<UserApiService>;
   let ratingsApiService: jasmine.SpyObj<RatingsApiService>;
+  let alertController: jasmine.SpyObj<AlertController>;
   let session: { currentSession: { user: { atletaUuid: string } } };
   const captain: TeamActiveMember = {
     playerUuid: 'player-uuid', alias: 'Demo10', rol: 'CAPITAN', primaryPositionId: 9, primaryPositionName: 'Delantero',
@@ -31,17 +32,20 @@ describe('TeamDetailPage', () => {
   beforeEach(async () => {
     session = { currentSession: { user: { atletaUuid: captain.playerUuid } } };
     teamApiService = jasmine.createSpyObj<TeamApiService>('TeamApiService', [
-      'getById', 'getActiveMembers', 'transferCaptain', 'removeMember', 'leaveTeam',
+      'getById', 'getActiveMembers', 'transferCaptain', 'removeMember', 'leaveTeam', 'updateTeamName', 'deleteTeam',
     ]);
     navigationService = jasmine.createSpyObj<NavigationService>('NavigationService', [
       'safeNavigate', 'goBackOrProfile', 'goToProfile',
     ]);
     userApiService = jasmine.createSpyObj<UserApiService>('UserApiService', ['getPublicPlayerProfile']);
     ratingsApiService = jasmine.createSpyObj<RatingsApiService>('RatingsApiService', ['getOverall']);
+    alertController = jasmine.createSpyObj<AlertController>('AlertController', ['create']);
     navigationService.safeNavigate.and.resolveTo(true);
     userApiService.getPublicPlayerProfile.and.returnValue(of({ pictureUrl: '/demo.jpg' } as any));
     ratingsApiService.getOverall.and.returnValue(of({ hybridOVR: 74 } as any));
-    teamApiService.getById.and.returnValue(of({ id: 77, nombre: 'Atleta FC', anioFundacion: 2020 }));
+    teamApiService.getById.and.returnValue(of({
+      id: 77, nombre: 'Atleta FC', anioFundacion: 2020, creadorUuid: captain.playerUuid,
+    }));
     teamApiService.getActiveMembers.and.returnValue(of([{
       playerUuid: 'player-uuid', alias: 'Demo10', rol: 'CAPITAN', primaryPositionId: 9,
       primaryPositionName: 'Delantero',
@@ -55,6 +59,7 @@ describe('TeamDetailPage', () => {
         { provide: NavigationService, useValue: navigationService },
         { provide: UserApiService, useValue: userApiService },
         { provide: RatingsApiService, useValue: ratingsApiService },
+        { provide: AlertController, useValue: alertController },
         { provide: NotificationBadgeService, useValue: { totalPending: () => 0 } },
         { provide: ActivatedRoute, useValue: { snapshot: { paramMap: { get: () => '77' } } } },
       ],
@@ -76,6 +81,253 @@ describe('TeamDetailPage', () => {
     fixture.detectChanges();
     return fixture.nativeElement.querySelector('.captain-transfer button');
   }
+
+  function button(label: string): HTMLButtonElement | undefined {
+    return Array.from<HTMLButtonElement>(fixture.nativeElement.querySelectorAll('button'))
+      .find(item => item.textContent?.trim() === label);
+  }
+
+  function openNameEditor(): HTMLInputElement {
+    button('Editar nombre')!.click();
+    fixture.detectChanges();
+    return fixture.nativeElement.querySelector('#team-name');
+  }
+
+  function enterName(input: HTMLInputElement, value: string): void {
+    input.value = value;
+    input.dispatchEvent(new Event('input', { bubbles: true }));
+    fixture.detectChanges();
+  }
+
+  function submit(form: string): void {
+    fixture.nativeElement.querySelector(form).dispatchEvent(new Event('submit', { cancelable: true }));
+    fixture.detectChanges();
+  }
+
+  it('shows edit and archive only to the active captain, including a successor', () => {
+    loadCaptainRoster();
+    expect(button('Editar nombre')).toBeDefined();
+    expect(button('Archivar equipo')).toBeDefined();
+    const pending = new Subject<TeamActiveMember[]>();
+    teamApiService.getActiveMembers.and.returnValue(pending);
+    component.ionViewWillEnter();
+    fixture.detectChanges();
+    expect(button('Editar nombre')).toBeUndefined();
+    expect(button('Archivar equipo')).toBeUndefined();
+    pending.next([{ ...captain, rol: 'JUGADOR' }, { ...successor, rol: 'CAPITAN' }]);
+    pending.complete();
+    fixture.detectChanges();
+    expect(button('Editar nombre')).toBeUndefined();
+    expect(button('Archivar equipo')).toBeUndefined();
+    session.currentSession.user.atletaUuid = 'external';
+    fixture.detectChanges();
+    expect(button('Editar nombre')).toBeUndefined();
+    session.currentSession.user.atletaUuid = successor.playerUuid;
+    fixture.detectChanges();
+    expect(button('Editar nombre')).toBeDefined();
+    expect(button('Archivar equipo')).toBeDefined();
+  });
+
+  it('preloads the name, validates normalized input and allows cancellation without a request', () => {
+    loadCaptainRoster();
+    const input = openNameEditor();
+    expect(input.value).toBe('Atleta FC');
+    enterName(input, '\u00a0Atleta FC\u2003');
+    expect(button('Guardar nombre')?.disabled).toBeTrue();
+    submit('.team-name-form');
+    for (const invalid of ['\u2003', 'a'.repeat(101), 'A\u007fB']) {
+      enterName(input, invalid);
+      submit('.team-name-form');
+      expect(fixture.nativeElement.querySelector('.team-admin-error')).not.toBeNull();
+    }
+    enterName(input, '\u00a0Atleta FC\u2003');
+    button('Cancelar edición')!.click();
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelector('#team-name')).toBeNull();
+    expect(teamApiService.updateTeamName).not.toHaveBeenCalled();
+  });
+
+  it('keeps the editor while confirming a switch to archive and coalesces repeated clicks', async () => {
+    loadCaptainRoster();
+    const input = openNameEditor();
+    enterName(input, 'Borrador');
+    let dismiss!: (decision: { role: string }) => void;
+    const decision = new Promise<{ role: string }>(resolve => { dismiss = resolve; });
+    const alert = jasmine.createSpyObj('alert', ['present', 'onDidDismiss', 'querySelector']);
+    alert.present.and.resolveTo();
+    alert.onDidDismiss.and.returnValue(decision);
+    alertController.create.and.resolveTo(alert);
+
+    const archive = button('Archivar equipo')!;
+    archive.click();
+    archive.click();
+    await fixture.whenStable();
+    fixture.detectChanges();
+    expect(alertController.create).toHaveBeenCalledTimes(1);
+    expect(fixture.nativeElement.querySelector('.team-archive-form')).toBeNull();
+
+    dismiss({ role: 'cancel' });
+    await fixture.whenStable();
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelector('#team-name')?.value).toBe('Borrador');
+    expect(teamApiService.deleteTeam).not.toHaveBeenCalled();
+  });
+
+  it('blocks PATCH if a successor is captain by the time the draft is submitted', () => {
+    loadCaptainRoster();
+    const input = openNameEditor();
+    enterName(input, 'Borrador');
+    teamApiService.updateTeamName.and.returnValue(of({ id: 77, nombre: 'Borrador' }));
+    teamApiService.getActiveMembers.and.returnValue(of([{ ...captain, rol: 'JUGADOR' }, { ...successor, rol: 'CAPITAN' }]));
+
+    submit('.team-name-form');
+
+    expect(teamApiService.updateTeamName).not.toHaveBeenCalled();
+    expect(teamApiService.getActiveMembers.calls.allArgs()).toEqual([[77], [77]]);
+    expect(button('Editar nombre')).toBeUndefined();
+    expect(fixture.nativeElement.querySelector('[role="status"]').textContent).toContain('Ya no tienes permiso');
+  });
+
+  it('keeps the draft and skips PATCH if captaincy cannot be verified', () => {
+    loadCaptainRoster();
+    const input = openNameEditor();
+    enterName(input, 'Borrador');
+    teamApiService.getActiveMembers.and.returnValue(throwError(() => ({ status: 503 })));
+
+    submit('.team-name-form');
+
+    expect(input.value).toBe('Borrador');
+    expect(fixture.nativeElement.querySelector('.team-admin-error')).not.toBeNull();
+    expect(teamApiService.updateTeamName).not.toHaveBeenCalled();
+  });
+
+  it('releases a stalled save without discarding the draft', fakeAsync(() => {
+    loadCaptainRoster();
+    const input = openNameEditor();
+    enterName(input, 'Borrador');
+    teamApiService.getActiveMembers.and.returnValue(NEVER);
+
+    submit('.team-name-form');
+    expect(component.canDeactivate()).toBeFalse();
+    tick(30_000);
+    fixture.detectChanges();
+
+    expect(button('Guardar nombre')?.disabled).toBeFalse();
+    expect(input.value).toBe('Borrador');
+    expect(fixture.nativeElement.querySelector('.team-admin-error').textContent).toContain('a tiempo');
+    expect(teamApiService.updateTeamName).not.toHaveBeenCalled();
+  }));
+
+  it('protects page unload only while a meaningful draft is open', () => {
+    loadCaptainRoster();
+    const input = openNameEditor();
+    enterName(input, '  Atleta FC  ');
+    const clean = new Event('beforeunload', { cancelable: true }) as BeforeUnloadEvent;
+    component.protectDraftOnUnload(clean);
+    expect(clean.defaultPrevented).toBeFalse();
+
+    enterName(input, 'Borrador');
+    const dirty = new Event('beforeunload', { cancelable: true }) as BeforeUnloadEvent;
+    component.protectDraftOnUnload(dirty);
+    expect(dirty.defaultPrevented).toBeTrue();
+  });
+
+  it('keeps the draft on 409, prevents duplicate updates and shows the returned name', () => {
+    loadCaptainRoster();
+    const input = openNameEditor();
+    teamApiService.updateTeamName.and.returnValue(throwError(() => ({ status: 409 })));
+    enterName(input, 'Fútbol Norte');
+    submit('.team-name-form');
+    expect(input.value).toBe('Fútbol Norte');
+    expect(fixture.nativeElement.querySelector('.team-admin-error').textContent).toContain('ya está en uso');
+
+    const pending = new Subject<TeamSummary>();
+    teamApiService.updateTeamName.and.returnValue(pending);
+    enterName(input, '\u00a0Fútbol Sur\u2003');
+    submit('.team-name-form');
+    expect(button('Guardar nombre')?.disabled).toBeTrue();
+    submit('.team-name-form');
+    expect(teamApiService.updateTeamName.calls.allArgs()).toEqual([[77, 'Fútbol Norte'], [77, 'Fútbol Sur']]);
+    pending.next({ id: 77, nombre: 'Fútbol Sur' });
+    pending.complete();
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelector('h1').textContent).toBe('Fútbol Sur');
+    expect(fixture.nativeElement.querySelector('#team-name')).toBeNull();
+    expect(component.members.length).toBe(2);
+    expect(teamApiService.getActiveMembers.calls.allArgs()).toEqual([[77], [77], [77]]);
+  });
+
+  it('reloads the active roster when editing returns 403 and removes stale controls', () => {
+    loadCaptainRoster();
+    const input = openNameEditor();
+    enterName(input, 'Otro nombre');
+    teamApiService.updateTeamName.and.returnValue(throwError(() => ({ status: 403 })));
+    teamApiService.getActiveMembers.and.returnValues(
+      of([captain, successor]),
+      of([{ ...captain, rol: 'JUGADOR' }, { ...successor, rol: 'CAPITAN' }]),
+    );
+    submit('.team-name-form');
+    expect(teamApiService.updateTeamName).toHaveBeenCalledOnceWith(77, 'Otro nombre');
+    expect(teamApiService.getActiveMembers.calls.allArgs()).toEqual([[77], [77], [77]]);
+    expect(button('Editar nombre')).toBeUndefined();
+    expect(button('Archivar equipo')).toBeUndefined();
+    expect(component.captainFeedbackText).toContain('Ya no tienes permiso');
+  });
+
+  it('keeps the name draft when the server rejects the input with 400', () => {
+    loadCaptainRoster();
+    const input = openNameEditor();
+    enterName(input, 'Nombre rechazado');
+    teamApiService.updateTeamName.and.returnValue(throwError(() => ({ status: 400 })));
+    submit('.team-name-form');
+    expect(input.value).toBe('Nombre rechazado');
+    expect(fixture.nativeElement.querySelector('.team-admin-error').textContent).toContain('El nombre no es válido');
+    expect(teamApiService.getActiveMembers.calls.allArgs()).toEqual([[77], [77]]);
+  });
+
+  for (const scenario of [
+    { status: 401, message: 'Tu sesión ya no es válida' },
+    { status: 404, message: 'El equipo ya no está disponible' },
+  ]) {
+    it(`removes the stale detail when editing returns ${scenario.status}`, () => {
+      loadCaptainRoster();
+      const input = openNameEditor();
+      enterName(input, 'Otro equipo');
+      teamApiService.updateTeamName.and.returnValue(throwError(() => ({ status: scenario.status })));
+      submit('.team-name-form');
+      expect(fixture.nativeElement.querySelector('.team-name-form')).toBeNull();
+      expect(fixture.nativeElement.querySelector('.team-hero')).toBeNull();
+      expect(component.captainFeedbackText).toContain(scenario.message);
+      expect(teamApiService.getActiveMembers.calls.allArgs()).toEqual([[77], [77]]);
+    });
+  }
+
+  it('requires archive confirmation, prevents duplicate deletes and leaves the archived roster', () => {
+    spyOn(window, 'matchMedia').and.returnValue({ matches: false } as MediaQueryList);
+    loadCaptainRoster();
+    button('Archivar equipo')!.click();
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelector('#team-archive-description').textContent).toContain('historial');
+    button('Cancelar archivado')!.click();
+    fixture.detectChanges();
+    expect(teamApiService.deleteTeam).not.toHaveBeenCalled();
+
+    button('Archivar equipo')!.click();
+    fixture.detectChanges();
+    const pending = new Subject<void>();
+    teamApiService.deleteTeam.and.returnValue(pending);
+    submit('.team-archive-form');
+    expect(button('Confirmar archivado')?.disabled).toBeTrue();
+    submit('.team-archive-form');
+    expect(teamApiService.deleteTeam).toHaveBeenCalledOnceWith(77, captain.playerUuid);
+    pending.next();
+    pending.complete();
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelector('.team-hero')).toBeNull();
+    expect(navigationService.safeNavigate).toHaveBeenCalledOnceWith(['/social'], {
+      queryParams: { tab: 'teams' }, replaceUrl: true, state: { archivedTeamName: 'Atleta FC' },
+    });
+  });
 
   it('shows a player who also coaches and keeps the removal action unavailable for that member', () => {
     const coach = { ...successor, esDt: true };
@@ -219,6 +471,8 @@ describe('TeamDetailPage', () => {
     const badge: HTMLElement = fixture.nativeElement.querySelector('.captain-armband');
     expect(badge.closest('button')?.getAttribute('aria-label')).toBe('Ver ficha de Demo11');
     expect(fixture.nativeElement.querySelector('.captain-transfer')).toBeNull();
+    expect(button('Editar nombre')).toBeUndefined();
+    expect(button('Archivar equipo')).toBeUndefined();
     expect(fixture.nativeElement.querySelector('.captain-feedback').textContent).toContain('Plantel actualizado');
   });
 

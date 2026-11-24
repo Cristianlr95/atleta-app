@@ -11,7 +11,7 @@ describe('TeamsPanelComponent', () => {
   it('does not emit team invites for a selected team whose captain permission is unknown or revoked', () => {
     spyOn(component.sendInvite, 'emit');
 
-    component.createdTeams = [{ id: 7, nombre: 'Atleta FC' }];
+    component.otherTeams = [{ id: 7, nombre: 'Atleta FC' }];
     component.inviteTeams = [{ id: 8, nombre: 'Otro equipo' }];
     component.inviteTeamId = '7';
     component.onSendInvite('player-1');
@@ -32,18 +32,23 @@ describe('TeamsPanelComponent', () => {
     expect(component.sendInvite.emit).toHaveBeenCalledTimes(1);
   });
 
-  it('shows invitation controls only for confirmed captain teams and keeps founder removal', () => {
+  it('opens any roster and shows direct invitation controls only for confirmed captain teams', () => {
     const fixture = TestBed.createComponent(TeamsPanelComponent);
     const panel = fixture.componentInstance;
-    panel.createdTeams = [{ id: 7, nombre: 'Azul' }];
+    panel.principalTeam = { id: 8, nombre: 'Verde', creadorUuid: 'another' };
+    panel.otherTeams = [{ id: 7, nombre: 'Azul' }];
+    spyOn(panel.openTeam, 'emit');
     fixture.detectChanges();
     expect(fixture.nativeElement.querySelector('app-metallic-select')).toBeNull();
-    expect(fixture.nativeElement.querySelector('button[aria-label="Eliminar Azul"]')).not.toBeNull();
+    expect(fixture.nativeElement.querySelector('button[aria-label="Eliminar Azul"]')).toBeNull();
+    fixture.nativeElement.querySelector('button[aria-label="Ver plantel de Azul"]').click();
+    expect(panel.openTeam.emit).toHaveBeenCalledOnceWith(7);
 
     panel.inviteTeams = [{ id: 8, nombre: 'Verde', creadorUuid: 'another' }];
     fixture.detectChanges();
     const select: HTMLSelectElement = fixture.nativeElement.querySelector('select');
     expect(Array.from(select.options).map(option => option.value)).toEqual(['', '8']);
     expect(fixture.nativeElement.querySelector('button[aria-label="Invitar jugador a Azul"]')).toBeNull();
+    expect(fixture.nativeElement.querySelector('button[aria-label="Invitar jugador a Verde"]')).not.toBeNull();
   });
 });

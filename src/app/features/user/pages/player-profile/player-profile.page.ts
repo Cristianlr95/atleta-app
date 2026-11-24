@@ -226,14 +226,6 @@ export class PlayerProfilePage implements OnDestroy {
     }
   }
 
-  isTeamCreator(team: TeamSummary): boolean {
-    const currentUser = this.authSessionService.currentSession?.user.atletaUuid;
-    if (!currentUser) {
-      return false;
-    }
-    return team.creadorUuid === currentUser || team.creador?.atletaUuid === currentUser;
-  }
-
   toggleTeamAccordion(teamId: number): void {
     const alreadyExpanded = this.expandedTeamId === teamId;
     this.closeTeamAccordion();
@@ -301,33 +293,6 @@ export class PlayerProfilePage implements OnDestroy {
       }
     } finally {
       this.inviteSendingUuid = null;
-    }
-  }
-
-  async onDeleteTeam(team: TeamSummary): Promise<void> {
-    if (!this.isTeamCreator(team)) {
-      await this.appToastService.info('Solo el creador puede eliminar este equipo.');
-      return;
-    }
-    const confirmed = window.confirm(
-      `Estas seguro de eliminar el equipo "${team.nombre}"?\nEsta accion no se puede deshacer.`,
-    );
-    if (!confirmed) {
-      return;
-    }
-    const actorUuid = this.authSessionService.currentSession?.user.atletaUuid;
-    if (!actorUuid) {
-      return;
-    }
-    try {
-      await firstValueFrom(this.teamApiService.deleteTeam(team.id, actorUuid));
-      this.memberTeams = this.memberTeams.filter((item) => item.id !== team.id);
-      if (this.expandedTeamId === team.id) {
-        this.closeTeamAccordion();
-      }
-      await this.appToastService.success('Equipo eliminado.');
-    } catch (error) {
-      await this.appToastService.error(this.errorMapper.toUserMessage(error, 'social'));
     }
   }
 

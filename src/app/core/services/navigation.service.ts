@@ -1,11 +1,15 @@
 import { Location } from '@angular/common';
-import { Injectable, inject } from '@angular/core';
+import { Injectable, Injector, inject } from '@angular/core';
 import { NavigationExtras, Router } from '@angular/router';
+import { NavController } from '@ionic/angular';
+
+export type SafeNavigationExtras = NavigationExtras & { animated?: false };
 
 @Injectable({ providedIn: 'root' })
 export class NavigationService {
   private readonly router = inject(Router);
   private readonly location = inject(Location);
+  private readonly injector = inject(Injector);
   private readonly mainBottomRoutes: Record<string, readonly string[]> = {
     home: ['/home'],
     matches: ['/matches'],
@@ -15,13 +19,16 @@ export class NavigationService {
   private lockedUntil = 0;
   private readonly lockMs = 450;
 
-  async safeNavigate(commands: readonly string[], extras?: NavigationExtras): Promise<boolean> {
+  async safeNavigate(commands: readonly string[], extras?: SafeNavigationExtras): Promise<boolean> {
     if (!this.canNavigate()) {
       return false;
     }
 
     this.lock();
     try {
+      if (extras?.animated === false) {
+        return await this.injector.get(NavController).navigateForward([...commands], extras);
+      }
       return await this.router.navigate([...commands], extras);
     } catch {
       return false;

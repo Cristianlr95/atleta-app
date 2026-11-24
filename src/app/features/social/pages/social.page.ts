@@ -1,5 +1,5 @@
-import { CommonModule } from '@angular/common';
-import { Component, OnDestroy, computed, inject } from '@angular/core';
+import { CommonModule, Location } from '@angular/common';
+import { Component, ElementRef, OnDestroy, ViewChild, computed, inject } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { IonicModule } from '@ionic/angular';
 import { NavigationService } from 'src/app/core/services/navigation.service';
@@ -41,10 +41,12 @@ import { SocialFacadeService, SocialTabId } from '../services/social-facade.serv
   ],
 })
 export class SocialPage implements OnDestroy {
+  @ViewChild('archiveFeedback') private archiveFeedback?: ElementRef<HTMLElement>;
   readonly facade = inject(SocialFacadeService);
   private readonly route = inject(ActivatedRoute);
   private readonly navigationService = inject(NavigationService);
   private readonly notificationBadgeService = inject(NotificationBadgeService);
+  private readonly location = inject(Location);
 
   readonly socialIconAsset = 'assets/icons/atleta-raster-v1/ic_social_friends_96.png';
 
@@ -62,6 +64,8 @@ export class SocialPage implements OnDestroy {
   );
 
   readonly principalTeam = computed(() => this.facade.teams()[0] ?? null);
+  readonly otherTeams = computed(() => this.facade.teams().slice(1));
+  archivedTeamName = '';
 
   readonly confirmedMatches = this.facade.confirmedMatches;
 
@@ -70,7 +74,13 @@ export class SocialPage implements OnDestroy {
   }
 
   ionViewWillEnter(): void {
+    const state = this.location.getState() as { archivedTeamName?: unknown } | null;
+    this.archivedTeamName = typeof state?.archivedTeamName === 'string' ? state.archivedTeamName : '';
     void this.loadOnEnter();
+  }
+
+  ionViewDidEnter(): void {
+    if (this.archivedTeamName) this.archiveFeedback?.nativeElement.focus();
   }
 
   private async loadOnEnter(): Promise<void> {
@@ -198,10 +208,6 @@ export class SocialPage implements OnDestroy {
 
   onSendTeamInvite(payload: { teamId: number; targetUuid: string }): void {
     void this.facade.sendTeamInvite(payload.teamId, payload.targetUuid);
-  }
-
-  onDeleteTeam(teamId: number): void {
-    void this.facade.deleteTeam(teamId);
   }
 
   private onAcceptItem(item: ActivityItem): void {

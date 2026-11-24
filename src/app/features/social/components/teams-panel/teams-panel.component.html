@@ -2,21 +2,23 @@
   <h4>Mi equipo principal</h4>
   <article class="teams-item" *ngIf="principalTeam; else noTeam">
     <p>{{ principalTeam.nombre }}</p>
-    <button type="button" [attr.aria-label]="'Abrir equipo ' + principalTeam.nombre" (click)="openTeam.emit(principalTeam.id)">Abrir equipo</button>
+    <div class="teams-item__actions">
+      <button type="button" [attr.aria-label]="'Abrir equipo ' + principalTeam.nombre" (click)="openTeam.emit(principalTeam.id)">Abrir equipo</button>
+      <button *ngIf="canInviteTo(principalTeam.id)" type="button" [attr.aria-label]="'Invitar jugador a ' + principalTeam.nombre"
+        (click)="onPickTeamForInvite(principalTeam)">Invitar jugador</button>
+    </div>
   </article>
   <ng-template #noTeam>
     <p class="teams-panel__state">No tienes equipo principal definido.</p>
   </ng-template>
 
-  <h4>Equipos creados</h4>
-  <p class="teams-panel__state" *ngIf="createdTeams.length === 0">Aun no tienes equipos creados.</p>
-  <div class="teams-panel__list" *ngIf="createdTeams.length > 0">
-    <article class="teams-item" *ngFor="let team of createdTeams">
+  <h4 *ngIf="otherTeams.length > 0">Otros equipos</h4>
+  <div class="teams-panel__list" *ngIf="otherTeams.length > 0">
+    <article class="teams-item" *ngFor="let team of otherTeams">
       <p>{{ team.nombre }}</p>
       <div class="teams-item__actions">
-        <button type="button" [attr.aria-label]="'Administrar ' + team.nombre" (click)="openTeam.emit(team.id)">Administrar</button>
+        <button type="button" [attr.aria-label]="'Ver plantel de ' + team.nombre" (click)="openTeam.emit(team.id)">Ver plantel</button>
         <button *ngIf="canInviteTo(team.id)" type="button" [attr.aria-label]="'Invitar jugador a ' + team.nombre" (click)="onPickTeamForInvite(team)">Invitar jugador</button>
-        <button type="button" [attr.aria-label]="'Eliminar ' + team.nombre" (click)="onDeleteTeam(team)">Eliminar</button>
       </div>
     </article>
   </div>

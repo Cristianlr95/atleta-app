@@ -124,10 +124,6 @@ export class ActivityService {
     await firstValueFrom(this.socialApiService.respondTeamInvite(inviteId, payload));
   }
 
-  async deleteTeam(teamId: number, actorUuid: string): Promise<void> {
-    await firstValueFrom(this.teamApiService.deleteTeam(teamId, actorUuid));
-  }
-
   async sendMatchInvite(payload: CreateMatchInvitePayload): Promise<void> {
     await firstValueFrom(this.socialApiService.createMatchInvite(payload));
   }

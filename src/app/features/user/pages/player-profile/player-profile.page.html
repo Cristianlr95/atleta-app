@@ -82,10 +82,10 @@
           <button type="button" class="profile-retry profile-teams-retry" (click)="retryStatistics()">Reintentar equipos</button>
         </div>
         <button *ngIf="!teamsUnavailable && memberTeams.length === 0" type="button" class="profile-settings-link profile-create-team" (click)="openTeamCreation()">Crear equipo</button>
-        <app-profile-teams *ngIf="!teamsUnavailable" [teams]="memberTeams" [currentPlayerUuid]="currentPlayerUuid" [expandedTeamId]="expandedTeamId"
+        <app-profile-teams *ngIf="!teamsUnavailable" [teams]="memberTeams" [expandedTeamId]="expandedTeamId"
           [teamMembers]="teamMembers" [teamMembersLoading]="teamMembersLoading" [teamMembersError]="teamMembersError" [inviteTeamIds]="inviteTeamIds"
           [inviteQuery]="inviteQuery" [inviteLoading]="inviteLoading" [inviteCandidates]="inviteCandidates" [inviteSendingUuid]="inviteSendingUuid"
-          (viewTeam)="openTeam($event)" (teamToggle)="toggleTeamAccordion($event)" (remove)="onDeleteTeam($event)" (queryChange)="onInviteQueryChange($event)" (invite)="onSendTeamInvite($event)">
+          (viewTeam)="openTeam($event)" (teamToggle)="toggleTeamAccordion($event)" (queryChange)="onInviteQueryChange($event)" (invite)="onSendTeamInvite($event)">
         </app-profile-teams>
       </section>
     </main>

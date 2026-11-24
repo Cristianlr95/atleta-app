@@ -181,7 +181,6 @@ function buildSocialFacadeMock() {
     pendingFriends: signal([]).asReadonly(),
     pendingTeamInvites: signal([]).asReadonly(),
     pendingMatchInvites: signal([]).asReadonly(),
-    createdTeams: signal([]).asReadonly(),
     inviteTeams: [],
     loadTeamInvitePermissions: jasmine.createSpy('loadTeamInvitePermissions').and.resolveTo(),
     friendCandidates: signal([]).asReadonly(),
@@ -200,7 +199,6 @@ function buildSocialFacadeMock() {
     respondTeamInvite: jasmine.createSpy('respondTeamInvite').and.resolveTo(),
     respondMatchInvite: jasmine.createSpy('respondMatchInvite').and.resolveTo(),
     sendTeamInvite: jasmine.createSpy('sendTeamInvite').and.resolveTo(),
-    deleteTeam: jasmine.createSpy('deleteTeam').and.resolveTo(),
   };
 
   return {

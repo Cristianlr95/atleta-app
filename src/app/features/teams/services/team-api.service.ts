@@ -34,6 +34,10 @@ export class TeamApiService extends ApiService {
     return this.get<TeamSummary>(`${API_ENDPOINTS.teams.base}/${teamId}`);
   }
 
+  updateTeamName(teamId: number, nombre: string) {
+    return this.patch<TeamSummary, { nombre: string }>(`${API_ENDPOINTS.teams.base}/${teamId}`, { nombre });
+  }
+
   getActiveMembers(teamId: number) {
     return this.get<TeamActiveMember[]>(`${API_ENDPOINTS.teams.base}/${teamId}/members/active`);
   }

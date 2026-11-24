@@ -58,6 +58,30 @@ h2 { font-size: 21px; }
 .visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 .team-error { color: var(--text-primary); font: 16px/1.4 var(--font-family-body); }
 .team-actions { display: flex; flex-wrap: wrap; gap: 12px; }
+.team-admin {
+  display: grid;
+  gap: 10px;
+  margin-block: 16px;
+  padding-block: 12px;
+  border-block: 1px solid var(--tactical-line);
+  color: var(--text-primary);
+  font: 15px/1.4 var(--font-family-body);
+}
+.team-admin form { display: grid; justify-items: start; gap: 8px; min-width: 0; }
+.team-admin p { margin: 0; overflow-wrap: anywhere; }
+.team-admin input {
+  width: min(100%, 24rem);
+  min-height: 44px;
+  padding: 8px;
+  border: 1px solid var(--tactical-visit);
+  border-radius: 6px;
+  background: #071e27;
+  color: var(--text-primary);
+  font: inherit;
+}
+.team-admin input:focus-visible { outline: 2px solid var(--tactical-visit); outline-offset: 3px; }
+.team-admin :disabled { opacity: .65; }
+.team-admin .team-archive-confirm { border-color: var(--atleta-red); }
 .captain-transfer { align-items: center; margin-block: 12px; }
 .captain-transfer select {
   min-width: 44px;

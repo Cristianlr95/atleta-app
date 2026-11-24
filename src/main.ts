@@ -1,6 +1,6 @@
 import { importProvidersFrom } from '@angular/core';
 import { bootstrapApplication } from '@angular/platform-browser';
-import { RouteReuseStrategy, provideRouter, withPreloading, PreloadAllModules } from '@angular/router';
+import { RouteReuseStrategy, provideRouter, withPreloading, PreloadAllModules, withRouterConfig } from '@angular/router';
 import { IonicModule, IonicRouteStrategy } from '@ionic/angular';
 import { provideCore } from './app/core/core.providers';
 
@@ -13,6 +13,11 @@ bootstrapApplication(AppComponent, {
     provideCore(),
     // Pages use IonicModule and need its custom-element loader.
     importProvidersFrom(IonicModule.forRoot()),
-    provideRouter(routes, withPreloading(PreloadAllModules)),
+    provideRouter(
+      routes,
+      withPreloading(PreloadAllModules),
+      // Canceling browser Back must restore the history index so the user can try again.
+      withRouterConfig({ canceledNavigationResolution: 'computed' }),
+    ),
   ],
 });

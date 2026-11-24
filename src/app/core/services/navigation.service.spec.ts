@@ -1,11 +1,13 @@
 import { Location } from '@angular/common';
 import { TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
+import { NavController } from '@ionic/angular';
 import { NavigationService } from './navigation.service';
 
 describe('NavigationService', () => {
   let service: NavigationService;
   let router: jasmine.SpyObj<Router>;
+  let navController: jasmine.SpyObj<NavController>;
 
   beforeEach(() => {
     router = jasmine.createSpyObj<Router>('Router', ['navigate', 'navigateByUrl'], {
@@ -13,12 +15,15 @@ describe('NavigationService', () => {
     });
     router.navigate.and.resolveTo(true);
     router.navigateByUrl.and.resolveTo(true);
+    navController = jasmine.createSpyObj<NavController>('NavController', ['navigateForward']);
+    navController.navigateForward.and.resolveTo(true);
 
     TestBed.configureTestingModule({
       providers: [
         NavigationService,
         { provide: Router, useValue: router },
         { provide: Location, useValue: jasmine.createSpyObj<Location>('Location', ['back']) },
+        { provide: NavController, useValue: navController },
       ],
     });
 
@@ -46,6 +51,13 @@ describe('NavigationService', () => {
     const navigated = await service.goToMainBottomSection('unknown');
 
     expect(navigated).toBeFalse();
+    expect(router.navigate).not.toHaveBeenCalled();
+  });
+
+  it('disables the Ionic animation only for navigation that explicitly opts out', async () => {
+    const extras = { queryParams: { tab: 'teams' }, replaceUrl: true, animated: false } as const;
+    expect(await service.safeNavigate(['/social'], extras)).toBeTrue();
+    expect(navController.navigateForward).toHaveBeenCalledOnceWith(['/social'], extras);
     expect(router.navigate).not.toHaveBeenCalled();
   });
 

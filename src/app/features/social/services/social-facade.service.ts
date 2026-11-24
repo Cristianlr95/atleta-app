@@ -81,10 +81,6 @@ export class SocialFacadeService {
     this.activityService.friendships().filter((item) => item.status === 'ACEPTADA').length,
   );
 
-  readonly createdTeams = computed(() =>
-    this.activityService.teams().filter((team) => team.creadorUuid === this.playerUuid || team.creador?.atletaUuid === this.playerUuid),
-  );
-
   get inviteTeams() {
     return this.teams().filter(team => this.teamInvitationAccess.canInvite(team.id));
   }
@@ -205,20 +201,6 @@ export class SocialFacadeService {
           return;
         }
         this.successMessageStore.set('Invitacion de equipo enviada.');
-        await this.refresh();
-      },
-      'social',
-    );
-  }
-
-  async deleteTeam(teamId: number): Promise<void> {
-    await this.executeAction(
-      async () => {
-        if (!this.playerUuid) {
-          return;
-        }
-        await this.activityService.deleteTeam(teamId, this.playerUuid);
-        this.successMessageStore.set('Equipo eliminado correctamente.');
         await this.refresh();
       },
       'social',

@@ -179,7 +179,6 @@ function buildActivityServiceMock(teams: ReturnType<typeof signal<TeamSummary[]>
     respondFriendRequest: jasmine.createSpy('respondFriendRequest').and.resolveTo(),
     sendTeamInvite: jasmine.createSpy('sendTeamInvite').and.resolveTo(),
     respondTeamInvite: jasmine.createSpy('respondTeamInvite').and.resolveTo(),
-    deleteTeam: jasmine.createSpy('deleteTeam').and.resolveTo(),
     sendMatchInvite: jasmine.createSpy('sendMatchInvite').and.resolveTo(),
     respondMatchInvite: jasmine.createSpy('respondMatchInvite').and.resolveTo(),
     searchPlayers: jasmine.createSpy('searchPlayers'),

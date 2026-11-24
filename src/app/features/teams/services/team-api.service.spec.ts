@@ -3,6 +3,22 @@ import { TestBed } from '@angular/core/testing';
 import { provideAppConfigMock, provideHttpTesting } from 'src/test/testbed-providers';
 import { TeamApiService } from './team-api.service';
 
+describe('TeamApiService.updateTeamName', () => {
+  it('PATCHes only the name and returns the updated team', () => {
+    TestBed.configureTestingModule({ providers: [provideAppConfigMock(), ...provideHttpTesting()] });
+    const http = TestBed.inject(HttpTestingController);
+    const updated = { id: 77, nombre: 'Fútbol Norte' };
+    const received = jasmine.createSpy('updated team');
+    TestBed.inject(TeamApiService).updateTeamName(77, updated.nombre).subscribe(received);
+
+    const request = http.expectOne({ method: 'PATCH', url: 'http://localhost:8080/api/v1/teams/77' });
+    expect(request.request.body).toEqual({ nombre: updated.nombre });
+    request.flush(updated);
+    expect(received).toHaveBeenCalledOnceWith(updated);
+    http.verify();
+  });
+});
+
 describe('TeamApiService.removeMember', () => {
   it('sends the team and target in the DELETE path without supplying an actor', () => {
     TestBed.configureTestingModule({ providers: [provideAppConfigMock(), ...provideHttpTesting()] });

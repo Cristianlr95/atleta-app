@@ -3,6 +3,7 @@
     <app-page-nav [showProfile]="false"></app-page-nav>
 
     <app-metallic-card title="Social" [titleIconAsset]="socialIconAsset">
+      <p #archiveFeedback class="social-message social-message--success" role="status" tabindex="-1" *ngIf="archivedTeamName">Equipo {{ archivedTeamName }} archivado.</p>
       <app-social-tabs
         *ngIf="!facade.loadError() && !facade.isLoading()"
         [activeTab]="facade.activeTab()"
@@ -53,12 +54,11 @@
       <app-teams-panel
         *ngIf="!facade.loadError() && !facade.isLoading() && facade.activeTab() === 'teams'"
         [principalTeam]="principalTeam()"
-        [createdTeams]="facade.createdTeams()"
+        [otherTeams]="otherTeams()"
         [inviteTeams]="facade.inviteTeams"
         [pendingInvites]="pendingTeams()"
         [inviteCandidates]="facade.inviteCandidates()"
         (openTeam)="onOpenTeam($event)"
-        (deleteTeam)="onDeleteTeam($event)"
         (respondInvite)="facade.respondTeamInvite($event.inviteId, $event.accept)"
         (searchInviteCandidate)="onInviteSearch($event)"
         (sendInvite)="onSendTeamInvite($event)">

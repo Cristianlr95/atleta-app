@@ -351,3 +351,25 @@ Se ejecutó `e2e/05-match-live.spec.ts` con frontend Angular y backend Spring/H2
 - 2026-11-06: verificación de integración local: 253 pruebas unitarias, lint, build de producción y 45 pruebas Playwright de interfaz aprobadas. Playwright usa respuestas simuladas; sigue pendiente el recorrido integral con API y datos locales reales y la comprobación en dispositivo físico.
 
 - 2026-11-06: flujo real con backend local: acceso, creación de partido, invitaciones aceptadas/rechazadas y actualización en vivo verificados con navegador y H2 temporal; la creación requirió primero una cancha sintética. Con PostgreSQL 18 temporal, cierre 0-0 desde la interfaz tras ajustar solo el inicio sintético a dos horas antes; el servidor guardó 10 historiales de jugador y 10 de rating. Voto MVP comprobado en navegador y API. Sin dispositivo físico ni producción.
+
+## CAP-03C · Inventario previo y base
+
+- Beta `7033ffd` reúne invitaciones, transferencia, retirada y abandono de integrantes. Inicio muestra invitaciones recibidas. No contiene todavía la sección «Mi equipo».
+- Perfil (`player-profile`, `profile-teams`) lista membresías y abre Plantel. El fundador ve un botón de eliminación. El panel de invitaciones obtiene el permiso del rol `CAPITAN` en la membresía activa.
+- Social (`social.page`, `teams-panel`, `social-facade`) abre Plantel desde el equipo principal y desde el listado de equipos creados. El listado de creados ofrece eliminación. El selector de invitaciones ya se basa en capitanía vigente.
+- Plantel (`team-detail`) carga equipo e integrantes activos. Usa su rol `CAPITAN` para transferir y retirar integrantes, y conserva la regla de abandono para el resto del plantel. No tiene editor de nombre ni archivado en esta base.
+- `TeamApiService` ya envía `DELETE /teams/{id}?actorUuid=…`. CAP-03A usa la identidad JWT. CAP-03B añade `PATCH /teams/{id}` con solo `nombre` y devuelve el equipo actualizado. El interceptor compartido renueva la sesión una vez ante un 401 cuando procede.
+- La reubicación BETA-UX-08 sigue en el diff local de `publish-main-app-20261116`. CAP-03C centraliza edición y archivado en Plantel, accesible desde Perfil y Social. Al integrar el traslado existente, el acceso desde Inicio apuntará al mismo Plantel y se retirará la sección duplicada de Perfil como parte de BETA-UX-08.
+
+### Resultado local CAP-03C
+
+- Plantel autoriza edición y archivado por la membresía activa `CAPITAN` de ese equipo. Oculta los controles durante la carga y comprueba el permiso al enviar. Una transferencia o un 403 invalidan el permiso de invitación almacenado y activan la recarga del plantel.
+- PATCH actualiza solo `nombre`. El editor valida el texto y conserva el borrador ante errores recuperables. El DELETE conserva `actorUuid` y el interceptor de autenticación. El archivado lleva a Social, recarga sus equipos y enfoca el aviso de éxito. Inicio y Perfil conservan su recarga al volver a la pantalla.
+- RED: cinco fallos esperados de interfaz. GREEN: 103 pruebas dirigidas en Chrome Headless, dos recorridos Playwright con API simulada, lint y build de producción correctos. Pendiente la validación conjunta con CAP-03A y CAP-03B, y la revisión visual manual.
+
+### CAP-03C · Corrección UX
+
+- Plantel compara el borrador con el nombre original usando la normalización del contrato. Cancelar, cambiar de panel o salir con cambios abre una única confirmación Ionic. El guard protege la navegación interna, incluido Atrás, y restaura el historial si el usuario sigue editando. La salida del documento usa la protección del navegador cuando está disponible.
+- Antes de guardar un nombre distinto se vuelve a consultar la membresía activa. Si el actor perdió la capitanía, Plantel invalida el permiso, cierra el editor y reutiliza el plantel consultado sin enviar el PATCH. El servidor continúa autorizando el cambio. El 409 y el guardado sin respuesta conservan el borrador. Pasados 30 segundos sin confirmar el guardado, el editor vuelve a quedar disponible.
+- El regreso a Social tras archivar omite la animación Ionic únicamente con movimiento reducido. Se conserva el foco en el aviso de éxito y la transición normal.
+- RED: dos fallos en componentes y dos recorridos fallidos a 390 px. La prueba adicional de la espera durante el guardado también falló antes de la corrección. GREEN: 112 pruebas dirigidas, ocho recorridos Chromium con API simulada, lint, build de producción y revisión de whitespace. Confirmación, foco y movimiento verificados a 390 y 1440 px. Queda pendiente la prueba en dispositivo físico y con CAP-03A y CAP-03B desplegados.

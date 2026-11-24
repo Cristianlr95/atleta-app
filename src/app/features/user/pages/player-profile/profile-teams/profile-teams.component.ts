@@ -13,7 +13,6 @@ import { TeamActiveMember, TeamSummary, teamMemberRoleLabel } from 'src/app/feat
 })
 export class ProfileTeamsComponent {
   @Input() teams: TeamSummary[] = [];
-  @Input() currentPlayerUuid: string | null = null;
   @Input() inviteTeamIds: number[] = [];
   @Input() expandedTeamId: number | null = null;
   @Input() teamMembers: Array<TeamActiveMember & { ovr: number | null }> = [];
@@ -26,13 +25,8 @@ export class ProfileTeamsComponent {
 
   @Output() viewTeam = new EventEmitter<number>();
   @Output() teamToggle = new EventEmitter<number>();
-  @Output() remove = new EventEmitter<TeamSummary>();
   @Output() queryChange = new EventEmitter<string>();
   @Output() invite = new EventEmitter<string>();
-
-  isTeamCreator(team: TeamSummary): boolean {
-    return !!this.currentPlayerUuid && (team.creadorUuid === this.currentPlayerUuid || team.creador?.atletaUuid === this.currentPlayerUuid);
-  }
 
   isTeamExpanded(teamId: number): boolean { return this.expandedTeamId === teamId; }
   canManageInvites(teamId: number): boolean { return this.inviteTeamIds.includes(teamId); }

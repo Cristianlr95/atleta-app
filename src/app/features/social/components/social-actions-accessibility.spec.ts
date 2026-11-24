@@ -21,12 +21,12 @@ describe('Social action names', () => {
     expect(fixture.nativeElement.querySelector('button').getAttribute('aria-label')).toBe('Aceptar invitación al partido 42 de Ana');
   });
 
-  it('identifies the team when managing or answering invitations', () => {
+  it('identifies the team when opening the roster or answering invitations', () => {
     const fixture = TestBed.createComponent(TeamsPanelComponent);
-    fixture.componentInstance.createdTeams = [{ id: 7, nombre: 'Azules' }];
+    fixture.componentInstance.otherTeams = [{ id: 7, nombre: 'Azules' }];
     fixture.componentInstance.pendingInvites = [request];
     fixture.detectChanges();
-    expect(fixture.nativeElement.querySelector('[aria-label="Administrar Azules"]')).not.toBeNull();
+    expect(fixture.nativeElement.querySelector('[aria-label="Ver plantel de Azules"]')).not.toBeNull();
     expect(fixture.nativeElement.querySelector('[aria-label="Aceptar invitación a Azules"]')).not.toBeNull();
   });
 });
