@@ -76,18 +76,6 @@
         <app-profile-achievements [achievements]="achievements"></app-profile-achievements>
       </section>
 
-      <section *ngIf="!isLoading" class="profile-section" aria-labelledby="profile-teams-title">
-        <h2 id="profile-teams-title"><img class="atleta-raster-icon" [src]="teamsSectionIconAsset" alt="" width="24" height="24" />Mi equipo</h2>
-        <div *ngIf="teamsUnavailable" role="alert" class="profile-message profile-message--warning">No pudimos cargar los equipos.
-          <button type="button" class="profile-retry profile-teams-retry" (click)="retryStatistics()">Reintentar equipos</button>
-        </div>
-        <button *ngIf="!teamsUnavailable && memberTeams.length === 0" type="button" class="profile-settings-link profile-create-team" (click)="openTeamCreation()">Crear equipo</button>
-        <app-profile-teams *ngIf="!teamsUnavailable" [teams]="memberTeams" [expandedTeamId]="expandedTeamId"
-          [teamMembers]="teamMembers" [teamMembersLoading]="teamMembersLoading" [teamMembersError]="teamMembersError" [inviteTeamIds]="inviteTeamIds"
-          [inviteQuery]="inviteQuery" [inviteLoading]="inviteLoading" [inviteCandidates]="inviteCandidates" [inviteSendingUuid]="inviteSendingUuid"
-          (viewTeam)="openTeam($event)" (teamToggle)="toggleTeamAccordion($event)" (queryChange)="onInviteQueryChange($event)" (invite)="onSendTeamInvite($event)">
-        </app-profile-teams>
-      </section>
     </main>
   </div>
 </ion-content>

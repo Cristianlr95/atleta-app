@@ -146,20 +146,20 @@ test.describe('Flujo visual integral de partidos', () => {
     await expect(page.getByText('Sin partido agendado')).toBeVisible();
     await expect(page.getByRole('alert')).toHaveCount(0);
   });
-  test('Perfil ofrece crear equipo cuando no hay equipo asociado', async ({ page }) => {
+  test('Inicio ofrece crear equipo cuando no hay equipo asociado', async ({ page }) => {
     await installFlowFixture(page);
     await page.route('**/api/v1/teams/by-player/ath-flow', route => json(route, []));
-    await page.goto('/player/profile');
+    await page.goto('/home');
     await page.getByRole('button', { name: 'Crear equipo', exact: true }).click();
     await expect(page).toHaveURL(/\/sessions\/create$/);
     await expect(page.getByRole('button', { name: 'Crear equipo', exact: true })).toHaveCount(1);
     await expect(page.getByRole('button', { name: 'Crear equipo', exact: true })).toBeVisible();
   });
-  test('Perfil permite recuperar el equipo si su carga falla', async ({ page }) => {
+  test('Inicio permite recuperar el equipo si su carga falla', async ({ page }) => {
     await installFlowFixture(page);
     const pattern = '**/api/v1/teams/by-player/ath-flow';
     await page.route(pattern, route => route.fulfill({ status: 500, json: {} }));
-    await page.goto('/player/profile');
+    await page.goto('/home');
     const team = page.getByRole('button', { name: 'Reintentar equipos' });
     await expect(team).toBeVisible();
     await page.unroute(pattern);
@@ -814,10 +814,10 @@ test.describe('Flujo visual integral de partidos', () => {
     await expect(page.locator('app-metallic-role-hexagon')).toHaveCount(0);
   });
 
-  test('perfil permite abrir integrantes de equipo en móvil', async ({ page }) => {
+  test('Inicio permite abrir integrantes de equipo en móvil', async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
     await installFlowFixture(page);
-    await page.goto('/player/profile');
+    await page.goto('/home');
     const team = page.getByRole('button', { name: 'Ver integrantes de Atleta Dev FC' });
     await team.click();
     await expect(page).toHaveURL(/\/teams\/10$/);

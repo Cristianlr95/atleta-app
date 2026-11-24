@@ -3,8 +3,7 @@ import { Component, OnDestroy, inject } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { IonicModule } from '@ionic/angular';
 import { Subject, Subscription, firstValueFrom, forkJoin, interval, of } from 'rxjs';
-import { catchError, finalize, map, switchMap, takeUntil } from 'rxjs/operators';
-import { ApiError } from 'src/app/core/models/api-error.model';
+import { catchError, finalize, takeUntil } from 'rxjs/operators';
 import { AuthSessionService } from 'src/app/core/services/auth-session.service';
 import { APP_CONFIG } from 'src/app/core/config/app-config.token';
 import { AppToastService } from 'src/app/core/services/app-toast.service';
@@ -14,8 +13,6 @@ import { MatchHistoryService, MatchHistoryViewItem } from 'src/app/features/matc
 import { NotificationBadgeService } from 'src/app/features/matches/services/notification-badge.service';
 import { OverallRating, RatingByRole, RoleType } from 'src/app/features/ratings/models/rating.models';
 import { RatingsApiService } from 'src/app/features/ratings/services/ratings-api.service';
-import { SocialPlayerLookupItem } from 'src/app/features/social/models/social.models';
-import { SocialApiService } from 'src/app/features/social/services/social-api.service';
 import {
   MetallicBottomNavComponent,
   MetallicBottomNavItem,
@@ -26,20 +23,12 @@ import {
   HexagonRoleStat,
   MetallicRoleHexagonComponent,
 } from 'src/app/shared/ui/metallic-role-hexagon/metallic-role-hexagon.component';
-import { TeamActiveMember, TeamSummary } from 'src/app/features/teams/models/team.models';
-import { TeamApiService } from 'src/app/features/teams/services/team-api.service';
-import { TEAM_INVITE_FORBIDDEN, TeamInvitationAccessService } from 'src/app/features/teams/services/team-invitation-access.service';
 import { buildMainBottomNav } from 'src/app/shared/navigation/main-bottom-nav';
 import { PlayerAssignedPosition } from '../../models/position.models';
 import { PlayerAchievement, PlayerProfile } from '../../models/user.models';
 import { PlayerPositionStateService } from '../../services/player-position-state.service';
-import { ProfileTeamsComponent } from './profile-teams/profile-teams.component';
 import { ProfileAchievementsComponent } from './profile-achievements/profile-achievements.component';
 import { UserApiService } from '../../services/user-api.service';
-
-interface TeamMemberView extends TeamActiveMember {
-  ovr: number | null;
-}
 
 interface OutcomeSummary {
   wins: number;
@@ -59,11 +48,9 @@ interface CompetitionSummary extends OutcomeSummary {
   standalone: true,
   templateUrl: './player-profile.page.html',
   styleUrls: ['./player-profile.page.scss'],
-  providers: [TeamInvitationAccessService],
   imports: [
     CommonModule,
     IonicModule,
-    ProfileTeamsComponent,
     ProfileAchievementsComponent,
     MetallicRoleHexagonComponent,
     MetallicBottomNavComponent,
@@ -76,9 +63,6 @@ export class PlayerProfilePage implements OnDestroy {
   private readonly userApiService = inject(UserApiService);
   private readonly ratingsApiService = inject(RatingsApiService);
   private readonly matchHistoryService = inject(MatchHistoryService);
-  private readonly teamApiService = inject(TeamApiService);
-  private readonly teamInvitationAccess = inject(TeamInvitationAccessService);
-  private readonly socialApiService = inject(SocialApiService);
   private readonly playerPositionStateService = inject(PlayerPositionStateService);
   private readonly route = inject(ActivatedRoute);
   private readonly navigationService = inject(NavigationService);
@@ -91,24 +75,23 @@ export class PlayerProfilePage implements OnDestroy {
   private readonly autoRefreshMs = 45000;
   private readonly isDemoMode: boolean;
   private autoRefreshSub: Subscription | null = null;
-  private inviteSearchTimer?: number;
-  private teamMembersLoad?: Subscription;
 
   readonly iconBase = 'assets/icons/atleta-raster-v1';
   readonly profileTitleIconAsset = `${this.iconBase}/ic_nav_profile_96.png`;
-  readonly teamsSectionIconAsset = `${this.iconBase}/ic_match_teams_96.png`;
   readonly settingsIconAsset = `${this.iconBase}/ic_auth_security_96.png`;
   readonly achievementsSectionIconAsset = `${this.iconBase}/ic_comp_medal_96.png`;
 
-  get currentPlayerUuid(): string | null { return this.authSessionService.currentSession?.user.atletaUuid ?? null; }
 
   get bottomNavItems(): ReadonlyArray<MetallicBottomNavItem> {
     return buildMainBottomNav('profile', this.notificationBadgeService.totalPending());
   }
 
+  get currentPlayerUuid(): string | null {
+    return this.authSessionService.currentSession?.user.atletaUuid ?? null;
+  }
+
   isLoading = false;
   historyUnavailable = false;
-  teamsUnavailable = false;
   errorMessage: string | null = null;
 
   displayName = 'Jugador';
@@ -133,25 +116,11 @@ export class PlayerProfilePage implements OnDestroy {
   }
   achievements: PlayerAchievement[] = [];
   playerPositions: PlayerPositionDisplay[] = [];
-  memberTeams: TeamSummary[] = [];
-  get inviteTeamIds(): number[] {
-    return this.memberTeams.filter(team => this.teamInvitationAccess.canInvite(team.id)).map(team => team.id);
-  }
-  expandedTeamId: number | null = null;
-  inviteQuery = '';
-  inviteLoading = false;
-  inviteCandidates: SocialPlayerLookupItem[] = [];
-  inviteSendingUuid: string | null = null;
-  teamMembers: TeamMemberView[] = [];
-  teamMembersLoading = false;
-  teamMembersError: string | null = null;
-
   constructor() {
     this.isDemoMode = this.route.snapshot.queryParamMap.get('demo') === '1';
   }
 
   ionViewWillEnter(): void {
-    this.teamInvitationAccess.clear();
     void this.notificationBadgeService.refresh();
     if (this.isDemoMode) {
       this.applyDemo('Jugador demo', 'demo@atleta.app');
@@ -165,14 +134,12 @@ export class PlayerProfilePage implements OnDestroy {
   ionViewWillLeave(): void {
     this.leave$.next();
     this.stopAutoRefresh();
-    this.clearInviteSearchTimer();
   }
 
   ngOnDestroy(): void {
     this.leave$.next();
     this.leave$.complete();
     this.stopAutoRefresh();
-    this.clearInviteSearchTimer();
     this.destroy$.next();
     this.destroy$.complete();
   }
@@ -183,14 +150,6 @@ export class PlayerProfilePage implements OnDestroy {
 
   openSettings(): void {
     void this.navigationService.safeNavigate(['/player/settings']);
-  }
-
-  openTeamCreation(): void {
-    void this.navigationService.safeNavigate(['/sessions/create']);
-  }
-
-  openTeam(teamId: number): void {
-    void this.navigationService.safeNavigate(['/teams', String(teamId)]);
   }
 
   retryStatistics(): void {
@@ -226,76 +185,6 @@ export class PlayerProfilePage implements OnDestroy {
     }
   }
 
-  toggleTeamAccordion(teamId: number): void {
-    const alreadyExpanded = this.expandedTeamId === teamId;
-    this.closeTeamAccordion();
-    if (alreadyExpanded) return;
-    this.expandedTeamId = teamId;
-    this.loadTeamMembers(teamId);
-  }
-
-  private closeTeamAccordion(): void {
-    this.teamMembersLoad?.unsubscribe();
-    this.clearInviteSearchTimer();
-    this.expandedTeamId = null;
-    this.inviteQuery = '';
-    this.inviteCandidates = [];
-    this.teamMembers = [];
-    this.teamMembersError = null;
-  }
-
-  onInviteQueryChange(value: string): void {
-    const teamId = this.expandedTeamId;
-    if (teamId === null || !this.canInviteTo(teamId)) return;
-    this.inviteQuery = value;
-    this.clearInviteSearchTimer();
-    const query = value.trim();
-    if (query.length < 2) {
-      this.inviteCandidates = [];
-      return;
-    }
-    this.inviteSearchTimer = window.setTimeout(() => {
-      void this.searchInviteCandidates(teamId, query);
-    }, 300);
-  }
-
-  async onSendTeamInvite(targetUuid: string): Promise<void> {
-    const requesterUuid = this.currentPlayerUuid;
-    const teamId = this.expandedTeamId;
-    if (!requesterUuid || teamId === null || !this.canInviteTo(teamId)) {
-      return;
-    }
-    try {
-      this.inviteSendingUuid = targetUuid;
-      await firstValueFrom(
-        this.socialApiService.createTeamInvite({
-          teamId,
-          requesterUuid,
-          targetUuid,
-        }),
-      );
-      await this.appToastService.success('Invitacion enviada.');
-      if (this.expandedTeamId === teamId) {
-        this.inviteCandidates = this.inviteCandidates.filter((item) => item.atletaUuid !== targetUuid);
-      }
-    } catch (error) {
-      if ((error as ApiError | null)?.status === 403 && this.currentPlayerUuid === requesterUuid) {
-        this.teamInvitationAccess.invalidate(teamId);
-        if (this.expandedTeamId === teamId) {
-          this.inviteCandidates = [];
-          this.loadTeamMembers(teamId);
-        } else if (this.memberTeams.some(team => team.id === teamId)) {
-          this.loadInviteRoster(teamId);
-        }
-        await this.appToastService.error(TEAM_INVITE_FORBIDDEN);
-      } else {
-        await this.appToastService.error(this.errorMapper.toUserMessage(error, 'social'));
-      }
-    } finally {
-      this.inviteSendingUuid = null;
-    }
-  }
-
   private loadProfile(isBackgroundRefresh = false): void {
     const session = this.authSessionService.currentSession;
 
@@ -314,7 +203,6 @@ export class PlayerProfilePage implements OnDestroy {
 
     this.errorMessage = null;
     this.historyUnavailable = false;
-    this.teamsUnavailable = false;
     const failStatistics = () => { this.errorMessage = 'No pudimos cargar las estadísticas.'; };
     forkJoin({
       profile: this.userApiService.getPlayerProfile(atletaUuid).pipe(catchError(() => { failStatistics(); return of(null); })),
@@ -329,7 +217,6 @@ export class PlayerProfilePage implements OnDestroy {
         failStatistics();
         return of([]);
       })),
-      teams: this.teamApiService.getByPlayer(atletaUuid).pipe(catchError(() => { this.teamsUnavailable = true; return of([] as TeamSummary[]); })),
       positions: this.userApiService
         .getPlayerPositions(atletaUuid)
         .pipe(catchError(() => of(this.playerPositionStateService.getByPlayer(atletaUuid)))),
@@ -338,7 +225,7 @@ export class PlayerProfilePage implements OnDestroy {
         takeUntil(this.leave$),
         finalize(() => (this.isLoading = false)),
       )
-      .subscribe(({ profile, achievements, overall, ratings, history, teams, positions }) => {
+      .subscribe(({ profile, achievements, overall, ratings, history, positions }) => {
         this.applyProfileData(
           session.user.nombre,
           session.user.email,
@@ -346,22 +233,9 @@ export class PlayerProfilePage implements OnDestroy {
           overall,
           ratings,
           history,
-          teams,
           positions,
         );
         this.achievements = achievements;
-        if (this.expandedTeamId !== null && !teams.some(team => team.id === this.expandedTeamId)) {
-          this.closeTeamAccordion();
-        }
-        if (!isBackgroundRefresh) {
-          for (const team of teams) {
-            if (team.id === this.expandedTeamId) {
-              this.loadTeamMembers(team.id);
-            } else {
-              this.loadInviteRoster(team.id);
-            }
-          }
-        }
       });
   }
 
@@ -383,62 +257,6 @@ export class PlayerProfilePage implements OnDestroy {
     this.autoRefreshSub = null;
   }
 
-  private canInviteTo(teamId: number): boolean {
-    return this.memberTeams.some(team => team.id === teamId) && this.teamInvitationAccess.canInvite(teamId);
-  }
-
-  private loadInviteRoster(teamId: number): void {
-    this.teamInvitationAccess.loadMembers(teamId).pipe(takeUntil(this.leave$)).subscribe({ error: () => undefined });
-  }
-
-  private async searchInviteCandidates(teamId: number, query: string): Promise<void> {
-    const currentUser = this.currentPlayerUuid;
-    if (!currentUser || this.expandedTeamId !== teamId || !this.canInviteTo(teamId)) {
-      return;
-    }
-    try {
-      this.inviteLoading = true;
-      const candidates = await firstValueFrom(this.socialApiService.searchPlayers(query));
-      if (this.expandedTeamId === teamId && this.inviteQuery.trim() === query && this.canInviteTo(teamId)) {
-        this.inviteCandidates = (candidates ?? []).filter((item) => item.atletaUuid !== currentUser);
-      }
-    } catch (error) {
-      this.inviteCandidates = [];
-      await this.appToastService.error(this.errorMapper.toUserMessage(error, 'social'));
-    } finally {
-      this.inviteLoading = false;
-    }
-  }
-
-  private loadTeamMembers(teamId: number): void {
-    this.teamMembersLoad?.unsubscribe();
-    this.teamMembersLoading = true;
-    this.teamMembersError = null;
-    this.teamMembersLoad = this.teamInvitationAccess.loadMembers(teamId).pipe(
-      switchMap(members => members.length ? forkJoin(members.map(member =>
-        this.ratingsApiService.getOverall(member.playerUuid).pipe(
-          catchError(() => of(null)),
-          map(overall => ({ ...member, ovr: overall?.hybridOVR ?? null })),
-        ),
-      )) : of([])),
-      takeUntil(this.leave$),
-      finalize(() => (this.teamMembersLoading = false)),
-    ).subscribe({
-      next: members => (this.teamMembers = members),
-      error: error => {
-        this.teamMembers = [];
-        this.teamMembersError = this.errorMapper.toUserMessage(error, 'social');
-      },
-    });
-  }
-
-  private clearInviteSearchTimer(): void {
-    if (this.inviteSearchTimer) {
-      window.clearTimeout(this.inviteSearchTimer);
-      this.inviteSearchTimer = undefined;
-    }
-  }
-
   private applyProfileData(
     sessionName: string,
     sessionEmail: string,
@@ -446,7 +264,6 @@ export class PlayerProfilePage implements OnDestroy {
     overall: OverallRating | null,
     ratings: RatingByRole[],
     history: MatchHistoryViewItem[],
-    teams: TeamSummary[],
     positions: PlayerAssignedPosition[],
   ): void {
     this.displayName = sessionName || 'Jugador';
@@ -473,7 +290,6 @@ export class PlayerProfilePage implements OnDestroy {
       goals: history.reduce((total, item) => total + item.goals, 0),
       assists: history.reduce((total, item) => total + item.assists, 0),
     };
-    this.memberTeams = teams;
     this.playerPositions = this.toPositionDisplay(positions);
   }
 
@@ -511,7 +327,6 @@ export class PlayerProfilePage implements OnDestroy {
     this.roleStats = this.demoHexagon();
     this.competition = { matches: 18, goals: 12, assists: 6, wins: 11, draws: 3, losses: 4, total: 18 };
     this.achievements = this.demoAchievements();
-    this.memberTeams = [];
     this.playerPositions = [
       { name: 'Delantero', priorityLabel: 'Principal' },
       { name: 'Mediocampista', priorityLabel: 'Secundaria' },

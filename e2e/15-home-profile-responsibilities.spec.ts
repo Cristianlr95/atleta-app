@@ -1,55 +1,51 @@
-import { expect, Page, test } from '@playwright/test';
-import { execFileSync } from 'node:child_process';
-import { mkdirSync, writeFileSync } from 'node:fs';
-import { join } from 'node:path';
+import { expect, test } from '@playwright/test';
 import { installH0H3Fixture } from './helpers/h0-h3-fixture';
 
-async function capture(page: Page, name: string) {
-  const directory = join(process.cwd(), 'docs/home-profile-2026-11-16/after');
-  mkdirSync(directory, { recursive: true });
-  await expect(page.getByRole('navigation', { name: 'Navegación inferior' })).toHaveCount(1);
-  await page.screenshot({ path: join(directory, `${name}.png`) });
-  writeFileSync(join(directory, `${name}.json`), JSON.stringify({
-    route: new URL(page.url()).pathname, viewport: page.viewportSize(), state: name,
-    environment: 'local, API simulada, sesión de prueba, sin demo',
-    commit: execFileSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' }).trim(),
-    sourceChanges: execFileSync('git', ['diff', 'HEAD', '--name-only', '--', 'src'], { encoding: 'utf8' }).trim(),
-  }, null, 2));
-}
-
 for (const width of [390, 1440]) {
-  test(`Inicio y Perfil tienen información propia a ${width}px`, async ({ page }) => {
+  test('Inicio y Perfil tienen información propia a ' + width + 'px', async ({ page }) => {
     await page.setViewportSize({ width, height: 844 });
-    const fixture = await installH0H3Fixture(page, 'data');
+    await installH0H3Fixture(page, 'data');
+    let role = 'CAPITAN';
+    await page.route('**/api/v1/teams/10/members/active', route => route.fulfill({ json: [
+      { playerUuid: 'ath-h3', alias: 'Ana', rol: role },
+    ] }));
     await page.goto('/home');
-    await expect(page.locator('.home-priority')).toContainText('partido');
-    await expect(page.locator('.home-invitations')).toContainText('Invitaciones pendientes');
-    await expect(page.locator('.home-activity')).toBeVisible();
-    await expect(page.getByText('Atleta Prueba FC', { exact: true })).toHaveCount(0);
-    await expect(page.getByText('Ana Torres', { exact: true })).toHaveCount(0);
-    await expect(page.getByText('OVR', { exact: true })).toHaveCount(0);
-    expect(fixture.requests.some(request => request.path.endsWith('/overall'))).toBe(false);
-    expect(fixture.requests.some(request => request.path.includes('/teams/by-player/'))).toBe(false);
-    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
-    await capture(page, `inicio-data-${width}`);
-    await page.getByRole('button', { name: 'Perfil', exact: true }).click();
+    const home = page.locator('app-home-page');
+    const team = home.getByRole('button', { name: 'Ver integrantes de Atleta Prueba FC' });
+    const invite = home.getByRole('button', { name: 'Invitaciones de Atleta Prueba FC' });
+    await expect(home.getByRole('heading', { name: 'Mi equipo' })).toBeVisible();
+    await expect(home.getByText('Ana Torres', { exact: true })).toHaveCount(0);
+    await expect(home.getByText('OVR', { exact: true })).toHaveCount(0);
+    await expect(invite).toBeVisible();
+    await team.press('Enter');
+    await expect(page).toHaveURL(/\/teams\/10$/);
+    await expect(page.getByRole('button', { name: 'Editar nombre', exact: true })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Archivar equipo', exact: true })).toBeVisible();
+
+    role = 'JUGADOR';
+    await page.getByRole('button', { name: '‹ Volver' }).click();
+    await expect(page).toHaveURL(/\/home$/);
+    await expect(team).toBeFocused();
+    await expect(invite).toHaveCount(0);
+    await team.click();
+    await expect(page.getByRole('heading', { name: 'Plantel activo' })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Editar nombre', exact: true })).toHaveCount(0);
+    await expect(page.getByRole('button', { name: 'Archivar equipo', exact: true })).toHaveCount(0);
+
+    await page.goto('/player/profile');
     await expect(page.locator('.ovr-block')).toContainText('68');
-    await expect(page.getByText('Atleta Prueba FC', { exact: true })).toHaveCount(1);
-    await expect(page.getByRole('button', { name: 'Ver integrantes de Atleta Prueba FC' })).toBeVisible();
-    await capture(page, `perfil-data-${width}`);
+    await expect(page.getByRole('heading', { name: 'Mi equipo', exact: true })).toHaveCount(0);
+    await expect(page.getByRole('button', { name: 'Ver integrantes de Atleta Prueba FC' })).toHaveCount(0);
   });
 
-  test(`Crear equipo se conserva en Perfil sin equipo a ${width}px`, async ({ page }) => {
+  test('Inicio permite crear equipo sin membresía a ' + width + 'px', async ({ page }) => {
     await page.setViewportSize({ width, height: 844 });
     await installH0H3Fixture(page, 'empty');
-    await page.goto('/player/profile');
-    await expect(page.getByText('Aun no perteneces a ningun equipo.', { exact: true })).toBeVisible();
-    const create = page.getByRole('button', { name: 'Crear equipo', exact: true });
+    await page.goto('/home');
+    const create = page.locator('app-home-page').getByRole('button', { name: 'Crear equipo', exact: true });
     await expect(create).toHaveCount(1);
-    await capture(page, `perfil-empty-${width}`);
     await create.click();
     await expect(page).toHaveURL(/\/sessions\/create$/);
-    await expect(page.getByRole('button', { name: 'Crear equipo', exact: true })).toHaveCount(1);
-    await expect(page.getByRole('button', { name: 'Crear equipo', exact: true })).toBeVisible();
+    await expect(page.locator('app-create-session-page').getByRole('button', { name: 'Crear equipo', exact: true })).toBeVisible();
   });
 }

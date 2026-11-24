@@ -1,10 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Subject, of, throwError } from 'rxjs';
+import { of, throwError } from 'rxjs';
 import { RatingByRole } from 'src/app/features/ratings/models/rating.models';
-import { TeamApiService } from 'src/app/features/teams/services/team-api.service';
-import { TeamActiveMember } from 'src/app/features/teams/models/team.models';
-import { SocialApiService } from 'src/app/features/social/services/social-api.service';
 import { NotificationBadgeService } from 'src/app/features/matches/services/notification-badge.service';
 import { AppToastService } from 'src/app/core/services/app-toast.service';
 import { AuthSessionService } from 'src/app/core/services/auth-session.service';
@@ -25,8 +22,6 @@ describe('PlayerProfilePage', () => {
   let userApiService: jasmine.SpyObj<UserApiService>;
   let appToastService: jasmine.SpyObj<AppToastService>;
   let ratingsApiService: jasmine.SpyObj<RatingsApiService>;
-  let teamApiService: jasmine.SpyObj<TeamApiService>;
-  let socialApiService: jasmine.SpyObj<SocialApiService>;
 
   beforeEach(async () => {
     authSessionService = {
@@ -45,10 +40,6 @@ describe('PlayerProfilePage', () => {
     ratingsApiService = jasmine.createSpyObj<RatingsApiService>('RatingsApiService', ['getOverall', 'getByRole']);
     ratingsApiService.getOverall.and.returnValue(throwError(() => ({ status: 404 })));
     ratingsApiService.getByRole.and.returnValue(of([]));
-    teamApiService = jasmine.createSpyObj<TeamApiService>('TeamApiService', ['getByPlayer', 'getActiveMembers']);
-    teamApiService.getByPlayer.and.returnValue(of([]));
-    teamApiService.getActiveMembers.and.returnValue(of([]));
-    socialApiService = jasmine.createSpyObj<SocialApiService>('SocialApiService', ['createTeamInvite', 'searchPlayers']);
     appToastService = jasmine.createSpyObj<AppToastService>('AppToastService', ['success', 'error', 'info']);
     appToastService.success.and.resolveTo();
     appToastService.error.and.resolveTo();
@@ -75,8 +66,6 @@ describe('PlayerProfilePage', () => {
           provide: RatingsApiService,
           useValue: ratingsApiService,
         },
-        { provide: TeamApiService, useValue: teamApiService },
-        { provide: SocialApiService, useValue: socialApiService },
         { provide: NotificationBadgeService, useValue: { totalPending: () => 0, refresh: async () => undefined } },
         {
           provide: MatchHistoryService,
@@ -138,79 +127,9 @@ describe('PlayerProfilePage', () => {
     expect(fixture.nativeElement.textContent).toContain('Aún no hay estadísticas');
     expect(fixture.nativeElement.textContent).toContain('No hay trofeos disponibles');
   });
-  it('opens the team roster from its single member action', () => {
-    const navigate = spyOn(TestBed.inject(Router), 'navigate').and.resolveTo(true);
-    component.memberTeams = [{ id: 7, nombre: 'Azul' } as any];
+  it('keeps the team section out of Perfil', () => {
     fixture.detectChanges();
-    const button: HTMLButtonElement = fixture.nativeElement.querySelector('.profile-team__btn--icon');
-    expect(button.getAttribute('aria-label')).toBe('Ver integrantes de Azul');
-    button.click();
-    expect(navigate).toHaveBeenCalledWith(['/teams', '7'], undefined);
-  });
-  it('should create', () => {
-    expect(component).toBeTruthy();
-  });
-
-  it('keeps team creation in the empty profile', () => {
-    const navigate = spyOn(TestBed.inject(Router), 'navigate').and.resolveTo(true);
-    fixture.detectChanges();
-    fixture.nativeElement.querySelector('.profile-create-team').click();
-    expect(navigate).toHaveBeenCalledWith(['/sessions/create'], undefined);
-  });
-
-  it('does not offer team creation on a team API failure and retries', () => {
-    authSessionService.currentSession = { user: { atletaUuid: 'ath-1', nombre: 'Ana' } };
-    const teams = teamApiService.getByPlayer.and.returnValue(throwError(() => ({ status: 500 })));
-    component.ionViewWillEnter();
-    fixture.detectChanges();
-    expect(fixture.nativeElement.textContent).toContain('No pudimos cargar los equipos.');
-    expect(fixture.nativeElement.querySelector('.profile-create-team')).toBeNull();
-    teams.and.returnValue(of([]));
-    fixture.nativeElement.querySelector('.profile-teams-retry').click();
-    fixture.detectChanges();
-    expect(fixture.nativeElement.querySelector('.profile-teams-retry')).toBeNull();
-    expect(fixture.nativeElement.querySelector('.profile-create-team')).not.toBeNull();
-  });
-
-  it('reuses the roster in the invite form and hides it on 403 and on reentry until confirmed', async () => {
-    authSessionService.currentSession = { user: { atletaUuid: 'ath-1', nombre: 'Ana' } };
-    teamApiService.getByPlayer.and.returnValue(of([{ id: 7, nombre: 'Azul', creadorUuid: 'founder' }]));
-    const captain: TeamActiveMember = { playerUuid: 'ath-1', alias: 'Ana', rol: 'CAPITAN', primaryPositionId: null, primaryPositionName: null };
-    const roster = new Subject<TeamActiveMember[]>();
-    teamApiService.getActiveMembers.and.returnValue(roster);
-    component.ionViewWillEnter();
-    fixture.detectChanges();
-    const adminButton = () => fixture.nativeElement.querySelector('.profile-team__btn--admin');
-    const inviteInput = () => fixture.nativeElement.querySelector('.profile-team-invite__input');
-    expect(adminButton()).toBeNull();
-
-    roster.next([captain]);
-    roster.complete();
-    fixture.detectChanges();
-    expect(fixture.nativeElement.querySelector('.profile-team__btn--danger')).toBeNull();
-    adminButton().click();
-    fixture.detectChanges();
-    expect(inviteInput()).not.toBeNull();
-    expect(teamApiService.getActiveMembers).toHaveBeenCalledOnceWith(7);
-
-    const updatedRoster = new Subject<TeamActiveMember[]>();
-    teamApiService.getActiveMembers.and.returnValue(updatedRoster);
-    socialApiService.createTeamInvite.and.returnValue(throwError(() => ({ status: 403 })));
-    await component.onSendTeamInvite('target');
-    fixture.detectChanges();
-    expect(inviteInput()).toBeNull();
-    expect(appToastService.error).toHaveBeenCalledOnceWith('Solo el capitán activo del equipo puede enviar invitaciones.');
-    updatedRoster.next([{ ...captain, rol: 'JUGADOR' }]);
-    updatedRoster.complete();
-    await component.onSendTeamInvite('target');
-    expect(socialApiService.createTeamInvite).toHaveBeenCalledOnceWith({ teamId: 7, requesterUuid: 'ath-1', targetUuid: 'target' });
-
-    component.ionViewWillLeave();
-    teamApiService.getActiveMembers.and.returnValue(of([captain]));
-    component.ionViewWillEnter();
-    fixture.detectChanges();
-    expect(adminButton()).not.toBeNull();
-    expect(teamApiService.getActiveMembers.calls.allArgs()).toEqual([[7], [7], [7]]);
+    expect(fixture.nativeElement.querySelector('app-profile-teams')).toBeNull();
   });
 
   it('does not repeat OVR as a general level', () => {

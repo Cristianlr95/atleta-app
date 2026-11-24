@@ -67,8 +67,10 @@ for (const width of [390, 1440]) {
     await capture(page, 'accessible-values', width, fixture.requests);
     await page.getByRole('heading', { name: 'Trofeos y metas', exact: true }).scrollIntoViewIfNeeded();
     await expect(page.locator('.achievement-card')).toContainText('Partidos jugados');
-    const team = page.getByRole('button', { name: 'Ver integrantes de Atleta Prueba FC' });
+    await expect(page.getByRole('heading', { name: 'Mi equipo', exact: true })).toHaveCount(0);
     await capture(page, 'teams-trophies', width, fixture.requests);
+    await page.goto('/home');
+    const team = page.getByRole('button', { name: 'Ver integrantes de Atleta Prueba FC' });
     await team.focus();
     await page.keyboard.press('Enter');
     await expect(page).toHaveURL(/\/teams\/10$/);
@@ -107,8 +109,7 @@ for (const width of [390, 1440]) {
     await capture(page, 'empty', width, fixture.requests);
     await page.getByRole('heading', { name: 'Trofeos y metas', exact: true }).scrollIntoViewIfNeeded();
     await expect(page.getByText('No hay trofeos disponibles.', { exact: true })).toBeVisible();
-    await page.getByRole('heading', { name: 'Mi equipo', exact: true }).scrollIntoViewIfNeeded();
-    await expect(page.getByText('Aun no perteneces a ningun equipo.', { exact: true })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Mi equipo', exact: true })).toHaveCount(0);
     await capture(page, 'empty-teams-trophies', width, fixture.requests);
   });
 

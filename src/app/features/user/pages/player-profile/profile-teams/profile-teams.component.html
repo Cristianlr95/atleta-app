@@ -5,7 +5,7 @@
               <div class="profile-team__meta"><p class="profile-team__name">{{ team.nombre }}</p><p class="profile-team__detail" *ngIf="team.anioFundacion">Fundado: {{ team.anioFundacion }}</p></div>
               <div class="profile-team__actions">
                 <button type="button" class="profile-team__btn profile-team__btn--icon"
-                  [attr.aria-label]="'Ver integrantes de ' + team.nombre" (click)="viewTeam.emit(team.id)">Ver integrantes</button>
+                  [attr.data-team-entry]="team.id" [attr.aria-label]="'Ver integrantes de ' + team.nombre" (click)="viewTeam.emit(team.id)">Ver integrantes</button>
                 <button *ngIf="canManageInvites(team.id)" type="button" class="profile-team__btn profile-team__btn--admin"
                   [attr.aria-expanded]="isTeamExpanded(team.id)" [attr.aria-label]="'Invitaciones de ' + team.nombre"
                   (click)="teamToggle.emit(team.id)">{{ isTeamExpanded(team.id) ? 'Cerrar invitaciones' : 'Invitaciones' }}</button>

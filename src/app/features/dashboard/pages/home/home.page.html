@@ -32,6 +32,19 @@
         <div *ngIf="historyUnavailable" role="alert"><p>No se pudo cargar la actividad reciente.</p><button type="button" class="home-retry" (click)="loadHomeData()">Reintentar</button></div>
         <div class="home-feed"><article class="home-feed__item" *ngFor="let item of activities" [attr.data-variant]="item.variant">{{ item.text }}</article></div>
       </section>
+      <section #teamSection class="home-team" aria-labelledby="home-team-title">
+        <h2 id="home-team-title" tabindex="-1"><img class="atleta-raster-icon" [src]="teamsSectionIconAsset" alt="" width="24" height="24" />Mi equipo</h2>
+        <p *ngIf="teamsLoading" role="status">Cargando equipos…</p>
+        <div *ngIf="!teamsLoading && teamsUnavailable" role="alert">No pudimos cargar los equipos.
+          <button type="button" class="home-retry home-teams-retry" (click)="loadTeams()">Reintentar equipos</button>
+        </div>
+        <button *ngIf="!teamsLoading && !teamsUnavailable && memberTeams.length === 0" type="button" class="home-create-team" data-team-entry="create" (click)="openTeamCreation()">Crear equipo</button>
+        <app-profile-teams *ngIf="!teamsLoading && !teamsUnavailable" [teams]="memberTeams" [expandedTeamId]="expandedTeamId"
+          [teamMembers]="teamMembers" [teamMembersLoading]="teamMembersLoading" [teamMembersError]="teamMembersError" [inviteTeamIds]="inviteTeamIds"
+          [inviteQuery]="inviteQuery" [inviteLoading]="inviteLoading" [inviteCandidates]="inviteCandidates" [inviteSendingUuid]="inviteSendingUuid"
+          (viewTeam)="openTeam($event)" (teamToggle)="toggleTeamAccordion($event)" (queryChange)="onInviteQueryChange($event)" (invite)="onSendTeamInvite($event)">
+        </app-profile-teams>
+      </section>
     </app-metallic-card>
   </div>
 </ion-content>

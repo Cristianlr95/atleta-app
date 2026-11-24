@@ -21,7 +21,7 @@
 .home-hint { margin: 0; color: var(--tactical-visit); font: 500 15px/1.4 var(--font-family-body); }
 .home-activity { background: linear-gradient(to bottom, #071219 5%, rgba(7,18,25,.96) 55%, rgba(7,18,25,.82)), url('/assets/backgrounds/stadium.png') center 82% / cover no-repeat; padding: 10px 0 20px; }
 .home-activity__heading { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; color: var(--tactical-visit); font: 700 15px var(--font-family-display); letter-spacing: .04em; text-transform: uppercase; }
-.home-activity__heading button, .home-retry { min-height: 44px; border: 0; padding: 8px 0; background: transparent; color: var(--tactical-visit); font: 700 14px var(--font-family-body); cursor: pointer; }
+.home-activity__heading button, .home-retry, .home-create-team { min-height: 44px; border: 0; padding: 8px 0; background: transparent; color: var(--tactical-visit); font: 700 14px var(--font-family-body); cursor: pointer; }
 button:focus-visible { outline: 2px solid var(--tactical-visit); outline-offset: 3px; }
 .home-feed { display: grid; }
 .home-feed__item { padding: 12px; border-bottom: 1px solid var(--tactical-line); color: var(--text-secondary); font: 16px/1.45 Arial, sans-serif; }
@@ -32,3 +32,6 @@ button:focus-visible { outline: 2px solid var(--tactical-visit); outline-offset:
 @media (min-width: 900px) { .home-container { padding-top: 32px; } }
 @media (max-width: 420px) { .home-priority { padding: 14px; } }
 @media (prefers-reduced-motion: reduce) { .home-xp__fill { transition: none; } }
+
+.home-team { border-top: 1px solid var(--tactical-line); padding-top: 14px; }
+.home-team h2 { display: flex; align-items: center; gap: 8px; margin: 0 0 10px; color: var(--text-primary); font: 700 17px var(--font-family-display); }

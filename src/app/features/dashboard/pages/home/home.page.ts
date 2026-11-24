@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, signal } from '@angular/core';
+import { Component, ElementRef, Injector, OnDestroy, ViewChild, afterNextRender, inject, signal } from '@angular/core';
 import { IonicModule } from '@ionic/angular';
-import { catchError, finalize, forkJoin, from, of } from 'rxjs';
+import { Subject, Subscription, catchError, finalize, firstValueFrom, forkJoin, from, map, of, switchMap, takeUntil } from 'rxjs';
 import { AuthSessionService } from 'src/app/core/services/auth-session.service';
 import { NavigationService } from 'src/app/core/services/navigation.service';
 import { MatchHistoryViewItem, MatchHistoryService } from 'src/app/features/matches/services/match-history.service';
@@ -17,25 +17,73 @@ import { MetallicCardComponent } from 'src/app/shared/ui/metallic-card/metallic-
 import { buildHomeActivity, HomeActivityItem } from '../../utils/home-activity.util';
 import { PositionLevel, positionLevel } from '../../utils/position-level.util';
 
+import { ApiError } from 'src/app/core/models/api-error.model';
+import { AppToastService } from 'src/app/core/services/app-toast.service';
+import { ErrorMapperService } from 'src/app/core/services/error-mapper.service';
+import { RatingsApiService } from 'src/app/features/ratings/services/ratings-api.service';
+import { SocialPlayerLookupItem } from 'src/app/features/social/models/social.models';
+import { SocialApiService } from 'src/app/features/social/services/social-api.service';
+import { TeamActiveMember, TeamSummary } from 'src/app/features/teams/models/team.models';
+import { TeamApiService } from 'src/app/features/teams/services/team-api.service';
+import { TEAM_INVITE_FORBIDDEN, TeamInvitationAccessService } from 'src/app/features/teams/services/team-invitation-access.service';
+import { ProfileTeamsComponent } from 'src/app/features/user/pages/player-profile/profile-teams/profile-teams.component';
+
+interface TeamMemberView extends TeamActiveMember {
+  ovr: number | null;
+}
+
 @Component({
   selector: 'app-home-page',
   standalone: true,
   templateUrl: './home.page.html',
   styleUrls: ['./home.page.scss'],
+  providers: [TeamInvitationAccessService],
   imports: [
+    ProfileTeamsComponent,
     CommonModule,
     IonicModule,
     MetallicCardComponent,
     MetallicBottomNavComponent,
   ],
 })
-export class HomePage {
+export class HomePage implements OnDestroy {
+  @ViewChild('teamSection') private teamSection?: ElementRef<HTMLElement>;
+  private readonly injector = inject(Injector);
+  private readonly leave$ = new Subject<void>();
+  private teamMembersLoad?: Subscription;
+  private inviteSearchTimer?: number;
+  private teamEntryToFocus: string | null = null;
+  private viewEntered = false;
   private readonly authSessionService = inject(AuthSessionService);
   private readonly navigationService = inject(NavigationService);
   private readonly matchHistoryService = inject(MatchHistoryService);
   private readonly invitationsStore = inject(InvitationsStore);
   private readonly notificationBadgeService = inject(NotificationBadgeService);
   private readonly userApiService = inject(UserApiService);
+
+  private readonly ratingsApiService = inject(RatingsApiService);
+  private readonly teamApiService = inject(TeamApiService);
+  private readonly teamInvitationAccess = inject(TeamInvitationAccessService);
+  private readonly socialApiService = inject(SocialApiService);
+  private readonly appToastService = inject(AppToastService);
+  private readonly errorMapper = inject(ErrorMapperService);
+
+  readonly teamsSectionIconAsset = 'assets/icons/atleta-raster-v1/ic_match_teams_96.png';
+  get currentPlayerUuid(): string | null { return this.authSessionService.currentSession?.user.atletaUuid ?? null; }
+  teamsLoading = true;
+  teamsUnavailable = false;
+  memberTeams: TeamSummary[] = [];
+  get inviteTeamIds(): number[] {
+    return this.memberTeams.filter(team => this.teamInvitationAccess.canInvite(team.id)).map(team => team.id);
+  }
+  expandedTeamId: number | null = null;
+  inviteQuery = '';
+  inviteLoading = false;
+  inviteCandidates: SocialPlayerLookupItem[] = [];
+  inviteSendingUuid: string | null = null;
+  teamMembers: TeamMemberView[] = [];
+  teamMembersLoading = false;
+  teamMembersError: string | null = null;
 
   isLoading = false;
   nextMatchLabel = 'Sin partido agendado';
@@ -57,6 +105,24 @@ export class HomePage {
 
   ionViewWillEnter(): void {
     this.loadHomeData();
+    this.loadTeams();
+  }
+
+  ionViewDidEnter(): void {
+    this.viewEntered = true;
+    this.restoreTeamEntryFocus();
+  }
+
+  ionViewWillLeave(): void {
+    this.viewEntered = false;
+    this.leave$.next();
+    this.teamInvitationAccess.clear();
+    this.closeTeamAccordion();
+  }
+
+  ngOnDestroy(): void {
+    this.ionViewWillLeave();
+    this.leave$.complete();
   }
 
   onNavItemSelected(itemId: string): void {
@@ -102,6 +168,182 @@ export class HomePage {
           this.applyHistoryContext(history);
         }
       });
+  }
+
+  openTeamCreation(): void {
+    void this.openTeamDestination(['/sessions/create'], 'create');
+  }
+
+  openTeam(teamId: number): void {
+    void this.openTeamDestination(['/teams', String(teamId)], String(teamId));
+  }
+
+  private async openTeamDestination(path: string[], entry: string): Promise<void> {
+    this.teamEntryToFocus = entry;
+    if (!await this.navigationService.safeNavigate(path) && this.teamEntryToFocus === entry) {
+      this.teamEntryToFocus = null;
+    }
+  }
+
+  private restoreTeamEntryFocus(): void {
+    if (!this.viewEntered || this.teamsLoading || this.teamEntryToFocus === null) return;
+    const entry = this.teamEntryToFocus;
+    afterNextRender(() => {
+      if (!this.viewEntered || this.teamsLoading || this.teamEntryToFocus !== entry) return;
+      this.teamEntryToFocus = null;
+      const section = this.teamSection?.nativeElement;
+      (section?.querySelector<HTMLElement>(`[data-team-entry="${entry}"]`) ?? section?.querySelector('h2'))?.focus();
+    }, { injector: this.injector });
+  }
+
+  loadTeams(): void {
+    const playerUuid = this.currentPlayerUuid;
+    this.teamInvitationAccess.clear();
+    this.closeTeamAccordion();
+    this.memberTeams = [];
+    this.teamsUnavailable = false;
+    this.teamsLoading = !!playerUuid;
+    if (!playerUuid) return;
+    this.teamApiService.getByPlayer(playerUuid).pipe(
+      takeUntil(this.leave$),
+      finalize(() => {
+        this.teamsLoading = false;
+        this.restoreTeamEntryFocus();
+      }),
+    ).subscribe({
+      next: teams => {
+        this.memberTeams = teams;
+        for (const team of teams) this.loadInviteRoster(team.id);
+      },
+      error: () => (this.teamsUnavailable = true),
+    });
+  }
+
+  toggleTeamAccordion(teamId: number): void {
+    if (!this.canInviteTo(teamId)) return;
+    const alreadyExpanded = this.expandedTeamId === teamId;
+    this.closeTeamAccordion();
+    if (alreadyExpanded) return;
+    this.expandedTeamId = teamId;
+    this.loadTeamMembers(teamId);
+  }
+
+  private closeTeamAccordion(): void {
+    this.teamMembersLoad?.unsubscribe();
+    this.clearInviteSearchTimer();
+    this.expandedTeamId = null;
+    this.inviteQuery = '';
+    this.inviteCandidates = [];
+    this.teamMembers = [];
+    this.teamMembersError = null;
+  }
+
+  onInviteQueryChange(value: string): void {
+    const teamId = this.expandedTeamId;
+    if (teamId === null || !this.canInviteTo(teamId)) return;
+    this.inviteQuery = value;
+    this.clearInviteSearchTimer();
+    const query = value.trim();
+    if (query.length < 2) {
+      this.inviteCandidates = [];
+      return;
+    }
+    this.inviteSearchTimer = window.setTimeout(() => {
+      void this.searchInviteCandidates(teamId, query);
+    }, 300);
+  }
+
+  async onSendTeamInvite(targetUuid: string): Promise<void> {
+    const requesterUuid = this.currentPlayerUuid;
+    const teamId = this.expandedTeamId;
+    if (!requesterUuid || teamId === null || this.inviteSendingUuid || !this.canInviteTo(teamId)) {
+      return;
+    }
+    try {
+      this.inviteSendingUuid = targetUuid;
+      await firstValueFrom(
+        this.socialApiService.createTeamInvite({
+          teamId,
+          requesterUuid,
+          targetUuid,
+        }),
+      );
+      await this.appToastService.success('Invitacion enviada.');
+      if (this.expandedTeamId === teamId) {
+        this.inviteCandidates = this.inviteCandidates.filter((item) => item.atletaUuid !== targetUuid);
+      }
+    } catch (error) {
+      if ((error as ApiError | null)?.status === 403 && this.currentPlayerUuid === requesterUuid) {
+        this.teamInvitationAccess.invalidate(teamId);
+        if (this.expandedTeamId === teamId) {
+          this.inviteCandidates = [];
+          this.loadTeamMembers(teamId);
+        } else if (this.memberTeams.some(team => team.id === teamId)) {
+          this.loadInviteRoster(teamId);
+        }
+        await this.appToastService.error(TEAM_INVITE_FORBIDDEN);
+      } else {
+        await this.appToastService.error(this.errorMapper.toUserMessage(error, 'social'));
+      }
+    } finally {
+      this.inviteSendingUuid = null;
+    }
+  }
+
+  private canInviteTo(teamId: number): boolean {
+    return this.memberTeams.some(team => team.id === teamId) && this.teamInvitationAccess.canInvite(teamId);
+  }
+
+  private loadInviteRoster(teamId: number): void {
+    this.teamInvitationAccess.loadMembers(teamId).pipe(takeUntil(this.leave$)).subscribe({ error: () => undefined });
+  }
+
+  private async searchInviteCandidates(teamId: number, query: string): Promise<void> {
+    const currentUser = this.currentPlayerUuid;
+    if (!currentUser || this.expandedTeamId !== teamId || !this.canInviteTo(teamId)) {
+      return;
+    }
+    try {
+      this.inviteLoading = true;
+      const candidates = await firstValueFrom(this.socialApiService.searchPlayers(query));
+      if (this.expandedTeamId === teamId && this.inviteQuery.trim() === query && this.canInviteTo(teamId)) {
+        this.inviteCandidates = (candidates ?? []).filter((item) => item.atletaUuid !== currentUser);
+      }
+    } catch (error) {
+      this.inviteCandidates = [];
+      await this.appToastService.error(this.errorMapper.toUserMessage(error, 'social'));
+    } finally {
+      this.inviteLoading = false;
+    }
+  }
+
+  private loadTeamMembers(teamId: number): void {
+    this.teamMembersLoad?.unsubscribe();
+    this.teamMembersLoading = true;
+    this.teamMembersError = null;
+    this.teamMembersLoad = this.teamInvitationAccess.loadMembers(teamId).pipe(
+      switchMap(members => members.length ? forkJoin(members.map(member =>
+        this.ratingsApiService.getOverall(member.playerUuid).pipe(
+          catchError(() => of(null)),
+          map(overall => ({ ...member, ovr: overall?.hybridOVR ?? null })),
+        ),
+      )) : of([])),
+      takeUntil(this.leave$),
+      finalize(() => (this.teamMembersLoading = false)),
+    ).subscribe({
+      next: members => (this.teamMembers = members),
+      error: error => {
+        this.teamMembers = [];
+        this.teamMembersError = this.errorMapper.toUserMessage(error, 'social');
+      },
+    });
+  }
+
+  private clearInviteSearchTimer(): void {
+    if (this.inviteSearchTimer) {
+      window.clearTimeout(this.inviteSearchTimer);
+      this.inviteSearchTimer = undefined;
+    }
   }
 
   private applyHistoryContext(history: MatchHistoryViewItem[]): void {

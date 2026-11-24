@@ -373,3 +373,10 @@ Se ejecutó `e2e/05-match-live.spec.ts` con frontend Angular y backend Spring/H2
 - Antes de guardar un nombre distinto se vuelve a consultar la membresía activa. Si el actor perdió la capitanía, Plantel invalida el permiso, cierra el editor y reutiliza el plantel consultado sin enviar el PATCH. El servidor continúa autorizando el cambio. El 409 y el guardado sin respuesta conservan el borrador. Pasados 30 segundos sin confirmar el guardado, el editor vuelve a quedar disponible.
 - El regreso a Social tras archivar omite la animación Ionic únicamente con movimiento reducido. Se conserva el foco en el aviso de éxito y la transición normal.
 - RED: dos fallos en componentes y dos recorridos fallidos a 390 px. La prueba adicional de la espera durante el guardado también falló antes de la corrección. GREEN: 112 pruebas dirigidas, ocho recorridos Chromium con API simulada, lint, build de producción y revisión de whitespace. Confirmación, foco y movimiento verificados a 390 y 1440 px. Queda pendiente la prueba en dispositivo físico y con CAP-03A y CAP-03B desplegados.
+
+### BETA-UX-08 · Mi equipo en Inicio
+
+- Adaptado sobre CAP-03C (`1948af8`). Inicio contiene el acceso a Plantel, las invitaciones y la creación para cuentas sin equipo. Perfil deja de mostrar la sección y de consultar sus equipos. Se conservan el diseño de Inicio y sus flujos de XP y actividad de la base beta.
+- Inicio consulta la membresía activa antes de mostrar invitaciones y vuelve a consultarla al regresar o ante un 403. Plantel mantiene edición, archivado y transferencia según el capitán vigente. El foco vuelve al acceso que abrió el destino o al título de «Mi equipo» si ese acceso dejó de existir.
+- Cambios locales en `codex/beta-ux08-home-team`. SEC-01 y SEC-02 siguen fuera. Sin publicación ni despliegue.
+- Verificación local: 103 pruebas dirigidas, 12 recorridos Playwright con API simulada, lint, build de producción y `git diff --check` aprobados. Los recorridos a 390 y 1440 px verifican el acceso, el regreso con foco, el cambio de capitanía y la creación ante una lista vacía.

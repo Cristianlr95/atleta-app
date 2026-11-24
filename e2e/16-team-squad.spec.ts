@@ -24,7 +24,7 @@ for (const width of [390, 1440]) {
     await installSquad(page);
     const runtimeErrors: string[] = [];
     page.on('pageerror', error => runtimeErrors.push(error.message));
-    await page.goto('/player/profile');
+    await page.goto('/home');
     await page.getByRole('button', { name: 'Ver integrantes de Atleta Prueba FC' }).click();
     await expect(page).toHaveURL(/\/teams\/10$/);
     await expect(page.locator('.team-member')).toHaveCount(3);
