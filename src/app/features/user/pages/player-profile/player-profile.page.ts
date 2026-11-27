@@ -211,7 +211,10 @@ export class PlayerProfilePage implements OnDestroy {
         if (error.status !== 404) failStatistics();
         return of(null);
       })),
-      ratings: this.ratingsApiService.getByRole(atletaUuid).pipe(catchError(() => { failStatistics(); return of([]); })),
+      ratings: this.ratingsApiService.getByRole(atletaUuid).pipe(catchError(error => {
+        if (error.status !== 404) failStatistics();
+        return of([]);
+      })),
       history: this.matchHistoryService.getPlayerHistory(atletaUuid, { requireRatings: true }).pipe(catchError(() => {
         this.historyUnavailable = true;
         failStatistics();

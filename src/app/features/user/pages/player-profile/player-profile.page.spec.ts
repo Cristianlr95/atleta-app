@@ -127,6 +127,20 @@ describe('PlayerProfilePage', () => {
     expect(fixture.nativeElement.textContent).toContain('Aún no hay estadísticas');
     expect(fixture.nativeElement.textContent).toContain('No hay trofeos disponibles');
   });
+
+  it('muestra el estado vacío cuando la API responde 404 para ambos tipos de valoración', () => {
+    authSessionService.currentSession = { user: { atletaUuid: 'ath-1', nombre: 'Ana' } };
+    ratingsApiService.getByRole.and.returnValue(throwError(() => ({ status: 404 })));
+
+    component.ionViewWillEnter();
+    fixture.detectChanges();
+
+    expect(fixture.nativeElement.querySelector('.profile-message[role="status"]')?.textContent)
+      .toContain('Aún no hay estadísticas');
+    expect(fixture.nativeElement.querySelector('[role="alert"]')).toBeNull();
+    expect(fixture.nativeElement.querySelector('.competition-metrics')).toBeNull();
+    component.ionViewWillLeave();
+  });
   it('keeps the team section out of Perfil', () => {
     fixture.detectChanges();
     expect(fixture.nativeElement.querySelector('app-profile-teams')).toBeNull();
